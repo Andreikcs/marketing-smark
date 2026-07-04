@@ -1,0 +1,71 @@
+<!-- @dsCard group="Fundação" -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:1200px;min-height:1200px;background:#F4F2FB;color:#100D1C;font-family:'Archivo',sans-serif;padding:64px 72px;}
+h1{font-family:'Anton';font-size:54px;text-transform:uppercase;}
+.sub{color:#6B6680;font-size:18px;margin:6px 0 34px;max-width:920px;line-height:1.5;}
+.label{font-size:14px;letter-spacing:2px;text-transform:uppercase;color:#8B3CF7;font-weight:700;margin:26px 0 14px;}
+.row{display:flex;gap:16px;}
+.samp{flex:1;height:200px;border-radius:14px;border:1px solid rgba(0,0,0,.12);position:relative;overflow:hidden;}
+/* escuro — roxo/indigo, visual no topo, base limpa p/ texto */
+.s1{background:radial-gradient(110% 80% at 72% 24%,#3a2a6b 0%,#0B0B0B 60%);}
+.s2{background:radial-gradient(100% 70% at 70% 26%,#5326c0 0%,#0B0B0B 58%);}
+.s3{background:radial-gradient(120% 80% at 64% 22%,#2a2350 0%,#0B0B0B 62%);}
+.lt span{color:#4A4560;}
+.l1{background:radial-gradient(120% 95% at 64% 18%,#e6dcff 0%,#F4F2FB 68%);}
+.l2{background:radial-gradient(110% 90% at 60% 20%,#d9c7ff 0%,#F4F2FB 66%);}
+.l3{background:linear-gradient(180deg,#e7e2f3 0%,#F4F2FB 78%);}
+.samp span{position:absolute;bottom:12px;left:14px;font-size:13px;color:#cfcfcf;}
+.blocks{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;}
+.blk{background:#FFFFFF;border:1px solid rgba(0,0,0,.12);border-radius:12px;padding:14px 18px;font-size:14.5px;line-height:1.5;color:#4A4560;}
+.blk b{color:#8B3CF7;}
+.concepts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.tag{background:#FFFFFF;border:1px solid #8B3CF744;color:#8B3CF7;border-radius:999px;padding:6px 13px;font-size:13px;font-weight:600;}
+.flow{background:#FFFFFF;border:1px solid rgba(0,0,0,.12);border-radius:12px;padding:16px 20px;color:#4A4560;font-size:15px;margin-top:8px;line-height:1.5;}
+.flow b{color:#8B3CF7;}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+.ok,.no{border-radius:12px;padding:16px 20px;font-size:15px;line-height:1.5;}
+.ok{background:#F3EDFE;border:1px solid #8B3CF755;color:#4A4560;}
+.no{background:#FBEEEE;border:1px solid #d9534f44;color:#4A4560;}
+.ok b{color:#8B3CF7;} .no b{color:#c0392b;}
+</style></head><body>
+<h1>Estilo de imagem · Direção de arte</h1>
+<div class="sub">Fundo gerado por IA com <b>direção estruturada nível agência</b> (sem texto) + texto/marca por cima (compositor), com <b>grade de acabamento</b> automática. Regra completa no vault: <code>shared/direcao-de-arte.md</code>.</div>
+
+<div class="label">Duas camadas</div>
+<div class="blocks">
+  <div class="blk"><b>1 · Construtor de prompt</b> (<code>_direcao.py</code>) — blocos: conceito · composição guiada pelo layout · luz · lente 85mm · cor (hex estritos) · material · mood · negativos.</div>
+  <div class="blk"><b>2 · Grade de acabamento</b> (compositor, padrão ligado) — duotone roxo + vinheta + grão de filme. Coesão de feed: tudo parece uma marca só.</div>
+</div>
+
+<div class="label">Biblioteca de conceitos por tipo de post</div>
+<div class="concepts">
+  <span class="tag">manifesto</span><span class="tag">núcleo</span><span class="tag">dor</span><span class="tag">provoca</span>
+  <span class="tag">educativo</span><span class="tag">antihype</span><span class="tag">prova</span><span class="tag">autoridade</span>
+  <span class="tag">diferencial</span><span class="tag">cta</span>
+</div>
+
+<div class="label">Direção — tema escuro (secundário)</div>
+<div class="row">
+  <div class="samp s2"><span>Acento roxo na luz · volumétrico</span></div>
+  <div class="samp s1"><span>Visual no topo · profundidade 85mm</span></div>
+  <div class="samp s3"><span>Terço inferior limpo p/ o texto</span></div>
+</div>
+
+<div class="label">Direção — tema claro (PADRÃO)</div>
+<div class="row">
+  <div class="samp lt l1"><span>High-key · lavanda · luz suave</span></div>
+  <div class="samp lt l2"><span>Acento violeta · otimista</span></div>
+  <div class="samp lt l3"><span>Base lavada p/ texto escuro</span></div>
+</div>
+
+<div class="flow">Pipeline: <b>IA gera o fundo dirigido (sem texto)</b> → <b>compositor aplica tipografia real + moldura + grade</b>. Composição <b>guiada pelo layout</b>: a zona do texto (terço inferior) já é reservada no prompt. Cor estrita: roxo/indigo sobre quase-preto (escuro) · off-white + lavanda com acento violeta (claro).</div>
+
+<div class="label">Regras</div>
+<div class="rules">
+  <div class="ok"><b>Sempre</b> · conceito por tipo de post · composição guiada (texto respira) · acento roxo na luz · paleta estrita · grade ligada · alta resolução.</div>
+  <div class="no"><b>Nunca</b> · prompt genérico de uma linha · IA cafona / stock · texto desenhado pela IA · cor fora da paleta (verde/amarelo, mesmo em tema Copa).</div>
+</div>
+</body></html>

@@ -1,0 +1,40 @@
+<!-- @dsCard group="Fundação" -->
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:1200px;min-height:780px;background:#F4F2FB;color:#100D1C;font-family:'Archivo',sans-serif;padding:64px 72px;}
+h1{font-family:'Anton';font-size:54px;text-transform:uppercase;}
+.sub{color:#6B6680;font-size:18px;margin:6px 0 34px;}
+.label{font-size:14px;letter-spacing:2px;text-transform:uppercase;color:#8B3CF7;font-weight:700;margin:26px 0 16px;}
+.wrap{display:flex;gap:40px;align-items:flex-start;}
+.frame{width:300px;height:375px;background:#FFFFFF;border:1px solid rgba(0,0,0,.12);border-radius:12px;position:relative;flex:none;}
+.safe{position:absolute;inset:24px;border:1px dashed #8B3CF788;border-radius:6px;}
+.fl{position:absolute;top:0;left:24px;width:18px;height:50px;background:#8B3CF7;border-radius:0 0 6px 6px;}
+.cap{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:#6B6680;}
+.scale{flex:1;}
+.bar{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
+.bar .blk{height:22px;background:#8B3CF7;border-radius:4px;}
+.bar .v{font-family:monospace;color:#4A4560;font-size:15px;}
+.note{color:#4A4560;font-size:15px;line-height:1.6;margin-top:16px;}
+.note b{color:#8B3CF7;}
+</style></head><body>
+<h1>Grid & espaçamento</h1>
+<div class="sub">Formato base 4:5 (feed). Margem segura e escala consistente.</div>
+<div class="wrap">
+  <div>
+    <div class="label">Formato 4:5 + safe area</div>
+    <div class="frame"><div class="fl"></div><div class="safe"></div><div class="cap">margem 64px · etiqueta na borda</div></div>
+  </div>
+  <div class="scale">
+    <div class="label">Escala de espaçamento (px)</div>
+    <div class="bar"><div class="blk" style="width:8px"></div><div class="v">8</div></div>
+    <div class="bar"><div class="blk" style="width:16px"></div><div class="v">16</div></div>
+    <div class="bar"><div class="blk" style="width:24px"></div><div class="v">24</div></div>
+    <div class="bar"><div class="blk" style="width:32px"></div><div class="v">32</div></div>
+    <div class="bar"><div class="blk" style="width:48px"></div><div class="v">48</div></div>
+    <div class="bar"><div class="blk" style="width:64px"></div><div class="v">64 · margem do post</div></div>
+    <div class="note"><b>Formatos:</b> feed 1080×1350 (4:5) · quadrado 1080×1080 · story 1080×1920. <b>Raio:</b> 16px. <b>Margem:</b> 64px. Headline e chip ancorados na base; etiqueta na borda superior-esquerda; rodapé fixo.</div>
+  </div>
+</div>
+</body></html>

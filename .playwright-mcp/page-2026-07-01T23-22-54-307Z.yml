@@ -1,0 +1,624 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - paragraph [ref=e3]: "Ordo é um sistema de agendamento online com IA no WhatsApp: página profissional criada por IA, agenda inteligente e um agente que atende, agenda e cobra no WhatsApp 24 horas por dia. Feito para barbearias, salões, clínicas, estúdios, personal trainers e profissionais autônomos."
+    - paragraph [ref=e4]: Agenda cheia, cliente fiel — no automático. O sistema para clínicas de estética que vivem de agenda.
+    - paragraph [ref=e5]: Seu cliente descobre você, agenda, paga e volta — no automático. Página profissional, agenda inteligente e um agente de IA no seu WhatsApp, atendendo 24 horas por dia.
+    - heading "Menos buraco na agenda, mais cliente voltando" [level=2] [ref=e6]
+    - article [ref=e7]:
+      - heading "Páginas com IA" [level=3] [ref=e8]
+      - paragraph [ref=e9]: Páginas de agendamento geradas por IA, personalizadas para seu negócio em segundos.
+    - article [ref=e10]:
+      - heading "Agendamento Inteligente" [level=3] [ref=e11]
+      - paragraph [ref=e12]: Calendário online com confirmação automática, lembretes e sincronização com Google Calendar.
+    - article [ref=e13]:
+      - heading "Pagamentos Integrados" [level=3] [ref=e14]
+      - paragraph [ref=e15]: Receba por agendamentos via Pix, cartão ou dinheiro. Integrado com Mercado Pago e Stripe.
+    - article [ref=e16]:
+      - heading "Analytics Completo" [level=3] [ref=e17]
+      - paragraph [ref=e18]: Dashboards com métricas de faturamento, agendamentos e tendências do seu negócio.
+    - article [ref=e19]:
+      - heading "Integrações" [level=3] [ref=e20]
+      - paragraph [ref=e21]: WhatsApp, Google Calendar, notificações por email e muito mais.
+    - heading "Veja como funciona" [level=2] [ref=e22]
+    - article [ref=e23]:
+      - heading "Agendamento de Serviços" [level=3] [ref=e24]
+      - paragraph [ref=e25]: Crie uma página profissional de agendamento para barbearias, salões, clínicas e mais. Seus clientes escolhem serviço, profissional, data e horário — e agendam em segundos.
+    - heading "Veja funcionando. De verdade." [level=2] [ref=e26]
+    - paragraph [ref=e27]: A página de agendamento e o atendente de WhatsApp da Marina Backes, rodando ao vivo. Sem mockup, sem encenação.
+    - article [ref=e28]:
+      - heading "A página" [level=3] [ref=e29]
+      - paragraph [ref=e30]: Seu cliente abre, escolhe o serviço e marca o horário sozinho, em segundos.
+    - article [ref=e31]:
+      - heading "O atendente" [level=3] [ref=e32]
+      - paragraph [ref=e33]: No WhatsApp, a IA responde, entende o pedido e confirma o agendamento. 24 horas por dia.
+  - generic [ref=e34]:
+    - banner [ref=e36]:
+      - generic [ref=e38]:
+        - link "Ordo — home" [ref=e39] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e40]: O
+          - generic [ref=e41]: Ordo
+        - navigation "Main navigation" [ref=e42]:
+          - link "Como funciona" [ref=e43] [cursor=pointer]:
+            - /url: "#how-it-works"
+          - link "Recursos" [ref=e44] [cursor=pointer]:
+            - /url: "#features"
+          - link "Planos" [ref=e45] [cursor=pointer]:
+            - /url: "#pricing"
+          - link "Depoimentos" [ref=e46] [cursor=pointer]:
+            - /url: "#testimonials"
+          - link "FAQ" [ref=e47] [cursor=pointer]:
+            - /url: "#faq"
+        - generic [ref=e48]:
+          - button "Change language" [ref=e50] [cursor=pointer]:
+            - generic [ref=e51]: 🇧🇷
+            - generic [ref=e52]: PT
+            - img [ref=e53]
+          - link "Entrar" [ref=e56] [cursor=pointer]:
+            - /url: /login
+          - link "Comece agora" [ref=e57] [cursor=pointer]:
+            - /url: /criar-conta
+    - main [ref=e58]:
+      - generic [ref=e63]:
+        - generic [ref=e66]: Ordo · O sistema para negócios de agenda
+        - heading "AGENDA CHEIA. CLIENTE FIEL. NO AUTOMÁTICO." [level=1] [ref=e67]:
+          - generic [ref=e68]: AGENDA CHEIA.
+          - generic [ref=e69]: CLIENTE FIEL.
+          - generic [ref=e70]: NO AUTOMÁTICO.
+        - heading "Sistema de agendamento online com IA no WhatsApp para barbearias, salões, clínicas e profissionais que vivem de agenda" [level=2] [ref=e71]
+        - generic [ref=e72]:
+          - generic [ref=e73]: Feito para
+          - generic [ref=e76]: clínicas de estética
+          - generic [ref=e77]: profissionais de serviço.
+          - generic [ref=e78]: · que vivem de agenda.
+        - paragraph [ref=e79]: Seu cliente descobre você, agenda, paga e volta — no automático. Página profissional, agenda inteligente e um agente de IA no seu WhatsApp, atendendo 24 horas por dia.
+        - generic [ref=e80]:
+          - button "Começar grátis" [ref=e81] [cursor=pointer]:
+            - text: Começar grátis
+            - img [ref=e82]
+          - button "Ver demonstração" [ref=e84] [cursor=pointer]:
+            - text: Ver demonstração
+            - generic [ref=e85]: →
+        - generic [ref=e86]:
+          - generic [ref=e87]:
+            - generic [ref=e88]: 24/7
+            - generic [ref=e89]: Sua agenda recebendo, mesmo fora do horário
+          - generic [ref=e90]:
+            - generic [ref=e91]: Zero
+            - generic [ref=e92]: Falta esquecida — lembrete automático no WhatsApp
+          - generic [ref=e93]:
+            - generic [ref=e94]: +Receita
+            - generic [ref=e95]: Cliente paga antes e volta sozinho
+          - generic [ref=e96]:
+            - generic [ref=e97]: 1 lugar
+            - generic [ref=e98]: Página, agenda, pagamento e IA — tudo junto
+      - generic [ref=e99]:
+        - generic [ref=e103]: Negócios autorais que confiam no Ordo
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - img [ref=e107]
+            - generic [ref=e113]: Barbearia
+          - generic [ref=e114]:
+            - img [ref=e115]
+            - generic [ref=e120]: Salão
+          - generic [ref=e121]:
+            - img [ref=e122]
+            - generic [ref=e126]: Clínica
+          - generic [ref=e127]:
+            - img [ref=e128]
+            - generic [ref=e131]: Estúdio
+          - generic [ref=e132]:
+            - img [ref=e133]
+            - generic [ref=e139]: Personal
+          - generic [ref=e140]:
+            - img [ref=e141]
+            - generic [ref=e144]: Mentorias
+          - generic [ref=e145]:
+            - img [ref=e146]
+            - generic [ref=e156]: Psicologia
+          - generic [ref=e157]:
+            - img [ref=e158]
+            - generic [ref=e161]: Nutrição
+          - generic [ref=e162]:
+            - img [ref=e163]
+            - generic [ref=e166]: Dentista
+          - generic [ref=e167]:
+            - img [ref=e168]
+            - generic [ref=e172]: Pacotes
+          - generic [ref=e173]:
+            - img [ref=e174]
+            - generic [ref=e176]: Esteticista
+          - generic [ref=e177]:
+            - img [ref=e178]
+            - generic [ref=e180]: Terapeuta
+          - generic [ref=e181]:
+            - img [ref=e182]
+            - generic [ref=e185]: Consultor
+          - generic [ref=e186]:
+            - img [ref=e187]
+            - generic [ref=e192]: Pet Care
+          - generic [ref=e193]:
+            - img [ref=e194]
+            - generic [ref=e200]: Barbearia
+          - generic [ref=e201]:
+            - img [ref=e202]
+            - generic [ref=e207]: Salão
+          - generic [ref=e208]:
+            - img [ref=e209]
+            - generic [ref=e213]: Clínica
+          - generic [ref=e214]:
+            - img [ref=e215]
+            - generic [ref=e218]: Estúdio
+          - generic [ref=e219]:
+            - img [ref=e220]
+            - generic [ref=e226]: Personal
+          - generic [ref=e227]:
+            - img [ref=e228]
+            - generic [ref=e231]: Mentorias
+          - generic [ref=e232]:
+            - img [ref=e233]
+            - generic [ref=e243]: Psicologia
+          - generic [ref=e244]:
+            - img [ref=e245]
+            - generic [ref=e248]: Nutrição
+          - generic [ref=e249]:
+            - img [ref=e250]
+            - generic [ref=e253]: Dentista
+          - generic [ref=e254]:
+            - img [ref=e255]
+            - generic [ref=e259]: Pacotes
+          - generic [ref=e260]:
+            - img [ref=e261]
+            - generic [ref=e263]: Esteticista
+          - generic [ref=e264]:
+            - img [ref=e265]
+            - generic [ref=e267]: Terapeuta
+          - generic [ref=e268]:
+            - img [ref=e269]
+            - generic [ref=e272]: Consultor
+          - generic [ref=e273]:
+            - img [ref=e274]
+            - generic [ref=e279]: Pet Care
+      - generic [ref=e282]:
+        - generic [ref=e285]: RESULTADO
+        - heading "Menos buraco na agenda, mais cliente voltando" [level=2] [ref=e286]
+        - generic [ref=e287]:
+          - generic [ref=e288]:
+            - img [ref=e290]
+            - heading "Páginas com IA" [level=3] [ref=e295]
+            - paragraph [ref=e296]: Páginas de agendamento geradas por IA, personalizadas para seu negócio em segundos.
+          - generic [ref=e298]:
+            - img [ref=e300]
+            - heading "Atendente no WhatsApp 24/7" [level=3] [ref=e302]
+            - paragraph [ref=e303]: Agente inteligente que conversa, agenda e fecha venda direto no WhatsApp — com o tom da sua marca, lembrando cada cliente pelo nome.
+          - generic [ref=e305]:
+            - img [ref=e307]
+            - heading "Agendamento Inteligente" [level=3] [ref=e309]
+            - paragraph [ref=e310]: Calendário online com confirmação automática, lembretes e sincronização com Google Calendar.
+          - generic [ref=e312]:
+            - img [ref=e314]
+            - heading "Pagamentos Integrados" [level=3] [ref=e316]
+            - paragraph [ref=e317]: Receba por agendamentos via Pix, cartão ou dinheiro. Integrado com Mercado Pago e Stripe.
+          - generic [ref=e319]:
+            - img [ref=e321]
+            - heading "Analytics Completo" [level=3] [ref=e323]
+            - paragraph [ref=e324]: Dashboards com métricas de faturamento, agendamentos e tendências do seu negócio.
+          - generic [ref=e326]:
+            - img [ref=e328]
+            - heading "Integrações" [level=3] [ref=e330]
+            - paragraph [ref=e331]: WhatsApp, Google Calendar, notificações por email e muito mais.
+      - generic [ref=e335]:
+        - generic [ref=e338]: Em números
+        - generic [ref=e339]:
+          - generic [ref=e340]:
+            - generic [ref=e342]: 0 min
+            - paragraph [ref=e343]: para criar sua página
+          - generic [ref=e344]:
+            - generic [ref=e346]: R$ 100
+            - paragraph [ref=e347]: para começar
+          - generic [ref=e348]:
+            - generic [ref=e350]: 0%
+            - paragraph [ref=e351]: de satisfação
+          - generic [ref=e352]:
+            - generic [ref=e354]: 0/7
+            - paragraph [ref=e355]: sempre disponível
+      - generic [ref=e358]:
+        - generic [ref=e359]:
+          - generic [ref=e362]: DEMONSTRAÇÃO REAL
+          - heading "Veja funcionando. De verdade." [level=2] [ref=e363]
+          - paragraph [ref=e364]: A página de agendamento e o atendente de WhatsApp da Marina Backes, rodando ao vivo. Sem mockup, sem encenação.
+        - generic [ref=e366]:
+          - figure "A página Seu cliente abre, escolhe o serviço e marca o horário sozinho, em segundos." [ref=e367]:
+            - generic [ref=e370]:
+              - img [ref=e373]
+              - generic [ref=e378]: ao vivo
+            - generic [ref=e379]:
+              - text: A página
+              - paragraph [ref=e380]: Seu cliente abre, escolhe o serviço e marca o horário sozinho, em segundos.
+          - figure "O atendente No WhatsApp, a IA responde, entende o pedido e confirma o agendamento. 24 horas por dia." [ref=e381]:
+            - generic [ref=e384]:
+              - img [ref=e387]
+              - generic [ref=e392]: ao vivo
+            - generic [ref=e393]:
+              - text: O atendente
+              - paragraph [ref=e394]: No WhatsApp, a IA responde, entende o pedido e confirma o agendamento. 24 horas por dia.
+        - button "Criar minha página" [ref=e396] [cursor=pointer]:
+          - text: Criar minha página
+          - img [ref=e397]
+        - generic [ref=e399]:
+          - generic [ref=e400]:
+            - generic [ref=e403]: HISTÓRIAS REAIS
+            - heading "Quando o cliente manda um áudio." [level=3] [ref=e404]
+            - paragraph [ref=e405]: A IA escuta, entende e responde como gente. Toque para ouvir o áudio real.
+          - generic [ref=e406]:
+            - figure "Mandou um áudio pra desmarcar. A IA entendeu o áudio, liberou o horário e ainda desejou boa viagem." [ref=e407]:
+              - img [ref=e411]
+              - generic [ref=e412]:
+                - heading "Mandou um áudio pra desmarcar." [level=4] [ref=e413]
+                - paragraph [ref=e414]: A IA entendeu o áudio, liberou o horário e ainda desejou boa viagem.
+            - 'figure "Desabafou num áudio difícil. A resposta foi de gente: acolheu primeiro, depois confirmou o atendimento." [ref=e415]':
+              - img [ref=e419]
+              - generic [ref=e420]:
+                - heading "Desabafou num áudio difícil." [level=4] [ref=e421]
+                - paragraph [ref=e422]: "A resposta foi de gente: acolheu primeiro, depois confirmou o atendimento."
+      - generic [ref=e425]:
+        - generic [ref=e428]: Passo a passo
+        - heading "Como funciona" [level=2] [ref=e429]
+        - generic [ref=e430]:
+          - generic [ref=e431]:
+            - button "Página com IA" [ref=e432] [cursor=pointer]:
+              - generic [ref=e433]: "01"
+              - generic [ref=e435]: Página com IA
+              - img [ref=e436]
+            - button "Agendamento" [ref=e441] [cursor=pointer]:
+              - generic [ref=e442]: "02"
+              - generic [ref=e444]: Agendamento
+              - img [ref=e445]
+            - button "Dashboard" [ref=e447] [cursor=pointer]:
+              - generic [ref=e448]: "03"
+              - generic [ref=e450]: Dashboard
+              - img [ref=e451]
+            - button "Agente WhatsApp IA" [ref=e456] [cursor=pointer]:
+              - generic [ref=e457]: "04"
+              - generic [ref=e459]: Agente WhatsApp IA
+              - img [ref=e460]
+          - generic [ref=e464]:
+            - generic [ref=e465]:
+              - img [ref=e467]
+              - generic [ref=e472]:
+                - paragraph [ref=e473]: Passo 1 de 4
+                - heading "Página com IA" [level=3] [ref=e474]
+            - paragraph [ref=e475]: Nossa IA cria uma página de agendamento personalizada para o seu negócio em segundos. Escolha o estilo, as cores e o conteúdo — ou deixe a IA decidir por você.
+            - generic [ref=e476]:
+              - generic [ref=e477]:
+                - generic [ref=e478]: "01"
+                - generic [ref=e479]: Descreva seu negócio
+              - generic [ref=e480]:
+                - generic [ref=e481]: "02"
+                - generic [ref=e482]: A IA gera sua página
+              - generic [ref=e483]:
+                - generic [ref=e484]: "03"
+                - generic [ref=e485]: Publique com um clique
+      - generic [ref=e488]:
+        - generic [ref=e491]: PLANOS
+        - heading "Escolha o plano ideal para você" [level=2] [ref=e492]
+        - paragraph [ref=e493]: Comece grátis e evolua conforme seu negócio cresce.
+        - generic [ref=e494]:
+          - button "Mensal" [ref=e495] [cursor=pointer]
+          - button "Anual" [ref=e496] [cursor=pointer]
+        - generic [ref=e497]:
+          - generic [ref=e498]:
+            - generic [ref=e499]:
+              - img [ref=e501]
+              - heading "Freemium" [level=3] [ref=e503]
+              - paragraph [ref=e504]: Para começar sem cartão
+            - generic [ref=e507]: Grátis
+            - generic [ref=e508]:
+              - generic [ref=e509]:
+                - img [ref=e510]
+                - generic [ref=e512]: 100 créditos IA grátis
+              - generic [ref=e513]:
+                - img [ref=e514]
+                - generic [ref=e516]: "Studio IA: geração de página"
+              - generic [ref=e517]:
+                - img [ref=e518]
+                - generic [ref=e520]: Até 50 agendamentos/mês
+              - generic [ref=e521]:
+                - img [ref=e522]
+                - generic [ref=e524]: 1 serviço cadastrado
+              - generic [ref=e525]:
+                - img [ref=e526]
+                - generic [ref=e528]: Lembretes por WhatsApp
+              - generic [ref=e529]:
+                - img [ref=e530]
+                - generic [ref=e532]: Link personalizado ordoai.app/book/seu-nome
+            - button "Começar grátis" [ref=e533] [cursor=pointer]
+          - generic [ref=e534]:
+            - generic [ref=e535]:
+              - img [ref=e537]
+              - heading "Starter" [level=3] [ref=e539]
+              - paragraph [ref=e540]: Para profissionais em crescimento
+            - generic [ref=e542]:
+              - generic [ref=e543]: R$ 59,90
+              - generic [ref=e544]: /mês
+            - generic [ref=e545]:
+              - generic [ref=e546]:
+                - img [ref=e547]
+                - generic [ref=e549]: Tudo do Freemium +
+              - generic [ref=e550]:
+                - img [ref=e551]
+                - generic [ref=e553]: Até 200 agendamentos/mês
+              - generic [ref=e554]:
+                - img [ref=e555]
+                - generic [ref=e557]: Até 15 serviços
+              - generic [ref=e558]:
+                - img [ref=e559]
+                - generic [ref=e561]: 700 créditos IA/mês
+              - generic [ref=e562]:
+                - img [ref=e563]
+                - generic [ref=e565]: Google Calendar sync
+              - generic [ref=e566]:
+                - img [ref=e567]
+                - generic [ref=e569]: Pagamentos via Pix e cartão
+              - generic [ref=e570]:
+                - img [ref=e571]
+                - generic [ref=e573]: Analytics básico
+              - generic [ref=e574]:
+                - img [ref=e575]
+                - generic [ref=e577]: Agente WhatsApp com IA (usa seus créditos)
+            - button "Escolher plano" [ref=e578] [cursor=pointer]
+          - generic [ref=e579]:
+            - generic [ref=e581]:
+              - img [ref=e582]
+              - text: Mais popular
+            - generic [ref=e584]:
+              - img [ref=e586]
+              - heading "Professional" [level=3] [ref=e588]
+              - paragraph [ref=e589]: Mais popular
+            - generic [ref=e591]:
+              - generic [ref=e592]: R$ 119,90
+              - generic [ref=e593]: /mês
+            - generic [ref=e594]:
+              - generic [ref=e595]:
+                - img [ref=e596]
+                - generic [ref=e598]: Tudo do Starter +
+              - generic [ref=e599]:
+                - img [ref=e600]
+                - generic [ref=e602]: Até 1.000 agendamentos/mês
+              - generic [ref=e603]:
+                - img [ref=e604]
+                - generic [ref=e606]: 1.700 créditos IA/mês
+              - generic [ref=e607]:
+                - img [ref=e608]
+                - generic [ref=e610]: Até 50 serviços
+              - generic [ref=e611]:
+                - img [ref=e612]
+                - generic [ref=e614]: Analytics avançado
+              - generic [ref=e615]:
+                - img [ref=e616]
+                - generic [ref=e618]: Domínio personalizado
+              - generic [ref=e619]:
+                - img [ref=e620]
+                - generic [ref=e622]: Branding customizado
+              - generic [ref=e623]:
+                - img [ref=e624]
+                - generic [ref=e626]: Branding customizado
+            - button "Escolher plano" [ref=e627] [cursor=pointer]
+          - generic [ref=e628]:
+            - generic [ref=e629]:
+              - img [ref=e631]
+              - heading "Enterprise" [level=3] [ref=e635]
+              - paragraph [ref=e636]: Para empresas com múltiplos profissionais
+            - generic [ref=e638]:
+              - generic [ref=e639]: R$ 299,90
+              - generic [ref=e640]: /mês
+            - generic [ref=e641]:
+              - generic [ref=e642]:
+                - img [ref=e643]
+                - generic [ref=e645]: Tudo do Professional +
+              - generic [ref=e646]:
+                - img [ref=e647]
+                - generic [ref=e649]: Agendamentos e serviços ilimitados
+              - generic [ref=e650]:
+                - img [ref=e651]
+                - generic [ref=e653]: 4.500 créditos IA/mês
+              - generic [ref=e654]:
+                - img [ref=e655]
+                - generic [ref=e657]: Permissões e papéis por profissional
+              - generic [ref=e658]:
+                - img [ref=e659]
+                - generic [ref=e661]: "Gestão de equipe: 2 profissionais inclusos"
+              - generic [ref=e662]:
+                - img [ref=e663]
+                - generic [ref=e665]: Profissional adicional por R$ 49,90/mês
+              - generic [ref=e666]:
+                - img [ref=e667]
+                - generic [ref=e669]: Agente WhatsApp com IA e transferência para humano
+            - button "Escolher plano" [ref=e670] [cursor=pointer]
+        - generic [ref=e671]:
+          - generic [ref=e674]: COMPARATIVO
+          - heading "Por que escolher o Ordo?" [level=3] [ref=e675]
+          - table [ref=e678]:
+            - rowgroup [ref=e679]:
+              - row "O Ordo Framer Lovable" [ref=e680]:
+                - columnheader [ref=e681]
+                - columnheader "O Ordo" [ref=e682]:
+                  - generic [ref=e683]:
+                    - generic [ref=e684]: O
+                    - text: Ordo
+                - columnheader "Framer" [ref=e685]
+                - columnheader "Lovable" [ref=e686]
+            - rowgroup [ref=e687]:
+              - row "Página criada por IA" [ref=e688]:
+                - cell "Página criada por IA" [ref=e689]
+                - cell [ref=e690]:
+                  - img [ref=e691]
+                - cell [ref=e693]:
+                  - img [ref=e694]
+                - cell [ref=e697]:
+                  - img [ref=e698]
+              - row "Agendamento online" [ref=e700]:
+                - cell "Agendamento online" [ref=e701]
+                - cell [ref=e702]:
+                  - img [ref=e703]
+                - cell [ref=e705]:
+                  - img [ref=e706]
+                - cell [ref=e709]:
+                  - img [ref=e710]
+              - row "Lembretes automáticos no WhatsApp" [ref=e713]:
+                - cell "Lembretes automáticos no WhatsApp" [ref=e714]
+                - cell [ref=e715]:
+                  - img [ref=e716]
+                - cell [ref=e718]:
+                  - img [ref=e719]
+                - cell [ref=e722]:
+                  - img [ref=e723]
+              - row "Pagamentos (Pix + Cartão)" [ref=e726]:
+                - cell "Pagamentos (Pix + Cartão)" [ref=e727]
+                - cell [ref=e728]:
+                  - img [ref=e729]
+                - cell [ref=e731]:
+                  - img [ref=e732]
+                - cell [ref=e735]:
+                  - img [ref=e736]
+              - row "Tudo em uma plataforma" [ref=e739]:
+                - cell "Tudo em uma plataforma" [ref=e740]
+                - cell [ref=e741]:
+                  - img [ref=e742]
+                - cell [ref=e744]:
+                  - img [ref=e745]
+                - cell [ref=e748]:
+                  - img [ref=e749]
+              - row "Plano gratuito Permanente Limitado" [ref=e752]:
+                - cell "Plano gratuito" [ref=e753]
+                - cell "Permanente" [ref=e754]
+                - cell "Limitado" [ref=e755]
+                - cell [ref=e756]:
+                  - img [ref=e757]
+              - row "Sem código" [ref=e760]:
+                - cell "Sem código" [ref=e761]
+                - cell [ref=e762]:
+                  - img [ref=e763]
+                - cell [ref=e765]:
+                  - img [ref=e766]
+                - cell [ref=e769]:
+                  - img [ref=e770]
+              - row "WhatsApp integrado" [ref=e772]:
+                - cell "WhatsApp integrado" [ref=e773]
+                - cell [ref=e774]:
+                  - img [ref=e775]
+                - cell [ref=e777]:
+                  - img [ref=e778]
+                - cell [ref=e781]:
+                  - img [ref=e782]
+              - row "Preço inicial Grátis US$ 10 (~R$ 58) US$ 20 (~R$ 116)" [ref=e785]:
+                - cell "Preço inicial" [ref=e786]
+                - cell "Grátis" [ref=e787]
+                - cell "US$ 10 (~R$ 58)" [ref=e788]
+                - cell "US$ 20 (~R$ 116)" [ref=e789]
+      - generic [ref=e792]:
+        - generic [ref=e795]: Dúvidas
+        - heading "Perguntas frequentes" [level=2] [ref=e796]
+        - generic [ref=e797]:
+          - button "O Ordo é gratuito?" [ref=e799] [cursor=pointer]:
+            - generic [ref=e800]: O Ordo é gratuito?
+            - img [ref=e801]
+          - button "Preciso saber programar?" [ref=e804] [cursor=pointer]:
+            - generic [ref=e805]: Preciso saber programar?
+            - img [ref=e806]
+          - button "Como funciona o agendamento?" [ref=e809] [cursor=pointer]:
+            - generic [ref=e810]: Como funciona o agendamento?
+            - img [ref=e811]
+          - button "Tem agente de WhatsApp?" [ref=e814] [cursor=pointer]:
+            - generic [ref=e815]: Tem agente de WhatsApp?
+            - img [ref=e816]
+          - button "Quais formas de pagamento?" [ref=e819] [cursor=pointer]:
+            - generic [ref=e820]: Quais formas de pagamento?
+            - img [ref=e821]
+          - button "Posso usar meu domínio próprio?" [ref=e824] [cursor=pointer]:
+            - generic [ref=e825]: Posso usar meu domínio próprio?
+            - img [ref=e826]
+      - generic [ref=e831]:
+        - generic [ref=e834]: COMECE AGORA
+        - heading "Seu negócio merece estar online." [level=2] [ref=e836]
+        - paragraph [ref=e837]: Crie sua página profissional com IA em minutos. Agendamento, vendas, WhatsApp com IA — tudo em um só lugar.
+        - link "Criar minha página agora" [ref=e839] [cursor=pointer]:
+          - /url: /criar-conta
+          - text: Criar minha página agora
+          - img [ref=e840]
+        - generic [ref=e842]:
+          - generic [ref=e843]:
+            - img [ref=e844]
+            - generic [ref=e846]: Sem cartão de crédito
+          - generic [ref=e847]:
+            - img [ref=e848]
+            - generic [ref=e850]: Pronto em minutos
+          - generic [ref=e851]:
+            - img [ref=e852]
+            - generic [ref=e854]: Cancele quando quiser
+    - contentinfo [ref=e855]:
+      - generic [ref=e856]:
+        - generic [ref=e857]:
+          - generic [ref=e858]:
+            - link "O Ordo" [ref=e859] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e860]: O
+              - generic [ref=e861]: Ordo
+            - paragraph [ref=e862]: "Plataforma all-in-one para profissionais de serviço: página premium com IA, agendamento online, gestão de clientes e Agente WhatsApp IA 24/7."
+          - generic [ref=e863]:
+            - heading "Produto" [level=3] [ref=e864]
+            - list [ref=e865]:
+              - listitem [ref=e866]:
+                - link "Recursos" [ref=e867] [cursor=pointer]:
+                  - /url: /#features
+              - listitem [ref=e868]:
+                - link "Preços" [ref=e869] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e870]:
+                - link "Agente WhatsApp IA" [ref=e871] [cursor=pointer]:
+                  - /url: /#whatsapp-agent
+              - listitem [ref=e872]:
+                - link "Depoimentos" [ref=e873] [cursor=pointer]:
+                  - /url: /#testimonials
+              - listitem [ref=e874]:
+                - link "Para o seu negócio" [ref=e875] [cursor=pointer]:
+                  - /url: /para
+          - generic [ref=e876]:
+            - heading "Suporte" [level=3] [ref=e877]
+            - list [ref=e878]:
+              - listitem [ref=e879]:
+                - link "Perguntas frequentes" [ref=e880] [cursor=pointer]:
+                  - /url: /faq
+              - listitem [ref=e881]:
+                - link "Email" [ref=e882] [cursor=pointer]:
+                  - /url: mailto:suporte@ordoai.app
+          - generic [ref=e883]:
+            - heading "Legal" [level=3] [ref=e884]
+            - list [ref=e885]:
+              - listitem [ref=e886]:
+                - link "Sobre" [ref=e887] [cursor=pointer]:
+                  - /url: /sobre
+              - listitem [ref=e888]:
+                - link "Privacidade" [ref=e889] [cursor=pointer]:
+                  - /url: /privacy
+              - listitem [ref=e890]:
+                - link "Termos de Uso" [ref=e891] [cursor=pointer]:
+                  - /url: /terms
+        - generic [ref=e893]:
+          - paragraph [ref=e894]: "Pergunte sobre o Ordo nos seus assistentes:"
+          - generic [ref=e895]:
+            - link "ChatGPT" [ref=e896] [cursor=pointer]:
+              - /url: https://chatgpt.com/?prompt=Summarize%20ordoai.app%20for%20me%20%E2%80%94%20what%20it%20is%2C%20who%20it%20serves%2C%20and%20the%20key%20features.%20Include%20the%20WhatsApp%20AI%20Agent.
+            - link "Claude" [ref=e897] [cursor=pointer]:
+              - /url: https://claude.ai/new?q=Visit%20ordoai.app%20and%20summarize%20it%20for%20a%20service-business%20owner.%20Include%20pricing%20tiers%20and%20the%20WhatsApp%20AI%20Agent%20feature.
+            - link "Perplexity" [ref=e898] [cursor=pointer]:
+              - /url: https://www.perplexity.ai/?q=What%20is%20Ordo%20(ordoai.app)%3F%20Summarize%20the%20product%2C%20target%20audience%2C%20pricing%2C%20and%20unique%20features%20like%20the%20WhatsApp%20AI%20Agent.
+            - link "Gemini" [ref=e899] [cursor=pointer]:
+              - /url: https://gemini.google.com/app?q=Tell%20me%20about%20Ordo%20at%20ordoai.app%20%E2%80%94%20what%20it%20does%2C%20pricing%2C%20and%20how%20its%20WhatsApp%20AI%20Agent%20works.
+        - generic [ref=e900]:
+          - paragraph [ref=e901]: © 2026 Ordo. Todos os direitos reservados.
+          - button "Change language" [ref=e903] [cursor=pointer]:
+            - generic [ref=e904]: 🇧🇷
+            - generic [ref=e905]: PT
+            - img [ref=e906]
+  - region "Notificações alt+T" [ref=e908]

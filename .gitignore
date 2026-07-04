@@ -1,0 +1,10 @@
+# Segredos — nunca versionar
+.env
+.secrets/
+
+# Sistema
+.DS_Store
+
+# Imagens geradas (drafts pesados; regeneráveis pela ficha). As fichas .md ficam versionadas.
+# Cobre tanto arte/<slug>.png (post único) quanto arte/<slug>/NN.png (carrossel).
+**/publicacoes/**/arte/**

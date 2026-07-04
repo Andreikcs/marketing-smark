@@ -1,0 +1,274 @@
+<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Storyboard de Lançamento — Grupo Smark</title>
+<style>
+ :root{--bg:#0B0B0B;--card:#16131f;--line:#2a2440;--rox:#8B3CF7;--txt:#ECEAF5;--sub:#9b95b5;
+   --ok:#5fd98a;--warn:#e8b65a;--gen:#b890ff}
+ *{box-sizing:border-box}
+ body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+ header{position:sticky;top:0;z-index:8;background:#0b0b0bee;backdrop-filter:blur(8px);
+   border-bottom:1px solid var(--line);padding:13px 22px;display:flex;align-items:center;gap:16px}
+ header b{font-size:16px;letter-spacing:.3px} .sp{flex:1}
+ a.nav{color:var(--sub);text-decoration:none;font-size:13px;padding-bottom:2px} a.nav:hover{color:var(--txt)}
+ a.nav.on{color:var(--rox);font-weight:600;border-bottom:2px solid var(--rox)}
+ .tabs{display:flex;gap:8px;padding:14px 22px 0}
+ .tab{padding:8px 15px;border:1px solid var(--line);border-radius:999px;cursor:pointer;font-size:13px;color:var(--sub);background:#120f1b}
+ .tab.on{background:var(--rox);border-color:var(--rox);color:#fff;font-weight:600}
+ /* STORYBOARD STRIP */
+ .stripwrap{padding:14px 22px 8px;border-bottom:1px solid var(--line);background:#0e0c15}
+ .striphdr{display:flex;align-items:center;gap:10px;color:var(--sub);font-size:12px;margin-bottom:9px}
+ .strip{display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:8px}
+ .frame{position:relative;flex:0 0 auto;width:104px;cursor:grab;border-radius:11px;overflow:hidden;
+   border:2px solid transparent;background:#1a1626;transition:.12s}
+ .frame img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;pointer-events:none}
+ .frame.cur{border-color:var(--rox);box-shadow:0 0 0 3px #8b3cf733}
+ .frame.drag{opacity:.35}
+ .frame .pos{position:absolute;top:5px;left:5px;background:#000a;border:1px solid #fff3;color:#fff;
+   font-size:11px;font-weight:700;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+ .frame .dot{position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--sub);box-shadow:0 0 0 2px #000a}
+ .dot.aprovado{background:var(--ok)} .dot.ajustar{background:var(--warn)} .dot.gerado{background:var(--gen)}
+ .arrow{flex:0 0 auto;color:#4a4368;font-size:18px;padding:0 4px;user-select:none}
+ /* FOCUS */
+ .focus{display:grid;grid-template-columns:380px 1fr;gap:26px;padding:22px;align-items:start;max-width:1180px}
+ .pv{position:sticky;top:74px}
+ .pv img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:16px;background:#0e0c16;border:1px solid var(--line)}
+ .pvnav{display:flex;align-items:center;gap:10px;margin-top:12px}
+ .pvnav .q{flex:1;text-align:center;color:var(--sub);font-size:13px}
+ .panel{display:flex;flex-direction:column;gap:14px}
+ .ptop{display:flex;align-items:center;gap:10px}
+ .ptop .tg{font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px}
+ label{font-size:11px;color:var(--sub);display:block;margin:0 0 5px}
+ textarea,input{width:100%;background:#0f0d17;border:1px solid var(--line);border-radius:10px;color:var(--txt);
+   padding:11px;font-size:14px;font-family:inherit;resize:vertical}
+ textarea:focus,input:focus{outline:none;border-color:var(--rox)}
+ .hl{min-height:84px;font-weight:600;font-size:16px;line-height:1.35} .cap{min-height:150px;line-height:1.55}
+ .btn{border:1px solid var(--line);background:#1b1729;color:var(--txt);padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px}
+ .btn:hover{border-color:var(--rox)} .btn:disabled{opacity:.4;cursor:not-allowed}
+ .btn.go{background:var(--rox);border-color:var(--rox);color:#fff;font-weight:600}
+ .row{display:flex;gap:10px;align-items:center}
+ .st{display:flex;gap:7px} .st button{flex:1;padding:9px;border-radius:9px;border:1px solid var(--line);
+   background:#15121e;color:var(--sub);cursor:pointer;font-size:13px}
+ .st button.on-r{background:#3a3550;color:#fff;border-color:#534c70}
+ .st button.on-a{background:#1f7a3d;color:#fff;border-color:#1f7a3d}
+ .st button.on-j{background:#9a6b15;color:#fff;border-color:#9a6b15}
+ .badge{font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--sub)}
+ .badge.aprovado{color:var(--ok);border-color:#1f7a3d} .badge.ajustar{color:var(--warn);border-color:#9a6b15}
+ .badge.gerado{color:var(--gen);border-color:var(--rox)}
+ .saveline{display:flex;align-items:center;gap:12px;margin-top:2px}
+ #dirty{font-size:12px} #dirty.no{color:var(--warn)} #dirty.yes{color:var(--ok)}
+ .footbar{position:sticky;bottom:0;background:#0b0b0bee;backdrop-filter:blur(8px);border-top:1px solid var(--line);
+   padding:12px 22px;display:flex;align-items:center;gap:14px}
+ .hint{font-size:12px;color:var(--sub)}
+ #toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#1b1729;border:1px solid var(--rox);
+   padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.25s;pointer-events:none}
+ #toast.on{opacity:1}
+ @media(max-width:780px){.focus{grid-template-columns:1fr}.pv{position:static}}
+</style></head><body>
+<header>
+  <b>Grupo Smark</b>
+  <a class=nav href="/painel">Conteúdo</a>
+  <a class=nav href="/vitrine">Vitrine</a>
+  <a class="nav on" href="/editor">✎ Storyboard</a>
+  <span class=sp></span>
+  <span id=resumo class=hint></span>
+</header>
+<div class=tabs id=tabs></div>
+
+<div class=stripwrap>
+  <div class=striphdr>
+    <b style="color:var(--txt)">Storyboard</b>
+    <span>— arraste os quadros pra montar a jornada · clique pra editar</span>
+    <span class=sp></span>
+    <span id=stripinfo></span>
+  </div>
+  <div class=strip id=strip></div>
+</div>
+
+<div class=focus>
+  <div class=pv>
+    <img id=fimg src="" alt="">
+    <div class=pvnav>
+      <button class=btn id=bprev>◀ Anterior</button>
+      <span class=q id=q></span>
+      <button class=btn id=bnext>Próxima ▶</button>
+    </div>
+  </div>
+  <div class=panel>
+    <div class=ptop>
+      <span class=tg id=ptipo></span><span class=sp></span>
+      <span class=badge id=pbadge></span>
+    </div>
+    <div><label>Frase da arte — uma linha por quebra · <code>*palavra*</code> = roxo</label>
+      <textarea class=hl id=fhl></textarea></div>
+    <div class=row>
+      <div style="flex:1"><label>Apoio (sub)</label><input id=fsub></div>
+    </div>
+    <div><label>CTA (opcional)</label><input id=fcta></div>
+    <div class=row><button class=btn id=brender>↻ Re-renderizar arte</button>
+      <span class=hint>grátis · redesenha o placeholder com o novo texto</span></div>
+    <div><label>Legenda do Instagram</label><textarea class=cap id=fcap></textarea></div>
+    <div><label>Status do quadro</label>
+      <div class=st>
+        <button id=sr>Rascunho</button>
+        <button id=sa>✓ Aprovar</button>
+        <button id=sj>Ajustar</button>
+      </div></div>
+    <div class=saveline>
+      <button class="btn go" id=bsave>💾 Salvar quadro</button>
+      <span id=dirty></span>
+    </div>
+  </div>
+</div>
+
+<div class=footbar>
+  <span class=hint id=footcont></span>
+  <span class=sp></span>
+  <span class=hint>Aprove os quadros bons e então</span>
+  <button class="btn go" id=bgerar>⚡ Gerar oficiais (aprovadas)</button>
+</div>
+<div id=toast></div>
+
+<script>
+let D=null, ATIVA=null, CUR=0, dirty=false, dragFrom=null;
+const $=s=>document.querySelector(s);
+const recs=()=>D.marcas[ATIVA].recs;
+const cur=()=>recs()[CUR];
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200);}
+function hl2area(h){return (h||'').split('|').join('\n');}
+function setDirty(v){dirty=v;const e=$('#dirty');e.className=v?'no':'yes';e.textContent=v?'● não salvo':'✓ salvo';}
+
+async function carregar(){
+  D=await (await fetch('/dados')).json();
+  if(!ATIVA||!D.marcas[ATIVA])ATIVA=Object.keys(D.marcas)[0];
+  if(CUR>=recs().length)CUR=0;
+  render();
+}
+function render(){renderTabs();renderStrip();renderFocus();}
+
+function renderTabs(){
+  const t=$('#tabs');t.innerHTML='';
+  Object.keys(D.marcas).forEach(m=>{
+    const r=D.marcas[m].recs, ap=r.filter(x=>x.status==='aprovado').length;
+    const el=document.createElement('div');el.className='tab'+(m===ATIVA?' on':'');
+    el.textContent=m+' · '+ap+'/'+r.length;
+    el.onclick=async()=>{await maybeSave();ATIVA=m;CUR=0;render();};
+    t.appendChild(el);
+  });
+  const info=D.marcas[ATIVA], ap=info.recs.filter(x=>x.status==='aprovado').length, aj=info.recs.filter(x=>x.status==='ajustar').length;
+  $('#resumo').textContent=info.handle;
+  $('#footcont').innerHTML='<b>'+ATIVA+'</b> · '+info.recs.length+' quadros · <span style="color:var(--ok)">'+ap+' aprovados</span> · <span style="color:var(--warn)">'+aj+' p/ ajustar</span>';
+  $('#stripinfo').textContent=ap+'/'+info.recs.length+' aprovados';
+  $('#bgerar').disabled=ap===0;$('#bgerar').textContent='⚡ Gerar oficiais ('+ap+')';
+}
+
+function renderStrip(){
+  const s=$('#strip');s.innerHTML='';
+  recs().forEach((r,i)=>{
+    const f=document.createElement('div');
+    f.className='frame'+(i===CUR?' cur':'');f.draggable=true;f.dataset.i=i;
+    f.innerHTML=`<img src="/${encodeURI(r.thumb)}?t=${Date.now()}" alt="">
+      <span class=pos>${i+1}</span><span class="dot ${r.status}"></span>`;
+    f.onclick=()=>go(i);
+    f.ondragstart=e=>{dragFrom=i;f.classList.add('drag');e.dataTransfer.effectAllowed='move';};
+    f.ondragend=()=>{f.classList.remove('drag');};
+    f.ondragover=e=>{e.preventDefault();};
+    f.ondrop=e=>{e.preventDefault();reorder(dragFrom,i);};
+    s.appendChild(f);
+    if(i<recs().length-1){const a=document.createElement('span');a.className='arrow';a.textContent='→';s.appendChild(a);}
+  });
+}
+
+function renderFocus(){
+  const r=cur();
+  $('#fimg').src='/'+encodeURI(r.thumb)+'?t='+Date.now();
+  $('#q').textContent='Quadro '+(CUR+1)+' de '+recs().length;
+  $('#ptipo').textContent='#'+String(r.n).padStart(2,'0')+' · '+r.tipo;
+  $('#fhl').value=hl2area(r.headline);
+  $('#fsub').value=r.sub||'';
+  $('#fcta').value=r.cta||'';
+  $('#fcap').value=r.caption||'';
+  pintaStatus(r.status);
+  $('#bprev').disabled=CUR===0;$('#bnext').disabled=CUR===recs().length-1;
+  setDirty(false);
+}
+function pintaStatus(st){
+  $('#sr').className=st==='rascunho'?'on-r':'';
+  $('#sa').className=st==='aprovado'?'on-a':'';
+  $('#sj').className=st==='ajustar'?'on-j':'';
+  $('#pbadge').className='badge '+st;$('#pbadge').textContent=st;
+}
+
+async function go(i){
+  if(i===CUR)return;
+  await maybeSave();
+  CUR=i;renderStrip();renderFocus();
+}
+async function maybeSave(){if(dirty)await salvar(false,true);}
+
+async function salvar(rerender,silent){
+  const r=cur();
+  const body={marca:ATIVA,n:r.n,headline:$('#fhl').value,sub:$('#fsub').value,
+    cta:$('#fcta').value,caption:$('#fcap').value,rerender};
+  if(!silent)toast(rerender?'renderizando…':'salvando…');
+  const res=await (await fetch('/salvar',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)})).json();
+  if(!res.ok){toast('erro: '+(res.erro||'?'));return;}
+  // atualiza estado local (sem perder a posição no array)
+  r.headline=$('#fhl').value.split('\n').map(x=>x.trim()).filter(Boolean).join('|');
+  r.sub=$('#fsub').value.trim();r.cta=$('#fcta').value.trim();r.caption=$('#fcap').value;
+  r.thumb=res.thumb;
+  setDirty(false);
+  if(res.rerender){
+    $('#fimg').src='/'+encodeURI(r.thumb)+'?t='+Date.now();
+    const fr=document.querySelector('.frame[data-i="'+CUR+'"] img');if(fr)fr.src='/'+encodeURI(r.thumb)+'?t='+Date.now();
+  }
+  if(!silent)toast(res.rerender?'arte re-renderizada ✓':'salvo ✓');
+}
+
+async function setStatus(st){
+  const r=cur();r.status=st;pintaStatus(st);
+  const fr=document.querySelector('.frame[data-i="'+CUR+'"] .dot');if(fr)fr.className='dot '+st;
+  await fetch('/status',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({marca:ATIVA,n:r.n,status:st})});
+  renderTabs();
+  toast('status: '+st);
+}
+
+function reorder(from,to){
+  if(from===null||from===to)return;
+  const curN=cur().n;
+  const arr=recs();const it=arr.splice(from,1)[0];arr.splice(to,0,it);
+  CUR=arr.findIndex(x=>x.n===curN);
+  renderStrip();renderFocus();renderTabs();
+  fetch('/ordem',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({marca:ATIVA,ordem:arr.map(x=>x.n)})});
+  toast('ordem salva ✓');
+}
+
+async function gerar(){
+  await maybeSave();
+  const ap=recs().filter(x=>x.status==='aprovado').length;
+  if(!ap)return toast('aprove ao menos 1 quadro');
+  if(!confirm('Gerar '+ap+' fundo(s) de IA REAIS para '+ATIVA+'?\n\nConsome créditos da API (só as aprovadas).'))return;
+  $('#bgerar').disabled=true;toast('gerando '+ap+' fundo(s) reais… pode levar ~'+ap+' min');
+  const r=await (await fetch('/gerar',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({marca:ATIVA})})).json();
+  await carregar();
+  toast('oficiais: '+((r.feitas||[]).length)+' geradas'+((r.falhas||[]).length?' · '+r.falhas.length+' falharam':''));
+}
+
+['fhl','fsub','fcta','fcap'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)setDirty(true);}));
+$('#bprev').onclick=()=>go(CUR-1);
+$('#bnext').onclick=()=>go(CUR+1);
+$('#brender').onclick=()=>salvar(true);
+$('#bsave').onclick=()=>salvar(false);
+$('#sr').onclick=()=>setStatus('rascunho');
+$('#sa').onclick=()=>setStatus('aprovado');
+$('#sj').onclick=()=>setStatus('ajustar');
+$('#bgerar').onclick=gerar;
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowLeft')go(CUR-1);if(e.key==='ArrowRight')go(CUR+1);
+});
+carregar();
+</script></body></html>
