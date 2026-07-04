@@ -72,7 +72,7 @@
           "bgmode": "claro",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave-bg.png",
           "cor": "",
-          "accent": "#f7863b",
+          "accent": "#8b14f7",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/01.png",
@@ -119,14 +119,15 @@
           "page": "04/06",
           "chip": false,
           "tema": "escuro",
-          "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave-bg.png",
+          "bgmode": "escuro",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_regen/04-51cbfd.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/04.png",
-          "n": 4
+          "n": 4,
+          "_v": 2
         },
         {
           "headline": "NINGUÉM FALA EM|*SUBSTITUIR GENTE.*",
