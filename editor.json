@@ -63,13 +63,13 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "USAR IA VIROU|*DECISÃO DE|GESTÃO.*",
-          "sub": "Deixou de ser vantagem. — Dados de mercado 👉",
+          "headline": "USAR IA VIROU|*DECISÃO ESTRATÉGICA.*",
+          "sub": "Deixou de ser opção. — Dados de mercado 👉",
           "cta": "",
           "page": "01/06",
           "chip": true,
           "tema": "escuro",
-          "bgmode": "imagem",
+          "bgmode": "claro",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave-bg.png",
           "cor": "",
           "accent": "",
@@ -79,20 +79,21 @@
           "n": 1
         },
         {
-          "headline": "*78%*",
-          "sub": "das empresas já usam IA — quase o dobro de um ano antes. Não é tendência distante. É o presente.  ·  Fonte: Stanford AI Index · 2025",
+          "headline": "*78% das empresas*",
+          "sub": "já usam IA — quase o dobro de um ano atrás. Não é tendência distante. É o presente.  ·  Fonte: Stanford AI Index · 2025",
           "cta": "",
           "page": "02/06",
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave-bg.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_regen/02-b51740.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/02.png",
-          "n": 2
+          "n": 2,
+          "_v": 4
         },
         {
           "headline": "*62%*",
