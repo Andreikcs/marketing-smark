@@ -4,40 +4,37 @@ canal: instagram
 formato: carrossel
 status: draft
 data: 2026-07-04
-tema: Contratação sem currículo (Chegada — post 1/5)
+tema: Chegada — sua próxima contratação (post 1/5)
 campanha: lancamento-funcionarios-ia
 arte: arte/contratacao-sem-curriculo/
 arte-frames: 3
 arte-paleta: roxo
+arte-tema: escuro
 drive: "Smark — Posts/smark/2026-07-04-contratacao-sem-curriculo/"
-alt: "Capa roxa clara: 'Sua próxima contratação não precisa de currículo', com selo uma plataforma smark."
-tags: [carrossel, campanha-lancamento, angulo-contexto-economico]
-referencias-usadas: ["skill smark-positioning (arco de lançamento, post 1)"]
-pilares: ["Construir em volta do que já existe"]
+alt: "Capa escura dramática: 'Sua próxima contratação não precisa de currículo', com a palavra contratação em roxo."
+tags: [carrossel, campanha-lancamento, contratacao, gestao]
+referencias-usadas: ["Campanha_Lancamento_smark.md (copy final — post 1)"]
+pilares: ["tendencias_mercado"]
 url-publicado:
 ---
 
-# Contratação sem currículo — carrossel (post 1/5)
+# Chegada — carrossel (post 1/5)
 
-> **Estratégia:** Ângulo 3 (contexto econômico). Filtro dos 3 Testes ✅ — fala da decisão do dono (não da ferramenta), vende a consequência (contratar sem o custo/risco), tom de gestão. CTA: diagnóstico gratuito.
+> **Estratégia:** Pilar tendências de mercado. Ancora na dor de contratação (caro/lento/arriscado). Filtro dos 3 Testes ✅. Copy final do documento de campanha.
 
 ![[arte/contratacao-sem-curriculo/01.png]]
 
 ## Frames
-1. Capa: SUA PRÓXIMA CONTRATAÇÃO NÃO PRECISA DE *CURRÍCULO.*
-2. Contratar gente boa hoje é caro, demora meses — e se não der certo, você recomeça do zero.
-3. E se o departamento ganhasse um funcionário de IA que já chega pronto, trabalhando na mão do seu time? O primeiro passo não é contratar. É o diagnóstico. →
+1. Capa: Sua próxima contratação não precisa de *currículo*, salário ou treinamento de 3 meses.
+2. Contratar no Brasil hoje é caro, lento e arriscado. Você entrevista, treina por meses, e ainda torce pra pessoa ficar. Enquanto isso, o trabalho não espera.
+3. CTA: E se parte da sua operação pudesse começar a rodar amanhã — sem processo seletivo, sem folha, sem rotatividade? Essa é a smark. Nos próximos dias, conheça como. 👇
 
 ## Legenda
-Sua próxima contratação não precisa de currículo, salário fixo nem três meses de treinamento.
+A parte mais cara de crescer uma empresa não é o salário. É o tempo e o risco de cada contratação.
 
-Contratar gente boa no Brasil hoje é caro, lento e arriscado. E quando a vaga é pra tarefa repetitiva, fica pior: você paga caro por trabalho que não exige uma pessoa inteira o dia todo.
+E se algumas funções da sua empresa não precisassem passar por isso?
 
-A smark coloca um funcionário de IA em cada departamento — trabalhando junto do seu time, no que você já usa. Sem trocar o que funciona.
-
-O primeiro passo não é contratar IA. É entender onde ela se pagaria primeiro na sua empresa. Isso é o diagnóstico gratuito.
-
-Chama a smark e faça o seu. →
+Essa semana a gente te apresenta um jeito diferente de resolver. Salva e acompanha. 👇
 
 ## Hashtags
-#inteligenciaartificial #gestao #produtividade #pequenaempresa #smark
+#contratacao #gestao #IAparaempresas #pmesbrasil #produtividade

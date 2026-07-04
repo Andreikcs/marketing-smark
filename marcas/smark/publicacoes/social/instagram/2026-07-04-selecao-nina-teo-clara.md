@@ -9,43 +9,34 @@ campanha: lancamento-funcionarios-ia
 arte: arte/selecao-nina-teo-clara/
 arte-frames: 5
 arte-paleta: roxo
+arte-tema: escuro
 drive: "Smark — Posts/smark/2026-07-04-selecao-nina-teo-clara/"
-alt: "Capa roxa clara: 'Conheça a seleção da smark', apresentando os funcionários de IA Nina, Téo, Clara e Marta."
-tags: [carrossel, campanha-lancamento, angulo-produtividade, personagens]
-referencias-usadas: ["skill smark-positioning (post 3)", "[[funcionarios-ia]]", "[[site-oficial]]"]
-pilares: ["O funcionário de IA que resolve uma função"]
+alt: "Capa escura: 'A smark selecionou 3 profissionais pra sua empresa', apresentando Nina, Téo e Clara."
+tags: [carrossel, campanha-lancamento, personagens, bastidores]
+referencias-usadas: ["Campanha_Lancamento_smark.md (copy final — post 3)", "[[funcionarios-ia]]"]
+pilares: ["bastidores_processo"]
 url-publicado:
 ---
 
 # Conheça a seleção da smark — carrossel (post 3/5)
 
-> **Estratégia:** Ângulo 1 (produtividade). Filtro dos 3 Testes ✅ — cada personagem apresentado **pela consequência pro dono**, nunca pela mecânica. Papéis traduzidos do site (sem SDR/BDR/CS). Coração da marca. CTA: diagnóstico.
+> **Estratégia:** post mais compartilhável — dá rosto e memória à marca. **Três personagens: Nina, Téo, Clara** (sem Marta neste arco). Cada um apresentado pelo que RESOLVE, nunca pela mecânica. Copy final do documento.
 
 ![[arte/selecao-nina-teo-clara/01.png]]
 
 ## Frames
-1. Capa: CONHEÇA A SELEÇÃO DA *SMARK.* — os funcionários de IA que trabalham na mão do seu time.
-2. Nina — com ela, nenhuma oportunidade fica sem resposta porque "não deu tempo". Ela é o primeiro atendimento de quem te chama.
-3. Téo — sua agenda comercial não fica vazia porque ninguém teve tempo de ir atrás. Ele vai atrás de cliente novo, todo dia.
-4. Clara — quem já é seu cliente não é esquecido depois da compra. Ela cuida de quem já confiou em você.
-5. Marta — a mãe de todos. Ela mostra onde a IA se pagaria primeiro na sua empresa. É por ela que começa. →
+1. Capa: A smark selecionou 3 profissionais pra sua empresa. Nenhum deles vai pedir *demissão*. 👇
+2. NINA · Pré-vendas — o que ela resolve: nenhuma oportunidade fica sem resposta porque "não deu tempo". Seu time só investe energia em quem realmente importa.
+3. TÉO · Prospecção — o que ele resolve: a agenda comercial que vive vazia porque prospectar toma tempo que ninguém tem. O funil abastecido sem depender de ânimo ou disponibilidade.
+4. CLARA · Receita e relacionamento — o que ela resolve: o cliente que compra e depois é esquecido. Quem já confiou na sua empresa continua bem cuidado.
+5. CTA: Nina, Téo e Clara. Sua próxima contratação começa com uma conversa. 👇 Link na bio.
 
 ## Legenda
-A smark tem um time. E ele já chega treinado.
+Apresentando a seleção da smark. 👋
 
-Conheça a seleção:
+Não são robôs de "aperte 1". São funções inteiras da sua empresa, cobertas por IA que trabalha na mão do seu time — não no lugar dele.
 
-Nina — o primeiro atendimento. Com ela, nenhuma oportunidade fica sem resposta porque "não deu tempo".
-
-Téo — vai atrás de cliente novo todo dia, pra sua agenda comercial não ficar vazia por falta de tempo de alguém.
-
-Clara — cuida de quem já é seu cliente. Quem comprou não é esquecido no dia seguinte.
-
-Marta — a mãe de todos. Ela faz o diagnóstico: mostra onde a IA se pagaria primeiro na sua empresa.
-
-Não são robôs de "aperte 1". É uma função inteira do seu negócio, coberta — na mão do seu time, no que você já usa.
-
-Quer saber qual deles faz mais sentido pra você? Começa pela Marta. Chama a smark pro diagnóstico gratuito. →
+Qual dessas áreas mais dói na sua operação hoje? Comenta. 👇
 
 ## Hashtags
-#inteligenciaartificial #funcionariosdeia #gestao #produtividade #smark
+#IAparaempresas #prevendas #prospeccao #relacionamento #pmesbrasil

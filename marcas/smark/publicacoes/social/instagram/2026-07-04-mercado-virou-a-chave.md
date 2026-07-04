@@ -4,40 +4,44 @@ canal: instagram
 formato: carrossel
 status: draft
 data: 2026-07-04
-tema: O mercado virou a chave (post 2/5)
+tema: Virou decisão de gestão — dados de mercado (post 2/5)
 campanha: lancamento-funcionarios-ia
 arte: arte/mercado-virou-a-chave/
-arte-frames: 3
+arte-frames: 6
 arte-paleta: roxo
+arte-tema: escuro
 drive: "Smark — Posts/smark/2026-07-04-mercado-virou-a-chave/"
-alt: "Capa roxa clara: 'IA na empresa virou decisão de gestão', com selo uma plataforma smark."
-tags: [carrossel, campanha-lancamento, angulo-contexto-economico, dados-mercado]
-referencias-usadas: ["skill smark-positioning (post 2)", "[[dados-mercado]] (dados verificados 2026-07-04)"]
-pilares: ["Maturidade acima do hype"]
+alt: "Capa escura: 'Usar IA virou decisão de gestão', seguida de cards de dados 78%, 62%, +40%."
+tags: [carrossel, campanha-lancamento, dados-mercado, gestao]
+referencias-usadas: ["Campanha_Lancamento_smark.md (copy final — post 2)", "[[dados-mercado]] (fontes primárias)"]
+pilares: ["tendencias_mercado"]
 url-publicado:
 ---
 
-# O mercado virou a chave — carrossel (post 2/5)
+# Virou decisão de gestão — carrossel (post 2/5)
 
-> **Estratégia:** Ângulo 3 (contexto econômico) com enquadramento de maturidade. Filtro dos 3 Testes ✅ — dado enquadrado como decisão de gestão, nunca "saia na frente". **Dados verificados** em [[dados-mercado]] (registrados como usados aqui): ~25% das empresas BR já com IA em produção; Deloitte projeta metade até 2027.
+> **Estratégia:** prova que IA na operação é movimento sério e consolidado, sem "saia na frente". **Dados de fontes primárias** (Stanford AI Index 2025, McKinsey 2025, Harvard+BCG 2023) — registrados em [[dados-mercado]]. Fonte citada como TEXTO na arte, nunca o logo da instituição.
 
 ![[arte/mercado-virou-a-chave/01.png]]
 
 ## Frames
-1. Capa: IA NA EMPRESA DEIXOU DE SER APOSTA. VIROU *DECISÃO DE GESTÃO.*
-2. Cerca de 1 em cada 4 empresas brasileiras já trabalha com IA na operação — mais que o dobro de um ano atrás. (fonte: IDC, 2026)
-3. E a projeção é que metade das empresas tenha funcionários de IA até 2027. A pergunta não é mais "se". É "por onde começar". O diagnóstico responde isso. →
+1. Capa: Usar IA na sua empresa deixou de ser vantagem. Virou *decisão de gestão*. (selo: Dados de mercado)
+2. *78%* das empresas já usam IA — quase o dobro de um ano antes. Não é tendência distante. É o presente. (Fonte: Stanford AI Index · 2025)
+3. *62%* já experimentam agentes de IA dentro dos processos. A pergunta mudou de "se" para "quando". (Fonte: McKinsey · 2025)
+4. *+40%* mais qualidade nas entregas com apoio de IA. Não é sobre gastar menos. É entregar melhor. (Fonte: Harvard + BCG · 2023)
+5. A virada: repare no que esses números NÃO dizem. Nenhum deles fala em "substituir gente". Todos falam em fazer o mesmo time entregar mais e melhor.
+6. CTA: Enquanto o mercado decide onde aplicar IA primeiro, a gente ajuda você a decidir onde ela se pagaria na sua empresa. Diagnóstico gratuito 👉 link na bio. smark. — um funcionário de IA para cada departamento.
 
 ## Legenda
-IA na empresa deixou de ser aposta de gente inovadora. Virou decisão de gestão.
+Quando um movimento sai do grupo dos "inovadores" e vira maioria, ele deixa de ser aposta e passa a ser gestão.
 
-Os números do mercado contam a virada: cerca de 1 em cada 4 empresas brasileiras já trabalha com IA na operação — mais que o dobro de um ano atrás (IDC, 2026). E a projeção é que metade das empresas tenha funcionários de IA até 2027 (Deloitte).
+Os números de Stanford, McKinsey e Harvard/BCG mostram a mesma coisa por ângulos diferentes: IA na operação não é mais tendência distante — é decisão que empresas sérias já estão tomando.
 
-Isso não é sobre moda nem sobre "sair na frente". É que a conta mudou: contratar ficou caro, o time está sobrecarregado, e dá pra entregar mais sem inchar a estrutura.
+E repare no ponto que quase ninguém comenta: nenhum desses estudos fala em substituir pessoas. Todos falam em fazer o mesmo time produzir mais e melhor.
 
-A maioria trava porque não sabe por onde começar. O primeiro degrau é simples e não custa nada: um diagnóstico que mostra onde a IA se pagaria primeiro na sua empresa.
+A pergunta, então, não é mais "devo usar IA?". É "por onde eu começo?".
 
-Chama a smark. →
+Salva esse post — e quando quiser responder essa pergunta pra sua empresa, o diagnóstico gratuito está no link da bio. 👇
 
 ## Hashtags
-#inteligenciaartificial #gestao #produtividade #tecnologia #smark
+#inteligenciaartificial #gestaoempresarial #produtividade #IAparaempresas #pmesbrasil #tecnologia

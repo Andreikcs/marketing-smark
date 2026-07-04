@@ -22,6 +22,19 @@ regra: consultar a fonte externamente antes de usar; registrar aqui o que já fo
 | **78% das empresas brasileiras** planejam ampliar investimento em IA | IBM (Global AI Adoption) | ✅ | reserva |
 | Apenas **1 em 5 empresas** tem modelo maduro de governança de agentes de IA | Deloitte 2026 | ✅ | reserva (ângulo método/medo) |
 
+## Campanha de lançamento — fontes primárias (doc 2026-07-04, verificadas)
+
+Regra: citar como **texto** na arte (nome + ano), **nunca o logo** da instituição (não são parceiras; logo sugere endosso = risco jurídico).
+
+| Dado | Fonte primária | Confiança | Usado em |
+|---|---|---|---|
+| **78%** das empresas já usam IA (quase o dobro de um ano antes; 78% em 2024 vs 55% antes) | Stanford AI Index Report 2025 — Stanford HAI · https://hai.stanford.edu/ai-index/2025-ai-index-report | ✅ | post 2, slide 2 |
+| **62%** já experimentam agentes de IA nos processos (23% escalando + 39% experimentando) | McKinsey, The State of AI in 2025 (QuantumBlack), nov/2025 · https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai | ✅ | post 2, slide 3 |
+| **+40%** mais qualidade nas entregas com apoio de IA | Harvard Business School + BCG, "Navigating the Jagged Technological Frontier", WP 24-013, set/2023 · https://www.hbs.edu/faculty/Pages/item.aspx?num=64700 | ✅ | post 2, slide 4 |
+
+> **Pendência (doc):** usar Stanford **78% (2025)** ou **88% (AI Index 2026)** na arte? Default atual = 78%. · Datar Harvard/BCG como **2023** ou **2026** (publicação em Organization Science), nunca "2024".
+> **Bônus de posicionamento:** Erik Brynjolfsson (Stanford Digital Economy Lab) — ganho de produtividade da IA vem de potencializar funcionários, não cortar mão de obra (alinhado ao discurso homem-máquina da smark).
+
 ## Da skill — revisar antes de usar
 
 | Dado (como veio na skill) | Situação | Ação |
