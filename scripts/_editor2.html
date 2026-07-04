@@ -68,6 +68,8 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 
 <script>
 const $=s=>document.querySelector(s);
+const TOKEN="__EDITOR_TOKEN__";
+const HJSON={'Content-Type':'application/json','X-Editor-Token':TOKEN};
 let D=null, PI=0, FI=0, dirty=false, tmr=null;
 
 const TIPOS=["manifesto","dor","provoca","educativo","antihype","prova","autoridade","diferencial","nucleo","cta"];
@@ -187,7 +189,7 @@ function renderCtrl(){
 function change(){renderStrip();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
 
 async function preview(){
-  const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json'},
+  const r=await fetch('/preview',{method:'POST',headers:HJSON,
     body:JSON.stringify({frame:frame(),size:post().size})});
   const html=await r.text();
   $('#pv').srcdoc=html;
@@ -203,7 +205,7 @@ function fit(){
 window.addEventListener('resize',fit);
 
 async function salvar(){
-  await fetch('/salvar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dados:D})});
+  await fetch('/salvar',{method:'POST',headers:HJSON,body:JSON.stringify({dados:D})});
   setDirty(false);toast('Salvo em editor.json');
 }
 $('#bsave').onclick=salvar;
@@ -211,7 +213,7 @@ $('#bsave').onclick=salvar;
 async function exportar(btn,scope){
   btn.disabled=true;const old=btn.textContent;btn.textContent='Exportando…';
   await salvar();
-  const r=await(await fetch('/exportar',{method:'POST',headers:{'Content-Type':'application/json'},
+  const r=await(await fetch('/exportar',{method:'POST',headers:HJSON,
     body:JSON.stringify({post:PI,frame:scope})})).json();
   btn.disabled=false;btn.textContent=old;
   if(r.ok){post().frames.forEach(f=>f._v=(f._v||0)+1);renderStrip();renderCtrl();toast('Exportado: '+r.feitas.length+' PNG');}
@@ -222,7 +224,7 @@ async function upload(file){
   if(!file)return;const rd=new FileReader();
   rd.onload=async()=>{
     toast('Enviando imagem…');
-    const r=await(await fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+    const r=await(await fetch('/upload',{method:'POST',headers:HJSON,
       body:JSON.stringify({slug:post().slug,dataurl:rd.result})})).json();
     if(r.ok){const f=frame();f.bgmode='imagem';f.bg=r.path;f._v=(f._v||0)+1;renderCtrl();change();toast('Fundo trocado');}
     else toast('Erro no upload: '+(r.erro||''));
@@ -232,7 +234,7 @@ async function upload(file){
 async function regen(btn,ref){
   btn.disabled=true;const old=btn.textContent;btn.textContent='Gerando fundo…';toast('Gerando fundo por IA (pago)…');
   const f=frame();
-  const r=await(await fetch('/regerar-fundo',{method:'POST',headers:{'Content-Type':'application/json'},
+  const r=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,
     body:JSON.stringify({post:PI,frame:FI,tipo:f._tipo||'manifesto',ref:ref||''})})).json();
   btn.disabled=false;btn.textContent=old;
   if(r.ok){f.bgmode='imagem';f.bg=r.path;f._v=(f._v||0)+1;renderCtrl();change();toast('Fundo regerado');}

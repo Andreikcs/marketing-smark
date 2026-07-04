@@ -11,6 +11,7 @@ import hashlib
 import http.server
 import json
 import os
+import secrets
 import socketserver
 import subprocess
 import sys
@@ -22,6 +23,11 @@ sys.path.insert(0, HERE)
 import compositor  # noqa: E402
 
 PORT = 8765
+# Segurança (CSRF / DNS rebinding): o servidor é local, mas tem rotas que gastam
+# dinheiro (regerar-fundo→OpenAI) e escrevem em disco. Um site malicioso aberto no
+# navegador poderia dar POST em localhost. Defesa: Host + Origin + token de sessão.
+ALLOWED_HOSTS = {"127.0.0.1:8765", "localhost:8765"}
+TOKEN = secrets.token_hex(16)  # novo a cada boot; injetado no HTML servido
 DATA = os.path.join(VAULT, "editor.json")
 UI = os.path.join(HERE, "_editor2.html")
 MIME = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
@@ -83,10 +89,25 @@ class H(http.server.BaseHTTPRequestHandler):
         n = int(self.headers.get("Content-Length", 0))
         return json.loads(self.rfile.read(n) or b"{}")
 
+    def _host_ok(self):
+        return self.headers.get("Host", "") in ALLOWED_HOSTS
+
+    def _post_allowed(self):
+        """POST muda estado / gasta dinheiro → exige Host + Origin próprios + token."""
+        if not self._host_ok():
+            return False
+        origin = self.headers.get("Origin")
+        if origin and urllib.parse.urlparse(origin).netloc not in ALLOWED_HOSTS:
+            return False
+        return self.headers.get("X-Editor-Token", "") == TOKEN
+
     def do_GET(self):
         path = urllib.parse.urlparse(self.path).path
+        if not self._host_ok():  # bloqueia DNS rebinding
+            return self._send(403, {"erro": "host não permitido"})
         if path in ("/", "/editor"):
-            return self._send(200, open(UI, encoding="utf-8").read(), MIME[".html"])
+            html = open(UI, encoding="utf-8").read().replace("__EDITOR_TOKEN__", TOKEN)
+            return self._send(200, html, MIME[".html"])
         if path == "/dados":
             return self._send(200, load())
         # arquivo estático dentro do vault (imagens)
@@ -100,6 +121,8 @@ class H(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = urllib.parse.urlparse(self.path).path
+        if not self._post_allowed():
+            return self._send(403, {"ok": False, "erro": "bloqueado (host/origin/token) — recarregue o editor"})
         try:
             req = self._body()
         except Exception as e:
