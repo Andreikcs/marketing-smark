@@ -11,6 +11,14 @@ O primeiro token de `$ARGUMENTS` é a marca. O restante é o briefing.
 
 Marcas válidas: `smark`, `provider-max`, `elever-ai`. Se a primeira palavra não bater com nenhuma, **pare e pergunte ao usuário qual marca**. Não assuma.
 
+## Passo 0 — Estratégia primeiro (obrigatório, camada acima da copy)
+
+**Antes de qualquer copy**, para a smark leia `marcas/smark/branding/estrategia.md` + `site-oficial.md`:
+1. Escolha **1 dos 3 Ângulos** (produtividade · medo/método · contexto econômico).
+2. Aplique o **Filtro dos 3 Testes** (DONO≠ferramenta · CONSEQUÊNCIA≠função · MADUREZA≠hype) ao gancho. Se falhar em qualquer um, reescreva o ângulo.
+3. Se for citar número de mercado, use **só** os dados ✅ verificados de `shared/dados-mercado.md` (e registre o uso lá).
+4. CTA de fundo de funil = **diagnóstico gratuito do site**.
+
 ## Passo 2 — Carregar contexto na ordem
 
 Leia, nesta ordem:
