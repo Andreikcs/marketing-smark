@@ -71,4 +71,4 @@ Se o usuário pedir conteúdo sem usar slash command (ex: "cria um post sobre X"
 - Não publicar automaticamente em redes sociais.
 - Geração de imagem é **opcional e sob demanda**, via Gemini (`scripts/gemini_image.py`). O gerador sempre entrega o briefing visual em texto; a arte só é gerada quando o usuário pedir. Requer billing ativo no projeto Gemini.
 - Não criar dashboards próprios — Obsidian + Dataview cobre.
-- Não versionar com git nesta fase (diferido).
+- Versionado no GitHub: `Andreikcs/marketing-smark` (branch `main`). **Salvamento automático** via launchd (`com.smark.autosave`, roda `scripts/autosave.sh` a cada 5 min: commit+push só quando há mudança). `.env` e artes-draft ficam fora pelo `.gitignore`.
