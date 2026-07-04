@@ -23,6 +23,34 @@ sys.path.insert(0, HERE)
 import compositor  # noqa: E402
 
 PORT = 8765
+PAINEL = os.path.join(VAULT, "painel.html")
+VITRINE = os.path.join(VAULT, "lancamento.html")
+
+HUB = """<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><title>smark · Sistema</title>
+<style>
+:root{--rox:#8b3cf7}*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0b13;color:#ece9f4;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px}
+h1{font-size:26px;margin-bottom:6px}h1 span{color:var(--rox)}
+.sub{color:#9a92ad;font-size:14px;margin-bottom:34px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:760px;width:100%}
+a.card{display:block;background:#141019;border:1px solid #2a2338;border-radius:16px;padding:22px;text-decoration:none;color:inherit;transition:.15s}
+a.card:hover{border-color:var(--rox);transform:translateY(-2px)}
+.card .ic{font-size:30px;margin-bottom:12px}
+.card b{font-size:16px;display:block;margin-bottom:5px}
+.card p{color:#9a92ad;font-size:12.5px;line-height:1.45}
+.foot{color:#6a6480;font-size:11px;margin-top:30px}
+</style></head><body>
+<h1>Grupo <span>smark</span> · Sistema</h1>
+<div class=sub>Tudo local · localhost:8765</div>
+<div class=grid>
+  <a class=card href="/editor"><div class=ic>✎</div><b>Super Editor</b><p>Edita arte frame a frame, preview ao vivo, troca de fundo, cor, upload e regenerar por IA.</p></a>
+  <a class=card href="/painel"><div class=ic>▦</div><b>Painel de Conteúdo</b><p>Todas as publicações com preview de Instagram/LinkedIn e download.</p></a>
+  <a class=card href="/vitrine"><div class=ic>▤</div><b>Vitrine</b><p>Galeria read-only por marca — feed pra aprovar copy e conceito.</p></a>
+</div>
+<div class=foot>Editor, Painel e Vitrine servidos pelo mesmo servidor.</div>
+</body></html>"""
+
 # Segurança (CSRF / DNS rebinding): o servidor é local, mas tem rotas que gastam
 # dinheiro (regerar-fundo→OpenAI) e escrevem em disco. Um site malicioso aberto no
 # navegador poderia dar POST em localhost. Defesa: Host + Origin + token de sessão.
@@ -101,13 +129,29 @@ class H(http.server.BaseHTTPRequestHandler):
             return False
         return self.headers.get("X-Editor-Token", "") == TOKEN
 
+    def _serve_module(self, fp, nome):
+        if not os.path.isfile(fp):
+            return self._send(200, f"<body style='font-family:sans-serif;background:#0d0b13;color:#ccc;padding:40px'>"
+                              f"<a href='/' style='color:#8b3cf7'>← Menu</a><h2>{nome} ainda não foi gerado.</h2></body>",
+                              MIME[".html"])
+        bar = ('<a href="/" style="position:fixed;top:8px;left:8px;z-index:99999;background:#8b3cf7;color:#fff;'
+               'padding:6px 12px;border-radius:8px;font:600 12px sans-serif;text-decoration:none">☰ Menu</a>')
+        html = open(fp, encoding="utf-8").read().replace("</body>", bar + "</body>", 1)
+        return self._send(200, html, MIME[".html"])
+
     def do_GET(self):
         path = urllib.parse.urlparse(self.path).path
         if not self._host_ok():  # bloqueia DNS rebinding
             return self._send(403, {"erro": "host não permitido"})
-        if path in ("/", "/editor"):
+        if path in ("/", "/menu"):
+            return self._send(200, HUB, MIME[".html"])
+        if path == "/editor":
             html = open(UI, encoding="utf-8").read().replace("__EDITOR_TOKEN__", TOKEN)
             return self._send(200, html, MIME[".html"])
+        if path == "/painel":
+            return self._serve_module(PAINEL, "Painel")
+        if path == "/vitrine":
+            return self._serve_module(VITRINE, "Vitrine")
         if path == "/dados":
             return self._send(200, load())
         # arquivo estático dentro do vault (imagens)
