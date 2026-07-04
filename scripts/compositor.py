@@ -13,6 +13,7 @@ import base64
 import html as htmlmod
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -122,6 +123,22 @@ def render_headline(text):
     return "<br>".join(out)
 
 
+def render_rich(text):
+    """Formatação: '|' ou '\\n' = quebra · **negrito** · _itálico_ · *acento*."""
+    lines = []
+    for line in (text or "").replace("|", "\\n").split("\\n"):
+        s = esc(line)
+        s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+        s = re.sub(r"_(.+?)_", r"<i>\1</i>", s)
+        s = re.sub(r"\*(.+?)\*", r'<span class="v">\1</span>', s)
+        lines.append(s)
+    return "<br>".join(lines)
+
+
+# Degradê claro da marca (fundo instantâneo, sem IA) — off-white → lavanda → roxo suave
+DEGRADE_CLARO = "linear-gradient(155deg,#F4F2FB 0%,#EFE6FF 42%,#D9C2FF 78%,#C6A8FF 100%)"
+
+
 def tab_font(label):
     """Fonte do nome vertical da etiqueta — auto-ajusta pra todos caberem na MESMA altura, centrados."""
     n = max(len(label), 1)
@@ -157,7 +174,9 @@ body{width:%(W)spx;height:%(H)spx;overflow:hidden;}
 .chip .hd .dot{color:%(DOT)s;}
 .chip .ck{width:32px;height:32px;border-radius:50%%;background:%(SQUARE)s;color:%(ONACC)s;font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center;}
 .h{font-family:'Anton','Arial Narrow',Impact,sans-serif;text-transform:uppercase;color:%(TXT)s;font-size:%(HSIZE)spx;line-height:%(LH)s;letter-spacing:1px;text-shadow:%(HSHADOW)s;}
-.h .v{%(VSTYLE)s}
+.v{%(VSTYLE)s}
+.h b,.sub b{font-weight:800;}
+.h i,.sub i{font-style:italic;}
 .sub{font-family:'Archivo';font-weight:500;color:%(SUBC)s;font-size:33px;line-height:1.32;margin-top:28px;max-width:90%%;}
 .footer{position:absolute;bottom:46px;left:64px;right:64px;display:flex;justify-content:space-between;align-items:center;font-family:'Archivo';font-size:23px;color:%(FOOTTXT)s;letter-spacing:1px;border-top:1px solid %(FOOTBORDER)s;padding-top:20px;z-index:1;}
 .footer div{font-weight:400;}
