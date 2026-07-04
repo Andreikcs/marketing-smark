@@ -250,7 +250,7 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     cssvars.update(T)
     css = CSS % cssvars
 
-    sub_h = f'<div class="sub">{esc(sub)}</div>' if sub else ""
+    sub_h = f'<div class="sub">{render_rich(sub)}</div>' if sub else ""
     cta_h = f'<div><span class="cta">{esc(cta)}</span></div>' if cta else ""
     page_h = f'<div class="page">{esc(page)}</div>' if page else ""
     chip_h = ("" if no_chip else
@@ -260,7 +260,7 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     grade_html = '<div class="grade"><i class="gt"></i><i class="gv"></i><i class="gg"></i></div>' if grade_on else ''
     body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ov"></div>{page_h}'
             f'<div class="tab"><div class="ic">{glyph_html(b, on_acc, 46)}</div><div class="vt">{esc(b["tab"])}</div></div>'
-            f'<div class="ct">{chip_h}<div class="h">{render_headline(headline)}</div>{sub_h}{cta_h}</div>'
+            f'<div class="ct">{chip_h}<div class="h">{render_rich(headline)}</div>{sub_h}{cta_h}</div>'
             f'<div class="footer"><div>{esc(b["handle"])}</div><div class="cred">{esc(rodape)}</div></div></div>')
     return PAGE % {"CSS": css, "BODY": body}, w, h
 

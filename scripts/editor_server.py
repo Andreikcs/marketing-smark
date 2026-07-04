@@ -11,6 +11,7 @@ import hashlib
 import http.server
 import json
 import os
+import re
 import secrets
 import socketserver
 import subprocess
@@ -47,9 +48,77 @@ a.card:hover{border-color:var(--rox);transform:translateY(-2px)}
   <a class=card href="/editor"><div class=ic>✎</div><b>Super Editor</b><p>Edita arte frame a frame, preview ao vivo, troca de fundo, cor, upload e regenerar por IA.</p></a>
   <a class=card href="/painel"><div class=ic>▦</div><b>Painel de Conteúdo</b><p>Todas as publicações com preview de Instagram/LinkedIn e download.</p></a>
   <a class=card href="/vitrine"><div class=ic>▤</div><b>Vitrine</b><p>Galeria read-only por marca — feed pra aprovar copy e conceito.</p></a>
+  <a class=card href="/config"><div class=ic>⚙</div><b>Configurações</b><p>Como o sistema está se comportando: temas, cores, degradês, conceitos e estado.</p></a>
 </div>
 <div class=foot>Editor, Painel e Vitrine servidos pelo mesmo servidor.</div>
 </body></html>"""
+
+def config_html():
+    """Tela read-only das configurações do sistema (como ele está se comportando)."""
+    try:
+        tok = json.load(open(os.path.join(VAULT, "design-system", "tokens", "tokens.json"), encoding="utf-8"))
+    except Exception:
+        tok = {}
+    try:
+        import _direcao
+        conceitos = list(getattr(_direcao, "CONCEITOS", {}).keys())
+    except Exception:
+        conceitos = []
+    ed = load() if os.path.isfile(DATA) else {"posts": []}
+    fund = tok.get("fundacao", {})
+    marcas = tok.get("marcas", {})
+    tp = tok.get("tema_padrao") or "claro"
+    sw = lambda c: f"<span style='display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:6px;background:{c};border:1px solid #333'></span>"
+    rows_m = "".join(
+        f"<tr><td><b>{m.get('nome', s)}</b></td><td>{sw(m.get('acento','#000'))}{m.get('acento','')}</td>"
+        f"<td>{sw(m.get('acento_claro', m.get('acento','#000')))}{m.get('acento_claro','—')}</td>"
+        f"<td style='font-size:11px;max-width:260px;word-break:break-all'>{m.get('gradiente','—')}</td>"
+        f"<td>{m.get('handle','')}</td></tr>" for s, m in marcas.items())
+    rows_p = "".join(
+        f"<tr><td>{i+1}</td><td>{p.get('titulo','')}</td><td>{p.get('slug','')}</td>"
+        f"<td>{len(p.get('frames',[]))}</td></tr>" for i, p in enumerate(ed.get("posts", [])))
+    chips = " ".join(f"<span class=chip>{c}</span>" for c in conceitos)
+    return f"""<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><title>Configurações · smark</title><style>
+*{{box-sizing:border-box;margin:0;padding:0}}body{{background:#0d0b13;color:#ece9f4;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:20px 30px 60px}}
+a.menu{{position:fixed;top:8px;left:8px;background:#8b3cf7;color:#fff;padding:6px 12px;border-radius:8px;font:600 12px sans-serif;text-decoration:none;z-index:9}}
+h1{{font-size:22px;margin:18px 0 4px}}h1 span{{color:#8b3cf7}} .sub{{color:#9a92ad;font-size:13px;margin-bottom:24px}}
+.grp{{background:#141019;border:1px solid #2a2338;border-radius:14px;padding:16px 18px;margin-bottom:16px;max-width:860px}}
+.grp h3{{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:#9a92ad;margin-bottom:12px}}
+table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:left;padding:7px 8px;border-bottom:1px solid #221c30}}th{{color:#9a92ad;font-weight:600;font-size:11px;text-transform:uppercase}}
+.kv{{display:flex;flex-wrap:wrap;gap:10px}}.kv div{{background:#1a1524;border:1px solid #2a2338;border-radius:9px;padding:8px 12px;font-size:13px}}.kv b{{color:#c9b6ff}}
+.chip{{display:inline-block;background:#241a38;border:1px solid #3a2b58;color:#c9b6ff;border-radius:999px;padding:4px 11px;font-size:12px;margin:2px}}
+.ok{{color:#37c26b}}
+</style></head><body>
+<a class=menu href="/">☰ Menu</a>
+<h1>Configurações do <span>Sistema</span></h1>
+<div class=sub>Read-only · como o sistema está se comportando agora.</div>
+
+<div class=grp><h3>Tema & padrões de geração</h3><div class=kv>
+<div>Tema-padrão: <b>{tp}</b></div>
+<div>Regra #9: imagens geradas saem <b>claras</b> por padrão</div>
+<div>Base clara: <b>{tok.get('tema_claro',{}).get('base','#F4F2FB')}</b></div>
+<div>Base escura: <b>{fund.get('base','#0B0B0B')}</b></div>
+<div>Rodapé: <b>{fund.get('rodape','—')}</b></div>
+<div>Degradê da marca (claro): <b>ativo</b></div>
+</div></div>
+
+<div class=grp><h3>Marcas (cores / degradê / handle)</h3>
+<table><tr><th>Marca</th><th>Acento</th><th>Acento claro</th><th>Degradê</th><th>Handle</th></tr>{rows_m}</table></div>
+
+<div class=grp><h3>Conceitos de direção de arte ({len(conceitos)})</h3>{chips}</div>
+
+<div class=grp><h3>Posts no editor ({len(ed.get('posts',[]))})</h3>
+<table><tr><th>#</th><th>Título</th><th>Slug</th><th>Frames</th></tr>{rows_p}</table></div>
+
+<div class=grp><h3>Servidor & segurança</h3><div class=kv>
+<div>Porta: <b>{PORT}</b></div>
+<div>Hosts permitidos: <b>localhost:8765 / 127.0.0.1:8765</b></div>
+<div>Proteção CSRF/DNS: <b class=ok>ativa</b> (Host+Origin+token)</div>
+<div>Dados do editor: <b>editor.json</b></div>
+</div></div>
+</body></html>"""
+
 
 # Segurança (CSRF / DNS rebinding): o servidor é local, mas tem rotas que gastam
 # dinheiro (regerar-fundo→OpenAI) e escrevem em disco. Um site malicioso aberto no
@@ -91,10 +160,23 @@ def frame_kwargs(fr, size, for_export):
             k["bg_url"] = "/" + urllib.parse.quote(fr["bg"])
     elif mode == "cor":
         k["base"] = fr.get("cor") or ""
+    elif mode == "degrade":  # degradê claro da marca (instantâneo, sem IA)
+        k["base"] = compositor.DEGRADE_CLARO
+        k["tema"] = "claro"
     else:  # escuro | claro (preset com mesh)
         k["placeholder"] = True
         k["tema"] = "claro" if mode == "claro" else "escuro"
     return k
+
+
+def normaliza(d):
+    """Garante n sequencial e caminho 'out' pra todo frame (permite adicionar/remover cards)."""
+    A = "marcas/smark/publicacoes/social/instagram/arte"
+    for p in d.get("posts", []):
+        for i, fr in enumerate(p.get("frames", []), 1):
+            fr["n"] = i
+            fr["out"] = f"{A}/{p['slug']}/{i:02d}.png"
+    return d
 
 
 class H(http.server.BaseHTTPRequestHandler):
@@ -152,6 +234,8 @@ class H(http.server.BaseHTTPRequestHandler):
             return self._serve_module(PAINEL, "Painel")
         if path == "/vitrine":
             return self._serve_module(VITRINE, "Vitrine")
+        if path == "/config":
+            return self._send(200, config_html(), MIME[".html"])
         if path == "/dados":
             return self._send(200, load())
         # arquivo estático dentro do vault (imagens)
@@ -181,8 +265,23 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(200, f"<pre style='color:#f66;font-family:monospace;padding:20px'>preview erro: {e}</pre>", MIME[".html"])
 
         if path == "/salvar":
-            save(req.get("dados", load()))
+            save(normaliza(req.get("dados", load())))
             return self._send(200, {"ok": True})
+
+        if path == "/novo-post":
+            d = load()
+            slug = re.sub(r"[^a-z0-9-]+", "-", (req.get("slug") or "").lower()).strip("-") \
+                or ("novo-" + secrets.token_hex(3))
+            if any(p["slug"] == slug for p in d["posts"]):
+                slug = slug + "-" + secrets.token_hex(2)
+            fr = {"headline": "SEU TÍTULO|*AQUI.*", "sub": "", "cta": "", "page": "01/01",
+                  "chip": True, "tema": "claro", "bgmode": "claro", "bg": "", "cor": "#F4F2FB",
+                  "accent": "", "hsize": 0, "grade": True}
+            d["posts"].append({"slug": slug, "marca": "smark",
+                               "titulo": req.get("titulo") or "Novo post", "size": "1080x1350",
+                               "frames": [fr]})
+            save(normaliza(d))
+            return self._send(200, {"ok": True, "index": len(d["posts"]) - 1, "slug": slug})
 
         if path == "/exportar":
             d = load()
@@ -234,14 +333,15 @@ class H(http.server.BaseHTTPRequestHandler):
                            "--prompt", req.get("prompt", "brand key visual, mesma composição, paleta roxa smark"),
                            "--size", "1024x1536", "--quality", "high"]
                 else:  # direção de arte
+                    tema = req.get("tema", "claro")  # PADRÃO CLARO (rule #9)
                     cmd = ["python3", os.path.join(HERE, "openai_image.py"), "--out", out, "--direcao",
                            "--marca", "smark", "--tipo", req.get("tipo", "manifesto"),
-                           "--tema", fr.get("tema", "escuro"), "--headline", (fr.get("headline", "") or "").replace("|", " "),
+                           "--tema", tema, "--headline", (fr.get("headline", "") or "").replace("|", " "),
                            "--size", "1024x1536", "--quality", "high"]
                 r = subprocess.run(cmd, cwd=VAULT, capture_output=True, text=True)
                 if os.path.exists(out):
                     rel = os.path.relpath(out, VAULT)
-                    return self._send(200, {"ok": True, "path": rel})
+                    return self._send(200, {"ok": True, "path": rel, "tema": req.get("tema", "claro")})
                 return self._send(500, {"ok": False, "erro": (r.stderr or r.stdout or "falhou")[-400:]})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
