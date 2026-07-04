@@ -169,6 +169,100 @@ body{width:%(W)spx;height:%(H)spx;overflow:hidden;}
 PAGE = "<!doctype html><html><head><meta charset='utf-8'><style>%(CSS)s</style></head><body>%(BODY)s</body></html>"
 
 
+def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="claro",
+                 size="1080x1350", hsize=0, accent="", bright="", base="", square="",
+                 bg="", bg_url="", placeholder=False, no_grade=False):
+    """Constrói o HTML completo do frame (mesmo motor do PNG final).
+    `bg` = caminho de imagem (embutida em base64, p/ render headless).
+    `bg_url` = URL direta (ex.: rota estática do servidor, p/ preview leve no navegador)."""
+    brands, fund = load_brands()
+    if marca not in brands:
+        raise ValueError(f"marca '{marca}' não está no tokens.json")
+    b = dict(brands[marca])
+    if accent:
+        b["accent"] = accent
+        b["bright"] = bright or accent
+    elif bright:
+        b["bright"] = bright
+
+    w, h = (int(x) for x in size.lower().split("x"))
+    accent_c, bright_c = b["accent"], b["bright"]
+    on_acc = "#0B0B0B" if accent_c.upper() in [c.upper() for c in LIME] else "#FFFFFF"
+    square = square or b.get("gradiente") or accent_c
+    rodape = fund.get("rodape", "@copywriting2026")
+
+    if tema == "claro":
+        cl = fund.get("_claro", {})
+        base_c = base or cl.get("base", "#F4F2FB")
+        txt = cl.get("texto", "#100D1C")
+        acc_txt = readable_on(accent_c, base_c)
+        T = {"BASE": base_c, "TXT": txt, "SUBC": cl.get("sub", "#4A4560"), "LH": ".98",
+             "OV": "linear-gradient(180deg, rgba(244,242,251,.30) 0%%, rgba(244,242,251,0) 28%%, rgba(244,242,251,.5) 52%%, rgba(244,242,251,.93) 78%%, rgba(244,242,251,1) 100%%)",
+             "HSHADOW": "none", "VSTYLE": f"color:{acc_txt};", "DOT": acc_txt,
+             "FOOTTXT": cl.get("apoio", "#6B6680"), "FOOTBORDER": "rgba(0,0,0,.14)", "FOOTCRED": "#8B8698",
+             "PAGETXT": txt, "PAGEBG": "rgba(255,255,255,.6)", "PAGEBORDER": "rgba(0,0,0,.14)",
+             "GTINT": "#8B3CF7", "GTO": ".07",
+             "GVIG": "radial-gradient(150% 130% at 50% 30%, transparent 60%, rgba(40,28,168,.10) 100%)", "GGO": ".05"}
+    else:
+        base_c = base or fund.get("base", "#0B0B0B")
+        T = {"BASE": base_c, "TXT": "#FFFFFF", "SUBC": "#DCDCDC", "LH": ".96",
+             "OV": "linear-gradient(180deg, rgba(11,11,11,.5) 0%%, rgba(11,11,11,0) 30%%, rgba(11,11,11,.42) 50%%, rgba(11,11,11,.9) 76%%, rgba(11,11,11,.99) 100%%)",
+             "HSHADOW": "0 6px 34px rgba(0,0,0,.7)", "VSTYLE": f"color:{bright_c};", "DOT": bright_c,
+             "FOOTTXT": "#9A9A9A", "FOOTBORDER": "rgba(255,255,255,.14)", "FOOTCRED": "#7A7A7A",
+             "PAGETXT": "rgba(255,255,255,.7)", "PAGEBG": "rgba(0,0,0,.28)", "PAGEBORDER": "rgba(255,255,255,.14)",
+             "GTINT": "#2A1CA8", "GTO": ".15",
+             "GVIG": "radial-gradient(135% 120% at 50% 34%, transparent 42%, rgba(0,0,0,.78) 100%)", "GGO": ".08"}
+
+    has_img = False
+    bg_css = "none"
+    if bg_url:
+        bg_css = f"url({bg_url})"
+        has_img = True
+    elif bg:
+        bgp = bg if os.path.isabs(bg) else os.path.join(VAULT, bg)
+        bg_css = f"url(data:image/png;base64,{base64.b64encode(open(bgp,'rb').read()).decode()})"
+        has_img = True
+    elif placeholder:
+        bg_css = MESH_CLARO if tema == "claro" else MESH_ESCURO
+
+    hsz = hsize if hsize > 0 else min(auto_hsize(headline), 92 if cta else 104)
+    cssvars = {"W": w, "H": h, "BG": bg_css, "ACCENT": accent_c, "SQUARE": square, "ONACC": on_acc,
+               "HSIZE": hsz, "TABF": tab_font(b["tab"]), "GRAIN": GRAIN}
+    cssvars.update(T)
+    css = CSS % cssvars
+
+    sub_h = f'<div class="sub">{esc(sub)}</div>' if sub else ""
+    cta_h = f'<div><span class="cta">{esc(cta)}</span></div>' if cta else ""
+    page_h = f'<div class="page">{esc(page)}</div>' if page else ""
+    chip_h = ("" if no_chip else
+              f'<div class="chip"><div class="av">{glyph_html(b, on_acc, 50)}</div>'
+              f'<div class="hd">{wordmark_html(b)}</div><div class="ck">&#10003;</div></div>')
+    grade_on = (not no_grade) and (has_img or placeholder)
+    grade_html = '<div class="grade"><i class="gt"></i><i class="gv"></i><i class="gg"></i></div>' if grade_on else ''
+    body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ov"></div>{page_h}'
+            f'<div class="tab"><div class="ic">{glyph_html(b, on_acc, 46)}</div><div class="vt">{esc(b["tab"])}</div></div>'
+            f'<div class="ct">{chip_h}<div class="h">{render_headline(headline)}</div>{sub_h}{cta_h}</div>'
+            f'<div class="footer"><div>{esc(b["handle"])}</div><div class="cred">{esc(rodape)}</div></div></div>')
+    return PAGE % {"CSS": css, "BODY": body}, w, h
+
+
+def render_html_to_png(page_html, out, w, h):
+    """Renderiza o HTML do frame pra PNG via Chrome headless (2x). Retorna True se gerou."""
+    html_path = os.path.join(VAULT, f".compositor.tmp.{os.getpid()}.html")
+    open(html_path, "w", encoding="utf-8").write(page_html)
+    out_abs = out if os.path.isabs(out) else os.path.join(VAULT, out)
+    os.makedirs(os.path.dirname(out_abs), exist_ok=True)
+    subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
+                    "--force-device-scale-factor=2", f"--window-size={w},{h}",
+                    "--virtual-time-budget=4000", f"--screenshot={out_abs}", f"file://{html_path}"],
+                   check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        os.remove(html_path)
+    except OSError:
+        pass
+    return os.path.exists(out_abs)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--marca", required=True)
@@ -190,87 +284,20 @@ def main():
     ap.add_argument("--no-grade", action="store_true", help="desliga a grade de acabamento (duotone+vinheta+grão)")
     args = ap.parse_args()
 
-    brands, fund = load_brands()
-    if args.marca not in brands:
-        sys.exit(f"ERRO: marca '{args.marca}' não está no tokens.json")
-    b = dict(brands[args.marca])
-    if args.accent:
-        b["accent"] = args.accent
-        b["bright"] = args.bright or args.accent
-    elif args.bright:
-        b["bright"] = args.bright
-
-    w, h = (int(x) for x in args.size.lower().split("x"))
-    accent, bright = b["accent"], b["bright"]
-    on_acc = "#0B0B0B" if accent.upper() in [c.upper() for c in LIME] else "#FFFFFF"
-    square = args.square or b.get("gradiente") or accent  # quadrados da moldura (override teste · gradiente da marca · cor sólida)
-    rodape = fund.get("rodape", "@copywriting2026")  # crédito padrão do rodapé (todas as marcas)
-
-    if args.tema == "claro":
-        cl = fund.get("_claro", {})
-        base = args.base or cl.get("base", "#F4F2FB")
-        txt = cl.get("texto", "#100D1C")
-        acc_txt = readable_on(accent, base)
-        T = {"BASE": base, "TXT": txt, "SUBC": cl.get("sub", "#4A4560"), "LH": ".98",
-             "OV": "linear-gradient(180deg, rgba(244,242,251,.30) 0%%, rgba(244,242,251,0) 28%%, rgba(244,242,251,.5) 52%%, rgba(244,242,251,.93) 78%%, rgba(244,242,251,1) 100%%)",
-             "HSHADOW": "none", "VSTYLE": f"color:{acc_txt};", "DOT": acc_txt,
-             "FOOTTXT": cl.get("apoio", "#6B6680"), "FOOTBORDER": "rgba(0,0,0,.14)", "FOOTCRED": "#8B8698",
-             "PAGETXT": txt, "PAGEBG": "rgba(255,255,255,.6)", "PAGEBORDER": "rgba(0,0,0,.14)",
-             "GTINT": "#8B3CF7", "GTO": ".07",
-             "GVIG": "radial-gradient(150% 130% at 50% 30%, transparent 60%, rgba(40,28,168,.10) 100%)", "GGO": ".05"}
-    else:
-        base = args.base or fund.get("base", "#0B0B0B")
-        T = {"BASE": base, "TXT": "#FFFFFF", "SUBC": "#DCDCDC", "LH": ".96",
-             "OV": "linear-gradient(180deg, rgba(11,11,11,.5) 0%%, rgba(11,11,11,0) 30%%, rgba(11,11,11,.42) 50%%, rgba(11,11,11,.9) 76%%, rgba(11,11,11,.99) 100%%)",
-             "HSHADOW": "0 6px 34px rgba(0,0,0,.7)", "VSTYLE": f"color:{bright};", "DOT": bright,
-             "FOOTTXT": "#9A9A9A", "FOOTBORDER": "rgba(255,255,255,.14)", "FOOTCRED": "#7A7A7A",
-             "PAGETXT": "rgba(255,255,255,.7)", "PAGEBG": "rgba(0,0,0,.28)", "PAGEBORDER": "rgba(255,255,255,.14)",
-             "GTINT": "#2A1CA8", "GTO": ".15",
-             "GVIG": "radial-gradient(135% 120% at 50% 34%, transparent 42%, rgba(0,0,0,.78) 100%)", "GGO": ".08"}
-
-    bg_css = "none"
-    if args.bg:
-        bgp = args.bg if os.path.isabs(args.bg) else os.path.join(VAULT, args.bg)
-        bg_css = f"url(data:image/png;base64,{base64.b64encode(open(bgp,'rb').read()).decode()})"
-    elif args.placeholder:
-        bg_css = MESH_CLARO if args.tema == "claro" else MESH_ESCURO
-
-    hsize = args.hsize if args.hsize > 0 else min(auto_hsize(args.headline), 92 if args.cta else 104)
-    cssvars = {"W": w, "H": h, "BG": bg_css, "ACCENT": accent, "SQUARE": square, "ONACC": on_acc,
-               "HSIZE": hsize, "TABF": tab_font(b["tab"]), "GRAIN": GRAIN}
-    cssvars.update(T)
-    css = CSS % cssvars
-
-    sub = f'<div class="sub">{esc(args.sub)}</div>' if args.sub else ""
-    cta = f'<div><span class="cta">{esc(args.cta)}</span></div>' if args.cta else ""
-    page = f'<div class="page">{esc(args.page)}</div>' if args.page else ""
-    chip = ("" if args.no_chip else
-            f'<div class="chip"><div class="av">{glyph_html(b, on_acc, 50)}</div>'
-            f'<div class="hd">{wordmark_html(b)}</div><div class="ck">&#10003;</div></div>')
-    grade_on = (not args.no_grade) and (bool(args.bg) or args.placeholder)
-    grade_html = '<div class="grade"><i class="gt"></i><i class="gv"></i><i class="gg"></i></div>' if grade_on else ''
-    body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ov"></div>{page}'
-            f'<div class="tab"><div class="ic">{glyph_html(b, on_acc, 46)}</div><div class="vt">{esc(b["tab"])}</div></div>'
-            f'<div class="ct">{chip}<div class="h">{render_headline(args.headline)}</div>{sub}{cta}</div>'
-            f'<div class="footer"><div>{esc(b["handle"])}</div><div class="cred">{esc(rodape)}</div></div></div>')
-    page_html = PAGE % {"CSS": css, "BODY": body}
-
-    html_path = os.path.join(VAULT, f".compositor.tmp.{os.getpid()}.html")
-    open(html_path, "w", encoding="utf-8").write(page_html)
-    out = args.out if os.path.isabs(args.out) else os.path.join(VAULT, args.out)
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
-                    "--force-device-scale-factor=2", f"--window-size={w},{h}",
-                    "--virtual-time-budget=4000", f"--screenshot={out}", f"file://{html_path}"],
-                   check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
-        os.remove(html_path)
-    except OSError:
-        pass
-    if os.path.exists(out):
-        print(f"OK: {out}  (compositor 2x · {args.marca} · tema={args.tema})")
-        print(meta_block(out, {"modelo": f"compositor ({args.tema})", "qualidade": "2x",
-                               "tamanho": f"{w*2}x{h*2}", "paleta": accent}))
+        page_html, w, h = compose_html(
+            args.marca, args.headline, sub=args.sub, cta=args.cta, page=args.page,
+            no_chip=args.no_chip, tema=args.tema, size=args.size, hsize=args.hsize,
+            accent=args.accent, bright=args.bright, base=args.base, square=args.square,
+            bg=args.bg, placeholder=args.placeholder, no_grade=args.no_grade)
+    except ValueError as e:
+        sys.exit(f"ERRO: {e}")
+
+    out_abs = args.out if os.path.isabs(args.out) else os.path.join(VAULT, args.out)
+    if render_html_to_png(page_html, args.out, w, h):
+        print(f"OK: {out_abs}  (compositor 2x · {args.marca} · tema={args.tema})")
+        print(meta_block(out_abs, {"modelo": f"compositor ({args.tema})", "qualidade": "2x",
+                                   "tamanho": f"{w*2}x{h*2}", "paleta": args.accent or "—"}))
     else:
         sys.exit("ERRO: render falhou")
 
