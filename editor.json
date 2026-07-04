@@ -63,8 +63,8 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "USAR IA VIROU|*DECISÃO ESTRATÉGICA.*",
-          "sub": "Deixou de ser opção. — Dados de mercado 👉",
+          "headline": "USAR IA VIROU Decisão|* ESTRATÉGICA da gestão.*",
+          "sub": "A pergunta mudou de \"se\" para \"quando\". 👉",
           "cta": "",
           "page": "01/06",
           "chip": true,
@@ -72,7 +72,7 @@
           "bgmode": "claro",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave-bg.png",
           "cor": "",
-          "accent": "",
+          "accent": "#f7863b",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/01.png",
@@ -96,20 +96,21 @@
           "_v": 4
         },
         {
-          "headline": "*62%*",
-          "sub": "já experimentam agentes de IA dentro dos processos. A pergunta mudou de \"se\" para \"quando\".  ·  Fonte: McKinsey · 2025",
+          "headline": "*62% das empresas*",
+          "sub": "já experimentam funcionários de IA dentro dos processos.  ·  Fonte: McKinsey · 2025",
           "cta": "",
           "page": "03/06",
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave-bg.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_regen/03-369ab1.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/03.png",
-          "n": 3
+          "n": 3,
+          "_v": 2
         },
         {
           "headline": "*+40%*",
