@@ -15,14 +15,16 @@ Tecnologia que deixa marcos. Resolver problema real de operação com tecnologia
 
 **Diferencial transversal:** construir o que falta **em volta do que o cliente já tem** (o programa que ele já usa, as ferramentas, os hábitos do time). Não trocar o que funciona, plugar no que já existe.
 
-## Arquitetura de 2 camadas — quem fala como (decisão 2026-06-23)
+## Arquitetura de camadas — quem fala como (revisão 2026-07-04, alinhada ao site)
 
-O grupo fala em **duas camadas**, e a voz muda conforme a camada:
+> Ajuste sobre a decisão 2026-06-23: o site `smarktech.com.br` (fonte canônica) mostra a **mãe frontando os funcionários de IA**. A regra "mãe = só método" foi relaxada pro modelo **híbrido** abaixo. A disciplina de voz (sem jargão, sem promessa de venda) continua igual.
 
-1. **smark = a mãe = assessoria tecnológica / MÉTODO.** Vende **método e resultado**, não um funcionário. Público mais maduro; o registro pode ser um pouco mais "consultoria" — **mas sem jargão técnico de ferramenta e SEM prometer venda**. smark é a única que mantém o termo **"assessoria tecnológica"**.
-2. **Provider Max e Elever = os produtos = O FUNCIONÁRIO.** Cada produto se apresenta como **"um funcionário de IA que faz [função]"**. Linguagem de **criança de 7 anos**. Os produtos **não** usam "assessoria tecnológica" nem jargão de ferramenta.
+1. **smark = a mãe = a assessoria que coloca um funcionário de IA em cada departamento.** Headline oficial: *"Cada departamento pode ganhar um novo funcionário de IA."* A mãe apresenta os funcionários como **sua "seleção"** e conduz com **método**. Duas portas de entrada:
+   - **Método / assessoria** (baixa fricção): o **diagnóstico gratuito**, personificado na **Marta** ("a mãe de todos"). Único registro que mantém o termo **"assessoria tecnológica"**.
+   - **O funcionário de IA** (nomeado): **Nina** (o primeiro atendimento → Elever), **Clara** (cuida de quem já é cliente → Provider Max), **Téo** (vai atrás de cliente novo). Falados **pelo que resolvem pro dono**, nunca pela mecânica.
+2. **Provider Max e Elever = os produtos = O FUNCIONÁRIO por dentro.** Cada produto é "um funcionário de IA que faz [função]", linguagem de **criança de 7 anos**, sem jargão de ferramenta.
 
-Regra geral de quem-fala-como: a mãe vende o **como** (método), o produto vende o **quem** (o funcionário que faz a tarefa).
+Regra de ouro: **positioning vem do site** (funcionários + assessoria + diagnóstico como hub); **a voz continua disciplinada** (tradutor DE→PARA, sem promessa de venda). Ver `marcas/smark/branding/estrategia.md`, `funcionarios-ia.md` e `site-oficial.md`.
 
 ## Regras de voz inegociáveis (vitrine pública)
 
