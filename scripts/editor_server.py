@@ -175,11 +175,26 @@ def frame_kwargs(fr, size, for_export, marca="smark"):
     return k
 
 
+BRANDS = ("smark", "provider-max", "elever-ai")
+
+
+def safe_marca(m):
+    """Bloqueia path traversal via marca — só marcas conhecidas."""
+    return m if m in BRANDS else "smark"
+
+
+def safe_slug(s):
+    """Bloqueia path traversal via slug — só kebab-case [a-z0-9-]."""
+    s = re.sub(r"[^a-z0-9-]+", "-", (s or "").lower()).strip("-")
+    return s or "post"
+
+
 def normaliza(d):
-    """Garante n sequencial e caminho 'out' pra todo frame (permite adicionar/remover cards)."""
+    """Garante n sequencial, marca/slug seguros e caminho 'out' pra todo frame."""
     for p in d.get("posts", []):
-        marca = p.get("marca", "smark")
-        A = f"marcas/{marca}/publicacoes/social/instagram/arte"
+        p["marca"] = safe_marca(p.get("marca", "smark"))
+        p["slug"] = safe_slug(p.get("slug", ""))
+        A = f"marcas/{p['marca']}/publicacoes/social/instagram/arte"
         for i, fr in enumerate(p.get("frames", []), 1):
             fr["n"] = i
             fr["out"] = f"{A}/{p['slug']}/{i:02d}.png"
@@ -317,8 +332,8 @@ class H(http.server.BaseHTTPRequestHandler):
             try:
                 data = req["dataurl"].split(",", 1)[1]
                 raw = base64.b64decode(data)
-                slug = req.get("slug", "avulso")
-                marca = req.get("marca", "smark")
+                slug = safe_slug(req.get("slug", "avulso"))
+                marca = safe_marca(req.get("marca", "smark"))
                 dd = os.path.join(VAULT, "marcas", marca, "publicacoes", "social", "instagram",
                                   "arte", slug, "_uploads")
                 os.makedirs(dd, exist_ok=True)
