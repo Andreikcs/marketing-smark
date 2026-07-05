@@ -1061,14 +1061,15 @@
           "page": "01/03",
           "chip": true,
           "tema": "escuro",
-          "bgmode": "claro",
-          "bg": "",
+          "bgmode": "imagem",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/_regen/01-eff78a.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/01.png"
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/01.png",
+          "_v": 1
         },
         {
           "headline": "Ele *responde* cada cliente|e agenda a visita",
@@ -1079,6 +1080,8 @@
           "grade": true,
           "bgmode": "imagem",
           "page": "02/03",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/_regen/02-3773ca.png",
+          "_v": 1,
           "n": 2,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/02.png"
         },
@@ -1091,6 +1094,8 @@
           "grade": true,
           "bgmode": "imagem",
           "page": "03/03",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/_regen/03-4478e7.png",
+          "_v": 1,
           "n": 3,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/03.png"
         }
