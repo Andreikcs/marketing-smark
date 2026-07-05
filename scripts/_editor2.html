@@ -284,6 +284,7 @@ function renderCtrl(){
   const e2=document.createElement('button');e2.className='btn';e2.textContent='⬇ Exportar o carrossel todo';e2.onclick=()=>exportar(e2,'all');g4.appendChild(e2);
   g4.appendChild(Object.assign(document.createElement('div'),{className:'mini',textContent:'O export roda o compositor real em alta (2x) e grava no arquivo do post.'}));
   c.appendChild(g4);
+  applyCollapse();
 }
 
 function change(){markDraft();renderStrip();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
@@ -413,8 +414,9 @@ async function delCard(){
 }
 async function novoPost(){
   const t=prompt('Título do novo post:','Novo post');if(t===null)return;
-  const r=await(await fetch('/novo-post',{method:'POST',headers:HJSON,body:JSON.stringify({titulo:t,slug:t})})).json();
-  if(r.ok){await reload(r.index,0);toast('Post criado — comece a editar')}else toast('Erro ao criar post');
+  const m=(prompt('Marca? (smark / provider-max / elever-ai)','smark')||'smark').trim();
+  const r=await(await fetch('/novo-post',{method:'POST',headers:HJSON,body:JSON.stringify({titulo:t,slug:t,marca:m})})).json();
+  if(r.ok){await reload(r.index,0);toast('Post criado ('+r.slug+')')}else toast('Erro ao criar post');
 }
 $('#bnew').onclick=novoPost;$('#baddc').onclick=addCard;$('#bdelc').onclick=delCard;
 $('#bmvl').onclick=()=>moveCard(-1);$('#bmvr').onclick=()=>moveCard(1);$('#bsim').onclick=openSim;
