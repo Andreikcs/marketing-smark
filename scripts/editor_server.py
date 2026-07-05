@@ -90,6 +90,67 @@ def fmt_tipo(n):
     return "post único" if n <= 1 else f"carrossel · {n}"
 
 
+def cmdk():
+    """Command palette global (⌘K / Ctrl+K) — busca publicações + comandos, pula pra qualquer tela.
+    Autocontido (markup + estilo + script); funciona em qualquer página (usa /dados)."""
+    return """
+<style>
+.cmdk-ov{position:fixed;inset:0;z-index:400;display:none;background:rgba(10,8,20,.55);backdrop-filter:blur(3px);align-items:flex-start;justify-content:center;padding-top:12vh}
+.cmdk-ov.on{display:flex}
+.cmdk-ov .sk-command{width:100%;max-width:560px;max-height:70vh;display:flex;flex-direction:column}
+.cmdk-list{overflow:auto;padding:6px}
+.cmdk-empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}
+.sk-command-item.is-active{background:var(--accent-soft)}
+.cmdk-ic{width:22px;text-align:center;flex:0 0 auto;color:var(--muted)}
+.cmdk-hint{position:fixed;right:26px;bottom:18px;z-index:30;display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:12px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow)}
+.cmdk-hint:hover{border-color:var(--accent);color:var(--text)}
+</style>
+<div class=cmdk-ov id=cmdk>
+  <div class="sk-command" onclick="event.stopPropagation()">
+    <div class=sk-command-head>
+      <svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 style="color:var(--muted);flex:0 0 auto"><circle cx=11 cy=11 r=7/><path d="M21 21l-4-4"/></svg>
+      <input id=cmdkin placeholder="Buscar publicação ou comando…" autocomplete=off spellcheck=false style="flex:1;background:transparent;border:0;outline:none;color:var(--text);font-size:15px;font-family:var(--font-text)">
+      <span class=sk-kbd>Esc</span>
+    </div>
+    <div class=cmdk-list id=cmdklist></div>
+  </div>
+</div>
+<button class=cmdk-hint id=cmdkhint>Buscar <span class=sk-kbd>⌘K</span></button>
+<script>
+(function(){
+  const ov=document.getElementById('cmdk'),inp=document.getElementById('cmdkin'),list=document.getElementById('cmdklist');
+  const NAV=[['Painel','/painel','▦'],['Vitrine','/vitrine','▤'],['Config','/config','⚙'],['Editor','/editor','✎']];
+  const ACTS=[['Novo projeto','/editor?novo=1','＋'],['Estúdio IA','/editor?estudio=1','✦']];
+  let posts=[],items=[],idx=0,loaded=false;
+  const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  async function load(){if(loaded)return;try{const d=await(await fetch('/dados')).json();posts=d.posts||[]}catch(e){}loaded=true}
+  function fmt(n){return n<=1?'post único':'carrossel · '+n}
+  function row(ic,t,m){return '<div class=sk-command-item><span class=cmdk-ic>'+ic+'</span><div style="flex:1;min-width:0"><div style="font-size:14px;color:var(--text)">'+esc(t)+'</div>'+(m?'<div style="font-size:11px;color:var(--muted)">'+esc(m)+'</div>':'')+'</div></div>'}
+  function build(){const q=(inp.value||'').toLowerCase().trim();items=[];let h='';
+    const nav=NAV.filter(n=>!q||n[0].toLowerCase().includes(q));
+    if(nav.length){h+='<div class=sk-command-group>Ir para</div>';nav.forEach(n=>{items.push({go:n[1]});h+=row(n[2],n[0],'')})}
+    const act=ACTS.filter(a=>!q||a[0].toLowerCase().includes(q));
+    if(act.length){h+='<div class=sk-command-group>Ações</div>';act.forEach(a=>{items.push({go:a[1]});h+=row(a[2],a[0],'')})}
+    const ps=posts.map((p,i)=>({p,i})).reverse().filter(({p})=>!q||((p.titulo||p.slug||'')+' '+(p.marca||'')).toLowerCase().includes(q));
+    if(ps.length){h+='<div class=sk-command-group>Publicações</div>';ps.slice(0,20).forEach(({p,i})=>{items.push({go:'/editor?post='+i});h+=row('▦',(p.titulo||p.slug),(p.marca||'smark')+' · '+fmt((p.frames||[]).length))})}
+    list.innerHTML=h||'<div class=cmdk-empty>Nada encontrado</div>';idx=0;mark();
+  }
+  function mark(){const els=list.querySelectorAll('.sk-command-item');els.forEach((e,i)=>e.classList.toggle('is-active',i===idx));const a=els[idx];if(a)a.scrollIntoView({block:'nearest'});
+    els.forEach((e,i)=>e.onclick=()=>{idx=i;pick()})}
+  function pick(){const it=items[idx];if(it&&it.go)location.href=it.go}
+  async function open(){await load();ov.classList.add('on');inp.value='';build();setTimeout(()=>inp.focus(),30)}
+  function close(){ov.classList.remove('on')}
+  inp.oninput=build;
+  inp.onkeydown=e=>{if(e.key==='ArrowDown'){e.preventDefault();idx=Math.min(idx+1,items.length-1);mark()}
+    else if(e.key==='ArrowUp'){e.preventDefault();idx=Math.max(idx-1,0);mark()}
+    else if(e.key==='Enter'){e.preventDefault();pick()}else if(e.key==='Escape'){close()}};
+  ov.onclick=close;document.getElementById('cmdkhint').onclick=open;
+  document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();ov.classList.contains('on')?close():open()}});
+})();
+</script>
+"""
+
+
 def topbar(active=""):
     """App shell topbar (.sk-topbar) — substitui o botão flutuante de menu em todas as telas."""
     def lk(href, label, key):
@@ -101,7 +162,7 @@ def topbar(active=""):
             + lk("/config", "Config", "config") + lk("/editor", "Editor", "editor")
             + '<span class="sk-spacer"></span>'
             '<a class="sk-btn sk-btn--secondary sk-btn--sm" href="/editor">✎ Abrir editor</a>'
-            '</div>')
+            '</div>' + cmdk())
 
 
 def config_html():
@@ -306,7 +367,7 @@ function render(){
     const c=document.createElement('div');c.className='sk-post'+(on?' is-selected':'');
     c.dataset.pi=i;
     c.innerHTML='<div class="sk-post-thumb">'
-      +'<div class="thumbhost">carregando…</div>'
+      +'<div class="thumbhost"><div class="sk-skel" style="position:absolute;inset:0"></div></div>'
       +'<div class="sk-post-check'+(on?' is-on':'')+'" data-i="'+i+'">✓</div>'
       +'<div class="sk-post-channel">'+ch+'</div>'
       +'</div><div class="sk-post-body">'
@@ -321,6 +382,10 @@ function render(){
       +'</div></div>';
     g.appendChild(c)});
   document.getElementById('count').textContent=n+' publicação'+(n===1?'':'ões');
+  if(n===0){g.innerHTML='<div class="sk-empty" style="grid-column:1/-1"><div class="sk-empty-icon sk-empty-icon--muted">▦</div>'
+    +'<div class="sk-empty-title">'+((FILT||STATUSF)?'Nada com esse filtro':'Nenhuma publicação ainda')+'</div>'
+    +'<div class="sk-empty-text">'+((FILT||STATUSF)?'Ajuste os filtros acima.':'Crie a primeira no editor ou peça pro Estúdio IA.')+'</div>'
+    +'<a class="sk-btn" href="/editor">＋ Novo post</a></div>';}
   // lazy-load das miniaturas compiladas (mostra a headline, nunca quebra)
   const io=new IntersectionObserver((es)=>{es.forEach(en=>{if(en.isIntersecting){const card=en.target;io.unobserve(card);
     const host=card.querySelector('.thumbhost');const pi=+card.dataset.pi;if(host&&D.posts[pi])loadThumb(host,D.posts[pi])}})},{rootMargin:'200px'});
@@ -423,7 +488,7 @@ async function load(){const D=await(await fetch('/dados')).json();const f=docume
     const frames=(p.frames||[]);if(!frames.length)return;n++;
     const el=document.createElement('div');el.className='post';
     el.innerHTML='<div class=ph><div class=av></div>'+(p.marca||'smark')+'<span style="flex:1"></span>&middot;&middot;&middot;</div>'
-      +'<div class=media><div class=vhost></div><div class=cbadge>1/'+frames.length+'</div><div class=dots>'+frames.map((_,i)=>'<span class="dot'+(i?'':' on')+'"></span>').join('')+'</div></div>'
+      +'<div class=media><div class=vhost><div class="sk-skel" style="position:absolute;inset:0"></div></div><div class=cbadge>1/'+frames.length+'</div><div class=dots>'+frames.map((_,i)=>'<span class="dot'+(i?'':' on')+'"></span>').join('')+'</div></div>'
       +'<div class=icons><span>&#9825;</span><span>&#128172;</span><span>&#10148;</span><span style="flex:1"></span><span>&#128278;</span></div>'
       +'<div class=cap><b>'+(p.marca||'smark')+'</b> '+((p.caption||'').replace(/</g,'&lt;'))+'</div>';
     const host=el.querySelector('.vhost'),badge=el.querySelector('.cbadge'),dots=el.querySelectorAll('.dot');
@@ -618,6 +683,7 @@ class H(http.server.BaseHTTPRequestHandler):
             return self._send(200, HUB, MIME[".html"])
         if path == "/editor":
             html = open(UI, encoding="utf-8").read().replace("__EDITOR_TOKEN__", TOKEN)
+            html = html.replace("</body>", cmdk() + "</body>", 1)
             return self._send(200, html, MIME[".html"])
         if path == "/painel":
             return self._send(200, painel_html().replace("__EDITOR_TOKEN__", TOKEN), MIME[".html"])

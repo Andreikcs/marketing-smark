@@ -353,7 +353,9 @@ function syncAllPages(){((D&&D.posts)||[]).forEach(syncPages)}
 
 async function carregar(){D=await(await fetch('/dados')).json();syncAllPages();renderPosts();
   const q=new URLSearchParams(location.search);let pi=parseInt(q.get('post'));
-  if(!isNaN(pi)&&pi>=0&&pi<D.posts.length){hideWelcome();sel(pi,0)}else{showWelcome()}}
+  if(!isNaN(pi)&&pi>=0&&pi<D.posts.length){hideWelcome();sel(pi,0)}else{showWelcome()}
+  if(q.get('novo'))setTimeout(novoPost,60);
+  else if(q.get('estudio'))setTimeout(()=>{const b=document.getElementById('bestudio');if(b)b.click()},60);}
 function showWelcome(){$('.app').classList.add('welcome');PI=-1;renderPosts()}
 function hideWelcome(){$('.app').classList.remove('welcome')}
 document.querySelectorAll('#welcome .wcard').forEach(c=>c.onclick=()=>{const a=c.dataset.a;
