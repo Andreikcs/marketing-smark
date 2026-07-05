@@ -302,6 +302,12 @@ function renderCtrl(){
   gr.querySelector('input').onchange=e=>{f.grade=e.target.checked;change()};g3.appendChild(gr);
   c.appendChild(g3);
 
+  // ASSINATURA (bundle) — respeita o padrão da marca; se editar, prevalece
+  const g5=document.createElement('div');g5.className='grp';g5.innerHTML='<h5>Assinatura (rodapé)</h5>';
+  g5.appendChild(fld('Handle esquerdo (vazio = padrão da marca)',f.handle||'',v=>{f.handle=v;change()}));
+  g5.appendChild(fld('Crédito direito (vazio = padrão do sistema)',f.rodape||'',v=>{f.rodape=v;change()}));
+  c.appendChild(g5);
+
   // AÇÕES
   const g4=document.createElement('div');g4.className='grp acts';g4.innerHTML='<h5>Exportar</h5>';
   const e1=document.createElement('button');e1.className='btn go';e1.textContent='⬇ Exportar este frame (PNG final)';e1.onclick=()=>exportar(e1,FI);g4.appendChild(e1);

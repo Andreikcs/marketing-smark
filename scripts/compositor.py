@@ -205,7 +205,8 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
                  size="1080x1350", hsize=0, accent="", bright="", base="", square="",
                  bg="", bg_url="", placeholder=False, no_grade=False,
                  zoom=1.0, posx=50, posy=50, overlay="none", overlay_op=0.85,
-                 ov_ang=180, ov_pos=20, brilho=1.0, contraste=1.0, satur=1.0):
+                 ov_ang=180, ov_pos=20, brilho=1.0, contraste=1.0, satur=1.0,
+                 handle_over="", rodape_over=""):
     """Constrói o HTML completo do frame (mesmo motor do PNG final).
     `bg` = caminho de imagem (embutida em base64, p/ render headless).
     `bg_url` = URL direta (ex.: rota estática do servidor, p/ preview leve no navegador)."""
@@ -223,7 +224,8 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     accent_c, bright_c = b["accent"], b["bright"]
     on_acc = "#0B0B0B" if accent_c.upper() in [c.upper() for c in LIME] else "#FFFFFF"
     square = square or b.get("gradiente") or accent_c
-    rodape = fund.get("rodape", "@copywriting2026")
+    rodape = rodape_over or fund.get("rodape", "@copywriting2026")
+    handle = handle_over or b["handle"]
 
     if tema == "claro":
         cl = fund.get("_claro", {})
@@ -280,7 +282,7 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ovx"></div><div class="ov"></div>{page_h}'
             f'<div class="tab"><div class="ic">{glyph_html(b, on_acc, 46)}</div><div class="vt">{esc(b["tab"])}</div></div>'
             f'<div class="ct">{chip_h}<div class="h">{render_rich(headline)}</div>{sub_h}{cta_h}</div>'
-            f'<div class="footer"><div>{esc(b["handle"])}</div><div class="cred">{esc(rodape)}</div></div></div>')
+            f'<div class="footer"><div>{esc(handle)}</div><div class="cred">{esc(rodape)}</div></div></div>')
     return PAGE % {"CSS": css, "BODY": body}, w, h
 
 

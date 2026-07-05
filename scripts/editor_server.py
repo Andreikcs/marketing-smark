@@ -100,6 +100,7 @@ table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:lef
 <div class=grp><h3>Padrões editáveis</h3><div class=kv>
 <div>Tema-padrão: <select class=cfin id=cf_tema><option value=claro>claro</option><option value=escuro>escuro</option></select></div>
 <div>Template padrão (tamanho): <select class=cfin id=cf_size><option value=1080x1350>Feed 4:5</option><option value=1080x1080>Quadrado 1:1</option><option value=1080x1920>Story 9:16</option></select></div>
+<div>Assinatura padrão (rodapé direito): <input class=cfin id=cf_rodape value="{fund.get('rodape','')}" style="width:180px"></div>
 </div>
 <div style="margin-top:8px;color:#9a92ad;font-size:12px">Regra #9: imagens geradas saem <b style="color:#c9b6ff">claras</b> por padrão · Base clara {tok.get('tema_claro',{}).get('base','#F4F2FB')} · Base escura {fund.get('base','#0B0B0B')} · Rodapé {fund.get('rodape','—')}</div>
 <button class=savebtn id=cf_save>💾 Salvar configurações</button> <span id=cf_msg class=ok></span>
@@ -126,7 +127,7 @@ document.getElementById('cf_size').value="{defsize}";
 document.getElementById('cf_save').onclick=async()=>{{
   const handles={{}};document.querySelectorAll('[id^=\\"cf_h_\\"]').forEach(i=>handles[i.id.slice(5)]=i.value.trim());
   const r=await(await fetch('/config-save',{{method:'POST',headers:{{'Content-Type':'application/json','X-Editor-Token':T}},
-    body:JSON.stringify({{tema_padrao:document.getElementById('cf_tema').value,size:document.getElementById('cf_size').value,handles:handles}})}})).json();
+    body:JSON.stringify({{tema_padrao:document.getElementById('cf_tema').value,size:document.getElementById('cf_size').value,rodape:document.getElementById('cf_rodape').value,handles:handles}})}})).json();
   document.getElementById('cf_msg').textContent=r.ok?'Salvo ✓':('Erro: '+(r.erro||''));
 }};
 </script>
@@ -170,7 +171,8 @@ def frame_kwargs(fr, size, for_export, marca="smark"):
              overlay_op=float(fr.get("overlay_op", 0.85)),
              ov_ang=int(fr.get("ov_ang", 180)), ov_pos=int(fr.get("ov_pos", 20)),
              brilho=float(fr.get("brilho", 1.0)), contraste=float(fr.get("contraste", 1.0)),
-             satur=float(fr.get("satur", 1.0)))
+             satur=float(fr.get("satur", 1.0)),
+             handle_over=fr.get("handle", ""), rodape_over=fr.get("rodape", ""))
     mode = fr.get("bgmode", "imagem")
     if mode == "imagem" and fr.get("bg"):
         if for_export:
@@ -312,6 +314,9 @@ class H(http.server.BaseHTTPRequestHandler):
                     tok["tema_padrao"] = req["tema_padrao"]
                 if re.match(r"^\d{3,4}x\d{3,4}$", req.get("size", "")):
                     tok.setdefault("editor_defaults", {})["size"] = req["size"]
+                rod = re.sub(r"[^@A-Za-z0-9_. ]", "", str(req.get("rodape", "")))[:40].strip()
+                if rod:
+                    tok.setdefault("fundacao", {})["rodape"] = rod
                 for slug, h in (req.get("handles") or {}).items():
                     if slug in tok.get("marcas", {}):
                         h = re.sub(r"[^@A-Za-z0-9_.]", "", str(h))[:40]
