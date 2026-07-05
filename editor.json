@@ -1566,36 +1566,6 @@
       ]
     },
     {
-      "slug": "amor",
-      "marca": "smark",
-      "status": "rascunho",
-      "titulo": "Amor",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
-          "cta": "",
-          "page": "",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/amor/_uploads/2ae0c04f8c.png",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/amor/01.png",
-          "_v": 1
-        }
-      ],
-      "caption": "",
-      "canais": [
-        "instagram"
-      ]
-    },
-    {
       "slug": "teste-amor",
       "marca": "smark",
       "status": "rascunho",
@@ -1821,52 +1791,6 @@
           "grade": true,
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/claude-code-ia/01.png"
-        }
-      ],
-      "caption": "",
-      "canais": [
-        "instagram"
-      ]
-    },
-    {
-      "slug": "amor-f41b-c6215",
-      "marca": "provider-max",
-      "status": "rascunho",
-      "titulo": "Amor (cópia)",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
-          "cta": "",
-          "page": "01/02",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "cor",
-          "bg": "",
-          "cor": "#947ee2",
-          "accent": "#53347f",
-          "hsize": 63,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/provider-max/publicacoes/social/instagram/arte/amor-f41b-c6215/01.png",
-          "overlay": "branco"
-        },
-        {
-          "headline": "NOVO|*CARD.*",
-          "sub": "",
-          "cta": "",
-          "page": "02/02",
-          "chip": false,
-          "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 2,
-          "out": "marcas/provider-max/publicacoes/social/instagram/arte/amor-f41b-c6215/02.png"
         }
       ],
       "caption": "",
