@@ -85,6 +85,22 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .gallery{border-top:1px solid var(--line);background:var(--pan)}
 .pitem small .stb{margin-left:6px}
 .th{cursor:grab} .th.drag{opacity:.4}
+.sidehead{position:sticky;top:0;background:var(--pan);padding-bottom:9px;margin-bottom:9px;border-bottom:1px solid var(--line);z-index:3}
+.psearch{width:100%;background:#0f0d17;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 9px;font-size:12px;margin-top:7px}
+.psearch:focus{outline:none;border-color:var(--rox)}
+.vermais{display:block;text-align:center;color:var(--rox);font-size:12px;text-decoration:none;padding:9px;margin-top:8px;border:1px dashed var(--line);border-radius:9px}
+.vermais:hover{background:var(--pan2)}
+.stage{position:relative}
+.stagenav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;background:#1b1729cc;border:1px solid var(--line);color:var(--txt);width:42px;height:62px;border-radius:11px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center}
+.stagenav:hover{border-color:var(--rox);background:var(--rox);color:#fff}
+.stagenav.l{left:16px}.stagenav.r{right:16px}
+.stagenav:disabled{opacity:.25;cursor:default}
+.addtile{flex:0 0 auto;width:74px;height:92px;border-radius:8px;border:2px dashed var(--line);background:transparent;color:var(--sub);cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center}
+.addtile:hover{border-color:var(--rox);color:var(--txt)}
+.igicon{width:15px;height:15px;vertical-align:-3px;margin-right:5px}
+.fsmodal{display:none;position:fixed;inset:0;background:#000e;z-index:300;align-items:center;justify-content:center}
+.fsmodal iframe{border:0;width:1080px;height:1350px;transform-origin:center center}
+.fsmodal .x{position:absolute;top:14px;right:18px;background:var(--rox);color:#fff;border:0;border-radius:8px;padding:9px 15px;cursor:pointer;z-index:2;font-size:13px}
 </style></head>
 <body>
 <div class=app>
@@ -99,15 +115,28 @@ input[type=range]{width:100%;accent-color:var(--rox)}
     <button class="btn" style="width:auto" id=bsave>💾 Salvar</button>
   </header>
 
-  <aside class=side><h4>Publicações</h4><div id=posts></div>
-    <button class=newpost id=bnew>+ Novo post</button>
-    <div class=sideacts><button id=bdup>⧉ Duplicar</button><button class=del id=bdelpost>🗑 Excluir sel.</button></div>
+  <aside class=side>
+    <div class=sidehead>
+      <div class=sideacts><button id=bnew>＋ Novo</button><button id=bdup>⧉ Duplicar</button><button class=del id=bdelpost>🗑 Excluir</button></div>
+      <input id=psearch class=psearch placeholder="buscar publicação…">
+    </div>
+    <div id=posts></div>
+    <a class=vermais id=vermais href="/painel">ver todas no Painel →</a>
   </aside>
 
   <div class=main>
-    <div class=stage><div class=framebox id=fbox><iframe id=pv></iframe></div></div>
+    <div class=stage>
+      <button class="stagenav l" id=bmvl title="mover card p/ esquerda">◀</button>
+      <div class=framebox id=fbox><iframe id=pv></iframe></div>
+      <button class="stagenav r" id=bmvr title="mover card p/ direita">▶</button>
+    </div>
     <div class=gallery>
-      <div class=cardacts><button id=bmvl>◀ Mover</button><button id=baddc>＋ Adicionar card</button><button id=bsim>📱 Instagram</button><button class=del id=bdelc>🗑 Excluir card</button><button id=bmvr>Mover ▶</button></div>
+      <div class=cardacts>
+        <button id=baddc>＋ Adicionar card</button>
+        <button id=bsim><svg class=igicon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Visualizar (Instagram)</button>
+        <button id=bfull>⛶ Tela cheia</button>
+        <button class=del id=bdelc>🗑 Excluir card</button>
+      </div>
       <div class=strip id=strip></div>
     </div>
   </div>
@@ -115,6 +144,7 @@ input[type=range]{width:100%;accent-color:var(--rox)}
   <aside class=ctrl id=ctrl></aside>
 </div>
 <div id=igmodal class=igmodal></div>
+<div id=fsmodal class=fsmodal><button class=x id=fsx>✕ fechar</button><iframe id=fsif></iframe></div>
 <div id=toast></div>
 
 <script>
@@ -137,18 +167,23 @@ async function carregar(){D=await(await fetch('/dados')).json();renderPosts();
   const q=new URLSearchParams(location.search);let pi=parseInt(q.get('post'));
   if(isNaN(pi)||pi<0||pi>=D.posts.length)pi=0;sel(pi,0)}
 
+let PSEARCH='';
 function renderPosts(){
   const el=$('#posts');el.innerHTML='';
-  D.posts.forEach((p,i)=>{
+  const q=PSEARCH.trim().toLowerCase();
+  let list=D.posts.map((p,i)=>({p,i}));
+  if(q)list=list.filter(o=>((o.p.titulo||o.p.slug||'')+' '+(o.p.marca||'')).toLowerCase().includes(q));
+  const shown=q?list:list.slice(0,10);
+  shown.forEach(({p,i})=>{
     const d=document.createElement('div');d.className='pitem'+(i===PI?' on':'');
     const st=(p.status==='salvo')?'<span class=stb style="color:var(--ok)">● salvo</span>':'<span class=stb style="color:var(--warn)">● rascunho</span>';
     const cb=document.createElement('input');cb.type='checkbox';cb.className='cb';cb.checked=SEL.has(i);
     cb.onclick=e=>{e.stopPropagation();cb.checked?SEL.add(i):SEL.delete(i)};
     const txt=document.createElement('div');txt.className='ptxt';
-    txt.innerHTML='<b>'+(i+1)+'. '+p.titulo.split('—')[0].trim()+'</b><small>'+(p.marca||'smark')+' · '+p.frames.length+' frames '+st+'</small>';
-    d.appendChild(cb);d.appendChild(txt);
-    d.onclick=()=>sel(i,0);el.appendChild(d);
+    txt.innerHTML='<b>'+(i+1)+'. '+(p.titulo||p.slug).split('—')[0].trim()+'</b><small>'+(p.marca||'smark')+' · '+p.frames.length+' frames '+st+'</small>';
+    d.appendChild(cb);d.appendChild(txt);d.onclick=()=>sel(i,0);el.appendChild(d);
   });
+  const vm=$('#vermais');if(vm)vm.textContent=q?('ver todas ('+list.length+') no Painel →'):(D.posts.length>10?('mostrando 10 de '+D.posts.length+' · ver todas →'):'ver no Painel →');
 }
 async function dupPost(){
   const p=JSON.parse(JSON.stringify(post()));p.titulo=(p.titulo||'')+' (cópia)';
@@ -176,6 +211,7 @@ function renderStrip(){
     d.ondrop=e=>{e.preventDefault();reorderFrame(+e.dataTransfer.getData('i'),i)};
     el.appendChild(d);
   });
+  const add=document.createElement('button');add.className='addtile';add.textContent='＋';add.title='adicionar card';add.onclick=addCard;el.appendChild(add);
 }
 async function reorderFrame(from,to){
   if(from===to||isNaN(from))return;const fr=post().frames;const[m]=fr.splice(from,1);fr.splice(to,0,m);
@@ -342,6 +378,7 @@ async function moveCard(dir){
   [fr[FI],fr[j]]=[fr[j],fr[FI]];await salvar(true);await reload(PI,j);toast('Ordem alterada');
 }
 const COLLAPSED=new Set();
+['Estilo','Assinatura (rodapé)','Exportar'].forEach(t=>COLLAPSED.add(t));
 const SEL=new Set();
 function applyCollapse(){
   document.querySelectorAll('#ctrl .grp').forEach(g=>{
@@ -481,6 +518,16 @@ async function novoPost(){
 $('#bnew').onclick=novoPost;$('#baddc').onclick=addCard;$('#bdelc').onclick=delCard;
 $('#bmvl').onclick=()=>moveCard(-1);$('#bmvr').onclick=()=>moveCard(1);$('#bsim').onclick=openSim;
 $('#bdup').onclick=dupPost;$('#bdelpost').onclick=delSelected;
+$('#psearch').oninput=e=>{PSEARCH=e.target.value;renderPosts()};
+async function openFull(){
+  const r=await fetch('/preview',{method:'POST',headers:HJSON,body:JSON.stringify({frame:frame(),size:post().size,marca:post().marca||'smark'})});
+  document.getElementById('fsif').srcdoc=await r.text();
+  const m=document.getElementById('fsmodal');m.style.display='flex';
+  const s=Math.min((window.innerWidth-40)/1080,(window.innerHeight-40)/1350);
+  document.getElementById('fsif').style.transform='scale('+s+')';
+}
+$('#bfull').onclick=openFull;$('#fsx').onclick=()=>document.getElementById('fsmodal').style.display='none';
+document.getElementById('fsmodal').onclick=e=>{if(e.target.id==='fsmodal')e.currentTarget.style.display='none'};
 
 carregar();
 </script>

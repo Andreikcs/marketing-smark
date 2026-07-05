@@ -83,8 +83,8 @@
           "overlay": "none"
         },
         {
-          "headline": "*+40%*",
-          "sub": "mais qualidade nas entregas com apoio de IA. Não é sobre gastar menos. É entregar melhor.  ·  Fonte: Harvard + BCG · 2023",
+          "headline": "*+40% das empresas*",
+          "sub": "relatam aumento de velociadade e qualidade nas entregas com apoio de IA. **_**·  ____{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:Fonte: Harvard + BCG · 2023**_**____}}}}}}}}",
           "cta": "",
           "page": "04/06",
           "chip": false,
@@ -1480,6 +1480,32 @@
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/amor/01.png",
           "_v": 1
+        }
+      ],
+      "caption": ""
+    },
+    {
+      "slug": "teste-amor",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "Teste Amor",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "01/01",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "degrade",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-amor/01.png"
         }
       ],
       "caption": ""
