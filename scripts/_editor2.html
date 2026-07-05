@@ -45,6 +45,15 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1c1729;border:1px solid var(--rox);padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;z-index:99}
 #toast.on{opacity:1}
 .bgthumb{width:100%;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--line);margin-bottom:8px;background:#000}
+.fmtbar{display:flex;gap:4px;margin-bottom:5px}
+.fmtb{border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:6px;padding:3px 9px;font-size:12px;cursor:pointer}
+.fmtb:hover{border-color:var(--rox);color:var(--txt)} .fmtb.b{font-weight:800} .fmtb.i{font-style:italic}
+.newpost{width:100%;margin-top:10px;padding:10px;border:1px dashed var(--line);background:transparent;color:var(--sub);border-radius:10px;cursor:pointer;font-size:13px}
+.newpost:hover{border-color:var(--rox);color:var(--txt)}
+.cardacts{display:flex;gap:6px;padding:0 14px 10px}
+.cardacts button{flex:1;border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:8px;padding:7px;font-size:12px;cursor:pointer}
+.cardacts button:hover{border-color:var(--rox);color:var(--txt)} .cardacts .del:hover{border-color:#c0392b;color:#ff8a80}
+.regsel{width:100%;background:#0f0d17;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px;font-size:12px;margin-bottom:6px}
 </style></head>
 <body>
 <div class=app>
@@ -59,10 +68,13 @@ input[type=range]{width:100%;accent-color:var(--rox)}
     <button class="btn" style="width:auto" id=bsave>💾 Salvar</button>
   </header>
 
-  <aside class=side><h4>Publicações</h4><div id=posts></div></aside>
+  <aside class=side><h4>Publicações</h4><div id=posts></div>
+    <button class=newpost id=bnew>+ Novo post</button>
+  </aside>
 
   <div class=main>
     <div class=strip id=strip></div>
+    <div class=cardacts><button id=baddc>＋ Adicionar card</button><button class=del id=bdelc>🗑 Excluir card</button></div>
     <div class=stage><div class=framebox id=fbox><iframe id=pv></iframe></div></div>
   </div>
 
@@ -109,13 +121,26 @@ function fld(label,val,onin,ph,rows){
   const w=document.createElement('div');w.innerHTML='<label>'+label+'</label>'+t;
   const inp=w.querySelector(rows?'textarea':'input');inp.oninput=()=>onin(inp.value);return w;
 }
+function richField(label,val,onin){
+  const w=document.createElement('div');w.innerHTML='<label>'+label+'</label>';
+  const bar=document.createElement('div');bar.className='fmtbar';
+  const ta=document.createElement('textarea');ta.rows=3;ta.value=val||'';ta.oninput=()=>onin(ta.value);
+  const wrap=(pre,suf)=>{const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value,sel=v.slice(s,e)||'texto';
+    ta.value=v.slice(0,s)+pre+sel+(suf||pre)+v.slice(e);ta.focus();
+    ta.selectionStart=s+pre.length;ta.selectionEnd=s+pre.length+sel.length;onin(ta.value)};
+  const ins=t=>{const s=ta.selectionStart,v=ta.value;ta.value=v.slice(0,s)+t+v.slice(ta.selectionEnd);
+    ta.focus();ta.selectionStart=ta.selectionEnd=s+t.length;onin(ta.value)};
+  [['↵ quebra','',()=>ins('|')],['★ acento','',()=>wrap('*')],['B','b',()=>wrap('**')],['I','i',()=>wrap('_')]]
+   .forEach(([lb,cls,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.onclick=fn;bar.appendChild(b)});
+  w.appendChild(bar);w.appendChild(ta);return w;
+}
 
 function renderCtrl(){
   const f=frame(),c=$('#ctrl');c.innerHTML='';
   // TEXTO
   const g1=document.createElement('div');g1.className='grp';g1.innerHTML='<h5>Texto</h5>';
-  g1.appendChild(fld('Headline (| = quebra de linha · *palavra* = acento)',f.headline,v=>{f.headline=v;change()},'',3));
-  g1.appendChild(fld('Apoio (sub)',f.sub,v=>{f.sub=v;change()},'',3));
+  g1.appendChild(richField('Headline (| quebra · *acento* · **negrito** · _itálico_)',f.headline,v=>{f.headline=v;change()}));
+  g1.appendChild(richField('Apoio (sub)',f.sub,v=>{f.sub=v;change()}));
   g1.appendChild(fld('CTA',f.cta,v=>{f.cta=v;change()}));
   const rowpc=document.createElement('div');rowpc.className='row';rowpc.style.marginTop='8px';
   const pg=fld('Paginação',f.page,v=>{f.page=v;change()});pg.style.flex='1';rowpc.appendChild(pg);
@@ -127,7 +152,7 @@ function renderCtrl(){
   // FUNDO
   const g2=document.createElement('div');g2.className='grp';g2.innerHTML='<h5>Fundo</h5>';
   const seg=document.createElement('div');seg.className='seg';
-  [['imagem','Imagem'],['escuro','Escuro'],['claro','Claro'],['cor','Cor']].forEach(([k,lb])=>{
+  [['imagem','Imagem'],['escuro','Escuro'],['claro','Claro'],['degrade','Degradê'],['cor','Cor']].forEach(([k,lb])=>{
     const b=document.createElement('button');b.textContent=lb;if((f.bgmode||'imagem')===k)b.classList.add('on');
     b.onclick=()=>{f.bgmode=k;renderCtrl();change()};seg.appendChild(b);
   });
@@ -141,14 +166,20 @@ function renderCtrl(){
     fi.onchange=e=>upload(e.target.files[0]);up.appendChild(fi);g2.appendChild(up);
     // regerar IA
     const reg=document.createElement('div');reg.style.marginTop='10px';
-    reg.innerHTML='<label>Regerar fundo por IA (conceito)</label>';
-    const selt=document.createElement('select');selt.style.cssText='width:100%;background:#0f0d17;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px;font-size:12px;margin-bottom:6px';
-    TIPOS.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;if((f._tipo||'manifesto')===t)o.selected=true;selt.appendChild(o)});
+    reg.innerHTML='<label>Regerar fundo por IA</label>';
+    const selm=document.createElement('select');selm.className='regsel';
+    [['claro','Tom claro (padrão)'],['escuro','Tom escuro']].forEach(([v,lb])=>{const o=document.createElement('option');o.value=v;o.textContent=lb;if((f._regtema||'claro')===v)o.selected=true;selm.appendChild(o)});
+    selm.onchange=()=>f._regtema=selm.value;reg.appendChild(selm);
+    const selt=document.createElement('select');selt.className='regsel';
+    TIPOS.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent='conceito: '+t;if((f._tipo||'manifesto')===t)o.selected=true;selt.appendChild(o)});
     selt.onchange=()=>f._tipo=selt.value;reg.appendChild(selt);
     const rb=document.createElement('button');rb.className='btn ai';rb.textContent='✨ Regerar fundo IA (pago ~40s)';
     rb.onclick=()=>regen(rb);reg.appendChild(rb);
     const rb2=document.createElement('button');rb2.className='btn ai';rb2.style.marginTop='6px';rb2.textContent='✨ Gerar a partir do fundo atual (referência)';
     rb2.onclick=()=>regen(rb2,f.bg);if(f.bg)reg.appendChild(rb2);
+    const hintp=document.createElement('div');hintp.className='mini';hintp.style.marginTop='6px';
+    hintp.textContent='Preview grátis do layout claro: clique "Degradê" ou "Claro" acima antes de gastar com IA.';
+    reg.appendChild(hintp);
     g2.appendChild(reg);
   }else if(mode==='cor'){
     const cw=document.createElement('div');cw.className='row';cw.style.marginTop='8px';
@@ -236,14 +267,33 @@ async function upload(file){
 }
 
 async function regen(btn,ref){
+  const f=frame(),tema=f._regtema||'claro',tipo=f._tipo||'manifesto';
+  const msg=ref?'Gerar fundo usando a imagem atual como REFERÊNCIA?\n(pago · ~40s)'
+                :('Gerar fundo por IA?\n\n• Tom: '+tema+'\n• Conceito: '+tipo+'\n\n(pago · ~40s)');
+  if(!confirm(msg))return;
   btn.disabled=true;const old=btn.textContent;btn.textContent='Gerando fundo…';toast('Gerando fundo por IA (pago)…');
-  const f=frame();
   const r=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,
-    body:JSON.stringify({post:PI,frame:FI,tipo:f._tipo||'manifesto',ref:ref||''})})).json();
+    body:JSON.stringify({post:PI,frame:FI,tipo:tipo,tema:tema,ref:ref||''})})).json();
   btn.disabled=false;btn.textContent=old;
-  if(r.ok){f.bgmode='imagem';f.bg=r.path;f._v=(f._v||0)+1;renderCtrl();change();toast('Fundo regerado');}
+  if(r.ok){f.bgmode='imagem';f.bg=r.path;if(r.tema)f.tema=r.tema;f._v=(f._v||0)+1;renderCtrl();change();toast('Fundo regerado');}
   else toast('Erro: '+(r.erro||''));
 }
+
+// novo post / adicionar / excluir card
+function newFrame(){return {headline:'NOVO|*CARD.*',sub:'',cta:'',page:'',chip:false,tema:'claro',bgmode:'claro',bg:'',cor:'#F4F2FB',accent:'',hsize:0,grade:true}}
+async function reload(pi,fi){D=await(await fetch('/dados')).json();sel(pi,fi)}
+async function addCard(){post().frames.splice(FI+1,0,newFrame());await salvar();await reload(PI,FI+1);toast('Card adicionado')}
+async function delCard(){
+  if(post().frames.length<=1){toast('O post precisa de pelo menos 1 card');return}
+  if(!confirm('Excluir este card do post?'))return;
+  post().frames.splice(FI,1);await salvar();await reload(PI,Math.max(0,FI-1));toast('Card excluído');
+}
+async function novoPost(){
+  const t=prompt('Título do novo post:','Novo post');if(t===null)return;
+  const r=await(await fetch('/novo-post',{method:'POST',headers:HJSON,body:JSON.stringify({titulo:t,slug:t})})).json();
+  if(r.ok){await reload(r.index,0);toast('Post criado — comece a editar')}else toast('Erro ao criar post');
+}
+$('#bnew').onclick=novoPost;$('#baddc').onclick=addCard;$('#bdelc').onclick=delCard;
 
 carregar();
 </script>
