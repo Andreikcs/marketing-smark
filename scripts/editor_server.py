@@ -293,13 +293,10 @@ class H(http.server.BaseHTTPRequestHandler):
 
         if path == "/novo-post":
             d = load()
-            slug = re.sub(r"[^a-z0-9-]+", "-", (req.get("slug") or "").lower()).strip("-") \
-                or ("novo-" + secrets.token_hex(3))
+            slug = safe_slug(req.get("slug", "")) if req.get("slug") else ("novo-" + secrets.token_hex(3))
             if any(p["slug"] == slug for p in d["posts"]):
                 slug = slug + "-" + secrets.token_hex(2)
-            marca = req.get("marca", "smark")
-            if marca not in ("smark", "provider-max", "elever-ai"):
-                marca = "smark"
+            marca = safe_marca(req.get("marca", "smark"))
             fr = {"headline": "SEU TÍTULO|*AQUI.*", "sub": "", "cta": "", "page": "01/01",
                   "chip": True, "tema": "claro", "bgmode": "claro", "bg": "", "cor": "#F4F2FB",
                   "accent": "", "hsize": 0, "grade": True}
@@ -349,8 +346,8 @@ class H(http.server.BaseHTTPRequestHandler):
             try:
                 post = d["posts"][req["post"]]
                 fr = post["frames"][req["frame"]]
-                slug = post["slug"]
-                marca = post.get("marca", "smark")
+                slug = safe_slug(post.get("slug", ""))
+                marca = safe_marca(post.get("marca", "smark"))
                 dd = os.path.join(VAULT, "marcas", marca, "publicacoes", "social", "instagram",
                                   "arte", slug, "_regen")
                 os.makedirs(dd, exist_ok=True)
