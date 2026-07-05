@@ -153,8 +153,8 @@ def tab_font(label):
 
 
 def auto_hsize(text):
-    plain = [ln.replace("*", "") for ln in text.split("\\n")]
-    longest = max((len(ln) for ln in plain), default=1)
+    plain = [ln.replace("*", "") for ln in (text or "").split("\\n")]
+    longest = max((len(ln) for ln in plain), default=1) or 1  # nunca 0 (evita div/0)
     n = max(len(plain), 1)
     return int(max(54, min((1080 - 128) / (longest * 0.52), 360 / (n * 0.92), 104)))
 

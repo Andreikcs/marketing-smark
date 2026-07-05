@@ -361,6 +361,8 @@ def normaliza(d):
     for p in d.get("posts", []):
         p["marca"] = safe_marca(p.get("marca", "smark"))
         p["slug"] = safe_slug(p.get("slug", ""))
+        if not p.get("canais"):
+            p["canais"] = ["instagram"]
         A = f"marcas/{p['marca']}/publicacoes/social/instagram/arte"
         for i, fr in enumerate(p.get("frames", []), 1):
             fr["n"] = i
@@ -473,6 +475,20 @@ class H(http.server.BaseHTTPRequestHandler):
             save(normaliza(d))
             return self._send(200, {"ok": True, "restantes": len(d["posts"])})
 
+        if path == "/duplicar-post":
+            d = load()
+            i = req.get("idx")
+            if not isinstance(i, int) or not (0 <= i < len(d["posts"])):
+                return self._send(400, {"ok": False, "erro": "índice inválido"})
+            import copy
+            novo = copy.deepcopy(d["posts"][i])
+            novo["titulo"] = (novo.get("titulo", "") + " (cópia)")[:80]
+            novo["slug"] = safe_slug(novo.get("slug", "post")) + "-c" + secrets.token_hex(2)
+            novo["status"] = "rascunho"
+            d["posts"].append(novo)  # cópia vai pro fim (= mais nova)
+            save(normaliza(d))
+            return self._send(200, {"ok": True, "index": len(d["posts"]) - 1})
+
         if path == "/importar-notas":
             d = load()
             existing = {(p.get("marca"), p.get("slug")) for p in d["posts"]}
@@ -546,7 +562,7 @@ class H(http.server.BaseHTTPRequestHandler):
                   "accent": "", "hsize": 0, "grade": True}
             d["posts"].append({"slug": slug, "marca": marca, "status": "rascunho",
                                "titulo": req.get("titulo") or "Novo post", "size": size,
-                               "frames": [fr], "caption": ""})
+                               "frames": [fr], "caption": "", "canais": ["instagram"]})
             save(normaliza(d))
             return self._send(200, {"ok": True, "index": len(d["posts"]) - 1, "slug": slug})
 
