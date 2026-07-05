@@ -572,25 +572,57 @@ async function upload(file){
   };rd.readAsDataURL(file);
 }
 
+// ===== Progresso visível de geração de IA (sobre o canvas) =====
+let _genT=null;
+function genStart(label){
+  const p=$('#genprog');if(!p)return;
+  $('#genlbl').textContent=label||'Gerando com IA…';
+  const bar=$('#genbar');bar.style.width='4%';$('#genstg').textContent='enviando pedido…';
+  p.classList.add('on');
+  const t0=Date.now();let pct=4;
+  const St=[[0,'enviando pedido…'],[2,'desenhando o fundo (nível agência)…'],[24,'aplicando paleta e moldura…'],[40,'quase lá…']];
+  clearInterval(_genT);
+  _genT=setInterval(()=>{
+    const s=Math.round((Date.now()-t0)/1000);
+    $('#gent').textContent=s+'s · fica na tela, atualiza sozinho quando terminar';
+    pct=pct+Math.max(.4,(93-pct)*0.06);if(pct>96)pct=96;bar.style.width=pct+'%';
+    let stg=St[0][1];for(const it of St){if(s>=it[0])stg=it[1]}
+    $('#genstg').textContent=stg;
+  },500);
+}
+function genStop(ok){
+  clearInterval(_genT);_genT=null;const p=$('#genprog');if(!p)return;
+  if(ok){$('#genbar').style.width='100%';$('#genstg').textContent='pronto ✓';setTimeout(()=>p.classList.remove('on'),400)}
+  else p.classList.remove('on');
+}
+// Sincroniza tema do texto + camada ao TOM escolhido (claro deixa de sair roxo)
+function applyTom(fr,tom){
+  if(tom==='claro'){fr.tema='claro';if(['roxo','todo-roxo'].includes(fr.overlay))fr.overlay='branco';}
+  else{fr.tema='escuro';if(['branco','todo-branco'].includes(fr.overlay))fr.overlay='roxo';}
+}
+
 async function regen(btn,ref){
   const f=frame(),tema=f._regtema||'claro',tipo=f._tipo||'manifesto',ctx=(f.contexto||'').trim();
   const msg=ref?('Gerar mantendo o ESTILO da referência'+(ctx?(', contexto:\n"'+ctx+'"'):'')+'\n\n(pago · ~40s)')
-                :('Gerar fundo por IA?\n\n• Tom: '+tema+'\n• Conceito: '+tipo+'\n\n(pago · ~40s)');
+                :('Gerar fundo por IA?\n\n• Tom: '+(tema==='claro'?'CLARO (padrão)':'escuro')+'\n• Conceito: '+tipo+'\n\n(pago · ~40s)');
   if(!confirm(msg))return;
   const pi=PI,fi=FI;  // fixa o alvo — pode navegar/editar enquanto gera
   btn.disabled=true;const old=btn.textContent;btn.textContent='Gerando…';
-  toast('Gerando em background — pode continuar editando ou sair, não perde.');
+  if(pi===PI&&fi===FI)genStart(ref?'Gerando com referência…':(tema==='claro'?'Gerando fundo CLARO…':'Gerando fundo escuro…'));
+  toast('Gerando em background — pode continuar editando, atualiza sozinho.');
   const st=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,
     body:JSON.stringify({post:pi,frame:fi,tipo:tipo,tema:tema,ref:ref||'',prompt:ctx})})).json();
-  if(!st.ok||!st.job){btn.disabled=false;btn.textContent=old;toast('Erro ao iniciar: '+(st.erro||''));return}
+  if(!st.ok||!st.job){btn.disabled=false;btn.textContent=old;genStop(false);toast('Erro ao iniciar: '+(st.erro||''));return}
   let tries=0;const poll=setInterval(async()=>{
     tries++;let s;try{s=await(await fetch('/job?id='+st.job)).json()}catch(e){return}
     if(s.status==='done'){clearInterval(poll);btn.disabled=false;btn.textContent=old;
-      const tf=D.posts[pi]&&D.posts[pi].frames[fi];if(tf){tf.bg=s.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1}
-      if(pi===PI&&fi===FI){renderCtrl();preview()}renderStrip();setDirty(true);toast('✨ Imagem gerada!');}
-    else if(s.status==='erro'){clearInterval(poll);btn.disabled=false;btn.textContent=old;toast('Erro: '+String(s.erro||'').slice(0,120));}
-    else if(tries>60){clearInterval(poll);btn.disabled=false;btn.textContent=old;toast('Ainda gerando… aparece ao recarregar.');}
-  },2500);
+      const tf=D.posts[pi]&&D.posts[pi].frames[fi];
+      if(tf){tf.bg=s.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(!ref)applyTom(tf,tema);}  // claro respeitado
+      if(pi===PI&&fi===FI){genStop(true);renderCtrl();preview();}else{renderStrip();}
+      renderStrip();setDirty(true);toast('✨ Fundo pronto — tela atualizada.');}
+    else if(s.status==='erro'){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Erro: '+String(s.erro||'').slice(0,120));}
+    else if(tries>80){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Ainda gerando… aparece ao recarregar.');}
+  },2000);
 }
 
 // ===== Simulação de Instagram =====
@@ -735,7 +767,7 @@ carregar().then(()=>snapshot());
   const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const slugify=s=>(s||'post').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'post';
   function addMsg(cls,html){const d=document.createElement('div');d.className='esmsg '+cls;d.innerHTML=html;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;return d}
-  document.getElementById('bestudio').onclick=()=>{panel.classList.toggle('on');if(panel.classList.contains('on')){if(typeof D!=='undefined'&&D&&post())optMarca.value=post().marca||'smark';txt.focus()}};
+  document.getElementById('bestudio').onclick=()=>{panel.classList.toggle('on');if(panel.classList.contains('on')){provEl.textContent='Claude';if(typeof D!=='undefined'&&D&&post())optMarca.value=post().marca||'smark';txt.focus()}};
   document.getElementById('esclose').onclick=()=>panel.classList.remove('on');
   function pollJob(id){return new Promise(res=>{let t=0;const iv=setInterval(async()=>{t++;let j;try{j=await(await fetch('/job?id='+id)).json()}catch(e){return}
     if(j.status==='done'||j.status==='erro'){clearInterval(iv);res(j)}else if(t>90){clearInterval(iv);res({status:'erro',erro:'tempo esgotado'})}},1300)})}
@@ -743,14 +775,15 @@ carregar().then(()=>snapshot());
     const pedido=txt.value.trim();if(!pedido)return;
     const emp=logEl.querySelector('.esempty');if(emp)emp.remove();
     addMsg('u',esc(pedido));txt.value='';txt.style.height='auto';
-    send.disabled=true;const wait=addMsg('a','⏳ gerando copy…');
+    send.disabled=true;const wait=addMsg('a','✍️ Claude está escrevendo a copy<span class=dots></span>');
+    let d=0;const anim=setInterval(()=>{d=(d+1)%4;const el=wait.querySelector('.dots');if(el)el.textContent='.'.repeat(d)},380);
     try{
       const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:pedido,marca:optMarca.value,n:+optN.value})})).json();
-      if(!st.ok){wait.innerHTML='⚠️ '+esc(st.erro||'falhou');send.disabled=false;return}
-      const j=await pollJob(st.job);
+      if(!st.ok){clearInterval(anim);wait.innerHTML='⚠️ '+esc(st.erro||'falhou');send.disabled=false;return}
+      const j=await pollJob(st.job);clearInterval(anim);
       if(j.status!=='done'){wait.innerHTML='⚠️ '+esc(j.erro||'falhou');send.disabled=false;return}
       wait.remove();renderResult(j.resultado,j.provider,optFundo.checked);
-    }catch(e){wait.innerHTML='⚠️ '+esc(e.message)}
+    }catch(e){clearInterval(anim);wait.innerHTML='⚠️ '+esc(e.message)}
     send.disabled=false;
   }
   function renderResult(r,prov,fundo){
@@ -773,18 +806,29 @@ carregar().then(()=>snapshot());
     p.titulo=r.titulo||p.titulo;
     p.caption=(r.caption||'')+(r.hashtags?('\n\n'+r.hashtags):'');
     const old=novo?[]:(p.frames||[]);
-    p.frames=(r.frames||[]).map((f,i)=>Object.assign({},old[i]||{},{headline:f.headline||'',sub:f.sub||'',cta:f.cta||'',tema:f.tema||r.tema||'claro',chip:(old[i]||{}).chip||false,grade:(old[i]||{}).grade!==undefined?(old[i]||{}).grade:true,bgmode:(old[i]&&old[i].bgmode)||(fundo?'imagem':(f.tema||r.tema||'claro'))}));
+    p.frames=(r.frames||[]).map((f,i)=>{
+      const o=old[i]||{};
+      const fr=Object.assign({},o,{headline:f.headline||'',sub:f.sub||'',cta:f.cta||'',tema:f.tema||r.tema||'claro',chip:o.chip||false,grade:o.grade!==undefined?o.grade:true,bgmode:o.bgmode||(fundo?'imagem':(f.tema||r.tema||'claro'))});
+      if(typeof applyTom==='function')applyTom(fr,fr.tema);  // claro respeitado (sem roxo forçado)
+      return fr;
+    });
     if(typeof syncPages==='function')syncPages(p);
     sel(PI,0);setDirty(true);toast('Copy aplicada ✓');
-    if(fundo&&r.conceito_visual)p.frames.forEach((f,i)=>gerarFundo(PI,i,r.conceito_visual,r.tipo,f.tema));
+    if(fundo&&r.conceito_visual){
+      toast('🎨 Gerando '+p.frames.length+' fundo(s) em sequência…');
+      (async()=>{for(let i=0;i<p.frames.length;i++){await gerarFundo(PI,i,r.conceito_visual,r.tipo,p.frames[i].tema)}})();
+    }
   }
   async function gerarFundo(pi,fi,conceito,tipo,tema){
     try{
+      if(pi===PI){FI=fi;renderPosts();renderStrip();renderCtrl();preview();if(typeof genStart==='function')genStart('Gerando fundo '+(fi+1)+' ('+(tema==='claro'?'claro':'escuro')+')…')}
       const st=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,body:JSON.stringify({post:pi,frame:fi,conceito:conceito,tipo:tipo||'manifesto',tema:tema||'claro'})})).json();
-      if(!st.ok)return;const j=await pollJob(st.job);
-      if(j.status==='done'){const tf=D.posts[pi]&&D.posts[pi].frames[fi];if(tf){tf.bg=j.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1}
-        if(pi===PI){renderStrip();if(fi===FI){renderCtrl();preview()}}setDirty(true);toast('✨ Fundo '+(fi+1)+' pronto')}
-    }catch(e){}
+      if(!st.ok){if(pi===PI&&typeof genStop==='function')genStop(false);return}
+      const j=await pollJob(st.job);
+      if(j.status==='done'){const tf=D.posts[pi]&&D.posts[pi].frames[fi];if(tf){tf.bg=j.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(typeof applyTom==='function')applyTom(tf,tema)}
+        if(pi===PI){if(typeof genStop==='function')genStop(true);renderStrip();if(fi===FI){renderCtrl();preview()}}setDirty(true);toast('✨ Fundo '+(fi+1)+' pronto')}
+      else if(pi===PI&&typeof genStop==='function')genStop(false);
+    }catch(e){if(pi===PI&&typeof genStop==='function')genStop(false)}
   }
   txt.addEventListener('input',()=>{txt.style.height='auto';txt.style.height=Math.min(txt.scrollHeight,120)+'px'});
   txt.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();gerar()}});
