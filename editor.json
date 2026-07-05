@@ -1104,6 +1104,35 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "elever-auto",
+      "marca": "elever-ai",
+      "status": "rascunho",
+      "titulo": "ELEVER AUTO",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "sua loja de carros ou motos | {#711ce9:piloto automático}.",
+          "sub": "Acelere com Nina e largue na frente dos seus concorrentes.",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "degrade",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
