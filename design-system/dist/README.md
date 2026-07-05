@@ -1,4 +1,4 @@
-# Grupo Smark — Design System
+# Grupo Smark — Design System · v2
 
 Pacote de implementação do sistema visual do painel de conteúdo (smark · Provider Max · Elever AI).
 Claro por padrão, escuro sob demanda. Roxo é a marca, lime é o segundo acento.
@@ -7,9 +7,10 @@ Claro por padrão, escuro sob demanda. Roxo é a marca, lime é o segundo acento
 
 | Arquivo | O que é | Você usa? |
 |---|---|---|
-| `smark-ds.css` | **Folha única: tokens + TODAS as classes de componente (incl. editor).** Drop-in. | ✅ **É este que entra no seu sistema** |
+| `smark-ds.css` | **Folha única: tokens + TODAS as classes de componente (fundamentos + editor + avançados v2).** Drop-in. | ✅ **É este que entra no seu sistema** |
+| `smark-design-system-v2.html` | **Galeria v2 — todos os componentes, incl. os 13 novos (menu, acordeão, stepper, sliders, progresso, chips, avatares, listas, tooltip, skeleton, vazio, calendário, busca).** | 👁️ Consulta (mais recente) |
 | `painel-corrigido.html` | Protótipo navegável de referência (Painel → Studio, Vitrine, Config). Abra no navegador. | 👁️ Alvo visual / de comportamento |
-| `smark-design-system.html` | Galeria de todos os componentes com toggle de tema. | 👁️ Consulta |
+| `smark-design-system.html` | Galeria v1 (fundamentos + componentes base). | 👁️ Consulta |
 | `README.md` | Este guia. | 📖 |
 
 ## ⬇️ O que baixar e implementar
@@ -79,6 +80,24 @@ Todos os tokens (`--bg`, `--surface`, `--accent`, ...) recalculam sozinhos. Nenh
 - **Navegação:** `.sk-tabs/.sk-tab` `.sk-breadcrumb` `.sk-page` `.sk-pill` (+ `.is-active`)
 - **Feedback:** `.sk-badge--info/warn/good/bad/accent` · `.sk-alert--info/warn/bad` · `.sk-toast` · `.sk-overlay/.sk-modal`
 - **Dados:** `.sk-table` `.sk-table-head` `.sk-table-row` `.sk-mono`
+
+## Componentes avançados (v2 · seção 12 do CSS)
+
+Inspirados no catálogo Material, reconstruídos com a cara Smark (nada de framework — só CSS + suas classes):
+
+- **Menu / dropdown:** `.sk-menu-wrap > button + .sk-menu-backdrop + .sk-menu` · `.sk-menu-item` (`.is-danger`) · `.sk-menu-sep`
+- **Acordeão:** `.sk-acc(.is-open) > .sk-acc-head (.sk-acc-chev) + .sk-acc-body`
+- **Stepper:** `.sk-stepper > .sk-step(.is-done/.is-current) (.sk-step-num/.sk-step-label)` + `.sk-step-line(.is-done)` entre passos
+- **Slider:** `.sk-slider-head (label + .sk-slider-val) + input.sk-slider`
+- **Progresso:** `.sk-progress > .sk-progress-bar(--lime)` · indeterminado `.sk-progress--indeterminate > span` · `.sk-spinner` (SVG)
+- **Chips:** `.sk-chip--input` (add/remove) · `.sk-chip--outline` · `.sk-chip--solid` (+ `.sk-segmented` para filtro)
+- **Avatares:** `.sk-avatar--sm/md/lg` · `.sk-avatar-wrap > .sk-avatar-status` · `.sk-avatar-group` + `.sk-avatar-more`
+- **Listas:** `.sk-list > .sk-list-item (.sk-list-icon / .sk-list-body > .sk-list-title + .sk-list-meta)`
+- **Tooltip & popover:** `.sk-tip-wrap:hover .sk-tip` · `.sk-popover`
+- **Skeleton:** `.sk-skel` (shimmer — aplique width/height/aspect-ratio inline)
+- **Estado vazio:** `.sk-empty > .sk-empty-icon(--muted) + .sk-empty-title + .sk-empty-text + botão`
+- **Calendário:** `.sk-cal > .sk-cal-grid > .sk-cal-dow / .sk-cal-day(.in-range/.is-selected)`
+- **Busca / comando:** `.sk-command > .sk-command-head (input) + .sk-command-group + .sk-command-item(.is-active)` · `.sk-kbd`
 
 ## Padrões compostos (o que faltava)
 
