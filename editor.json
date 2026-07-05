@@ -1232,6 +1232,37 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "teste",
+      "marca": "provider-max",
+      "status": "rascunho",
+      "titulo": "teste",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "receita parada \n{#8B3CF7:Já era}",
+          "sub": "",
+          "cta": "acesse gora",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/teste/01.png",
+          "_accOpen": true,
+          "overlay": "branco"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
