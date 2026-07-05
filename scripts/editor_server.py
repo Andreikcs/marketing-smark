@@ -564,8 +564,10 @@ class H(http.server.BaseHTTPRequestHandler):
                 if ref:  # referência → openai_edit (usa o contexto do usuário como prompt)
                     ctx = (req.get("prompt", "") or "").strip()
                     full = ((ctx + ". ") if ctx else "") + (
-                        "Brand key visual for smark — abstract, premium, violet/roxo palette, "
-                        "editorial, lower third kept clean for headline text, 4k, no text, no logos.")
+                        "Keep the SAME lighting, color palette, mood, materials and overall composition "
+                        "style as the reference image, so it matches the other slides of the carousel. "
+                        "Brand key visual for smark — abstract, premium, violet/roxo palette, editorial, "
+                        "lower third kept clean for headline text, 4k, no text, no logos.")
                     cmd = ["python3", os.path.join(HERE, "openai_edit.py"),
                            "--image", os.path.join(VAULT, ref), "--out", out,
                            "--prompt", full, "--size", "1024x1536", "--quality", "high"]
