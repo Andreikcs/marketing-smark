@@ -435,17 +435,17 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "SEU TÍTULO|*AQUI.*",
+          "headline": "fdafadsfd|🔥sa{#f2f1f4|dsdasdasd}",
           "sub": "",
-          "cta": "",
+          "cta": "fsdfsdfds",
           "page": "01/01",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/_regen/01-71f94a.png",
-          "cor": "#F4F2FB",
+          "cor": "#4419e1",
           "accent": "",
-          "hsize": 0,
+          "hsize": 95,
           "grade": true,
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/01.png",
@@ -454,7 +454,10 @@
           "posy": 33,
           "contraste": 0.45,
           "overlay": "todo-roxo",
-          "overlay_op": 0
+          "overlay_op": 0,
+          "handle": "fdfdd",
+          "rodape": "fdfdfd",
+          "posx": 29
         }
       ],
       "caption": "",

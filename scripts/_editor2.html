@@ -201,7 +201,7 @@ function richField(label,val,onin){
    .forEach(([lb,cls,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.onclick=fn;bar.appendChild(b)});
   const col=document.createElement('input');col.type='color';col.value='#8b3cf7';col.className='fmtcol';col.title='cor';
   const cbtn=document.createElement('button');cbtn.type='button';cbtn.className='fmtb';cbtn.textContent='🎨';cbtn.title='colorir seleção';
-  cbtn.onclick=()=>wrap('{'+col.value+'|','}');bar.appendChild(col);bar.appendChild(cbtn);
+  cbtn.onclick=()=>wrap('{'+col.value+':','}');bar.appendChild(col);bar.appendChild(cbtn);
   w.appendChild(bar);w.appendChild(ta);return w;
 }
 
