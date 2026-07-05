@@ -1139,28 +1139,30 @@
       "slug": "teste-novo-modelo",
       "marca": "smark",
       "status": "rascunho",
-      "titulo": "TESTE NOVO MODELO",
+      "titulo": "Loja de móveis com funcionário de IA",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "VAMOOOOO TIME!",
-          "sub": "Brasil começa hoje uma nova história.",
-          "cta": "Comente Selecao",
+          "headline": "Sua loja de móveis|com um *funcionário de IA*",
+          "sub": "Atende, organiza e não perde cliente no fim do dia",
+          "cta": "",
           "page": "",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/teste-novo-modelo/_uploads/c0b6204912.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/teste-novo-modelo/_regen/01-147aa1.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/teste-novo-modelo/01.png",
-          "_v": 1
+          "_v": 2,
+          "overlay": "branco",
+          "overlay_op": 0.5
         }
       ],
-      "caption": "",
+      "caption": "Imagina cada canto da sua loja com alguém de IA cuidando: um pra atender quem chega, outro pra organizar os pedidos. Na smark, cada departamento ganha o seu. Você foca em vender móvel bonito, o resto anda sozinho.\n\n#smark #lojademoveis #inteligenciaartificial #gestao",
       "canais": [
         "instagram"
       ]
