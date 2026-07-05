@@ -1,5 +1,5 @@
 <!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
-<title>smark · Super Editor</title>
+<title>smark · editor</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css">
 <style>
 /* Design System smark: tokens locais herdam do DS (dark). Marcação intacta. */
@@ -7,10 +7,20 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--txt);font-family:var(--font-text);height:100vh;overflow:hidden}
 .app{display:grid;grid-template-columns:200px 1fr 320px;grid-template-rows:52px 1fr;height:100vh}
-header{grid-column:1/4;display:flex;align-items:center;gap:14px;padding:0 18px;border-bottom:1px solid var(--line);background:var(--pan)}
-header b{font-size:15px}header .tag{font-size:11px;color:var(--sub);border:1px solid var(--line);padding:2px 8px;border-radius:999px}
+header{grid-column:1/4;display:flex;align-items:center;gap:10px;padding:0 18px;border-bottom:1px solid var(--line);background:var(--pan)}
 header .sp{flex:1}
-#dirty{font-size:12px;color:var(--sub)} #dirty.yes{color:var(--warn)}
+.hlogo{display:inline-flex;align-items:center;gap:8px;text-decoration:none;margin-right:4px}
+.hmark{width:26px;height:26px;border-radius:7px;background:linear-gradient(155deg,#9A4DFF,#2A1CA8);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.hword{font-family:var(--font-text);font-weight:800;font-size:18px;color:var(--txt);letter-spacing:-.01em}
+.hnav{color:var(--sub);text-decoration:none;font-size:14px;padding:6px 12px;border-radius:9px;transition:.15s}
+.hnav:hover{background:var(--pan2);color:var(--txt)} .hnav.on{background:var(--accent-soft);color:var(--txt);font-weight:700}
+.autosave{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.autosave .stdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto} .autosave .stdot.ok{background:var(--good)} .autosave .stdot.warn{background:var(--warn)}
+.hicon{width:38px;height:38px;border:1px solid var(--field-line);background:var(--surface);color:var(--txt);border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.hicon:hover{border-color:var(--accent);color:var(--accent)}
+.expmenu{position:fixed;z-index:500;background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow-lg);padding:6px;display:flex;flex-direction:column;gap:4px;min-width:170px}
+.expmenu button{border:0;background:transparent;color:var(--txt);text-align:left;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px}
+.expmenu button:hover{background:var(--pan2)}
 .side{border-right:1px solid var(--line);background:var(--pan);overflow:auto;padding:10px}
 .side h4{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);margin:6px 6px 10px}
 .pitem{padding:10px 11px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--sub);border:1px solid transparent;margin-bottom:4px;line-height:1.3}
@@ -202,14 +212,18 @@ input[type=range]{accent-color:var(--accent)}
 <body>
 <div class=app>
   <header>
-    <b>smark · Super Editor</b><span class=tag>clique no texto da imagem pra editar ✏️</span>
-    <a href="/" style="color:var(--sub);text-decoration:none;font-size:13px;margin-left:8px">☰ Menu</a>
-    <a href="/painel" style="color:var(--sub);text-decoration:none;font-size:13px">Painel</a>
-    <a href="/vitrine" style="color:var(--sub);text-decoration:none;font-size:13px">Vitrine</a>
-    <a href="/config" style="color:var(--sub);text-decoration:none;font-size:13px">⚙ Config</a>
+    <a href="/" class=hlogo title="início">
+      <span class=hmark><svg viewBox="0 0 100 100" width=15 height=15><path fill-rule=evenodd fill=#fff d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></span>
+      <span class=hword>smark<span style="color:var(--accent)">.</span></span>
+    </a>
+    <a href="/painel" class=hnav>Painel</a>
+    <a href="/vitrine" class=hnav>Vitrine</a>
+    <a href="/config" class=hnav>Config</a>
+    <a href="/editor" class="hnav on">Editor</a>
     <span class=sp></span>
-    <span id=dirty>salvo</span>
-    <button class="sk-btn sk-btn--studio" style="width:auto" id=bestudio>🤖 Estúdio IA</button>
+    <span id=autosave class=autosave><span class="stdot ok"></span> salvo</span>
+    <button class=hicon id=bexport title="exportar PNG (este frame ou o carrossel)"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></button>
+    <button class="sk-btn sk-btn--studio" style="width:auto" id=bestudio><svg viewBox="0 0 24 24" width=15 height=15 fill=currentColor style="margin-right:5px;vertical-align:-2px"><path d="M12 2l1.7 5.5L19 9l-5.3 1.5L12 16l-1.7-5.5L5 9l5.3-1.5z"/><path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>Estúdio IA</button>
     <button class="btn" style="width:auto" id=bsave>💾 Salvar</button>
   </header>
 
@@ -273,7 +287,12 @@ function insEmoji(e){const ta=_lastTa;if(!ta){toast('Clique num campo de texto p
 const TIPOS=["manifesto","dor","provoca","educativo","antihype","prova","autoridade","diferencial","nucleo","cta"];
 
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2600)}
-function setDirty(v){dirty=v;const e=$('#dirty');e.className=v?'yes':'';e.textContent=v?'● não salvo':'✓ salvo'}
+let lastSave=null,autoT=null;
+function fmtHora(d){return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function updateSaveStatus(){const e=$('#autosave');if(!e)return;
+  e.innerHTML=dirty?'<span class="stdot warn"></span> salvando…':('<span class="stdot ok"></span> '+(lastSave?('salvo automaticamente em '+fmtHora(lastSave)):'salvo'));}
+function setDirty(v){dirty=v;updateSaveStatus();
+  if(v){clearTimeout(autoT);autoT=setTimeout(()=>{if(dirty)salvar(true)},4000)}}
 function post(){return D.posts[PI]}
 function frame(){return post().frames[FI]}
 function syncPages(p){const n=(p.frames||[]).length;(p.frames||[]).forEach((fr,i)=>{fr.page=n>1?(String(i+1).padStart(2,'0')+'/'+String(n).padStart(2,'0')):''})}
@@ -560,10 +579,19 @@ $('#pv').addEventListener('load',attachWysiwyg);
 async function salvar(silent){
   syncAllPages();
   await fetch('/salvar',{method:'POST',headers:HJSON,body:JSON.stringify({dados:D})});
-  setDirty(false);if(!silent)toast('Salvo');
+  lastSave=new Date();dirty=false;clearTimeout(autoT);updateSaveStatus();if(!silent)toast('Salvo');
 }
 function markDraft(){if(D&&D.posts[PI])D.posts[PI].status='rascunho'}
 $('#bsave').onclick=async()=>{if(post())post().status='salvo';await salvar(true);renderPosts();toast('Salvo — finalizado ✓')};
+$('#bexport').onclick=(e)=>{
+  document.querySelectorAll('.expmenu').forEach(m=>m.remove());
+  const m=document.createElement('div');m.className='expmenu';
+  m.innerHTML='<button data-s="one">⬇ Exportar este frame (PNG)</button><button data-s="all">⬇ Exportar o carrossel todo</button>';
+  document.body.appendChild(m);const r=e.currentTarget.getBoundingClientRect();
+  m.style.top=(r.bottom+6)+'px';m.style.right=(window.innerWidth-r.right)+'px';
+  m.onclick=ev=>{const b=ev.target.closest('button');if(!b)return;exportar($('#bexport'),b.dataset.s==='one'?FI:'all');m.remove()};
+  setTimeout(()=>document.addEventListener('mousedown',function h(ev){if(!m.contains(ev.target)){m.remove();document.removeEventListener('mousedown',h)}}),40);
+};
 // auto-save de estado a cada 30s (mantém status rascunho até salvar final)
 setInterval(()=>{if(dirty){salvar(true);toast('Auto-salvo (rascunho)')}},30000);
 
