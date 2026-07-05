@@ -3,18 +3,18 @@
     {
       "slug": "contratacao-sem-curriculo",
       "marca": "smark",
-      "titulo": "Chegada — post 1/5",
+      "titulo": "3 habilidades do Clara para provedores",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "COMEÇA A textoRODAR|*AMANHÃ.*",
-          "sub": "Sem processo seletivo, sem folha, sem rotatividade. Essa é a smark — nos próximos dias, conheça como. 👇",
-          "cta": "",
+          "headline": "3 coisas que a *Clara*|faz pelo seu provedor",
+          "sub": "Responde cliente, organiza cobrança e cuida do suporte — sem parar.",
+          "cta": "Diagnóstico gratuito: link na bio",
           "page": "",
           "chip": false,
-          "tema": "escuro",
+          "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/contratacao-sem-curriculo/_regen/01-5da6e4.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/contratacao-sem-curriculo/_regen/01-5bc9b2.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
@@ -26,10 +26,10 @@
           "overlay": "todo-roxo",
           "overlay_op": 0,
           "contexto": "casal netflix",
-          "_v": 1
+          "_v": 2
         }
       ],
-      "caption": "A parte mais cara de crescer uma empresa não é o salário. É o tempo e o risco de cada contratação.\n\nE se algumas funções da sua empresa não precisassem passar por isso?\n\nEssa semana a gente te apresenta um jeito diferente de resolver. Salva e acompanha. 👇\n\n#contratacao #gestao #IAparaempresas #pmesbrasil #produtividade",
+      "caption": "A Clara é a funcionária de IA feita pra provedores de internet. Ela responde clientes na hora, ajuda na cobrança e não deixa chamado esquecido. Tudo isso sem aumentar sua folha. Quer ver como ela encaixa no seu time? Comece pelo diagnóstico gratuito.\n\n#provedor #ISP #inteligenciaartificial #atendimento",
       "status": "rascunho",
       "canais": [
         "instagram"
@@ -677,6 +677,35 @@
       ],
       "caption": "Quando um movimento sai do grupo dos \"inovadores\" e vira maioria, ele deixa de ser aposta e passa a ser gestão.\n\nOs números de Stanford, McKinsey e Harvard/BCG mostram a mesma coisa por ângulos diferentes: IA na operação não é mais tendência distante — é decisão que empresas sérias já estão tomando.\n\nE repare no ponto que quase ninguém comenta: nenhum desses estudos fala em substituir pessoas. Todos falam em fazer o mesmo time produzir mais e melhor.\n\nA pergunta, então, não é mais \"devo usar IA?\". É \"por onde eu começo?\".\n\nSalva esse post — e quando quiser responder essa pergunta pra sua empresa, o diagnóstico gratuito está no link da bio. 👇\n\n#inteligenciaartificial #gestaoempresarial #produtividade #IAparaempresas #pmesbrasil #tecnologia",
       "status": "rascunho",
+      "canais": [
+        "instagram"
+      ]
+    },
+    {
+      "slug": "teste-ia",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "Teste IA",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-ia/01.png"
+        }
+      ],
+      "caption": "",
       "canais": [
         "instagram"
       ]
