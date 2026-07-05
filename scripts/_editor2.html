@@ -929,8 +929,9 @@ carregar().then(()=>snapshot());
     try{const r=await(await fetch('/estudio-upload',{method:'POST',headers:HJSON,body:JSON.stringify({data:attB64,mime:attMime,marca:optMarca.value})})).json();attPath=r.path||null}catch(e){attPath=null}
     esfile.value='';
   };
-  function pollJob(id){return new Promise(res=>{let t=0;const iv=setInterval(async()=>{t++;let j;try{j=await(await fetch('/job?id='+id)).json()}catch(e){return}
-    if(j.status==='done'||j.status==='erro'){clearInterval(iv);res(j)}else if(t>90){clearInterval(iv);res({status:'erro',erro:'tempo esgotado'})}},1300)})}
+  function pollJob(id,onTick){return new Promise(res=>{let t=0;const t0=Date.now();const iv=setInterval(async()=>{t++;let j;try{j=await(await fetch('/job?id='+id)).json()}catch(e){return}
+    if(onTick)onTick(Math.round((Date.now()-t0)/1000),(j||{}).status);
+    if(j.status==='done'||j.status==='erro'){clearInterval(iv);res(j)}else if(t>180){clearInterval(iv);res({status:'timeout',erro:'ainda gerando — aparece ao recarregar a página'})}},2000)})}
   async function gerar(){
     const pedido=txt.value.trim();if(!pedido)return;
     const emp=logEl.querySelector('.esempty');if(emp)emp.remove();
@@ -981,15 +982,19 @@ carregar().then(()=>snapshot());
     }
   }
   async function gerarFundo(pi,fi,conceito,tipo,tema){
+    const total=(D.posts[pi]&&D.posts[pi].frames.length)||1;
+    const withRef=!!attPath;
+    const prog=addMsg('a','🎨 Gerando arte de fundo <b>'+(fi+1)+'/'+total+'</b>… <span class=dots></span>'+(withRef?'<div style="font-size:11px;color:var(--muted);margin-top:3px">com referência — pode levar 1 a 3 min por frame</div>':''));
     try{
-      if(pi===PI){FI=fi;renderPosts();renderStrip();renderCtrl();preview();if(typeof genStart==='function')genStart('Gerando fundo '+(fi+1)+' ('+(tema==='claro'?'claro':'escuro')+')…')}
+      if(pi===PI){FI=fi;renderPosts();renderStrip();renderCtrl();preview();if(typeof genStart==='function')genStart('Gerando fundo '+(fi+1)+'/'+total+(withRef?' (referência)':'')+'…')}
       const st=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,body:JSON.stringify({post:pi,frame:fi,conceito:conceito,tipo:tipo||'manifesto',tema:tema||'claro',ref:attPath||'',prompt:attPath?(conceito||''):''})})).json();
-      if(!st.ok){if(pi===PI&&typeof genStop==='function')genStop(false);return}
-      const j=await pollJob(st.job);
+      if(!st.ok||!st.job){prog.innerHTML='⚠️ Falha ao iniciar o fundo '+(fi+1)+(st.erro?': '+esc(st.erro):'');if(pi===PI&&typeof genStop==='function')genStop(false);return}
+      const j=await pollJob(st.job,(sec)=>{prog.innerHTML='🎨 Gerando arte de fundo <b>'+(fi+1)+'/'+total+'</b> · '+sec+'s'+(withRef?' · com referência (1-3 min)':'')});
       if(j.status==='done'){const tf=D.posts[pi]&&D.posts[pi].frames[fi];if(tf){tf.bg=j.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(typeof applyTom==='function')applyTom(tf,tema)}
-        if(pi===PI){if(typeof genStop==='function')genStop(true);renderStrip();if(fi===FI){renderCtrl();preview()}}setDirty(true);toast('✨ Fundo '+(fi+1)+' pronto')}
-      else if(pi===PI&&typeof genStop==='function')genStop(false);
-    }catch(e){if(pi===PI&&typeof genStop==='function')genStop(false)}
+        prog.innerHTML='✨ Fundo <b>'+(fi+1)+'/'+total+'</b> pronto';
+        if(pi===PI){if(typeof genStop==='function')genStop(true);renderStrip();if(fi===FI){renderCtrl();preview()}}setDirty(true)}
+      else{prog.innerHTML=(j.status==='timeout'?'⏳ Fundo '+(fi+1)+' ainda gerando — recarregue a página em 1 min pra ver.':'⚠️ Fundo '+(fi+1)+' falhou'+(j.erro?': '+esc(String(j.erro).slice(0,120)):''));if(pi===PI&&typeof genStop==='function')genStop(false)}
+    }catch(e){prog.innerHTML='⚠️ Erro no fundo '+(fi+1)+': '+esc(e.message);if(pi===PI&&typeof genStop==='function')genStop(false)}
   }
   txt.addEventListener('input',()=>{txt.style.height='auto';txt.style.height=Math.min(txt.scrollHeight,120)+'px'});
   txt.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();gerar()}});
