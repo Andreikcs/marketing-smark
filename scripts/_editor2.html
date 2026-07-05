@@ -45,6 +45,14 @@ textarea:focus,input:focus{outline:none;border-color:var(--rox)}
 .seg{display:flex;gap:5px;flex-wrap:wrap}
 .seg button{flex:1;min-width:60px;padding:8px 6px;border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:8px;cursor:pointer;font-size:12px}
 .seg button.on{background:var(--rox);border-color:var(--rox);color:#fff;font-weight:600}
+.chbtn{display:flex;align-items:center;gap:8px;justify-content:flex-start!important}
+.chlb{display:flex;flex-direction:column;line-height:1.15;text-align:left}
+.chlb small{color:var(--muted);font-size:10px;font-weight:400}
+.chbtn.on .chlb small{color:#ffffffcc}
+.subacc{border:1px solid var(--line);border-radius:10px;background:var(--pan2);margin-top:10px;overflow:hidden}
+.subacc>.sh{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--sub)}
+.subacc>.sh::after{content:'▸';transition:.2s} .subacc.open>.sh::after{content:'▾'}
+.subacc>.sb{padding:0 12px 12px;display:none} .subacc.open>.sb{display:block}
 .row{display:flex;gap:8px;align-items:center}
 .chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt);cursor:pointer}
 input[type=color]{width:44px;height:32px;border:1px solid var(--line);border-radius:8px;background:#0f0d17;cursor:pointer;padding:2px}
@@ -363,6 +371,7 @@ async function reorderFrame(from,to){
 }
 function sel(pi,fi){PI=pi;FI=fi;renderPosts();renderStrip();renderCtrl();preview()}
 
+function fmtSize(s){return ({'1080x1350':'Feed 4:5','1080x1080':'Quadrado 1:1','1080x1920':'Story 9:16'})[s]||'Feed 4:5'}
 function fld(label,val,onin,ph,rows,key){
   const t=rows?('<textarea rows='+rows+'>'+ (val||'') +'</textarea>'):('<input type=text value="'+(val||'').replace(/"/g,'&quot;')+'">');
   const w=document.createElement('div');w.innerHTML='<label>'+label+'</label>'+t;
@@ -407,8 +416,11 @@ function renderCtrl(){
   // PUBLICAÇÃO (canais)
   const gp=document.createElement('div');gp.className='grp';gp.innerHTML='<h5>Publicação — canais</h5>';
   const cseg=document.createElement('div');cseg.className='seg';
+  const chsvg={instagram:'<svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2><rect x=2 y=2 width=20 height=20 rx=5.5/><circle cx=12 cy=12 r=4.3/><circle cx=17.6 cy=6.4 r=1.3 fill=currentColor stroke=none/></svg>',linkedin:'<svg viewBox="0 0 24 24" width=17 height=17 fill=currentColor><path d="M4.98 3.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.4 8.65 21 11 21 14v7h-4v-6.2c0-1.48-.03-3.4-2.07-3.4-2.07 0-2.39 1.62-2.39 3.29V21H9z"/></svg>'};
+  const fmt=fmtSize(post().size);
   [['instagram','Instagram'],['linkedin','LinkedIn']].forEach(([k,lb])=>{
-    const b=document.createElement('button');b.textContent=lb;if((post().canais||['instagram']).includes(k))b.classList.add('on');
+    const b=document.createElement('button');b.className='chbtn';if((post().canais||['instagram']).includes(k))b.classList.add('on');
+    b.innerHTML=chsvg[k]+'<span class=chlb>'+lb+'<small>'+fmt+'</small></span>';
     b.onclick=()=>{let c2=post().canais||['instagram'];c2=c2.includes(k)?c2.filter(x=>x!==k):c2.concat(k);if(!c2.length)c2=['instagram'];post().canais=c2;renderCtrl();setDirty(true)};cseg.appendChild(b)});
   gp.appendChild(cseg);c.appendChild(gp);
   // TEXTO
@@ -440,14 +452,18 @@ function renderCtrl(){
     const up=document.createElement('div');up.style.marginTop='6px';up.innerHTML='<label>Trocar fundo (upload)</label>';
     const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.style.cssText='font-size:12px;color:var(--sub)';
     fi.onchange=e=>upload(e.target.files[0]);up.appendChild(fi);g2.appendChild(up);
-    // ajuste da imagem
-    g2.appendChild(slider('Zoom da imagem: '+(f.zoom||1).toFixed(2)+'x',(f.zoom||1),1,2.5,0.05,(v,l)=>{f.zoom=v;l.textContent='Zoom da imagem: '+v.toFixed(2)+'x';touch()}));
-    g2.appendChild(slider('Posição horizontal',(f.posx==null?50:f.posx),0,100,1,v=>{f.posx=v;touch()}));
-    g2.appendChild(slider('Posição vertical',(f.posy==null?50:f.posy),0,100,1,v=>{f.posy=v;touch()}));
-    // brilho / contraste / saturação
-    g2.appendChild(slider('Brilho: '+Math.round((f.brilho||1)*100)+'%',(f.brilho||1),0.4,1.8,0.05,(v,l)=>{f.brilho=v;l.textContent='Brilho: '+Math.round(v*100)+'%';touch()}));
-    g2.appendChild(slider('Contraste: '+Math.round((f.contraste||1)*100)+'%',(f.contraste||1),0.4,1.8,0.05,(v,l)=>{f.contraste=v;l.textContent='Contraste: '+Math.round(v*100)+'%';touch()}));
-    g2.appendChild(slider('Saturação: '+Math.round((f.satur||1)*100)+'%',(f.satur||1),0,2,0.05,(v,l)=>{f.satur=v;l.textContent='Saturação: '+Math.round(v*100)+'%';touch()}));
+    // ajuste fino da imagem — sanfona fechada por padrão (item 18)
+    const acc=document.createElement('div');acc.className='subacc'+(f._accOpen?' open':'');
+    const sh=document.createElement('div');sh.className='sh';sh.textContent='Ajuste fino da imagem';
+    sh.onclick=()=>{f._accOpen=!acc.classList.contains('open');acc.classList.toggle('open')};
+    const sb=document.createElement('div');sb.className='sb';acc.appendChild(sh);acc.appendChild(sb);
+    sb.appendChild(slider('Zoom da imagem: '+(f.zoom||1).toFixed(2)+'x',(f.zoom||1),1,2.5,0.05,(v,l)=>{f.zoom=v;l.textContent='Zoom da imagem: '+v.toFixed(2)+'x';touch()}));
+    sb.appendChild(slider('Posição horizontal',(f.posx==null?50:f.posx),0,100,1,v=>{f.posx=v;touch()}));
+    sb.appendChild(slider('Posição vertical',(f.posy==null?50:f.posy),0,100,1,v=>{f.posy=v;touch()}));
+    sb.appendChild(slider('Brilho: '+Math.round((f.brilho||1)*100)+'%',(f.brilho||1),0.4,1.8,0.05,(v,l)=>{f.brilho=v;l.textContent='Brilho: '+Math.round(v*100)+'%';touch()}));
+    sb.appendChild(slider('Contraste: '+Math.round((f.contraste||1)*100)+'%',(f.contraste||1),0.4,1.8,0.05,(v,l)=>{f.contraste=v;l.textContent='Contraste: '+Math.round(v*100)+'%';touch()}));
+    sb.appendChild(slider('Saturação: '+Math.round((f.satur||1)*100)+'%',(f.satur||1),0,2,0.05,(v,l)=>{f.satur=v;l.textContent='Saturação: '+Math.round(v*100)+'%';touch()}));
+    g2.appendChild(acc);
     // camada por cima
     const ol=document.createElement('div');ol.style.marginTop='10px';ol.innerHTML='<label>Camada por cima da imagem</label>';
     const os=document.createElement('div');os.className='seg';
@@ -461,33 +477,12 @@ function renderCtrl(){
       g2.appendChild(slider('Rotação do degradê: '+(f.ov_ang==null?180:f.ov_ang)+'°',(f.ov_ang==null?180:f.ov_ang),0,360,5,(v,l)=>{f.ov_ang=v;l.textContent='Rotação do degradê: '+v+'°';touch()}));
       g2.appendChild(slider('Mover o degradê: '+(f.ov_pos==null?20:f.ov_pos)+'%',(f.ov_pos==null?20:f.ov_pos),0,90,2,(v,l)=>{f.ov_pos=v;l.textContent='Mover o degradê: '+v+'%';touch()}));
     }
-    // gerar por IA
-    const reg=document.createElement('div');reg.style.marginTop='12px';reg.innerHTML='<label>Gerar fundo por IA</label>';
-    const selm=document.createElement('select');selm.className='regsel';
-    [['claro','Tom claro (padrão)'],['escuro','Tom escuro']].forEach(([v,lb])=>{const o=document.createElement('option');o.value=v;o.textContent=lb;if((f._regtema||'claro')===v)o.selected=true;selm.appendChild(o)});
-    selm.onchange=()=>f._regtema=selm.value;reg.appendChild(selm);
-    const selt=document.createElement('select');selt.className='regsel';
-    TIPOS.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent='conceito: '+t;if((f._tipo||'manifesto')===t)o.selected=true;selt.appendChild(o)});
-    selt.onchange=()=>f._tipo=selt.value;reg.appendChild(selt);
-    const rb=document.createElement('button');rb.className='btn ai';rb.textContent='✨ Regerar fundo IA (pago ~40s)';
-    rb.onclick=()=>regen(rb);reg.appendChild(rb);
-    // CONSISTÊNCIA: referência de estilo (outro slide) + contexto
-    const ctxw=document.createElement('div');ctxw.style.marginTop='12px';ctxw.innerHTML='<label>Consistência — gerar mantendo o estilo de um slide</label>';
-    const rsel=document.createElement('select');rsel.className='regsel';
-    const o0=document.createElement('option');o0.value='';o0.textContent='referência: nenhuma (gera do zero)';if(!f._ref)o0.selected=true;rsel.appendChild(o0);
-    const gDeste=document.createElement('optgroup');gDeste.label='Deste post';
-    (post().frames||[]).forEach((ff,fi)=>{if(ff.bgmode==='imagem'&&ff.bg){const o=document.createElement('option');o.value=ff.bg;o.textContent='card '+(fi+1);if(f._ref===ff.bg)o.selected=true;gDeste.appendChild(o)}});
-    if(gDeste.children.length)rsel.appendChild(gDeste);
-    const gGal=document.createElement('optgroup');gGal.label='Da galeria';
-    D.posts.forEach(pp=>{if(pp===post())return;(pp.frames||[]).forEach((ff,fi)=>{if(ff.bgmode==='imagem'&&ff.bg){const o=document.createElement('option');o.value=ff.bg;o.textContent=((pp.titulo||pp.slug).slice(0,14))+' · '+(fi+1);if(f._ref===ff.bg)o.selected=true;gGal.appendChild(o)}})});
-    if(gGal.children.length)rsel.appendChild(gGal);
-    rsel.onchange=()=>f._ref=rsel.value;ctxw.appendChild(rsel);
-    const cta2=document.createElement('textarea');cta2.rows=2;cta2.placeholder='contexto do novo slide (ex.: o Téo entrando em campo, mesma luz e composição da referência)';cta2.value=f.contexto||'';
-    cta2.oninput=()=>{f.contexto=cta2.value;setDirty(true)};ctxw.appendChild(cta2);reg.appendChild(ctxw);
-    const rb2=document.createElement('button');rb2.className='btn ai';rb2.style.marginTop='6px';rb2.textContent='✨ Gerar com referência + contexto (pago)';
-    rb2.onclick=()=>regen(rb2,f._ref||'');reg.appendChild(rb2);
+    // geração por IA agora vive no ESTÚDIO IA (tom, conceito, referência) — item 19/20
+    const reg=document.createElement('div');reg.style.marginTop='12px';
+    const rb=document.createElement('button');rb.className='btn ai';rb.innerHTML='🤖 Gerar / trocar fundo no Estúdio IA';
+    rb.onclick=()=>{const b=document.getElementById('bestudio');if(b)b.click()};reg.appendChild(rb);
     const hintp=document.createElement('div');hintp.className='mini';hintp.style.marginTop='6px';
-    hintp.textContent='Referência = slide-modelo (deste post, da galeria, ou faça upload em "Trocar fundo"). Nenhuma = gera do zero. + contexto do novo.';
+    hintp.textContent='Tom (claro/escuro), conceito e referência por imagem agora ficam no Estúdio IA.';
     reg.appendChild(hintp);g2.appendChild(reg);
   }else if(mode==='cor'){
     const cw=document.createElement('div');cw.className='row';cw.style.marginTop='8px';
