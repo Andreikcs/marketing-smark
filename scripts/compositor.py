@@ -157,7 +157,7 @@ CSS = """
 *{margin:0;padding:0;box-sizing:border-box;}
 body{width:%(W)spx;height:%(H)spx;overflow:hidden;}
 .card{position:relative;width:%(W)spx;height:%(H)spx;background:%(BASE)s;}
-.bg{position:absolute;inset:0;background-image:%(BG)s;background-size:cover;background-position:%(POSX)s%% %(POSY)s%%;transform:scale(%(ZOOM)s);transform-origin:%(POSX)s%% %(POSY)s%%;}
+.bg{position:absolute;inset:0;background-image:%(BG)s;background-size:cover;background-position:%(POSX)s%% %(POSY)s%%;transform:scale(%(ZOOM)s);transform-origin:%(POSX)s%% %(POSY)s%%;filter:brightness(%(BRI)s) contrast(%(CON)s) saturate(%(SAT)s);}
 .ovx{position:absolute;inset:0;background:%(OVX)s;opacity:%(OVXO)s;}
 .grade{position:absolute;inset:0;}
 .grade i{position:absolute;inset:0;display:block;}
@@ -189,19 +189,23 @@ body{width:%(W)spx;height:%(H)spx;overflow:hidden;}
 PAGE = "<!doctype html><html><head><meta charset='utf-8'><style>%(CSS)s</style></head><body>%(BODY)s</body></html>"
 
 
-OVX_PRESETS = {
-    "none": "none",
-    "branco": "linear-gradient(180deg, rgba(255,255,255,0) 22%, rgba(255,255,255,1) 100%)",
-    "roxo": "linear-gradient(180deg, rgba(138,60,247,0) 12%, rgba(74,30,150,.96) 100%)",
-    "todo-branco": "#FFFFFF",
-    "todo-roxo": "#8A3CF7",
-}
+def _ovx_bg(overlay, ang, pos):
+    if overlay == "branco":
+        return f"linear-gradient({ang}deg, rgba(255,255,255,0) {pos}%, rgba(255,255,255,1) 100%)"
+    if overlay == "roxo":
+        return f"linear-gradient({ang}deg, rgba(138,60,247,0) {pos}%, rgba(74,30,150,.96) 100%)"
+    if overlay == "todo-branco":
+        return "#FFFFFF"
+    if overlay == "todo-roxo":
+        return "#8A3CF7"
+    return "none"
 
 
 def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="claro",
                  size="1080x1350", hsize=0, accent="", bright="", base="", square="",
                  bg="", bg_url="", placeholder=False, no_grade=False,
-                 zoom=1.0, posx=50, posy=50, overlay="none", overlay_op=0.85):
+                 zoom=1.0, posx=50, posy=50, overlay="none", overlay_op=0.85,
+                 ov_ang=180, ov_pos=20, brilho=1.0, contraste=1.0, satur=1.0):
     """Constrói o HTML completo do frame (mesmo motor do PNG final).
     `bg` = caminho de imagem (embutida em base64, p/ render headless).
     `bg_url` = URL direta (ex.: rota estática do servidor, p/ preview leve no navegador)."""
