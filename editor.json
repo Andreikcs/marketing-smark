@@ -20,7 +20,11 @@
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/contratacao-sem-curriculo/01.png",
-          "n": 1
+          "n": 1,
+          "zoom": 1,
+          "posx": 100,
+          "overlay": "todo-roxo",
+          "overlay_op": 0.6
         },
         {
           "headline": "SUA PRÓXIMA|CONTRATAÇÃO NÃO|PRECISA DE *CURRÍCULO.*",
@@ -55,7 +59,8 @@
           "n": 3
         }
       ],
-      "caption": "A parte mais cara de crescer uma empresa não é o salário. É o tempo e o risco de cada contratação.\n\nE se algumas funções da sua empresa não precisassem passar por isso?\n\nEssa semana a gente te apresenta um jeito diferente de resolver. Salva e acompanha. 👇\n\n#contratacao #gestao #IAparaempresas #pmesbrasil #produtividade"
+      "caption": "A parte mais cara de crescer uma empresa não é o salário. É o tempo e o risco de cada contratação.\n\nE se algumas funções da sua empresa não precisassem passar por isso?\n\nEssa semana a gente te apresenta um jeito diferente de resolver. Salva e acompanha. 👇\n\n#contratacao #gestao #IAparaempresas #pmesbrasil #produtividade",
+      "status": "rascunho"
     },
     {
       "slug": "mercado-virou-a-chave",
