@@ -273,9 +273,9 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "fdafadsfd|🔥sa{#f2f1f4|dsdasdasd}fdfdfsfa",
-          "sub": "fdfdfdfdfdfdfdfdfdfdfd",
-          "cta": "dsfsdfsdfds",
+          "headline": "{#efe9f7:Cazemiro fora da copa 2027?  }",
+          "sub": "**{#e8e8e8:Suspeiras de te}**",
+          "cta": "Clique e saiba mais",
           "page": "",
           "chip": true,
           "tema": "claro",
@@ -741,22 +741,24 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
-          "cta": "",
+          "headline": "Sistemas de IA com Velocidade ",
+          "sub": "{#3bf748:Confira as melhores opcoes e orcamentos}",
+          "cta": "chama no acelerador",
           "page": "",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_regen/01-7e608f.png",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_uploads/3ab517f1bb.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/01.png",
-          "_v": 2,
-          "overlay": "todo-branco"
+          "_v": 3,
+          "overlay": "branco",
+          "zoom": 1.25,
+          "brilho": 0.55
         }
       ],
       "caption": "",

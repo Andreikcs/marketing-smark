@@ -104,9 +104,9 @@ def config_html():
     return f"""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Configurações · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
-body.sk{{padding:20px 30px 60px}}
-a.menu{{position:fixed;top:8px;left:8px;background:var(--accent);color:var(--accent-ink);padding:6px 12px;border-radius:8px;font:600 12px var(--font-text);text-decoration:none;z-index:9}}
-h1{{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:30px;margin:18px 0 4px}}h1 span{{color:var(--accent)}} .sub{{color:var(--muted);font-size:13px;margin-bottom:24px}}
+body.sk{{padding:0}}
+.wrap{{padding:24px 30px 60px;max-width:1000px;margin:0 auto}}
+.sk-pagehead h1{{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:32px;margin:6px 0 4px}}h1 span{{color:var(--accent)}} .sub{{color:var(--muted);font-size:13px}}
 .gh{{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:12px}}
 .sk-card{{margin-bottom:16px;max-width:880px}}
 table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}}th{{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em}}
@@ -115,10 +115,12 @@ tr:last-child td{{border-bottom:0}}
 .ok{{color:var(--good);font-weight:600}}
 .sk-input.mini,.sk-select.mini{{padding:7px 10px;font-size:13px;width:auto}}
 </style></head><body class="sk">
-<a class=menu href="/">☰ Menu</a>
+{topbar("config")}
+<div class=wrap>
+<div class="sk-pagehead"><div>
 <div class=sk-kicker>painel local · tokens.json</div>
 <h1>Configurações do <span>Sistema</span></h1>
-<div class=sub>Edite os padrões e os handles das marcas — salva no tokens.json.</div>
+<div class=sub>Edite os padrões e os handles das marcas — salva no tokens.json.</div></div></div>
 
 <div class="sk-card"><div class=gh>Padrões editáveis</div><div class=kv>
 <div class=cell>Tema-padrão: <select class="sk-select mini" id=cf_tema><option value=claro>claro</option><option value=escuro>escuro</option></select></div>
@@ -143,6 +145,7 @@ tr:last-child td{{border-bottom:0}}
 <div class=cell>Proteção CSRF/DNS: <b class=ok>ativa</b> (Host+Origin+token)</div>
 <div class=cell>Dados do editor: <b>editor.json</b></div>
 </div></div>
+</div>
 <script>
 const T="__EDITOR_TOKEN__";
 document.getElementById('cf_tema').value="{tp}";
@@ -158,76 +161,88 @@ document.getElementById('cf_save').onclick=async()=>{{
 
 
 def painel_html():
-    """Painel de Conteúdo integrado — galeria de TODAS as publicações do editor.json."""
-    return """<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
+    """Painel de Conteúdo — novo layout: topbar + toolbar segmentada + cards .sk-post."""
+    return ("""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Painel de Conteúdo · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
-body.sk{padding:16px 26px 60px}
-a.menu{position:fixed;top:8px;left:8px;background:var(--accent);color:var(--accent-ink);padding:6px 12px;border-radius:8px;font:600 12px var(--font-text);text-decoration:none;z-index:9}
-h1{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:30px;margin:16px 0 4px}h1 span{color:var(--accent)}.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
-.bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
-.bar button,.bar a{border:1px solid var(--field-line);background:var(--surface);color:var(--text);border-radius:var(--radius-md);padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:.15s}
-.bar button:hover,.bar a:hover{background:var(--surface-2)}
-.bar .del:hover{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
-.bar .go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow)}.bar .go:hover{filter:brightness(1.07);background:var(--accent)}
-.filters{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}.filters button{padding:7px 14px;font-size:12px;font-weight:600;border-radius:var(--radius-pill);background:var(--inset);color:var(--sub);border:1px solid transparent}.filters button:hover{color:var(--text)}.filters button.on{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:700}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;position:relative;box-shadow:var(--shadow);transition:.15s}
-.card:hover{transform:translateY(-2px);border-color:var(--line-strong)}
-.card .cb{position:absolute;top:8px;left:8px;z-index:2;accent-color:var(--accent);width:18px;height:18px}
-.card .chbadge{position:absolute;top:8px;right:8px;z-index:2;display:flex;gap:3px}
-.card .acts button,.card .acts a{font-size:11px;padding:8px 3px}
-.card .th{aspect-ratio:4/5;width:100%;object-fit:cover;display:block}
-.card .thx{aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;background:var(--surface-2)}
-.card .meta{padding:10px 11px}.card .meta b{font-size:13px;display:block;margin-bottom:2px}.card .meta small{color:var(--muted);font-size:11px}
-.stt{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:5px}.stt.r{background:var(--warn-soft);color:var(--warn)}.stt.s{background:var(--good-soft);color:var(--good)}
-.card .acts{display:flex;border-top:1px solid var(--line)}
-.card .acts a,.card .acts button{flex:1;border:0;background:transparent;color:var(--accent-2);padding:9px 4px;font-size:12px;cursor:pointer;border-right:1px solid var(--line)}
-.card .acts button:last-child{border-right:0;color:var(--bad)}
-.modal{display:none;position:fixed;inset:0;background:#000c;z-index:50;align-items:center;justify-content:center;padding:20px}
-.modal .box{background:var(--surface);border-radius:12px;overflow:hidden}
-.modal .mm{width:400px;max-width:90vw;height:500px;overflow:hidden;position:relative;background:#000}
-.modal iframe{border:0;width:1080px;height:1350px;transform:scale(.37);transform-origin:top left}
-.mnav{display:flex;justify-content:space-between;align-items:center;padding:8px 10px}.mnav button{background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+.wrap{padding:26px 30px 60px;max-width:1240px;margin:0 auto}
+.sk-pagehead h1{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:34px;line-height:.96;margin:6px 0 4px}
+.sk-pagehead .sub{color:var(--muted);font-size:13px}
+.thumbimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.chIG{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}.chIN{background:#0a66c2}
 </style></head><body class="sk">
-<a class=menu href="/">&#9776; Menu</a>
-<h1>Painel de <span>Conteudo</span></h1>
-<div class=sub>Todas as publicacoes, todas as marcas &mdash; integrado ao editor.</div>
-<div class=bar><button class=del id=delsel>&#128465; Excluir selecionados</button>
-<a class=go href="/editor">+ Novo / abrir editor</a>
-<div class=filters id=sfilters></div><div class=filters id=filters></div></div>
-<div class=grid id=grid></div>
-<div class=modal id=modal><div class=box><div class=mm><iframe id=mif></iframe></div>
-<div class=mnav><button id=mprev>&lsaquo;</button><span id=mpg></span><button id=mnext>&rsaquo;</button></div>
-<div style="padding:0 10px 12px"><button class="sk-btn" onclick="document.getElementById('modal').style.display='none'" style="width:100%">Fechar</button></div></div></div>
+__TOPBAR__
+<div class=wrap>
+<div class="sk-pagehead">
+  <div><div class="sk-kicker">tudo local · integrado ao editor</div>
+    <h1>Painel de <span class=sk-accent>Conteúdo</span></h1>
+    <div class=sub>Todas as publicações, todas as marcas.</div></div>
+  <div class="sk-pagehead-actions">
+    <button class="sk-btn sk-btn--danger sk-btn--sm" id=delsel>🗑 Excluir selecionados</button>
+    <a class="sk-btn" href="/editor">＋ Novo post</a></div>
+</div>
+<div class="sk-toolbar">
+  <div class="sk-filter-group"><span class="sk-filter-label">Status</span><div class="sk-segmented" id=sfilters></div></div>
+  <div class="sk-toolbar-sep"></div>
+  <div class="sk-filter-group"><span class="sk-filter-label">Marca</span><div class="sk-segmented" id=filters></div></div>
+  <span class="sk-spacer"></span>
+  <span id=count style="font-size:12px;color:var(--muted)"></span>
+</div>
+<div class="sk-cardgrid" id=grid></div>
+</div>
+<div class="sk-overlay" id=modal style="display:none">
+  <div class="sk-modal" style="max-width:430px;padding:0;overflow:hidden">
+    <div style="width:100%;height:520px;overflow:hidden;position:relative;background:#000"><iframe id=mif style="border:0;width:1080px;height:1350px;transform:scale(.398);transform-origin:top left"></iframe></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px">
+      <button class="sk-btn sk-btn--secondary sk-btn--sm" id=mprev>‹</button>
+      <span id=mpg style="font-size:13px;color:var(--muted)"></span>
+      <button class="sk-btn sk-btn--secondary sk-btn--sm" id=mnext>›</button></div>
+    <div style="padding:0 14px 14px"><button class="sk-btn" onclick="document.getElementById('modal').style.display='none'" style="width:100%">Fechar</button></div>
+  </div>
+</div>
 <script>
-const T="__EDITOR_TOKEN__";let D=null,FILT='',STATUSF='',MI=0,MP=0;
+const T="__EDITOR_TOKEN__";let D=null,FILT='',STATUSF='',MI=0,MP=0;const SEL=new Set();
 async function load(){D=await(await fetch('/dados')).json();render()}
 function brands(){return [...new Set(D.posts.map(p=>p.marca||'smark'))]}
-function chIcon(c){if(c==='linkedin')return '<span title=LinkedIn style="background:#0a66c2;color:#fff;font:700 9px sans-serif;padding:2px 4px;border-radius:3px">in</span>';
-  return '<span title=Instagram style="background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);color:#fff;font:700 9px sans-serif;padding:2px 5px;border-radius:4px">IG</span>'}
+function chIcon(c){const cl=c==='linkedin'?'chIN':'chIG';const t=c==='linkedin'?'in':'IG';return '<span class="'+cl+'" style="padding:1px 5px;border-radius:4px">'+t+'</span>'}
+function seg(host,opts,cur,cb){host.innerHTML='';opts.forEach(([v,lb])=>{const b=document.createElement('button');b.textContent=lb;if(cur===v)b.className='is-active';b.onclick=()=>cb(v);host.appendChild(b)})}
 function render(){
-  const sf=document.getElementById('sfilters');sf.innerHTML='';
-  [['','status: todos'],['rascunho','rascunho'],['salvo','salvo']].forEach(([v,lb])=>{const b=document.createElement('button');b.textContent=lb;if(STATUSF===v)b.className='on';b.onclick=()=>{STATUSF=v;render()};sf.appendChild(b)});
-  const fl=document.getElementById('filters');fl.innerHTML='';
-  [''].concat(brands()).forEach(b=>{const btn=document.createElement('button');btn.textContent=b||'todas as marcas';if(FILT===b)btn.className='on';btn.onclick=()=>{FILT=b;render()};fl.appendChild(btn)});
-  const g=document.getElementById('grid');g.innerHTML='';
-  const items=D.posts.map((p,i)=>({p,i})).reverse();  // mais novos primeiro
+  seg(document.getElementById('sfilters'),[['','Todos'],['rascunho','Rascunho'],['salvo','Salvo']],STATUSF,v=>{STATUSF=v;render()});
+  seg(document.getElementById('filters'),[['','Todas']].concat(brands().map(b=>[b,b])),FILT,v=>{FILT=v;render()});
+  const g=document.getElementById('grid');g.innerHTML='';let n=0;
+  const items=D.posts.map((p,i)=>({p,i})).reverse();
   items.forEach(({p,i})=>{
     if(FILT&&(p.marca||'smark')!==FILT)return;
     if(STATUSF&&(p.status||'rascunho')!==STATUSF)return;
+    n++;
     const f0=p.frames&&p.frames[0];const cp=f0?((f0.bgmode==='imagem'&&f0.bg)?f0.bg:(f0.out||'')):'';
     const cov=cp?('/'+cp+'?t='+Date.now()):'';
-    const st=p.status==='salvo'?'<span class="stt s">salvo</span>':'<span class="stt r">rascunho</span>';
-    const ch=(p.canais||['instagram']).map(chIcon).join(' ');
-    const c=document.createElement('div');c.className='card';
-    c.innerHTML='<input type=checkbox class=cb data-i="'+i+'">'
-      +'<div class=chbadge>'+ch+'</div>'
-      +(cov?'<img class=th src="'+cov+'">':'<div class=thx>sem arte</div>')
-      +'<div class=meta><b>'+(p.titulo||p.slug)+'</b><small>'+(p.marca||'smark')+' &middot; '+(p.frames?p.frames.length:0)+' frames'+st+'</small></div>'
-      +'<div class=acts><button onclick="ver('+i+')">&#128065; Ver</button><a href="/editor?post='+i+'">&#9998; Editar</a><button onclick="dupPost('+i+')">&#10697; Dup</button><button onclick="del(['+i+'])">&#128465;</button></div>';
+    const salvo=p.status==='salvo';
+    const badge='<span class="sk-badge '+(salvo?'sk-badge--good':'sk-badge--warn')+'">'+(salvo?'salvo':'rascunho')+'</span>';
+    const ch=(p.canais||['instagram']).map(chIcon).join('');
+    const on=SEL.has(i);
+    const c=document.createElement('div');c.className='sk-post'+(on?' is-selected':'');
+    c.innerHTML='<div class="sk-post-thumb">'
+      +'<div class="sk-post-check'+(on?' is-on':'')+'" data-i="'+i+'">✓</div>'
+      +'<div class="sk-post-channel">'+ch+'</div>'
+      +(cov?'<img class=thumbimg src="'+cov+'">':'sem arte')
+      +'</div><div class="sk-post-body">'
+      +'<div class="sk-post-title">'+(p.titulo||p.slug)+'</div>'
+      +'<div class="sk-post-meta">'+(p.marca||'smark')+'<span class=sk-dot></span>'+(p.frames?p.frames.length:0)+' frames<span class=sk-dot></span>'+badge+'</div>'
+      +'<div class="sk-post-actions">'
+      +'<button data-a=ver data-i="'+i+'" title=Ver>👁</button>'
+      +'<button class=act-edit data-a=edit data-i="'+i+'" title=Editar>✎</button>'
+      +'<button data-a=dup data-i="'+i+'" title=Duplicar>⧉</button>'
+      +'<button class=act-del data-a=del data-i="'+i+'" title=Excluir>🗑</button>'
+      +'</div></div>';
     g.appendChild(c)});
+  document.getElementById('count').textContent=n+' publicação'+(n===1?'':'ões');
 }
+document.getElementById('grid').addEventListener('click',e=>{
+  const chk=e.target.closest('.sk-post-check');if(chk){const i=+chk.dataset.i;SEL.has(i)?SEL.delete(i):SEL.add(i);render();return}
+  const b=e.target.closest('[data-a]');if(!b)return;const i=+b.dataset.i,a=b.dataset.a;
+  if(a==='ver')ver(i);else if(a==='edit')location.href='/editor?post='+i;else if(a==='dup')dupPost(i);else if(a==='del')del([i]);
+});
 async function ver(i){MP=i;MI=0;document.getElementById('modal').style.display='flex';mframe()}
 async function mframe(){const p=D.posts[MP],fr=p.frames[MI];
   const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
@@ -235,23 +250,22 @@ async function mframe(){const p=D.posts[MP],fr=p.frames[MI];
 document.getElementById('mprev').onclick=()=>{const n=D.posts[MP].frames.length;MI=(MI-1+n)%n;mframe()};
 document.getElementById('mnext').onclick=()=>{const n=D.posts[MP].frames.length;MI=(MI+1)%n;mframe()};
 async function del(idx){if(!idx.length){alert('Selecione ao menos um');return}
-  if(!confirm('Excluir '+idx.length+' publicacao(oes)?'))return;
-  await fetch('/excluir-posts',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:idx})});await load()}
+  if(!confirm('Excluir '+idx.length+' publicação(ões)?'))return;
+  await fetch('/excluir-posts',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:idx})});SEL.clear();await load()}
 async function dupPost(i){await fetch('/duplicar-post',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:i})});await load()}
-document.getElementById('delsel').onclick=()=>del([...document.querySelectorAll('.cb:checked')].map(c=>+c.dataset.i));
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});  // sincroniza ao voltar pra aba
+document.getElementById('delsel').onclick=()=>del([...SEL]);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 load();
-</script></body></html>"""
+</script></body></html>""").replace("__TOPBAR__", topbar("painel"))
 
 
 def vitrine_html():
     """Vitrine estilo feed do Instagram — todas as publicações do editor.json."""
-    return """<!doctype html><html lang=pt-BR data-theme="claro"><head><meta charset=utf-8>
+    return ("""<!doctype html><html lang=pt-BR data-theme="claro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Vitrine · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
 body.sk{padding-bottom:50px}
-a.menu{position:fixed;top:8px;left:8px;background:var(--accent);color:var(--accent-ink);padding:6px 12px;border-radius:8px;font:600 12px var(--font-text);text-decoration:none;z-index:9}
-.top{text-align:center;padding:16px;font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:18px;letter-spacing:.02em;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:5}.top span{color:var(--accent)}
+.top{text-align:center;padding:14px;font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:16px;letter-spacing:.02em;border-bottom:1px solid var(--line);background:var(--surface)}.top span{color:var(--accent)}
 .feed{max-width:440px;margin:18px auto;display:flex;flex-direction:column;gap:22px;padding:0 8px}
 .post{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
 .ph{display:flex;align-items:center;gap:9px;padding:11px 13px;font-size:14px;font-weight:600}
@@ -265,8 +279,8 @@ a.menu{position:fixed;top:8px;left:8px;background:var(--accent);color:var(--acce
 .cap{padding:0 13px 14px;font-size:14px;line-height:1.4;white-space:pre-wrap;color:var(--text)}.cap b{font-weight:600}
 .empty{text-align:center;color:var(--muted);padding:40px;font-size:14px}
 </style></head><body class="sk">
-<a class=menu href="/">&#9776; Menu</a>
-<div class=top><span>smark</span> &middot; vitrine</div>
+__TOPBAR__
+<div class=top><span>smark</span> &middot; vitrine · feed pra aprovar</div>
 <div class=feed id=feed></div>
 <script>
 async function load(){const D=await(await fetch('/dados')).json();const f=document.getElementById('feed');f.innerHTML='';let n=0;
@@ -285,7 +299,7 @@ async function load(){const D=await(await fetch('/dados')).json();const f=docume
   if(!n)f.innerHTML='<div class=empty>Nenhuma arte exportada ainda. Exporte no editor pra ver aqui.</div>';
 }
 load();
-</script></body></html>"""
+</script></body></html>""").replace("__TOPBAR__", topbar("vitrine"))
 
 
 # Segurança (CSRF / DNS rebinding): o servidor é local, mas tem rotas que gastam
