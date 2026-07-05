@@ -90,41 +90,41 @@ def config_html():
 body.sk{{padding:20px 30px 60px}}
 a.menu{{position:fixed;top:8px;left:8px;background:var(--accent);color:var(--accent-ink);padding:6px 12px;border-radius:8px;font:600 12px var(--font-text);text-decoration:none;z-index:9}}
 h1{{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:30px;margin:18px 0 4px}}h1 span{{color:var(--accent)}} .sub{{color:var(--muted);font-size:13px;margin-bottom:24px}}
-.grp{{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;max-width:860px}}
-.grp h3{{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:12px}}
-table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}}th{{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase}}
-.kv{{display:flex;flex-wrap:wrap;gap:10px}}.kv div{{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:13px}}.kv b{{color:var(--accent-2)}}
-.chip{{display:inline-block;background:var(--accent-soft);border:1px solid var(--line);color:var(--accent);border-radius:999px;padding:4px 11px;font-size:12px;margin:2px}}
-.ok{{color:var(--good)}}
-.cfin,select.cfin{{background:var(--field);border:1px solid var(--field-line);color:var(--text);border-radius:8px;padding:7px 10px;font-size:13px}}
-.savebtn{{background:var(--accent);color:var(--accent-ink);border:0;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px}}
+.gh{{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:12px}}
+.sk-card{{margin-bottom:16px;max-width:880px}}
+table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}}th{{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em}}
+tr:last-child td{{border-bottom:0}}
+.kv{{display:flex;flex-wrap:wrap;gap:10px;align-items:center}}.kv .cell{{background:var(--inset);border:1px solid var(--line);border-radius:var(--radius-md);padding:8px 12px;font-size:13px}}.kv b{{color:var(--accent-2)}}
+.ok{{color:var(--good);font-weight:600}}
+.sk-input.mini,.sk-select.mini{{padding:7px 10px;font-size:13px;width:auto}}
 </style></head><body class="sk">
 <a class=menu href="/">☰ Menu</a>
+<div class=sk-kicker>painel local · tokens.json</div>
 <h1>Configurações do <span>Sistema</span></h1>
 <div class=sub>Edite os padrões e os handles das marcas — salva no tokens.json.</div>
 
-<div class=grp><h3>Padrões editáveis</h3><div class=kv>
-<div>Tema-padrão: <select class=cfin id=cf_tema><option value=claro>claro</option><option value=escuro>escuro</option></select></div>
-<div>Template padrão (tamanho): <select class=cfin id=cf_size><option value=1080x1350>Feed 4:5</option><option value=1080x1080>Quadrado 1:1</option><option value=1080x1920>Story 9:16</option></select></div>
-<div>Assinatura padrão (rodapé direito): <input class=cfin id=cf_rodape value="{fund.get('rodape','')}" style="width:180px"></div>
+<div class="sk-card"><div class=gh>Padrões editáveis</div><div class=kv>
+<div class=cell>Tema-padrão: <select class="sk-select mini" id=cf_tema><option value=claro>claro</option><option value=escuro>escuro</option></select></div>
+<div class=cell>Template padrão (tamanho): <select class="sk-select mini" id=cf_size><option value=1080x1350>Feed 4:5</option><option value=1080x1080>Quadrado 1:1</option><option value=1080x1920>Story 9:16</option></select></div>
+<div class=cell>Assinatura padrão (rodapé direito): <input class="sk-input mini" id=cf_rodape value="{fund.get('rodape','')}" style="width:180px"></div>
 </div>
-<div style="margin-top:8px;color:#9a92ad;font-size:12px">Regra #9: imagens geradas saem <b style="color:#c9b6ff">claras</b> por padrão · Base clara {tok.get('tema_claro',{}).get('base','#F4F2FB')} · Base escura {fund.get('base','#0B0B0B')} · Rodapé {fund.get('rodape','—')}</div>
-<button class=savebtn id=cf_save>💾 Salvar configurações</button> <span id=cf_msg class=ok></span>
+<div style="margin-top:12px;color:var(--muted);font-size:12px">Regra #9: imagens geradas saem <b style="color:var(--accent-2)">claras</b> por padrão · Base clara {tok.get('tema_claro',{}).get('base','#F4F2FB')} · Base escura {fund.get('base','#0B0B0B')} · Rodapé {fund.get('rodape','—')}</div>
+<div style="margin-top:14px"><button class="sk-btn" id=cf_save>💾 Salvar configurações</button> <span id=cf_msg class=ok></span></div>
 </div>
 
-<div class=grp><h3>Marcas (cores / degradê / handle editável)</h3>
+<div class="sk-card"><div class=gh>Marcas (cores / degradê / handle editável)</div>
 <table><tr><th>Marca</th><th>Acento</th><th>Acento claro</th><th>Degradê</th><th>Handle</th></tr>{rows_m}</table></div>
 
-<div class=grp><h3>Conceitos de direção de arte ({len(conceitos)})</h3>{chips}</div>
+<div class="sk-card"><div class=gh>Conceitos de direção de arte ({len(conceitos)})</div>{chips}</div>
 
-<div class=grp><h3>Posts no editor ({len(ed.get('posts',[]))})</h3>
+<div class="sk-card"><div class=gh>Posts no editor ({len(ed.get('posts',[]))})</div>
 <table><tr><th>#</th><th>Título</th><th>Slug</th><th>Frames</th></tr>{rows_p}</table></div>
 
-<div class=grp><h3>Servidor & segurança</h3><div class=kv>
-<div>Porta: <b>{PORT}</b></div>
-<div>Hosts permitidos: <b>localhost:8765 / 127.0.0.1:8765</b></div>
-<div>Proteção CSRF/DNS: <b class=ok>ativa</b> (Host+Origin+token)</div>
-<div>Dados do editor: <b>editor.json</b></div>
+<div class="sk-card"><div class=gh>Servidor & segurança</div><div class=kv>
+<div class=cell>Porta: <b>{PORT}</b></div>
+<div class=cell>Hosts permitidos: <b>localhost:8765 / 127.0.0.1:8765</b></div>
+<div class=cell>Proteção CSRF/DNS: <b class=ok>ativa</b> (Host+Origin+token)</div>
+<div class=cell>Dados do editor: <b>editor.json</b></div>
 </div></div>
 <script>
 const T="__EDITOR_TOKEN__";
@@ -149,18 +149,21 @@ body.sk{padding:16px 26px 60px}
 a.menu{position:fixed;top:8px;left:8px;background:var(--accent);color:var(--accent-ink);padding:6px 12px;border-radius:8px;font:600 12px var(--font-text);text-decoration:none;z-index:9}
 h1{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:30px;margin:16px 0 4px}h1 span{color:var(--accent)}.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
 .bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
-.bar button,.bar a{border:1px solid var(--field-line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer;text-decoration:none}
-.bar .del:hover{border-color:var(--bad);color:var(--bad)}.bar .go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
-.filters{display:flex;gap:6px;margin-left:auto}.filters button{padding:6px 12px;font-size:12px}.filters button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.bar button,.bar a{border:1px solid var(--field-line);background:var(--surface);color:var(--text);border-radius:var(--radius-md);padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:.15s}
+.bar button:hover,.bar a:hover{background:var(--surface-2)}
+.bar .del:hover{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.bar .go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow)}.bar .go:hover{filter:brightness(1.07);background:var(--accent)}
+.filters{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}.filters button{padding:7px 14px;font-size:12px;font-weight:600;border-radius:var(--radius-pill);background:var(--inset);color:var(--sub);border:1px solid transparent}.filters button:hover{color:var(--text)}.filters button.on{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:700}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;position:relative;box-shadow:var(--shadow);transition:.15s}
+.card:hover{transform:translateY(-2px);border-color:var(--line-strong)}
 .card .cb{position:absolute;top:8px;left:8px;z-index:2;accent-color:var(--accent);width:18px;height:18px}
 .card .chbadge{position:absolute;top:8px;right:8px;z-index:2;display:flex;gap:3px}
 .card .acts button,.card .acts a{font-size:11px;padding:8px 3px}
 .card .th{aspect-ratio:4/5;width:100%;object-fit:cover;display:block}
 .card .thx{aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;background:var(--surface-2)}
 .card .meta{padding:10px 11px}.card .meta b{font-size:13px;display:block;margin-bottom:2px}.card .meta small{color:var(--muted);font-size:11px}
-.stt{font-size:10px;padding:1px 7px;border-radius:999px;margin-left:5px}.stt.r{background:var(--warn-soft);color:var(--warn)}.stt.s{background:var(--good-soft);color:var(--good)}
+.stt{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:5px}.stt.r{background:var(--warn-soft);color:var(--warn)}.stt.s{background:var(--good-soft);color:var(--good)}
 .card .acts{display:flex;border-top:1px solid var(--line)}
 .card .acts a,.card .acts button{flex:1;border:0;background:transparent;color:var(--accent-2);padding:9px 4px;font-size:12px;cursor:pointer;border-right:1px solid var(--line)}
 .card .acts button:last-child{border-right:0;color:var(--bad)}
@@ -179,7 +182,7 @@ h1{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font
 <div class=grid id=grid></div>
 <div class=modal id=modal><div class=box><div class=mm><iframe id=mif></iframe></div>
 <div class=mnav><button id=mprev>&lsaquo;</button><span id=mpg></span><button id=mnext>&rsaquo;</button></div>
-<div style="padding:0 10px 12px"><button onclick="document.getElementById('modal').style.display='none'" style="width:100%;background:#8b3cf7;color:#fff;border:0;border-radius:8px;padding:9px;cursor:pointer">Fechar</button></div></div></div>
+<div style="padding:0 10px 12px"><button class="sk-btn" onclick="document.getElementById('modal').style.display='none'" style="width:100%">Fechar</button></div></div></div>
 <script>
 const T="__EDITOR_TOKEN__";let D=null,FILT='',STATUSF='',MI=0,MP=0;
 async function load(){D=await(await fetch('/dados')).json();render()}
@@ -226,26 +229,27 @@ load();
 
 def vitrine_html():
     """Vitrine estilo feed do Instagram — todas as publicações do editor.json."""
-    return """<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1"><title>Vitrine · smark</title><style>
-*{box-sizing:border-box;margin:0;padding:0}body{background:#fafafa;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding-bottom:50px}
-a.menu{position:fixed;top:8px;left:8px;background:#8b3cf7;color:#fff;padding:6px 12px;border-radius:8px;font:600 12px sans-serif;text-decoration:none;z-index:9}
-.top{text-align:center;padding:14px;font-weight:700;font-size:16px;border-bottom:1px solid #dbdbdb;background:#fff;position:sticky;top:0;z-index:5}
+    return """<!doctype html><html lang=pt-BR data-theme="claro"><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><title>Vitrine · smark</title>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
+body.sk{padding-bottom:50px}
+a.menu{position:fixed;top:8px;left:8px;background:var(--accent);color:var(--accent-ink);padding:6px 12px;border-radius:8px;font:600 12px var(--font-text);text-decoration:none;z-index:9}
+.top{text-align:center;padding:16px;font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:18px;letter-spacing:.02em;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:5}.top span{color:var(--accent)}
 .feed{max-width:440px;margin:18px auto;display:flex;flex-direction:column;gap:22px;padding:0 8px}
-.post{background:#fff;border:1px solid #dbdbdb;border-radius:10px;overflow:hidden}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
 .ph{display:flex;align-items:center;gap:9px;padding:11px 13px;font-size:14px;font-weight:600}
-.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#8b3cf7,#5a28b4)}
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
 .media{position:relative;background:#000;aspect-ratio:4/5;cursor:pointer}
 .media img{width:100%;height:100%;object-fit:cover;display:block}
 .cbadge{position:absolute;top:10px;right:10px;background:#000a;color:#fff;font-size:12px;padding:2px 9px;border-radius:12px}
 .dots{position:absolute;bottom:10px;left:0;right:0;display:flex;gap:5px;justify-content:center}
 .dot{width:6px;height:6px;border-radius:50%;background:#ffffff88}.dot.on{background:#fff}
 .icons{display:flex;gap:15px;padding:10px 13px;font-size:22px}
-.cap{padding:0 13px 14px;font-size:14px;line-height:1.4;white-space:pre-wrap}.cap b{font-weight:600}
-.empty{text-align:center;color:#999;padding:40px;font-size:14px}
-</style></head><body>
+.cap{padding:0 13px 14px;font-size:14px;line-height:1.4;white-space:pre-wrap;color:var(--text)}.cap b{font-weight:600}
+.empty{text-align:center;color:var(--muted);padding:40px;font-size:14px}
+</style></head><body class="sk">
 <a class=menu href="/">&#9776; Menu</a>
-<div class=top>smark &middot; vitrine</div>
+<div class=top><span>smark</span> &middot; vitrine</div>
 <div class=feed id=feed></div>
 <script>
 async function load(){const D=await(await fetch('/dados')).json();const f=document.getElementById('feed');f.innerHTML='';let n=0;
@@ -418,8 +422,10 @@ class H(http.server.BaseHTTPRequestHandler):
 
     def _serve_module(self, fp, nome):
         if not os.path.isfile(fp):
-            return self._send(200, f"<body style='font-family:sans-serif;background:#0d0b13;color:#ccc;padding:40px'>"
-                              f"<a href='/' style='color:#8b3cf7'>← Menu</a><h2>{nome} ainda não foi gerado.</h2></body>",
+            return self._send(200, f"<!doctype html><html data-theme='escuro'><head>"
+                              f"<link rel='stylesheet' href='/design-system/dist/smark-ds.css'></head>"
+                              f"<body class='sk' style='padding:40px'>"
+                              f"<a class='sk-btn sk-btn--ghost' href='/'>← Menu</a><h2 class='sk-h2' style='margin-top:16px'>{nome} ainda não foi gerado.</h2></body></html>",
                               MIME[".html"])
         bar = ('<a href="/" style="position:fixed;top:8px;left:8px;z-index:99999;background:#8b3cf7;color:#fff;'
                'padding:6px 12px;border-radius:8px;font:600 12px sans-serif;text-decoration:none">☰ Menu</a>')
