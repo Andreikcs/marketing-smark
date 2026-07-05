@@ -1164,6 +1164,59 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "eloise",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "Copa do Mundo: cada posição no time certo",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "TIME BOM|GANHA COM *ESCALAÇÃO*",
+          "sub": "Cada jogador na posição que domina.",
+          "cta": "",
+          "page": "01/03",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/eloise/01.png"
+        },
+        {
+          "headline": "SUA EMPRESA|TAMBÉM É UM *TIME*",
+          "sub": "Cada setor merece um funcionário de IA na função certa.",
+          "cta": "",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "02/03",
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/eloise/02.png"
+        },
+        {
+          "headline": "MONTE A SUA|*ESCALAÇÃO* DE IA",
+          "sub": "A gente mostra onde cada um joga melhor.",
+          "cta": "Diagnóstico gratuito no link da bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "03/03",
+          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/eloise/03.png"
+        }
+      ],
+      "caption": "Copa é sobre time bem montado: cada um na posição que domina. Na sua empresa funciona igual — cada setor pode ter um funcionário de IA na função certa. A gente ajuda você a montar essa escalação com um diagnóstico gratuito.\n\n#copadomundo #inteligenciaartificial #gestao #produtividade",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
