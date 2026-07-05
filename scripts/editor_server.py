@@ -14,6 +14,7 @@ import json
 import os
 import re
 import secrets
+import threading
 import socketserver
 import subprocess
 import sys
@@ -264,12 +265,19 @@ MIME = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
         ".js": "application/javascript", ".html": "text/html; charset=utf-8"}
 
 
+IO_LOCK = threading.RLock()      # protege leitura/escrita do editor.json (servidor multi-thread)
+GEN_SEM = threading.Semaphore(2)  # no máx. 2 gerações de IA simultâneas
+JOBS = {}                         # id -> {"status": running|done|erro, "path":..., "erro":...}
+
+
 def load():
-    return json.load(open(DATA, encoding="utf-8"))
+    with IO_LOCK:
+        return json.load(open(DATA, encoding="utf-8"))
 
 
 def save(d):
-    json.dump(d, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    with IO_LOCK:
+        json.dump(d, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
 
 def hl(text):
@@ -550,8 +558,8 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(500, {"ok": False, "erro": str(e)})
 
         if path == "/regerar-fundo":
-            d = load()
             try:
+                d = load()
                 post = d["posts"][req["post"]]
                 fr = post["frames"][req["frame"]]
                 slug = safe_slug(post.get("slug", ""))
@@ -559,29 +567,29 @@ class H(http.server.BaseHTTPRequestHandler):
                 dd = os.path.join(VAULT, "marcas", marca, "publicacoes", "social", "instagram",
                                   "arte", slug, "_regen")
                 os.makedirs(dd, exist_ok=True)
-                out = os.path.join(dd, f"{req['frame']+1:02d}-{hashlib.sha1(str(req).encode()).hexdigest()[:6]}.png")
+                out = os.path.join(dd, f"{req['frame']+1:02d}-{secrets.token_hex(3)}.png")
                 ref = req.get("ref", "")
-                if ref:  # referência → openai_edit (usa o contexto do usuário como prompt)
+                if ref:  # referência → openai_edit (contexto do usuário como prompt)
                     ctx = (req.get("prompt", "") or "").strip()
                     full = ((ctx + ". ") if ctx else "") + (
                         "Keep the SAME lighting, color palette, mood, materials and overall composition "
                         "style as the reference image, so it matches the other slides of the carousel. "
-                        "Brand key visual for smark — abstract, premium, violet/roxo palette, editorial, "
+                        "Brand key visual, abstract, premium, violet/roxo palette, editorial, "
                         "lower third kept clean for headline text, 4k, no text, no logos.")
                     cmd = ["python3", os.path.join(HERE, "openai_edit.py"),
                            "--image", os.path.join(VAULT, ref), "--out", out,
                            "--prompt", full, "--size", "1024x1536", "--quality", "high"]
-                else:  # direção de arte
-                    tema = req.get("tema", "claro")  # PADRÃO CLARO (rule #9)
+                else:  # direção de arte (padrão claro, rule #9)
                     cmd = ["python3", os.path.join(HERE, "openai_image.py"), "--out", out, "--direcao",
                            "--marca", marca, "--tipo", req.get("tipo", "manifesto"),
-                           "--tema", tema, "--headline", (fr.get("headline", "") or "").replace("|", " "),
+                           "--tema", req.get("tema", "claro"),
+                           "--headline", (fr.get("headline", "") or "").replace("|", " "),
                            "--size", "1024x1536", "--quality", "high"]
-                r = subprocess.run(cmd, cwd=VAULT, capture_output=True, text=True)
-                if os.path.exists(out):
-                    rel = os.path.relpath(out, VAULT)
-                    return self._send(200, {"ok": True, "path": rel, "tema": req.get("tema", "claro")})
-                return self._send(500, {"ok": False, "erro": (r.stderr or r.stdout or "falhou")[-400:]})
+                job_id = secrets.token_hex(6)
+                JOBS[job_id] = {"status": "running"}
+                threading.Thread(target=_run_gen, args=(job_id, cmd, out, req["post"], req["frame"]),
+                                 daemon=True).start()
+                return self._send(200, {"ok": True, "job": job_id})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 
