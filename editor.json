@@ -201,14 +201,14 @@
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-94f072.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-7e7807.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/03.png",
           "n": 3,
-          "_v": 3,
+          "_v": 5,
           "contexto": "gere a imagem do teo nosso funcionario de IA nesta pose, gere dele beijando a camisa, o tom deve ser mais amarelo e o contexto do fundo da imagem mais parecido com o da nina para manter simetria ",
           "overlay": "none",
           "overlay_op": 0
@@ -247,7 +247,7 @@
         }
       ],
       "caption": "Apresentando a seleção da smark. 👋\n\nNão são robôs de \"aperte 1\". São funções inteiras da sua empresa, cobertas por IA que trabalha na mão do seu time — não no lugar dele.\n\nQual dessas áreas mais dói na sua operação hoje? Comenta. 👇\n\n#IAparaempresas #prevendas #prospeccao #relacionamento #pmesbrasil",
-      "status": "salvo"
+      "status": "rascunho"
     },
     {
       "slug": "case-destaque",

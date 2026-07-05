@@ -124,10 +124,11 @@ def render_headline(text):
 
 
 def render_rich(text):
-    """Formatação: '|' ou '\\n' = quebra · **negrito** · _itálico_ · *acento*."""
+    """Formatação: '|' ou '\\n' = quebra · **negrito** · _itálico_ · *acento* · {#hex|texto} = cor livre."""
     lines = []
     for line in (text or "").replace("|", "\\n").split("\\n"):
         s = esc(line)
+        s = re.sub(r"\{(#[0-9a-fA-F]{3,6})\|(.+?)\}", r'<span style="color:\1">\2</span>', s)
         s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
         s = re.sub(r"_(.+?)_", r"<i>\1</i>", s)
         s = re.sub(r"\*(.+?)\*", r'<span class="v">\1</span>', s)
@@ -206,7 +207,7 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
                  bg="", bg_url="", placeholder=False, no_grade=False,
                  zoom=1.0, posx=50, posy=50, overlay="none", overlay_op=0.85,
                  ov_ang=180, ov_pos=20, brilho=1.0, contraste=1.0, satur=1.0,
-                 handle_over="", rodape_over=""):
+                 handle_over="", rodape_over="", raw=False):
     """Constrói o HTML completo do frame (mesmo motor do PNG final).
     `bg` = caminho de imagem (embutida em base64, p/ render headless).
     `bg_url` = URL direta (ex.: rota estática do servidor, p/ preview leve no navegador)."""
