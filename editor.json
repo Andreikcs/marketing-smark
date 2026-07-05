@@ -730,35 +730,6 @@
       "canais": [
         "instagram"
       ]
-    },
-    {
-      "slug": "teste-xcca",
-      "marca": "smark",
-      "status": "rascunho",
-      "titulo": "Churn que derruba provedor",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "O *churn* elimina|seu provedor|antes do fim do mês",
-          "sub": "Cada cliente que sai é uma vaga que você não devia perder",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "page": "",
-          "chip": true,
-          "tema": "escuro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-xcca/01.png"
-        }
-      ],
-      "caption": "Provedor não perde cliente de repente. Perde um por dia, sem ninguém olhar. A Clara acompanha cada assinante, avisa quem está prestes a cancelar e organiza o retorno antes da conta virar prejuízo. Menos churn é menos trabalho refazendo o que já era seu.\n\n#provedores #isp #churn #gestao",
-      "canais": [
-        "instagram"
-      ]
     }
   ]
 }
