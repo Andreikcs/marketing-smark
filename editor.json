@@ -1134,6 +1134,36 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "teste-novo-modelo",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "TESTE NOVO MODELO",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "VAMOOOOO TIME!",
+          "sub": "Brasil começa hoje uma nova história.",
+          "cta": "Comente Selecao",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/teste-novo-modelo/_uploads/c0b6204912.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-novo-modelo/01.png",
+          "_v": 1
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
