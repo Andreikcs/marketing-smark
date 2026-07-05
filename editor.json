@@ -1108,28 +1108,29 @@
     {
       "slug": "elever-auto",
       "marca": "elever-ai",
-      "status": "rascunho",
-      "titulo": "ELEVER AUTO",
+      "status": "salvo",
+      "titulo": "Elever Auto no Piloto Automático",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "sua loja de carros ou motos | {#711ce9:piloto automático}.",
-          "sub": "Acelere com Nina e largue na frente dos seus concorrentes.",
+          "headline": "Sua loja de carros ou motos|no *piloto automático*",
+          "sub": "A Nina atende, responde, anota e organiza todos os contatos por você.🏆",
           "cta": "",
           "page": "",
           "chip": true,
           "tema": "claro",
-          "bgmode": "degrade",
-          "bg": "",
+          "bgmode": "imagem",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/_regen/01-34c6fc.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/01.png"
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/01.png",
+          "_v": 1
         }
       ],
-      "caption": "",
+      "caption": "Enquanto sua equipe fecha negócio no salão, a Nina cuida das mensagens que chegam a qualquer hora. Ela responde na hora, tira dúvidas e deixa cada contato organizado pra ninguém escapar. Sua loja de carros ou motos rodando sem depender de você o tempo todo.\n\n#lojadecarros #concessionaria #motos #atendimento",
       "canais": [
         "instagram"
       ]
