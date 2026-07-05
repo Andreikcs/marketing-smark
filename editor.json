@@ -183,7 +183,7 @@
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_uploads/68b2a89887.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-0ea5fe.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
@@ -191,7 +191,7 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/02.png",
           "n": 2,
           "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n",
-          "_v": 2
+          "_v": 3
         },
         {
           "headline": "*TÉO*",
@@ -201,13 +201,15 @@
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-bg.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_uploads/0e2abebc75.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/03.png",
-          "n": 3
+          "n": 3,
+          "_v": 1,
+          "contexto": "gere a imagem do teo nosso funcionario de IA nesta pos"
         },
         {
           "headline": "*CLARA*",

@@ -132,7 +132,9 @@ function setDirty(v){dirty=v;const e=$('#dirty');e.className=v?'yes':'';e.textCo
 function post(){return D.posts[PI]}
 function frame(){return post().frames[FI]}
 
-async function carregar(){D=await(await fetch('/dados')).json();renderPosts();sel(0,0)}
+async function carregar(){D=await(await fetch('/dados')).json();renderPosts();
+  const q=new URLSearchParams(location.search);let pi=parseInt(q.get('post'));
+  if(isNaN(pi)||pi<0||pi>=D.posts.length)pi=0;sel(pi,0)}
 
 function renderPosts(){
   const el=$('#posts');el.innerHTML='';

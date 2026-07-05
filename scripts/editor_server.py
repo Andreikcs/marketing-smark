@@ -134,6 +134,74 @@ document.getElementById('cf_save').onclick=async()=>{{
 </body></html>"""
 
 
+def painel_html():
+    """Painel de Conteúdo integrado — galeria de TODAS as publicações do editor.json."""
+    return """<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><title>Painel de Conteúdo · smark</title><style>
+*{box-sizing:border-box;margin:0;padding:0}body{background:#0d0b13;color:#ece9f4;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:16px 26px 60px}
+a.menu{position:fixed;top:8px;left:8px;background:#8b3cf7;color:#fff;padding:6px 12px;border-radius:8px;font:600 12px sans-serif;text-decoration:none;z-index:9}
+h1{font-size:22px;margin:16px 0 4px}h1 span{color:#8b3cf7}.sub{color:#9a92ad;font-size:13px;margin-bottom:16px}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.bar button,.bar a{border:1px solid #2a2338;background:#15121e;color:#ece9f4;border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer;text-decoration:none}
+.bar .del:hover{border-color:#c0392b;color:#ff8a80}.bar .go{background:#8b3cf7;border-color:#8b3cf7;font-weight:600}
+.filters{display:flex;gap:6px;margin-left:auto}.filters button{padding:6px 12px;font-size:12px}.filters button.on{background:#8b3cf7;border-color:#8b3cf7}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.card{background:#141019;border:1px solid #2a2338;border-radius:12px;overflow:hidden;position:relative}
+.card .cb{position:absolute;top:8px;left:8px;z-index:2;accent-color:#8b3cf7;width:18px;height:18px}
+.card .th{aspect-ratio:4/5;width:100%;object-fit:cover;display:block}
+.card .thx{aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;color:#555;font-size:12px;background:#1a1524}
+.card .meta{padding:10px 11px}.card .meta b{font-size:13px;display:block;margin-bottom:2px}.card .meta small{color:#9a92ad;font-size:11px}
+.stt{font-size:10px;padding:1px 7px;border-radius:999px;margin-left:5px}.stt.r{background:#3a2f10;color:#e0a020}.stt.s{background:#12331f;color:#37c26b}
+.card .acts{display:flex;border-top:1px solid #2a2338}
+.card .acts a,.card .acts button{flex:1;border:0;background:transparent;color:#c9b6ff;padding:9px 4px;font-size:12px;cursor:pointer;border-right:1px solid #2a2338}
+.card .acts button:last-child{border-right:0;color:#ff8a80}
+.modal{display:none;position:fixed;inset:0;background:#000c;z-index:50;align-items:center;justify-content:center;padding:20px}
+.modal .box{background:#111;border-radius:12px;overflow:hidden}
+.modal .mm{width:400px;max-width:90vw;height:500px;overflow:hidden;position:relative;background:#000}
+.modal iframe{border:0;width:1080px;height:1350px;transform:scale(.37);transform-origin:top left}
+.mnav{display:flex;justify-content:space-between;align-items:center;padding:8px 10px}.mnav button{background:#222;color:#fff;border:0;border-radius:6px;padding:6px 12px;cursor:pointer}
+</style></head><body>
+<a class=menu href="/">&#9776; Menu</a>
+<h1>Painel de <span>Conteudo</span></h1>
+<div class=sub>Todas as publicacoes, todas as marcas &mdash; integrado ao editor.</div>
+<div class=bar><button class=del id=delsel>&#128465; Excluir selecionados</button>
+<a class=go href="/editor">+ Novo / abrir editor</a><div class=filters id=filters></div></div>
+<div class=grid id=grid></div>
+<div class=modal id=modal><div class=box><div class=mm><iframe id=mif></iframe></div>
+<div class=mnav><button id=mprev>&lsaquo;</button><span id=mpg></span><button id=mnext>&rsaquo;</button></div>
+<div style="padding:0 10px 12px"><button onclick="document.getElementById('modal').style.display='none'" style="width:100%;background:#8b3cf7;color:#fff;border:0;border-radius:8px;padding:9px;cursor:pointer">Fechar</button></div></div></div>
+<script>
+const T="__EDITOR_TOKEN__";let D=null,FILT='',MI=0,MP=0;
+async function load(){D=await(await fetch('/dados')).json();render()}
+function brands(){return [...new Set(D.posts.map(p=>p.marca||'smark'))]}
+function render(){
+  const fl=document.getElementById('filters');fl.innerHTML='';
+  [''].concat(brands()).forEach(b=>{const btn=document.createElement('button');btn.textContent=b||'todas';if(FILT===b)btn.className='on';btn.onclick=()=>{FILT=b;render()};fl.appendChild(btn)});
+  const g=document.getElementById('grid');g.innerHTML='';
+  D.posts.forEach((p,i)=>{if(FILT&&(p.marca||'smark')!==FILT)return;
+    const cov=p.frames&&p.frames[0]&&p.frames[0].out?('/'+p.frames[0].out+'?t='+Date.now()):'';
+    const st=p.status==='salvo'?'<span class="stt s">salvo</span>':'<span class="stt r">rascunho</span>';
+    const c=document.createElement('div');c.className='card';
+    c.innerHTML='<input type=checkbox class=cb data-i="'+i+'">'
+      +(cov?'<img class=th src="'+cov+'">':'<div class=thx>sem arte</div>')
+      +'<div class=meta><b>'+(p.titulo||p.slug)+'</b><small>'+(p.marca||'smark')+' &middot; '+(p.frames?p.frames.length:0)+' frames'+st+'</small></div>'
+      +'<div class=acts><button onclick="ver('+i+')">&#128065; Ver</button><a href="/editor?post='+i+'">&#9998; Editar</a><button onclick="del(['+i+'])">&#128465;</button></div>';
+    g.appendChild(c)});
+}
+async function ver(i){MP=i;MI=0;document.getElementById('modal').style.display='flex';mframe()}
+async function mframe(){const p=D.posts[MP],fr=p.frames[MI];
+  const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
+  document.getElementById('mif').srcdoc=await r.text();document.getElementById('mpg').textContent=(MI+1)+'/'+p.frames.length}
+document.getElementById('mprev').onclick=()=>{const n=D.posts[MP].frames.length;MI=(MI-1+n)%n;mframe()};
+document.getElementById('mnext').onclick=()=>{const n=D.posts[MP].frames.length;MI=(MI+1)%n;mframe()};
+async function del(idx){if(!idx.length){alert('Selecione ao menos um');return}
+  if(!confirm('Excluir '+idx.length+' publicacao(oes)?'))return;
+  await fetch('/excluir-posts',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:idx})});await load()}
+document.getElementById('delsel').onclick=()=>del([...document.querySelectorAll('.cb:checked')].map(c=>+c.dataset.i));
+load();
+</script></body></html>"""
+
+
 # Segurança (CSRF / DNS rebinding): o servidor é local, mas tem rotas que gastam
 # dinheiro (regerar-fundo→OpenAI) e escrevem em disco. Um site malicioso aberto no
 # navegador poderia dar POST em localhost. Defesa: Host + Origin + token de sessão.
@@ -268,7 +336,9 @@ class H(http.server.BaseHTTPRequestHandler):
             html = open(UI, encoding="utf-8").read().replace("__EDITOR_TOKEN__", TOKEN)
             return self._send(200, html, MIME[".html"])
         if path == "/painel":
-            return self._serve_module(PAINEL, "Painel")
+            return self._send(200, painel_html().replace("__EDITOR_TOKEN__", TOKEN), MIME[".html"])
+        if path == "/painel-notas":
+            return self._serve_module(PAINEL, "Painel (notas)")
         if path == "/vitrine":
             return self._serve_module(VITRINE, "Vitrine")
         if path == "/config":
@@ -305,6 +375,14 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/salvar":
             save(normaliza(req.get("dados", load())))
             return self._send(200, {"ok": True})
+
+        if path == "/excluir-posts":
+            d = load()
+            idx = sorted([i for i in req.get("idx", []) if isinstance(i, int) and 0 <= i < len(d["posts"])], reverse=True)
+            for i in idx:
+                d["posts"].pop(i)
+            save(normaliza(d))
+            return self._send(200, {"ok": True, "restantes": len(d["posts"])})
 
         if path == "/config-save":
             try:
