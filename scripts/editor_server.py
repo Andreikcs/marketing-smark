@@ -7,6 +7,7 @@ Preview ao vivo (mesmo HTML/CSS do compositor) + export do PNG final + upload de
 Rodar:  python3 scripts/editor_server.py   →   http://localhost:8765
 """
 import base64
+import glob
 import hashlib
 import http.server
 import json
@@ -165,6 +166,7 @@ h1{font-size:22px;margin:16px 0 4px}h1 span{color:#8b3cf7}.sub{color:#9a92ad;fon
 <h1>Painel de <span>Conteudo</span></h1>
 <div class=sub>Todas as publicacoes, todas as marcas &mdash; integrado ao editor.</div>
 <div class=bar><button class=del id=delsel>&#128465; Excluir selecionados</button>
+<button id=imp>&#8681; Importar notas antigas</button>
 <a class=go href="/editor">+ Novo / abrir editor</a><div class=filters id=filters></div></div>
 <div class=grid id=grid></div>
 <div class=modal id=modal><div class=box><div class=mm><iframe id=mif></iframe></div>
@@ -240,7 +242,8 @@ def frame_kwargs(fr, size, for_export, marca="smark"):
              ov_ang=int(fr.get("ov_ang", 180)), ov_pos=int(fr.get("ov_pos", 20)),
              brilho=float(fr.get("brilho", 1.0)), contraste=float(fr.get("contraste", 1.0)),
              satur=float(fr.get("satur", 1.0)),
-             handle_over=fr.get("handle", ""), rodape_over=fr.get("rodape", ""))
+             handle_over=fr.get("handle", ""), rodape_over=fr.get("rodape", ""),
+             raw=bool(fr.get("raw", False)))
     mode = fr.get("bgmode", "imagem")
     if mode == "imagem" and fr.get("bg"):
         if for_export:
@@ -383,6 +386,41 @@ class H(http.server.BaseHTTPRequestHandler):
                 d["posts"].pop(i)
             save(normaliza(d))
             return self._send(200, {"ok": True, "restantes": len(d["posts"])})
+
+        if path == "/importar-notas":
+            d = load()
+            existing = {(p.get("marca"), p.get("slug")) for p in d["posts"]}
+            novos = 0
+            for note in sorted(glob.glob(os.path.join(VAULT, "marcas", "*", "publicacoes", "social", "instagram", "*.md"))):
+                parts = os.path.relpath(note, VAULT).split(os.sep)
+                marca = safe_marca(parts[1])
+                slug = safe_slug(re.sub(r"^\d{4}-\d{2}-\d{2}-", "", os.path.basename(note)[:-3]))
+                if (marca, slug) in existing:
+                    continue
+                txt = open(note, encoding="utf-8").read()
+                mt = re.search(r"^tema:\s*(.+)$", txt, re.M) or re.search(r"^#\s+(.+)$", txt, re.M)
+                titulo = (mt.group(1).strip() if mt else slug)[:80]
+                ml = re.search(r"##\s*Legenda\s*\n(.*?)(?:\n##\s|\Z)", txt, re.S)
+                mh = re.search(r"##\s*Hashtags\s*\n(.*?)(?:\n##\s|\Z)", txt, re.S)
+                caption = (ml.group(1).strip() if ml else "") + (("\n\n" + mh.group(1).strip()) if mh else "")
+                adir = os.path.join(os.path.dirname(note), "arte", slug)
+                pngs = sorted(glob.glob(os.path.join(adir, "*.png"))) if os.path.isdir(adir) else []
+                single = os.path.join(os.path.dirname(note), "arte", slug + ".png")
+                if not pngs and os.path.exists(single):
+                    pngs = [single]
+                frames = [{"headline": "", "sub": "", "cta": "", "page": "", "chip": False,
+                           "tema": "escuro", "bgmode": "imagem", "bg": os.path.relpath(pg, VAULT),
+                           "raw": True, "grade": False} for pg in pngs]
+                if not frames:
+                    frames = [{"headline": titulo.upper(), "sub": "", "cta": "", "page": "",
+                               "chip": True, "tema": "claro", "bgmode": "claro", "grade": True}]
+                d["posts"].append({"slug": slug, "marca": marca, "titulo": titulo,
+                                   "status": "rascunho", "size": "1080x1350",
+                                   "caption": caption, "frames": frames, "importado": True})
+                existing.add((marca, slug))
+                novos += 1
+            save(normaliza(d))
+            return self._send(200, {"ok": True, "novos": novos, "total": len(d["posts"])})
 
         if path == "/config-save":
             try:

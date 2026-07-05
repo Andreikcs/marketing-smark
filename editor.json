@@ -201,17 +201,18 @@
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-7e7807.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-bd02a4.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/03.png",
           "n": 3,
-          "_v": 5,
-          "contexto": "gere a imagem do teo nosso funcionario de IA nesta pose, gere dele beijando a camisa, o tom deve ser mais amarelo e o contexto do fundo da imagem mais parecido com o da nina para manter simetria ",
+          "_v": 6,
+          "contexto": "gere a imagem do teo nosso funcionario de IA nesta pose, gere dele beijando a camisa, o tom deve ser mais amarelo e o contexto do fundo da imagem mais parecido com o da nina para manter simetria teo esta em uma cena  partindo para o ataque nina defende na cena anterior teo ataca \n\n",
           "overlay": "none",
-          "overlay_op": 0
+          "overlay_op": 0,
+          "posx": 0
         },
         {
           "headline": "*CLARA*",

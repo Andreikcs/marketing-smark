@@ -280,10 +280,13 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
               f'<div class="hd">{wordmark_html(b)}</div><div class="ck">&#10003;</div></div>')
     grade_on = (not no_grade) and (has_img or placeholder)
     grade_html = '<div class="grade"><i class="gt"></i><i class="gv"></i><i class="gg"></i></div>' if grade_on else ''
-    body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ovx"></div><div class="ov"></div>{page_h}'
-            f'<div class="tab"><div class="ic">{glyph_html(b, on_acc, 46)}</div><div class="vt">{esc(b["tab"])}</div></div>'
-            f'<div class="ct">{chip_h}<div class="h">{render_rich(headline)}</div>{sub_h}{cta_h}</div>'
-            f'<div class="footer"><div>{esc(handle)}</div><div class="cred">{esc(rodape)}</div></div></div>')
+    if raw:  # só a imagem (arte já pronta importada) + overlay/filtros; sem texto/moldura
+        body = '<div class="card"><div class="bg"></div><div class="ovx"></div></div>'
+    else:
+        body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ovx"></div><div class="ov"></div>{page_h}'
+                f'<div class="tab"><div class="ic">{glyph_html(b, on_acc, 46)}</div><div class="vt">{esc(b["tab"])}</div></div>'
+                f'<div class="ct">{chip_h}<div class="h">{render_rich(headline)}</div>{sub_h}{cta_h}</div>'
+                f'<div class="footer"><div>{esc(handle)}</div><div class="cred">{esc(rodape)}</div></div></div>')
     return PAGE % {"CSS": css, "BODY": body}, w, h
 
 
