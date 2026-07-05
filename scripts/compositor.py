@@ -238,7 +238,8 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
         cl = fund.get("_claro", {})
         base_c = base or cl.get("base", "#F4F2FB")
         txt = cl.get("texto", "#100D1C")
-        acc_txt = readable_on(accent_c, base_c)
+        base_hex = base_c if (base_c.startswith("#") and len(base_c) in (4, 7)) else cl.get("base", "#F4F2FB")
+        acc_txt = readable_on(accent_c, base_hex)
         T = {"BASE": base_c, "TXT": txt, "SUBC": cl.get("sub", "#4A4560"), "LH": ".98",
              "OV": "linear-gradient(180deg, rgba(244,242,251,.30) 0%%, rgba(244,242,251,0) 28%%, rgba(244,242,251,.5) 52%%, rgba(244,242,251,.93) 78%%, rgba(244,242,251,1) 100%%)",
              "HSHADOW": "none", "VSTYLE": f"color:{acc_txt};", "DOT": acc_txt,
