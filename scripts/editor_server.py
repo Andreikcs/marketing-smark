@@ -59,17 +59,46 @@ a.tile:hover .sk-card{border-color:var(--accent);transform:translateY(-2px)}
 </div>
 </body></html>"""
 
+SMARK_MARK = "M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"
+
+
+def smark_logo(h=26, wordmark=True, word="smark", suffix=""):
+    """Logo oficial da smark: brasão (seta A em quadrado roxo) + wordmark. Usado em todo o sistema."""
+    r = round(h * 0.28)
+    g = round(h * 0.62)
+    mark = (f'<span style="display:inline-flex;align-items:center;justify-content:center;width:{h}px;height:{h}px;'
+            f'border-radius:{r}px;background:linear-gradient(155deg,#9A4DFF,#2A1CA8);flex:0 0 auto">'
+            f'<svg viewBox="0 0 100 100" width="{g}" height="{g}"><path fill-rule="evenodd" fill="#fff" d="{SMARK_MARK}"/></svg></span>')
+    if not wordmark:
+        return mark
+    fs = round(h * 0.82)
+    suf = (f'<span style="font-family:var(--font-text);font-weight:700;font-size:{round(h*0.5)}px;'
+           f'color:var(--muted);margin-left:4px">{suffix}</span>') if suffix else ""
+    return (f'<span style="display:inline-flex;align-items:center;gap:9px">{mark}'
+            f'<span style="font-family:var(--font-text);font-weight:800;font-size:{fs}px;letter-spacing:-.01em;'
+            f'color:var(--text)">{word}<span style="color:var(--accent)">.</span></span>{suf}</span>')
+
+
+def claude_logo(h=14):
+    """Brasão laranja do Claude (sunburst estilizado)."""
+    return (f'<svg viewBox="0 0 24 24" width="{h}" height="{h}" style="flex:0 0 auto">'
+            f'<g fill="#D97757"><path d="M12 2.5c.3 0 .5.2.6.5l.9 4.3 3.1-3.1c.3-.3.7-.2.8.2l.5 2.9 2.9.5c.4.1.5.5.2.8l-3.1 3.1 4.3.9c.5.1.5.9 0 1l-4.3.9 3.1 3.1c.3.3.2.7-.2.8l-2.9.5-.5 2.9c-.1.4-.5.5-.8.2l-3.1-3.1-.9 4.3c-.1.5-.9.5-1 0l-.9-4.3-3.1 3.1c-.3.3-.7.2-.8-.2l-.5-2.9-2.9-.5c-.4-.1-.5-.5-.2-.8l3.1-3.1-4.3-.9c-.5-.1-.5-.9 0-1l4.3-.9-3.1-3.1c-.3-.3-.2-.7.2-.8l2.9-.5.5-2.9c.1-.4.5-.5.8-.2l3.1 3.1.9-4.3c.1-.3.3-.5.6-.5z"/></g></svg>')
+
+
+def fmt_tipo(n):
+    """Tipagem do formato pela contagem de frames (item 6)."""
+    return "post único" if n <= 1 else f"carrossel · {n}"
+
+
 def topbar(active=""):
     """App shell topbar (.sk-topbar) — substitui o botão flutuante de menu em todas as telas."""
     def lk(href, label, key):
         cls = "sk-navlink is-active" if key == active else "sk-navlink"
         return f'<a class="{cls}" href="{href}">{label}</a>'
     return ('<div class="sk-topbar">'
-            '<a href="/" style="font-family:var(--font-display);text-transform:uppercase;font-size:20px;'
-            'letter-spacing:.01em;color:var(--text);text-decoration:none;margin-right:4px">smark'
-            '<span style="color:var(--accent)">.</span></a>'
+            f'<a href="/" style="text-decoration:none;margin-right:6px">{smark_logo(26)}</a>'
             + lk("/painel", "Painel", "painel") + lk("/vitrine", "Vitrine", "vitrine")
-            + lk("/config", "Config", "config")
+            + lk("/config", "Config", "config") + lk("/editor", "Editor", "editor")
             + '<span class="sk-spacer"></span>'
             '<a class="sk-btn sk-btn--secondary sk-btn--sm" href="/editor">✎ Abrir editor</a>'
             '</div>')
@@ -173,13 +202,28 @@ def painel_html():
 .thumbfr{position:absolute;top:0;left:0;border:0;transform-origin:top left;pointer-events:none;background:#000}
 .chpill{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .chIG{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}.chIN{background:#0a66c2}
+.stdot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:0 0 auto}.st-s{background:var(--good)}.st-r{background:var(--warn)}
+.sk-post-meta{gap:7px}
+/* modal estilo Instagram (item 9) */
+.igm{max-width:420px;padding:0;overflow:hidden}
+.igmhead{display:flex;align-items:center;gap:10px;padding:11px 13px}
+.igmav{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));flex:0 0 auto}
+.igmtitle{flex:1;background:transparent;border:1px solid transparent;border-radius:8px;color:var(--text);font-weight:700;font-size:14px;padding:6px 8px;font-family:var(--font-text)}
+.igmtitle:hover{border-color:var(--field-line)}.igmtitle:focus{outline:none;border-color:var(--accent);background:var(--field)}
+.igmhead #mst{font-size:11px;color:var(--muted)}
+.igmmedia{position:relative;background:#000;aspect-ratio:4/5;overflow:hidden}
+.igmhost{position:absolute;inset:0;overflow:hidden}
+.igmnav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:#000a;color:#fff;border:0;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer}
+.igmnav.l{left:8px}.igmnav.r{right:8px}
+.igmpg{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:#fff;font-size:12px;text-shadow:0 1px 3px #000}
+.igmicons{display:flex;gap:15px;padding:10px 14px;font-size:21px}
+.igmcap{padding:0 14px 12px;font-size:13px;line-height:1.4;color:var(--text);max-height:120px;overflow:auto;white-space:pre-wrap}
+.igmbtns{display:flex;gap:8px;padding:0 14px 14px}
 </style></head><body class="sk">
 __TOPBAR__
 <div class=wrap>
 <div class="sk-pagehead">
-  <div><div class="sk-kicker">tudo local · integrado ao editor</div>
-    <h1>Painel de <span class=sk-accent>Conteúdo</span></h1>
-    <div class=sub>Todas as publicações, todas as marcas.</div></div>
+  <div style="display:flex;align-items:center;gap:10px">__LOGOSTORE__</div>
   <div class="sk-pagehead-actions">
     <button class="sk-btn sk-btn--danger sk-btn--sm" id=delsel>🗑 Excluir selecionados</button>
     <a class="sk-btn" href="/editor">＋ Novo post</a></div>
@@ -194,19 +238,21 @@ __TOPBAR__
 <div class="sk-cardgrid" id=grid></div>
 </div>
 <div class="sk-overlay" id=modal style="display:none">
-  <div class="sk-modal" style="max-width:430px;padding:0;overflow:hidden">
-    <div style="width:100%;height:520px;overflow:hidden;position:relative;background:#000"><iframe id=mif style="border:0;width:1080px;height:1350px;transform:scale(.398);transform-origin:top left"></iframe></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px">
-      <button class="sk-btn sk-btn--secondary sk-btn--sm" id=mprev>‹</button>
-      <span id=mpg style="font-size:13px;color:var(--muted)"></span>
-      <button class="sk-btn sk-btn--secondary sk-btn--sm" id=mnext>›</button></div>
-    <div style="padding:0 14px 14px"><button class="sk-btn" onclick="document.getElementById('modal').style.display='none'" style="width:100%">Fechar</button></div>
+  <div class="sk-modal igm">
+    <div class=igmhead><div class=igmav></div><input id=mtitle class=igmtitle title="clique pra editar o nome do post" spellcheck=false><span id=mst></span></div>
+    <div class=igmmedia><div class=igmhost id=mhost></div>
+      <button class="igmnav l" id=mprev>‹</button><button class="igmnav r" id=mnext>›</button>
+      <div class=igmpg id=mpg></div></div>
+    <div class=igmicons><span>&#9825;</span><span>&#128172;</span><span>&#10148;</span><span style="flex:1"></span><span>&#128278;</span></div>
+    <div class=igmcap id=mcap></div>
+    <div class=igmbtns><button class="sk-btn" id=mopen style="flex:2">✎ Abrir no editor</button><button class="sk-btn sk-btn--secondary" id=mclose style="flex:1">Fechar</button></div>
   </div>
 </div>
 <script>
 const T="__EDITOR_TOKEN__";let D=null,FILT='',STATUSF='',MI=0,MP=0;const SEL=new Set();
 async function load(){D=await(await fetch('/dados')).json();render()}
 function brands(){return [...new Set(D.posts.map(p=>p.marca||'smark'))]}
+function fmtTipo(n){return n<=1?'post único':'carrossel · '+n}
 function chIcon(c){
   if(c==='linkedin')return '<span class="chpill chIN" title=LinkedIn><svg viewBox="0 0 24 24" width=13 height=13 fill="#fff"><path d="M4.98 3.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.4 8.65 21 11 21 14v7h-4v-6.2c0-1.48-.03-3.4-2.07-3.4-2.07 0-2.39 1.62-2.39 3.29V21H9z"/></svg></span>';
   return '<span class="chpill chIG" title=Instagram><svg viewBox="0 0 24 24" width=13 height=13 fill="none" stroke="#fff" stroke-width="2.1"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.6" cy="6.4" r="1.2" fill="#fff" stroke="none"/></svg></span>';}
@@ -232,7 +278,7 @@ function render(){
     if(STATUSF&&(p.status||'rascunho')!==STATUSF)return;
     n++;
     const salvo=p.status==='salvo';
-    const badge='<span class="sk-badge '+(salvo?'sk-badge--good':'sk-badge--warn')+'">'+(salvo?'salvo':'rascunho')+'</span>';
+    const badge='<span class="stdot '+(salvo?'st-s':'st-r')+'" title="'+(salvo?'salvo':'rascunho')+'"></span>';
     const ch=(p.canais||['instagram']).map(chIcon).join('');
     const on=SEL.has(i);
     const c=document.createElement('div');c.className='sk-post'+(on?' is-selected':'');
@@ -243,7 +289,7 @@ function render(){
       +'<div class="sk-post-channel">'+ch+'</div>'
       +'</div><div class="sk-post-body">'
       +'<div class="sk-post-title">'+(p.titulo||p.slug)+'</div>'
-      +'<div class="sk-post-meta">'+(p.marca||'smark')+'<span class=sk-dot></span>'+(p.frames?p.frames.length:0)+' frames<span class=sk-dot></span>'+badge+'</div>'
+      +'<div class="sk-post-meta">'+badge+(p.marca||'smark')+'<span class=sk-dot></span>'+fmtTipo(p.frames?p.frames.length:0)+'</div>'
       +'<div class="sk-post-actions">'
       +'<button data-a=ver data-i="'+i+'" title=Ver>👁</button>'
       +'<button class=act-edit data-a=edit data-i="'+i+'" title=Editar>✎</button>'
@@ -262,12 +308,23 @@ document.getElementById('grid').addEventListener('click',e=>{
   const b=e.target.closest('[data-a]');if(!b)return;const i=+b.dataset.i,a=b.dataset.a;
   if(a==='ver')ver(i);else if(a==='edit')location.href='/editor?post='+i;else if(a==='dup')dupPost(i);else if(a==='del')del([i]);
 });
-async function ver(i){MP=i;MI=0;document.getElementById('modal').style.display='flex';mframe()}
-async function mframe(){const p=D.posts[MP],fr=p.frames[MI];
+async function ver(i){MP=i;MI=0;const p=D.posts[i];
+  document.getElementById('modal').style.display='flex';
+  document.getElementById('mtitle').value=p.titulo||p.slug||'';
+  document.getElementById('mst').innerHTML=(p.status==='salvo'?'<span class="stdot st-s"></span> salvo':'<span class="stdot st-r"></span> rascunho');
+  document.getElementById('mcap').textContent=p.caption||'';mframe()}
+async function mframe(){const p=D.posts[MP],fr=p.frames[MI],host=document.getElementById('mhost');
   const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
-  document.getElementById('mif').srcdoc=await r.text();document.getElementById('mpg').textContent=(MI+1)+'/'+p.frames.length}
+  const html=await r.text();const s=(host.clientWidth||420)/1080;
+  host.innerHTML='';const ifr=document.createElement('iframe');ifr.style.cssText='position:absolute;top:0;left:0;border:0;width:1080px;height:1350px;transform-origin:top left;pointer-events:none;transform:scale('+s+')';host.appendChild(ifr);ifr.srcdoc=html;
+  document.getElementById('mpg').textContent=(MI+1)+'/'+p.frames.length;
+  const one=p.frames.length<2;['mprev','mnext','mpg'].forEach(id=>document.getElementById(id).style.display=one?'none':'')}
 document.getElementById('mprev').onclick=()=>{const n=D.posts[MP].frames.length;MI=(MI-1+n)%n;mframe()};
 document.getElementById('mnext').onclick=()=>{const n=D.posts[MP].frames.length;MI=(MI+1)%n;mframe()};
+document.getElementById('mopen').onclick=()=>location.href='/editor?post='+MP;
+document.getElementById('mclose').onclick=()=>document.getElementById('modal').style.display='none';
+document.getElementById('mtitle').onchange=async e=>{const t=e.target.value.trim();if(!t)return;
+  await fetch('/renomear',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:MP,titulo:t})});D.posts[MP].titulo=t;render()};
 async function del(idx){if(!idx.length){alert('Selecione ao menos um');return}
   if(!confirm('Excluir '+idx.length+' publicação(ões)?'))return;
   await fetch('/excluir-posts',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:idx})});SEL.clear();await load()}
@@ -275,7 +332,7 @@ async function dupPost(i){await fetch('/duplicar-post',{method:'POST',headers:{'
 document.getElementById('delsel').onclick=()=>del([...SEL]);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 load();
-</script></body></html>""").replace("__TOPBAR__", topbar("painel"))
+</script></body></html>""").replace("__TOPBAR__", topbar("painel")).replace("__LOGOSTORE__", smark_logo(34, suffix="STORE"))
 
 
 def vitrine_html():
@@ -749,6 +806,18 @@ class H(http.server.BaseHTTPRequestHandler):
                                  args=(job_id, pedido, marca, n, tipo, contexto, historico,
                                        img_b64, img_mime), daemon=True).start()
                 return self._send(200, {"ok": True, "job": job_id})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/renomear":
+            try:
+                with IO_LOCK:
+                    d = load()
+                    i = int(req.get("idx", -1))
+                    if 0 <= i < len(d["posts"]):
+                        d["posts"][i]["titulo"] = str(req.get("titulo", "")).strip()[:120]
+                        save(d)
+                return self._send(200, {"ok": True})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 
