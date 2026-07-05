@@ -214,6 +214,7 @@ def painel_html():
 .chIG{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}.chIN{background:#0a66c2}
 .stdot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:0 0 auto}.st-s{background:var(--good)}.st-r{background:var(--warn)}
 .sk-post-meta{gap:7px}
+.sk-post-actions.a5{grid-template-columns:repeat(5,1fr)}
 /* modal estilo Instagram (item 9) */
 .igm{max-width:420px;padding:0;overflow:hidden}
 .igmhead{display:flex;align-items:center;gap:10px;padding:11px 13px}
@@ -227,8 +228,14 @@ def painel_html():
 .igmnav.l{left:8px}.igmnav.r{right:8px}
 .igmpg{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:#fff;font-size:12px;text-shadow:0 1px 3px #000}
 .igmicons{display:flex;gap:15px;padding:10px 14px;font-size:21px}
-.igmcap{padding:0 14px 12px;font-size:13px;line-height:1.4;color:var(--text);max-height:120px;overflow:auto;white-space:pre-wrap}
+.igmcap{margin:0 14px 12px;width:calc(100% - 28px);min-height:66px;max-height:150px;font-size:13px;line-height:1.45;color:var(--text);background:var(--field);border:1px solid var(--field-line);border-radius:10px;padding:9px 11px;font-family:var(--font-text);resize:vertical}
+.igmcap:focus{outline:none;border-color:var(--accent)}
+.msave{font-size:11px;color:var(--muted)}
 .igmbtns{display:flex;gap:8px;padding:0 14px 14px}
+.igmbtns .sk-btn{padding:9px 12px}
+.dlmenu{position:fixed;z-index:600;background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow-lg);padding:6px;display:flex;flex-direction:column;gap:4px;min-width:190px}
+.dlmenu button{border:0;background:transparent;color:var(--text);text-align:left;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px}
+.dlmenu button:hover{background:var(--surface-2)}
 </style></head><body class="sk">
 __TOPBAR__
 <div class=wrap>
@@ -253,9 +260,14 @@ __TOPBAR__
     <div class=igmmedia><div class=igmhost id=mhost></div>
       <button class="igmnav l" id=mprev>‹</button><button class="igmnav r" id=mnext>›</button>
       <div class=igmpg id=mpg></div></div>
-    <div class=igmicons><span>&#9825;</span><span>&#128172;</span><span>&#10148;</span><span style="flex:1"></span><span>&#128278;</span></div>
-    <div class=igmcap id=mcap></div>
-    <div class=igmbtns><button class="sk-btn" id=mopen style="flex:2">✎ Abrir no editor</button><button class="sk-btn sk-btn--secondary" id=mclose style="flex:1">Fechar</button></div>
+    <div class=igmicons><span>&#9825;</span><span>&#128172;</span><span>&#10148;</span><span style="flex:1"></span><span id=msave class=msave></span></div>
+    <textarea class=igmcap id=mcap placeholder="escreva a legenda… (salva sozinho)" spellcheck=false></textarea>
+    <div class=igmbtns>
+      <button class="sk-btn" id=mopen style="flex:2">✎ Abrir no editor</button>
+      <button class="sk-btn sk-btn--secondary" id=mcopy title="copiar legenda">⧉ Copiar</button>
+      <button class="sk-btn sk-btn--secondary" id=mdl title="baixar imagem (um ou todos)">⬇</button>
+      <button class="sk-btn sk-btn--secondary" id=mclose>Fechar</button>
+    </div>
   </div>
 </div>
 <script>
@@ -300,9 +312,10 @@ function render(){
       +'</div><div class="sk-post-body">'
       +'<div class="sk-post-title">'+(p.titulo||p.slug)+'</div>'
       +'<div class="sk-post-meta">'+badge+(p.marca||'smark')+'<span class=sk-dot></span>'+fmtTipo(p.frames?p.frames.length:0)+'</div>'
-      +'<div class="sk-post-actions">'
+      +'<div class="sk-post-actions a5">'
       +'<button data-a=ver data-i="'+i+'" title=Ver>👁</button>'
       +'<button class=act-edit data-a=edit data-i="'+i+'" title=Editar>✎</button>'
+      +'<button data-a=dl data-i="'+i+'" title="Baixar (um ou todos)">⬇</button>'
       +'<button data-a=dup data-i="'+i+'" title=Duplicar>⧉</button>'
       +'<button class=act-del data-a=del data-i="'+i+'" title=Excluir>🗑</button>'
       +'</div></div>';
@@ -317,12 +330,13 @@ document.getElementById('grid').addEventListener('click',e=>{
   const chk=e.target.closest('.sk-post-check');if(chk){const i=+chk.dataset.i;SEL.has(i)?SEL.delete(i):SEL.add(i);render();return}
   const b=e.target.closest('[data-a]');if(!b)return;const i=+b.dataset.i,a=b.dataset.a;
   if(a==='ver')ver(i);else if(a==='edit')location.href='/editor?post='+i;else if(a==='dup')dupPost(i);else if(a==='del')del([i]);
+  else if(a==='dl'){MP=i;MI=0;dlMenu({currentTarget:b},i)}
 });
 async function ver(i){MP=i;MI=0;const p=D.posts[i];
   document.getElementById('modal').style.display='flex';
   document.getElementById('mtitle').value=p.titulo||p.slug||'';
   document.getElementById('mst').innerHTML=(p.status==='salvo'?'<span class="stdot st-s"></span> salvo':'<span class="stdot st-r"></span> rascunho');
-  document.getElementById('mcap').textContent=p.caption||'';mframe()}
+  document.getElementById('mcap').value=p.caption||'';document.getElementById('msave').textContent='';mframe()}
 async function mframe(){const p=D.posts[MP],fr=p.frames[MI],host=document.getElementById('mhost');
   const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
   const html=await r.text();const s=(host.clientWidth||420)/1080;
@@ -335,6 +349,31 @@ document.getElementById('mopen').onclick=()=>location.href='/editor?post='+MP;
 document.getElementById('mclose').onclick=()=>document.getElementById('modal').style.display='none';
 document.getElementById('mtitle').onchange=async e=>{const t=e.target.value.trim();if(!t)return;
   await fetch('/renomear',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:MP,titulo:t})});D.posts[MP].titulo=t;render()};
+// legenda editável — salva sozinho (auto-save)
+let mcapT=null;
+document.getElementById('mcap').oninput=e=>{const v=e.target.value;document.getElementById('msave').textContent='salvando…';
+  clearTimeout(mcapT);mcapT=setTimeout(async()=>{
+    await fetch('/legenda',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:MP,caption:v})});
+    if(D.posts[MP])D.posts[MP].caption=v;document.getElementById('msave').textContent='salvo ✓';},700)};
+document.getElementById('mcopy').onclick=async()=>{try{await navigator.clipboard.writeText(document.getElementById('mcap').value||'');document.getElementById('mcopy').textContent='✓ Copiado';setTimeout(()=>document.getElementById('mcopy').textContent='⧉ Copiar',1400)}catch(e){alert('Não consegui copiar')}};
+document.getElementById('mdl').onclick=(e)=>dlMenu(e,MP);
+// baixa a arte compilada (renderiza no servidor e faz download)
+async function baixarPost(pi,scope){
+  const p=D.posts[pi];toast('Renderizando PNG…');
+  const r=await(await fetch('/exportar',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({post:pi,frame:scope==='all'?'all':MI})})).json();
+  if(!r.ok||!r.feitas||!r.feitas.length){toast('Erro ao renderizar');return}
+  r.feitas.forEach((path,k)=>{setTimeout(()=>{const a=document.createElement('a');a.href='/'+path+'?t='+Date.now();a.download=(p.slug||'post')+'-'+String(k+1).padStart(2,'0')+'.png';document.body.appendChild(a);a.click();a.remove()},k*400)});
+  toast('⬇ Baixando '+r.feitas.length+' PNG');
+}
+function dlMenu(e,pi){document.querySelectorAll('.dlmenu').forEach(m=>m.remove());
+  const p=D.posts[pi],n=(p.frames||[]).length;
+  const m=document.createElement('div');m.className='dlmenu';
+  m.innerHTML='<button data-s=one>⬇ Baixar este frame</button>'+(n>1?'<button data-s=all>⬇ Baixar o carrossel todo ('+n+')</button>':'');
+  document.body.appendChild(m);const r=e.currentTarget.getBoundingClientRect();
+  m.style.top=(r.bottom+6)+'px';m.style.left=Math.min(r.left,window.innerWidth-210)+'px';
+  m.onclick=ev=>{const b=ev.target.closest('button');if(!b)return;baixarPost(pi,b.dataset.s);m.remove()};
+  setTimeout(()=>document.addEventListener('mousedown',function h(ev){if(!m.contains(ev.target)){m.remove();document.removeEventListener('mousedown',h)}}),40);
+}
 async function del(idx){if(!idx.length){alert('Selecione ao menos um');return}
   if(!confirm('Excluir '+idx.length+' publicação(ões)?'))return;
   await fetch('/excluir-posts',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:idx})});SEL.clear();await load()}
@@ -826,6 +865,18 @@ class H(http.server.BaseHTTPRequestHandler):
                     i = int(req.get("idx", -1))
                     if 0 <= i < len(d["posts"]):
                         d["posts"][i]["titulo"] = str(req.get("titulo", "")).strip()[:120]
+                        save(d)
+                return self._send(200, {"ok": True})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/legenda":
+            try:
+                with IO_LOCK:
+                    d = load()
+                    i = int(req.get("idx", -1))
+                    if 0 <= i < len(d["posts"]):
+                        d["posts"][i]["caption"] = str(req.get("caption", ""))[:4000]
                         save(d)
                 return self._send(200, {"ok": True})
             except Exception as e:
