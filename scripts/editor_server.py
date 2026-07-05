@@ -79,11 +79,11 @@ def config_html():
         f"<tr><td><b>{m.get('nome', s)}</b></td><td>{sw(m.get('acento','#000'))}{m.get('acento','')}</td>"
         f"<td>{sw(m.get('acento_claro', m.get('acento','#000')))}{m.get('acento_claro','—')}</td>"
         f"<td style='font-size:11px;max-width:260px;word-break:break-all'>{m.get('gradiente','—')}</td>"
-        f"<td><input class=cfin id='cf_h_{s}' value='{m.get('handle','')}'></td></tr>" for s, m in marcas.items())
+        f"<td><input class=\"sk-input\" style=\"padding:7px 10px;font-size:13px\" id='cf_h_{s}' value='{m.get('handle','')}'></td></tr>" for s, m in marcas.items())
     rows_p = "".join(
         f"<tr><td>{i+1}</td><td>{p.get('titulo','')}</td><td>{p.get('slug','')}</td>"
         f"<td>{len(p.get('frames',[]))}</td></tr>" for i, p in enumerate(ed.get("posts", [])))
-    chips = " ".join(f"<span class=chip>{c}</span>" for c in conceitos)
+    chips = " ".join(f"<span class='sk-pill'>{c}</span>" for c in conceitos)
     return f"""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Configurações · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>

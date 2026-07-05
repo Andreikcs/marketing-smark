@@ -1829,6 +1829,35 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "teste",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "teste",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "dgdfgf",
+          "cta": "gsfgs",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teste/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }

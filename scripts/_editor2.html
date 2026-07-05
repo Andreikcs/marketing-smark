@@ -113,6 +113,42 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .npbtns{display:flex;gap:8px;margin-top:18px}
 .npbtns button{flex:1;padding:10px;border:1px solid var(--line);background:#1b1729;color:var(--txt);border-radius:9px;cursor:pointer}
 .npbtns .go{background:var(--rox);border-color:var(--rox);font-weight:600}
+
+/* ===================== DESIGN SYSTEM — harmonização ===================== */
+/* reveste os componentes nativos do editor com a estética do smark-ds (raios, sombras, focus ring, botões). Só CSS. */
+header{background:var(--surface);box-shadow:var(--shadow)}
+header b{font-family:var(--font-display);font-weight:400;text-transform:uppercase;letter-spacing:.01em;font-size:17px}
+.side,.ctrl,.strip,.gallery{background:var(--surface)}
+.grp{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
+.grp h5{color:var(--muted);letter-spacing:.7px}
+label,.hint,.mini{color:var(--muted)}
+textarea,input[type=text],.regsel,.psearch{background:var(--field);border:1px solid var(--field-line);border-radius:11px;color:var(--text);font-family:var(--font-text)}
+textarea:focus,input[type=text]:focus,.regsel:focus,.psearch:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea::placeholder,input[type=text]::placeholder{color:var(--muted)}
+.btn{background:var(--surface);border:1px solid var(--field-line);border-radius:var(--radius-md);color:var(--text);font-weight:600;box-shadow:none;transition:.15s}
+.btn:hover{background:var(--surface-2);border-color:var(--field-line)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow)}
+.btn.go:hover{filter:brightness(1.07);background:var(--accent)}
+.btn.ai{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.btn.ai:hover{filter:brightness(1.06);background:var(--good-soft)}
+.seg button,.sideacts button,.cardacts button,.fmtb,.emob,.npbrands button{background:var(--surface);border:1px solid var(--field-line);border-radius:var(--radius-sm);color:var(--sub);transition:.15s}
+.seg button:hover,.sideacts button:hover,.cardacts button:hover,.fmtb:hover,.emob:hover{border-color:var(--accent);color:var(--text)}
+.seg button.on,.npbrands button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.pitem{border-radius:var(--radius-md)}
+.pitem.on{background:var(--accent-soft);border-color:var(--accent);color:var(--text)}
+.pitem.on small{color:var(--accent-2)}
+input[type=color]{border-radius:var(--radius-sm);border:1px solid var(--field-line);background:var(--field)}
+input[type=range]{accent-color:var(--accent)}
+.newpost{border-radius:var(--radius-md);border:1px dashed var(--field-line)}
+.newpost:hover,.addtile:hover,.stagenav:hover{border-color:var(--accent)}
+.npbox{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg)}
+.npbox h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:20px}
+.npbtns .go{color:var(--accent-ink)}
+.stagenav{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-md);box-shadow:var(--shadow)}
+.stagenav:hover{background:var(--accent);color:var(--accent-ink)}
+.tag{border-color:var(--field-line)}
+#toast{background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius-md);box-shadow:var(--shadow-lg)}
+.th.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 </style></head>
 <body>
 <div class=app>
