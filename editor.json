@@ -89,7 +89,7 @@
           "page": "04/06",
           "chip": false,
           "tema": "escuro",
-          "bgmode": "escuro",
+          "bgmode": "imagem",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_regen/04-51cbfd.png",
           "cor": "",
           "accent": "",
@@ -148,7 +148,8 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/05.png"
         }
       ],
-      "caption": "Quando um movimento sai do grupo dos \"inovadores\" e vira maioria, ele deixa de ser aposta e passa a ser gestão.\n\nOs números de Stanford, McKinsey e Harvard/BCG mostram a mesma coisa por ângulos diferentes: IA na operação não é mais tendência distante — é decisão que empresas sérias já estão tomando.\n\nE repare no ponto que quase ninguém comenta: nenhum desses estudos fala em substituir pessoas. Todos falam em fazer o mesmo time produzir mais e melhor.\n\nA pergunta, então, não é mais \"devo usar IA?\". É \"por onde eu começo?\".\n\nSalva esse post — e quando quiser responder essa pergunta pra sua empresa, o diagnóstico gratuito está no link da bio. 👇\n\n#inteligenciaartificial #gestaoempresarial #produtividade #IAparaempresas #pmesbrasil #tecnologia"
+      "caption": "Quando um movimento sai do grupo dos \"inovadores\" e vira maioria, ele deixa de ser aposta e passa a ser gestão.\n\nOs números de Stanford, McKinsey e Harvard/BCG mostram a mesma coisa por ângulos diferentes: IA na operação não é mais tendência distante — é decisão que empresas sérias já estão tomando.\n\nE repare no ponto que quase ninguém comenta: nenhum desses estudos fala em substituir pessoas. Todos falam em fazer o mesmo time produzir mais e melhor.\n\nA pergunta, então, não é mais \"devo usar IA?\". É \"por onde eu começo?\".\n\nSalva esse post — e quando quiser responder essa pergunta pra sua empresa, o diagnóstico gratuito está no link da bio. 👇\n\n#inteligenciaartificial #gestaoempresarial #produtividade #IAparaempresas #pmesbrasil #tecnologia",
+      "status": "rascunho"
     },
     {
       "slug": "selecao-nina-teo-clara",
@@ -1028,7 +1029,7 @@
           "page": "",
           "chip": false,
           "tema": "escuro",
-          "bgmode": "imagem",
+          "bgmode": "cor",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/claude-melhor-que-gpt.png",
           "raw": true,
           "grade": false,
@@ -1468,14 +1469,15 @@
           "page": "01/01",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/amor/_uploads/2ae0c04f8c.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/amor/01.png"
+          "out": "marcas/smark/publicacoes/social/instagram/arte/amor/01.png",
+          "_v": 1
         }
       ],
       "caption": ""

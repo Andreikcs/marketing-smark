@@ -89,7 +89,7 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 <body>
 <div class=app>
   <header>
-    <b>smark · Super Editor</b><span class=tag>frame a frame · preview ao vivo</span>
+    <b>smark · Super Editor</b><span class=tag>clique no texto da imagem pra editar ✏️</span>
     <a href="/" style="color:var(--sub);text-decoration:none;font-size:13px;margin-left:8px">☰ Menu</a>
     <a href="/painel" style="color:var(--sub);text-decoration:none;font-size:13px">Painel</a>
     <a href="/vitrine" style="color:var(--sub);text-decoration:none;font-size:13px">Vitrine</a>
@@ -183,15 +183,15 @@ async function reorderFrame(from,to){
 }
 function sel(pi,fi){PI=pi;FI=fi;renderPosts();renderStrip();renderCtrl();preview()}
 
-function fld(label,val,onin,ph,rows){
+function fld(label,val,onin,ph,rows,key){
   const t=rows?('<textarea rows='+rows+'>'+ (val||'') +'</textarea>'):('<input type=text value="'+(val||'').replace(/"/g,'&quot;')+'">');
   const w=document.createElement('div');w.innerHTML='<label>'+label+'</label>'+t;
-  const inp=w.querySelector(rows?'textarea':'input');inp.oninput=()=>onin(inp.value);return w;
+  const inp=w.querySelector(rows?'textarea':'input');inp.oninput=()=>onin(inp.value);if(key)inp.id='fld_'+key;return w;
 }
-function richField(label,val,onin){
+function richField(label,val,onin,key){
   const w=document.createElement('div');w.innerHTML='<label>'+label+'</label>';
   const bar=document.createElement('div');bar.className='fmtbar';
-  const ta=document.createElement('textarea');ta.rows=3;ta.value=val||'';ta.oninput=()=>onin(ta.value);ta.onfocus=()=>_lastTa=ta;
+  const ta=document.createElement('textarea');ta.rows=3;ta.value=val||'';ta.oninput=()=>onin(ta.value);ta.onfocus=()=>_lastTa=ta;if(key)ta.id='fld_'+key;
   const wrap=(pre,suf)=>{const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value,sel=v.slice(s,e)||'texto';
     ta.value=v.slice(0,s)+pre+sel+(suf||pre)+v.slice(e);ta.focus();
     ta.selectionStart=s+pre.length;ta.selectionEnd=s+pre.length+sel.length;onin(ta.value)};
@@ -209,14 +209,14 @@ function renderCtrl(){
   const f=frame(),c=$('#ctrl');c.innerHTML='';
   // TEXTO
   const g1=document.createElement('div');g1.className='grp';g1.innerHTML='<h5>Texto</h5>';
-  g1.appendChild(richField('Headline (| quebra · *acento* · **negrito** · _itálico_)',f.headline,v=>{f.headline=v;change()}));
-  g1.appendChild(richField('Apoio (sub)',f.sub,v=>{f.sub=v;change()}));
-  g1.appendChild(fld('CTA',f.cta,v=>{f.cta=v;change()}));
+  g1.appendChild(richField('Headline (| quebra · *acento* · **negrito** · _itálico_)',f.headline,v=>{f.headline=v;change()},'headline'));
+  g1.appendChild(richField('Apoio (sub)',f.sub,v=>{f.sub=v;change()},'sub'));
+  g1.appendChild(fld('CTA',f.cta,v=>{f.cta=v;change()},0,0,'cta'));
   const emo=document.createElement('div');emo.className='emobar';
   '👉 👇 🔥 ✅ 🚀 💡 📈 ⚡ 🎯 ❤️ 🙌 ✨ 💜 ⚽ 🏆 📱'.split(' ').forEach(e=>{const b=document.createElement('button');b.type='button';b.className='emob';b.textContent=e;b.onclick=()=>insEmoji(e);emo.appendChild(b)});
   g1.appendChild(emo);
   const rowpc=document.createElement('div');rowpc.className='row';rowpc.style.marginTop='8px';
-  const pg=fld('Paginação',f.page,v=>{f.page=v;change()});pg.style.flex='1';rowpc.appendChild(pg);
+  const pg=fld('Paginação',f.page,v=>{f.page=v;change()},0,0,'page');pg.style.flex='1';rowpc.appendChild(pg);
   c.appendChild(g1);
   const chk=document.createElement('label');chk.className='chk';chk.style.marginTop='8px';
   chk.innerHTML='<input type=checkbox '+(f.chip?'checked':'')+'> Mostrar selo (chip da capa)';
@@ -310,8 +310,8 @@ function renderCtrl(){
 
   // ASSINATURA (bundle) — respeita o padrão da marca; se editar, prevalece
   const g5=document.createElement('div');g5.className='grp';g5.innerHTML='<h5>Assinatura (rodapé)</h5>';
-  g5.appendChild(fld('Handle esquerdo (vazio = padrão da marca)',f.handle||'',v=>{f.handle=v;change()}));
-  g5.appendChild(fld('Crédito direito (vazio = padrão do sistema)',f.rodape||'',v=>{f.rodape=v;change()}));
+  g5.appendChild(fld('Handle esquerdo (vazio = padrão da marca)',f.handle||'',v=>{f.handle=v;change()},0,0,'handle'));
+  g5.appendChild(fld('Crédito direito (vazio = padrão do sistema)',f.rodape||'',v=>{f.rodape=v;change()},0,0,'rodape'));
   c.appendChild(g5);
 
   // AÇÕES
@@ -360,6 +360,23 @@ function fit(){
   box.style.width=(1080*s)+'px';box.style.height=(1350*s)+'px';
 }
 window.addEventListener('resize',fit);
+function attachWysiwyg(){
+  const fr=$('#pv');let doc;try{doc=fr.contentDocument}catch(e){return}if(!doc||!doc.body)return;
+  if(!doc.getElementById('wys')){const st=doc.createElement('style');st.id='wys';
+    st.textContent='.h,.sub,.cta,.page,.footer>div{cursor:pointer}.h:hover,.sub:hover,.cta:hover,.page:hover,.footer>div:hover{outline:2px dashed #8b3cf7;outline-offset:4px}';
+    (doc.head||doc.body).appendChild(st)}
+  const wire=(sel,field)=>{const el=doc.querySelector(sel);if(el)el.onclick=e=>{e.stopPropagation();focusField(field)}};
+  wire('.h','headline');wire('.sub','sub');wire('.cta','cta');wire('.page','page');
+  const fs=doc.querySelectorAll('.footer>div');if(fs[0])fs[0].onclick=()=>focusField('handle');
+  const cred=doc.querySelector('.footer .cred');if(cred)cred.onclick=()=>focusField('rodape');
+}
+function focusField(field){
+  const el=document.getElementById('fld_'+field);if(!el){toast('Esse elemento não é editável por aqui');return}
+  const g=el.closest('.grp');if(g)g.classList.remove('collapsed');
+  el.scrollIntoView({block:'center',behavior:'smooth'});el.focus();
+  el.style.boxShadow='0 0 0 2px var(--rox)';setTimeout(()=>{el.style.boxShadow=''},1000);
+}
+$('#pv').addEventListener('load',attachWysiwyg);
 
 async function salvar(silent){
   await fetch('/salvar',{method:'POST',headers:HJSON,body:JSON.stringify({dados:D})});
