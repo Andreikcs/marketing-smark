@@ -739,13 +739,13 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "O *churn* elimina|seu provedor|antes do fim do ",
+          "headline": "O *churn* elimina|seu provedor|antes do fim do mês",
           "sub": "Cada cliente que sai é uma vaga que você não devia perder",
           "cta": "Diagnóstico gratuito — link na bio",
           "page": "",
-          "chip": false,
+          "chip": true,
           "tema": "escuro",
-          "bgmode": "degrade",
+          "bgmode": "claro",
           "bg": "",
           "cor": "#F4F2FB",
           "accent": "",
