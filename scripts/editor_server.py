@@ -214,6 +214,7 @@ async function del(idx){if(!idx.length){alert('Selecione ao menos um');return}
   await fetch('/excluir-posts',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:idx})});await load()}
 async function dupPost(i){await fetch('/duplicar-post',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:i})});await load()}
 document.getElementById('delsel').onclick=()=>del([...document.querySelectorAll('.cb:checked')].map(c=>+c.dataset.i));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});  // sincroniza ao voltar pra aba
 load();
 </script></body></html>"""
 

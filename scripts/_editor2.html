@@ -143,9 +143,7 @@ input[type=range]{width:100%;accent-color:var(--rox)}
     <div class=gallery>
       <div class=cardacts>
         <button id=baddc>＋ Adicionar</button>
-        <button id=bdupc>⧉ Duplicar</button>
-        <button id=bmoveL>◀ reordenar</button>
-        <button id=bmoveR>reordenar ▶</button>
+        <button id=bdupc>⧉ Duplicar card</button>
         <button id=bsim><svg class=igicon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Instagram</button>
         <button id=bfull>⛶ Tela cheia</button>
         <button id=bdl>⬇ Baixar</button>
@@ -194,7 +192,7 @@ let PSEARCH='';
 function renderPosts(){
   const el=$('#posts');el.innerHTML='';
   const q=PSEARCH.trim().toLowerCase();
-  let list=D.posts.map((p,i)=>({p,i}));
+  let list=D.posts.map((p,i)=>({p,i})).reverse();  // mais novos primeiro
   if(q)list=list.filter(o=>((o.p.titulo||o.p.slug||'')+' '+(o.p.marca||'')).toLowerCase().includes(q));
   const shown=q?list:list.slice(0,10);
   shown.forEach(({p,i})=>{
@@ -271,6 +269,13 @@ function richField(label,val,onin,key){
 
 function renderCtrl(){
   const f=frame(),c=$('#ctrl');c.innerHTML='';
+  // PUBLICAÇÃO (canais)
+  const gp=document.createElement('div');gp.className='grp';gp.innerHTML='<h5>Publicação — canais</h5>';
+  const cseg=document.createElement('div');cseg.className='seg';
+  [['instagram','Instagram'],['linkedin','LinkedIn']].forEach(([k,lb])=>{
+    const b=document.createElement('button');b.textContent=lb;if((post().canais||['instagram']).includes(k))b.classList.add('on');
+    b.onclick=()=>{let c2=post().canais||['instagram'];c2=c2.includes(k)?c2.filter(x=>x!==k):c2.concat(k);if(!c2.length)c2=['instagram'];post().canais=c2;renderCtrl();setDirty(true)};cseg.appendChild(b)});
+  gp.appendChild(cseg);c.appendChild(gp);
   // TEXTO
   const g1=document.createElement('div');g1.className='grp';g1.innerHTML='<h5>Texto</h5>';
   g1.appendChild(richField('Headline (| quebra · *acento* · **negrito** · _itálico_)',f.headline,v=>{f.headline=v;change()},'headline'));
@@ -567,8 +572,7 @@ $('#bnew').onclick=novoPost;$('#baddc').onclick=addCard;$('#bdelc').onclick=delC
 // setas laterais = NAVEGAR entre cards (visualizar próximo/anterior)
 $('#bmvl').onclick=()=>{if(FI>0)sel(PI,FI-1)};$('#bmvr').onclick=()=>{if(FI<post().frames.length-1)sel(PI,FI+1)};
 $('#bsim').onclick=openSim;$('#bdup').onclick=dupPost;$('#bdelpost').onclick=delSelected;
-// menu do card = reordenar / duplicar / baixar
-$('#bmoveL').onclick=()=>{if(FI>0)reorderFrame(FI,FI-1)};$('#bmoveR').onclick=()=>{if(FI<post().frames.length-1)reorderFrame(FI,FI+1)};
+// menu do card = duplicar / baixar (reordenar = arrastar na tira, ou ◀▶ do teclado com card focado)
 $('#bdupc').onclick=dupFrame;$('#bdl').onclick=baixar;
 $('#psearch').oninput=e=>{PSEARCH=e.target.value;renderPosts()};
 async function dupFrame(){const c=JSON.parse(JSON.stringify(frame()));delete c._v;post().frames.splice(FI+1,0,c);await salvar(true);await reload(PI,FI+1);toast('Card duplicado')}
