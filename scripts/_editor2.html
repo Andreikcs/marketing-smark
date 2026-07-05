@@ -61,6 +61,12 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .fmtb{border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:6px;padding:3px 9px;font-size:12px;cursor:pointer}
 .fmtb:hover{border-color:var(--rox);color:var(--txt)} .fmtb.b{font-weight:800} .fmtb.i{font-style:italic}
 .fmtcol{width:26px;height:24px;padding:1px;border:1px solid var(--line);border-radius:6px;background:#15121e;cursor:pointer}
+.fmtchip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--field-line);background:var(--surface);color:var(--sub);border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;transition:.15s}
+.fmtchip:hover{border-color:var(--accent);color:var(--text)}
+.fmtchip .sw{width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.35);flex:0 0 auto}
+.fmthex{width:66px;background:var(--field);border:1px solid var(--field-line);color:var(--txt);border-radius:6px;padding:3px 7px;font-size:11px;font-family:var(--font-mono)}
+.fmthex:focus{outline:none;border-color:var(--accent)}
+.fmthint{font-size:10px;color:var(--muted);align-self:center;margin-left:auto}
 .newpost{width:100%;margin-top:10px;padding:10px;border:1px dashed var(--line);background:transparent;color:var(--sub);border-radius:10px;cursor:pointer;font-size:13px}
 .newpost:hover{border-color:var(--rox);color:var(--txt)}
 .pitem{display:flex;align-items:flex-start;gap:7px}
@@ -168,8 +174,11 @@ input[type=range]{accent-color:var(--accent)}
 #estudio.min .eslog,#estudio.min .esfoot{display:none}
 #estudio.min .eshead{border-bottom:0;cursor:pointer}
 .eshead{display:flex;align-items:center;gap:8px;padding:13px 15px;border-bottom:1px solid var(--line)}
-.eshead b{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:16px;flex:1}
-.eshead .prov{font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.eslogo{display:inline-flex;align-items:center;gap:7px}
+.esmark{width:24px;height:24px;border-radius:6px;background:linear-gradient(155deg,#9A4DFF,#2A1CA8);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.esword{font-family:var(--font-text);font-weight:800;font-size:16px;color:var(--txt)}
+.essub{font-size:12px;color:var(--muted);font-weight:600}
+.eshead .prov{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
 .eshead .x{background:transparent;border:0;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px}
 .eslog{flex:1;overflow:auto;padding:14px 15px;display:flex;flex-direction:column;gap:10px;min-height:90px}
 .esmsg{font-size:13px;line-height:1.45;border-radius:12px;padding:9px 12px;max-width:92%}
@@ -361,29 +370,36 @@ function fld(label,val,onin,ph,rows,key){
 }
 function richField(label,val,onin,key){
   const w=document.createElement('div');w.innerHTML='<label>'+label+'</label>';
-  const bar=document.createElement('div');bar.className='fmtbar';
   const ta=document.createElement('textarea');ta.rows=3;ta.value=val||'';ta.oninput=()=>onin(ta.value);ta.onfocus=()=>_lastTa=ta;if(key)ta.id='fld_'+key;
   const wrap=(pre,suf)=>{const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value,sel=v.slice(s,e)||'texto';
     ta.value=v.slice(0,s)+pre+sel+(suf||pre)+v.slice(e);ta.focus();
     ta.selectionStart=s+pre.length;ta.selectionEnd=s+pre.length+sel.length;onin(ta.value)};
-  const ins=t=>{const s=ta.selectionStart,v=ta.value;ta.value=v.slice(0,s)+t+v.slice(ta.selectionEnd);
-    ta.focus();ta.selectionStart=ta.selectionEnd=s+t.length;onin(ta.value)};
-  [['↵ quebra','','quebra de linha',()=>ins('|')],['★ acento','','destaque roxo (palavra-chave)',()=>wrap('*')],['B','b','negrito',()=>wrap('**')],['I','i','itálico',()=>wrap('_')]]
+  // pinta a seleção com a cor (hex). Preserva a seleção via savedSel (chips usam preventDefault).
+  const paint=(hex,ss)=>{const s=ss?ss.s:ta.selectionStart,e=ss?ss.e:ta.selectionEnd,v=ta.value;
+    if(s===e){toast('Selecione a palavra que quer pintar primeiro');return}
+    const txt=v.slice(s,e).replace(/\{#[0-9a-fA-F]{3,6}:/g,'').replace(/[{}]/g,'');
+    const insv='{'+hex+':'+txt+'}';ta.value=v.slice(0,s)+insv+v.slice(e);ta.focus();
+    ta.selectionStart=s;ta.selectionEnd=s+insv.length;onin(ta.value)};
+  // ATALHOS DE TECLADO: Ctrl/Cmd+B / I ; Enter = quebra de linha natural (já quebra na arte)
+  ta.addEventListener('keydown',ev=>{if(ev.ctrlKey||ev.metaKey){const k=ev.key.toLowerCase();
+    if(k==='b'){ev.preventDefault();wrap('**')}else if(k==='i'){ev.preventDefault();wrap('_')}}});
+  // linha 1: acento / B / I (+ dica de Enter e teclado)
+  const bar=document.createElement('div');bar.className='fmtbar';
+  [['★ acento','','realçar palavra (roxo)',()=>wrap('*')],['B','b','negrito · Ctrl+B',()=>wrap('**')],['I','i','itálico · Ctrl+I',()=>wrap('_')]]
    .forEach(([lb,cls,tip,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.title=tip;
-     b.onmousedown=e=>e.preventDefault();/* não perde a seleção */ b.onclick=fn;bar.appendChild(b)});
-  // COR: seleciona a palavra → escolhe a cor → aplica na hora (sem clique extra)
-  const col=document.createElement('input');col.type='color';col.value='#8b3cf7';col.className='fmtcol';col.title='cor: selecione a palavra e escolha a cor — aplica na hora';
-  let savedSel=null;
-  col.onmousedown=()=>{savedSel={s:ta.selectionStart,e:ta.selectionEnd}};
-  col.oninput=()=>{
-    const sel=(savedSel&&savedSel.s!==savedSel.e)?savedSel:{s:ta.selectionStart,e:ta.selectionEnd};
-    if(sel.s===sel.e){toast('Selecione a palavra ANTES de escolher a cor');return}
-    const v=ta.value,txt=v.slice(sel.s,sel.e).replace(/\{#[0-9a-fA-F]{3,6}:/g,'').replace(/[{}]/g,'');
-    const insv='{'+col.value+':'+txt+'}';ta.value=v.slice(0,sel.s)+insv+v.slice(sel.e);
-    ta.focus();ta.selectionStart=sel.s;ta.selectionEnd=sel.s+insv.length;onin(ta.value);savedSel=null;
-  };
-  bar.appendChild(col);
-  w.appendChild(bar);w.appendChild(ta);return w;
+     b.onmousedown=e=>e.preventDefault();b.onclick=fn;bar.appendChild(b)});
+  const hint=document.createElement('span');hint.className='fmthint';hint.textContent='Enter = quebra';bar.appendChild(hint);
+  w.appendChild(bar);
+  // linha 2: cores — chips (acento/claro/escuro) + hex. Seleciona → clica → pinta.
+  const bar2=document.createElement('div');bar2.className='fmtbar';
+  [['acento','#8B3CF7'],['claro','#FFFFFF'],['escuro','#100D1C']].forEach(([nm,hex])=>{
+    const b=document.createElement('button');b.type='button';b.className='fmtchip';b.title='pintar seleção · '+hex;
+    b.innerHTML='<span class=sw style="background:'+hex+'"></span>'+nm;b.onmousedown=e=>e.preventDefault();b.onclick=()=>paint(hex);bar2.appendChild(b)});
+  const hx=document.createElement('input');hx.type='text';hx.className='fmthex';hx.placeholder='#hex';hx.maxLength=7;hx.title='cor em hexadecimal — Enter aplica na seleção';
+  let sel2=null;hx.onfocus=()=>{sel2={s:ta.selectionStart,e:ta.selectionEnd}};
+  hx.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();let h=hx.value.trim();if(!/^#?[0-9a-fA-F]{6}$/.test(h)){toast('hex inválido (ex.: #8B3CF7)');return}if(h[0]!=='#')h='#'+h;paint(h,sel2);hx.value=''}};
+  bar2.appendChild(hx);w.appendChild(bar2);
+  w.appendChild(ta);return w;
 }
 
 function renderCtrl(){
@@ -789,7 +805,10 @@ carregar().then(()=>snapshot());
 </script>
 
 <div id=estudio>
-  <div class=eshead id=eshead><b>Estúdio IA</b><span class=prov id=esprov></span><button class=x id=esmin title="minimizar">–</button><button class=x id=esclose title="fechar">✕</button></div>
+  <div class=eshead id=eshead>
+    <span class=eslogo><span class=esmark><svg viewBox="0 0 100 100" width=13 height=13><path fill-rule=evenodd fill=#fff d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></span><b class=esword>smark<span style="color:var(--accent)">.</span></b><span class=essub>studio IA</span></span>
+    <span style="flex:1"></span>
+    <span class=prov id=esprov></span><button class=x id=esmin title="minimizar">–</button><button class=x id=esclose title="fechar">✕</button></div>
   <div class=eslog id=eslog><div class=esempty>Descreva o post que você quer — eu gero a copy (headline, sub, CTA, legenda, hashtags) já no markup do editor, e um conceito visual pro fundo.<br><br>Ex: <i>"carrossel de 3 sobre parar de perder tempo com tarefa repetitiva, tom leve"</i></div></div>
   <div class=esfoot>
     <div class=esopts>
@@ -814,6 +833,8 @@ carregar().then(()=>snapshot());
     optMarca=document.getElementById('esmarca'),optN=document.getElementById('esn'),
     optFundo=document.getElementById('esfundo'),provEl=document.getElementById('esprov');
   const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const CLAUDELOGO='<svg viewBox="0 0 24 24" width=12 height=12 style="flex:0 0 auto"><path fill="#D97757" d="M12 2.5c.3 0 .5.2.6.5l.9 4.3 3.1-3.1c.3-.3.7-.2.8.2l.5 2.9 2.9.5c.4.1.5.5.2.8l-3.1 3.1 4.3.9c.5.1.5.9 0 1l-4.3.9 3.1 3.1c.3.3.2.7-.2.8l-2.9.5-.5 2.9c-.1.4-.5.5-.8.2l-3.1-3.1-.9 4.3c-.1.5-.9.5-1 0l-.9-4.3-3.1 3.1c-.3.3-.7.2-.8-.2l-.5-2.9-2.9-.5c-.4-.1-.5-.5-.2-.8l3.1-3.1-4.3-.9c-.5-.1-.5-.9 0-1l4.3-.9-3.1-3.1c-.3-.3-.2-.7.2-.8l2.9-.5.5-2.9c.1-.4.5-.5.8-.2l3.1 3.1.9-4.3c.1-.3.3-.5.6-.5z"/></svg>';
+  function setProv(name){provEl.innerHTML=(name==='Claude'?CLAUDELOGO:'')+'<span>'+name+'</span>';}
   const slugify=s=>(s||'post').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'post';
   function addMsg(cls,html){const d=document.createElement('div');d.className='esmsg '+cls;d.innerHTML=html;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;return d}
   const hist=[];  // memória da conversa (role/content)
@@ -822,7 +843,7 @@ carregar().then(()=>snapshot());
     const p=post();const hs=(p.frames||[]).map((f,i)=>(i+1)+') '+((f.headline||'').replace(/\|/g,' ')).slice(0,60)).join(' | ');
     return 'Post aberto: "'+(p.titulo||p.slug||'')+'" ('+(p.marca||'smark')+', '+(p.frames||[]).length+' frames). Headlines atuais: '+hs;
   }
-  document.getElementById('bestudio').onclick=()=>{panel.classList.remove('min');panel.classList.toggle('on');if(panel.classList.contains('on')){provEl.textContent='Claude';if(typeof D!=='undefined'&&D&&post())optMarca.value=post().marca||'smark';txt.focus()}};
+  document.getElementById('bestudio').onclick=()=>{panel.classList.remove('min');panel.classList.toggle('on');if(panel.classList.contains('on')){setProv('Claude');if(typeof D!=='undefined'&&D&&post())optMarca.value=post().marca||'smark';txt.focus()}};
   document.getElementById('esclose').onclick=()=>panel.classList.remove('on');
   document.getElementById('esmin').onclick=(e)=>{e.stopPropagation();panel.classList.toggle('min')};
   document.getElementById('eshead').onclick=(e)=>{if(panel.classList.contains('min')&&e.target.tagName!=='BUTTON')panel.classList.remove('min')};
@@ -862,7 +883,7 @@ carregar().then(()=>snapshot());
     send.disabled=false;
   }
   function renderResult(r,prov,fundo){
-    provEl.textContent=prov==='claude'?'Claude':'OpenAI';
+    setProv(prov==='claude'?'Claude':'OpenAI');
     hist.push({role:'assistant',content:(r.resumo||r.titulo||'')});
     let h='<b>'+esc(r.titulo||'Post')+'</b> <span style="font-size:11px;color:var(--muted)">· tema '+(r.tema==='escuro'?'escuro':'claro'+(r.forcado_claro?' (padrão)':''))+'</span>';
     if(r.resumo)h+='<br>'+esc(r.resumo);

@@ -453,14 +453,14 @@ def _run_estudio(job_id, pedido, marca, n, tipo, contexto="", historico=None,
 
 
 def hl(text):
-    """headline do editor usa '|' como quebra; o compositor usa '\\n'."""
-    return (text or "").replace("|", "\\n")
+    """quebra de linha: '|' (legado) e Enter (newline real) → '\\n' que o compositor entende."""
+    return (text or "").replace("\r", "").replace("|", "\\n").replace("\n", "\\n")
 
 
 def frame_kwargs(fr, size, for_export, marca="smark"):
     """Traduz um frame do editor.json nos kwargs do compose_html.
     for_export=True embute a imagem (base64, render headless); False usa URL estática (preview leve)."""
-    k = dict(marca=marca, headline=hl(fr.get("headline", "")), sub=fr.get("sub", ""),
+    k = dict(marca=marca, headline=hl(fr.get("headline", "")), sub=hl(fr.get("sub", "")),
              cta=fr.get("cta", ""), page=fr.get("page", ""), no_chip=not fr.get("chip", False),
              tema=fr.get("tema", "escuro"), size=size, hsize=int(fr.get("hsize", 0) or 0),
              accent=fr.get("accent", ""), no_grade=not fr.get("grade", True),
