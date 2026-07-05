@@ -805,7 +805,7 @@
           "page": "",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
+          "bgmode": "imagem",
           "bg": "",
           "cor": "#F4F2FB",
           "accent": "",
