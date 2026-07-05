@@ -48,6 +48,7 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .fmtbar{display:flex;gap:4px;margin-bottom:5px}
 .fmtb{border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:6px;padding:3px 9px;font-size:12px;cursor:pointer}
 .fmtb:hover{border-color:var(--rox);color:var(--txt)} .fmtb.b{font-weight:800} .fmtb.i{font-style:italic}
+.fmtcol{width:26px;height:24px;padding:1px;border:1px solid var(--line);border-radius:6px;background:#15121e;cursor:pointer}
 .newpost{width:100%;margin-top:10px;padding:10px;border:1px dashed var(--line);background:transparent;color:var(--sub);border-radius:10px;cursor:pointer;font-size:13px}
 .newpost:hover{border-color:var(--rox);color:var(--txt)}
 .pitem{display:flex;align-items:flex-start;gap:7px}
@@ -198,6 +199,9 @@ function richField(label,val,onin){
     ta.focus();ta.selectionStart=ta.selectionEnd=s+t.length;onin(ta.value)};
   [['↵ quebra','',()=>ins('|')],['★ acento','',()=>wrap('*')],['B','b',()=>wrap('**')],['I','i',()=>wrap('_')]]
    .forEach(([lb,cls,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.onclick=fn;bar.appendChild(b)});
+  const col=document.createElement('input');col.type='color';col.value='#8b3cf7';col.className='fmtcol';col.title='cor';
+  const cbtn=document.createElement('button');cbtn.type='button';cbtn.className='fmtb';cbtn.textContent='🎨';cbtn.title='colorir seleção';
+  cbtn.onclick=()=>wrap('{'+col.value+'|','}');bar.appendChild(col);bar.appendChild(cbtn);
   w.appendChild(bar);w.appendChild(ta);return w;
 }
 

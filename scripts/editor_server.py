@@ -181,7 +181,8 @@ function render(){
   [''].concat(brands()).forEach(b=>{const btn=document.createElement('button');btn.textContent=b||'todas';if(FILT===b)btn.className='on';btn.onclick=()=>{FILT=b;render()};fl.appendChild(btn)});
   const g=document.getElementById('grid');g.innerHTML='';
   D.posts.forEach((p,i)=>{if(FILT&&(p.marca||'smark')!==FILT)return;
-    const cov=p.frames&&p.frames[0]&&p.frames[0].out?('/'+p.frames[0].out+'?t='+Date.now()):'';
+    const f0=p.frames&&p.frames[0];const cp=f0?((f0.bgmode==='imagem'&&f0.bg)?f0.bg:(f0.out||'')):'';
+    const cov=cp?('/'+cp+'?t='+Date.now()):'';
     const st=p.status==='salvo'?'<span class="stt s">salvo</span>':'<span class="stt r">rascunho</span>';
     const c=document.createElement('div');c.className='card';
     c.innerHTML='<input type=checkbox class=cb data-i="'+i+'">'
@@ -200,6 +201,53 @@ async function del(idx){if(!idx.length){alert('Selecione ao menos um');return}
   if(!confirm('Excluir '+idx.length+' publicacao(oes)?'))return;
   await fetch('/excluir-posts',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:idx})});await load()}
 document.getElementById('delsel').onclick=()=>del([...document.querySelectorAll('.cb:checked')].map(c=>+c.dataset.i));
+async function importar(){if(!confirm('Importar todas as notas antigas do vault pro editor?'))return;
+  const r=await(await fetch('/importar-notas',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:'{}'})).json();
+  alert('Importados: '+(r.novos||0)+' (total '+(r.total||0)+')');await load()}
+document.getElementById('imp').onclick=importar;
+load();
+</script></body></html>"""
+
+
+def vitrine_html():
+    """Vitrine estilo feed do Instagram — todas as publicações do editor.json."""
+    return """<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><title>Vitrine · smark</title><style>
+*{box-sizing:border-box;margin:0;padding:0}body{background:#fafafa;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding-bottom:50px}
+a.menu{position:fixed;top:8px;left:8px;background:#8b3cf7;color:#fff;padding:6px 12px;border-radius:8px;font:600 12px sans-serif;text-decoration:none;z-index:9}
+.top{text-align:center;padding:14px;font-weight:700;font-size:16px;border-bottom:1px solid #dbdbdb;background:#fff;position:sticky;top:0;z-index:5}
+.feed{max-width:440px;margin:18px auto;display:flex;flex-direction:column;gap:22px;padding:0 8px}
+.post{background:#fff;border:1px solid #dbdbdb;border-radius:10px;overflow:hidden}
+.ph{display:flex;align-items:center;gap:9px;padding:11px 13px;font-size:14px;font-weight:600}
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#8b3cf7,#5a28b4)}
+.media{position:relative;background:#000;aspect-ratio:4/5;cursor:pointer}
+.media img{width:100%;height:100%;object-fit:cover;display:block}
+.cbadge{position:absolute;top:10px;right:10px;background:#000a;color:#fff;font-size:12px;padding:2px 9px;border-radius:12px}
+.dots{position:absolute;bottom:10px;left:0;right:0;display:flex;gap:5px;justify-content:center}
+.dot{width:6px;height:6px;border-radius:50%;background:#ffffff88}.dot.on{background:#fff}
+.icons{display:flex;gap:15px;padding:10px 13px;font-size:22px}
+.cap{padding:0 13px 14px;font-size:14px;line-height:1.4;white-space:pre-wrap}.cap b{font-weight:600}
+.empty{text-align:center;color:#999;padding:40px;font-size:14px}
+</style></head><body>
+<a class=menu href="/">&#9776; Menu</a>
+<div class=top>smark &middot; vitrine</div>
+<div class=feed id=feed></div>
+<script>
+async function load(){const D=await(await fetch('/dados')).json();const f=document.getElementById('feed');f.innerHTML='';let n=0;
+  D.posts.forEach(p=>{
+    const imgs=(p.frames||[]).map(fr=>((fr.bgmode==='imagem'&&fr.bg)?fr.bg:fr.out)).filter(Boolean);
+    if(!imgs.length)return;n++;
+    const el=document.createElement('div');el.className='post';
+    el.innerHTML='<div class=ph><div class=av></div>'+(p.marca||'smark')+'<span style="flex:1"></span>&middot;&middot;&middot;</div>'
+      +'<div class=media><img src="/'+imgs[0]+'"><div class=cbadge>1/'+imgs.length+'</div><div class=dots>'+imgs.map((_,i)=>'<span class="dot'+(i?'':' on')+'"></span>').join('')+'</div></div>'
+      +'<div class=icons><span>&#9825;</span><span>&#128172;</span><span>&#10148;</span><span style="flex:1"></span><span>&#128278;</span></div>'
+      +'<div class=cap><b>'+(p.marca||'smark')+'</b> '+((p.caption||'').replace(/</g,'&lt;'))+'</div>';
+    let idx=0;const img=el.querySelector('img'),badge=el.querySelector('.cbadge'),dots=el.querySelectorAll('.dot');
+    el.querySelector('.media').onclick=()=>{idx=(idx+1)%imgs.length;img.src='/'+imgs[idx]+'?t='+Date.now();badge.textContent=(idx+1)+'/'+imgs.length;dots.forEach((d,i)=>d.classList.toggle('on',i===idx))};
+    f.appendChild(el);
+  });
+  if(!n)f.innerHTML='<div class=empty>Nenhuma arte exportada ainda. Exporte no editor pra ver aqui.</div>';
+}
 load();
 </script></body></html>"""
 
@@ -343,7 +391,9 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/painel-notas":
             return self._serve_module(PAINEL, "Painel (notas)")
         if path == "/vitrine":
-            return self._serve_module(VITRINE, "Vitrine")
+            return self._send(200, vitrine_html(), MIME[".html"])
+        if path == "/vitrine-notas":
+            return self._serve_module(VITRINE, "Vitrine (notas)")
         if path == "/config":
             return self._send(200, config_html().replace("__EDITOR_TOKEN__", TOKEN), MIME[".html"])
         if path == "/dados":
