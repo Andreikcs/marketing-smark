@@ -426,6 +426,30 @@
           "n": 5
         }
       ]
+    },
+    {
+      "slug": "caz-tv",
+      "marca": "smark",
+      "titulo": "CAZé tv",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "01/01",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/01.png"
+        }
+      ]
     }
   ]
 }
