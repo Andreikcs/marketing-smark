@@ -183,7 +183,7 @@
           "page": "02/05",
           "chip": false,
           "tema": "escuro",
-          "bgmode": "imagem",
+          "bgmode": "degrade",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
           "cor": "",
           "accent": "",
@@ -217,8 +217,8 @@
           "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png"
         },
         {
-          "headline": "*CLARA*",
-          "sub": "Receita e relacionamento. O cliente que compra e depois é esquecido? Quem já confiou na sua empresa continua bem cuidado.",
+          "headline": "*CLA",
+          "sub": "",
           "cta": "",
           "page": "04/05",
           "chip": false,
