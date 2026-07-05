@@ -272,7 +272,6 @@ input[type=range]{accent-color:var(--accent)}
         <button id=bdupc>⧉ Duplicar card</button>
         <button id=bsim><svg class=igicon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Instagram</button>
         <button id=bfull>⛶ Tela cheia</button>
-        <button id=bdl>⬇ Baixar</button>
         <button class=del id=bdelc>🗑 Excluir</button>
       </div>
       <div class=strip id=strip></div>
@@ -503,33 +502,10 @@ function renderCtrl(){
   }
   c.appendChild(g2);
 
-  // ESTILO
-  const g3=document.createElement('div');g3.className='grp';g3.innerHTML='<h5>Estilo</h5>';
-  const ac=document.createElement('div');ac.className='row';ac.innerHTML='<label style=margin:0;flex:1>Cor de acento (palavra em *)</label>';
-  const acol=document.createElement('input');acol.type='color';acol.value=f.accent||'#8b3cf7';
-  acol.oninput=()=>{f.accent=acol.value;change()};ac.appendChild(acol);g3.appendChild(ac);
-  const hs=document.createElement('div');hs.style.marginTop='10px';
-  hs.innerHTML='<label>Tamanho do título: '+(f.hsize?f.hsize+'px':'automático')+'</label>';
-  const rg=document.createElement('input');rg.type='range';rg.min=0;rg.max=140;rg.value=f.hsize||0;
-  rg.oninput=()=>{f.hsize=+rg.value;hs.querySelector('label').textContent='Tamanho do título: '+(f.hsize?f.hsize+'px':'automático');clearTimeout(tmr);tmr=setTimeout(preview,120);setDirty(true)};
-  hs.appendChild(rg);g3.appendChild(hs);
-  const gr=document.createElement('label');gr.className='chk';gr.style.marginTop='10px';
-  gr.innerHTML='<input type=checkbox '+(f.grade!==false?'checked':'')+'> Grade de acabamento (duotone+grão)';
-  gr.querySelector('input').onchange=e=>{f.grade=e.target.checked;change()};g3.appendChild(gr);
-  c.appendChild(g3);
-
-  // ASSINATURA (bundle) — respeita o padrão da marca; se editar, prevalece
-  const g5=document.createElement('div');g5.className='grp';g5.innerHTML='<h5>Assinatura (rodapé)</h5>';
-  g5.appendChild(fld('Handle esquerdo (vazio = padrão da marca)',f.handle||'',v=>{f.handle=v;change()},0,0,'handle'));
-  g5.appendChild(fld('Crédito direito (vazio = padrão do sistema)',f.rodape||'',v=>{f.rodape=v;change()},0,0,'rodape'));
-  c.appendChild(g5);
-
-  // AÇÕES
-  const g4=document.createElement('div');g4.className='grp acts';g4.innerHTML='<h5>Exportar</h5>';
-  const e1=document.createElement('button');e1.className='btn go';e1.textContent='⬇ Exportar este frame (PNG final)';e1.onclick=()=>exportar(e1,FI);g4.appendChild(e1);
-  const e2=document.createElement('button');e2.className='btn';e2.textContent='⬇ Exportar o carrossel todo';e2.onclick=()=>exportar(e2,'all');g4.appendChild(e2);
-  g4.appendChild(Object.assign(document.createElement('div'),{className:'mini',textContent:'O export roda o compositor real em alta (2x) e grava no arquivo do post.'}));
-  c.appendChild(g4);
+  // ESTILO / ASSINATURA / EXPORTAR saíram do editor:
+  //  · Estilo (acento, tamanho, grade) = automático (ajusta em Config se precisar)
+  //  · Assinatura (rodapé) = padrão da marca/sistema (ajusta em Config)
+  //  · Exportar = ícone no cabeçalho
   applyCollapse();
 }
 
