@@ -68,12 +68,13 @@ def config_html():
     fund = tok.get("fundacao", {})
     marcas = tok.get("marcas", {})
     tp = tok.get("tema_padrao") or "claro"
+    defsize = tok.get("editor_defaults", {}).get("size", "1080x1350")
     sw = lambda c: f"<span style='display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:6px;background:{c};border:1px solid #333'></span>"
     rows_m = "".join(
         f"<tr><td><b>{m.get('nome', s)}</b></td><td>{sw(m.get('acento','#000'))}{m.get('acento','')}</td>"
         f"<td>{sw(m.get('acento_claro', m.get('acento','#000')))}{m.get('acento_claro','—')}</td>"
         f"<td style='font-size:11px;max-width:260px;word-break:break-all'>{m.get('gradiente','—')}</td>"
-        f"<td>{m.get('handle','')}</td></tr>" for s, m in marcas.items())
+        f"<td><input class=cfin id='cf_h_{s}' value='{m.get('handle','')}'></td></tr>" for s, m in marcas.items())
     rows_p = "".join(
         f"<tr><td>{i+1}</td><td>{p.get('titulo','')}</td><td>{p.get('slug','')}</td>"
         f"<td>{len(p.get('frames',[]))}</td></tr>" for i, p in enumerate(ed.get("posts", [])))
@@ -89,21 +90,22 @@ table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:lef
 .kv{{display:flex;flex-wrap:wrap;gap:10px}}.kv div{{background:#1a1524;border:1px solid #2a2338;border-radius:9px;padding:8px 12px;font-size:13px}}.kv b{{color:#c9b6ff}}
 .chip{{display:inline-block;background:#241a38;border:1px solid #3a2b58;color:#c9b6ff;border-radius:999px;padding:4px 11px;font-size:12px;margin:2px}}
 .ok{{color:#37c26b}}
+.cfin,select.cfin{{background:#0f0d17;border:1px solid #3a2b58;color:#ece9f4;border-radius:8px;padding:7px 10px;font-size:13px}}
+.savebtn{{background:#8b3cf7;color:#fff;border:0;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px}}
 </style></head><body>
 <a class=menu href="/">☰ Menu</a>
 <h1>Configurações do <span>Sistema</span></h1>
-<div class=sub>Read-only · como o sistema está se comportando agora.</div>
+<div class=sub>Edite os padrões e os handles das marcas — salva no tokens.json.</div>
 
-<div class=grp><h3>Tema & padrões de geração</h3><div class=kv>
-<div>Tema-padrão: <b>{tp}</b></div>
-<div>Regra #9: imagens geradas saem <b>claras</b> por padrão</div>
-<div>Base clara: <b>{tok.get('tema_claro',{}).get('base','#F4F2FB')}</b></div>
-<div>Base escura: <b>{fund.get('base','#0B0B0B')}</b></div>
-<div>Rodapé: <b>{fund.get('rodape','—')}</b></div>
-<div>Degradê da marca (claro): <b>ativo</b></div>
-</div></div>
+<div class=grp><h3>Padrões editáveis</h3><div class=kv>
+<div>Tema-padrão: <select class=cfin id=cf_tema><option value=claro>claro</option><option value=escuro>escuro</option></select></div>
+<div>Template padrão (tamanho): <select class=cfin id=cf_size><option value=1080x1350>Feed 4:5</option><option value=1080x1080>Quadrado 1:1</option><option value=1080x1920>Story 9:16</option></select></div>
+</div>
+<div style="margin-top:8px;color:#9a92ad;font-size:12px">Regra #9: imagens geradas saem <b style="color:#c9b6ff">claras</b> por padrão · Base clara {tok.get('tema_claro',{}).get('base','#F4F2FB')} · Base escura {fund.get('base','#0B0B0B')} · Rodapé {fund.get('rodape','—')}</div>
+<button class=savebtn id=cf_save>💾 Salvar configurações</button> <span id=cf_msg class=ok></span>
+</div>
 
-<div class=grp><h3>Marcas (cores / degradê / handle)</h3>
+<div class=grp><h3>Marcas (cores / degradê / handle editável)</h3>
 <table><tr><th>Marca</th><th>Acento</th><th>Acento claro</th><th>Degradê</th><th>Handle</th></tr>{rows_m}</table></div>
 
 <div class=grp><h3>Conceitos de direção de arte ({len(conceitos)})</h3>{chips}</div>
@@ -117,6 +119,17 @@ table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:lef
 <div>Proteção CSRF/DNS: <b class=ok>ativa</b> (Host+Origin+token)</div>
 <div>Dados do editor: <b>editor.json</b></div>
 </div></div>
+<script>
+const T="__EDITOR_TOKEN__";
+document.getElementById('cf_tema').value="{tp}";
+document.getElementById('cf_size').value="{defsize}";
+document.getElementById('cf_save').onclick=async()=>{{
+  const handles={{}};document.querySelectorAll('[id^=\\"cf_h_\\"]').forEach(i=>handles[i.id.slice(5)]=i.value.trim());
+  const r=await(await fetch('/config-save',{{method:'POST',headers:{{'Content-Type':'application/json','X-Editor-Token':T}},
+    body:JSON.stringify({{tema_padrao:document.getElementById('cf_tema').value,size:document.getElementById('cf_size').value,handles:handles}})}})).json();
+  document.getElementById('cf_msg').textContent=r.ok?'Salvo ✓':('Erro: '+(r.erro||''));
+}};
+</script>
 </body></html>"""
 
 
@@ -257,7 +270,7 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/vitrine":
             return self._serve_module(VITRINE, "Vitrine")
         if path == "/config":
-            return self._send(200, config_html(), MIME[".html"])
+            return self._send(200, config_html().replace("__EDITOR_TOKEN__", TOKEN), MIME[".html"])
         if path == "/dados":
             return self._send(200, load())
         # arquivo estático dentro do vault (imagens)
@@ -291,18 +304,42 @@ class H(http.server.BaseHTTPRequestHandler):
             save(normaliza(req.get("dados", load())))
             return self._send(200, {"ok": True})
 
+        if path == "/config-save":
+            try:
+                tokp = os.path.join(VAULT, "design-system", "tokens", "tokens.json")
+                tok = json.load(open(tokp, encoding="utf-8"))
+                if req.get("tema_padrao") in ("claro", "escuro"):
+                    tok["tema_padrao"] = req["tema_padrao"]
+                if re.match(r"^\d{3,4}x\d{3,4}$", req.get("size", "")):
+                    tok.setdefault("editor_defaults", {})["size"] = req["size"]
+                for slug, h in (req.get("handles") or {}).items():
+                    if slug in tok.get("marcas", {}):
+                        h = re.sub(r"[^@A-Za-z0-9_.]", "", str(h))[:40]
+                        if h:
+                            tok["marcas"][slug]["handle"] = h if h.startswith("@") else "@" + h
+                json.dump(tok, open(tokp, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+                return self._send(200, {"ok": True})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
         if path == "/novo-post":
             d = load()
             slug = safe_slug(req.get("slug", "")) if req.get("slug") else ("novo-" + secrets.token_hex(3))
             if any(p["slug"] == slug for p in d["posts"]):
                 slug = slug + "-" + secrets.token_hex(2)
             marca = safe_marca(req.get("marca", "smark"))
+            try:
+                defs = json.load(open(os.path.join(VAULT, "design-system", "tokens", "tokens.json"), encoding="utf-8"))
+            except Exception:
+                defs = {}
+            tema = defs.get("tema_padrao", "claro")
+            size = defs.get("editor_defaults", {}).get("size", "1080x1350")
             fr = {"headline": "SEU TÍTULO|*AQUI.*", "sub": "", "cta": "", "page": "01/01",
-                  "chip": True, "tema": "claro", "bgmode": "claro", "bg": "", "cor": "#F4F2FB",
+                  "chip": True, "tema": tema, "bgmode": tema, "bg": "", "cor": "#F4F2FB",
                   "accent": "", "hsize": 0, "grade": True}
             d["posts"].append({"slug": slug, "marca": marca, "status": "rascunho",
-                               "titulo": req.get("titulo") or "Novo post", "size": "1080x1350",
-                               "frames": [fr]})
+                               "titulo": req.get("titulo") or "Novo post", "size": size,
+                               "frames": [fr], "caption": ""})
             save(normaliza(d))
             return self._send(200, {"ok": True, "index": len(d["posts"]) - 1, "slug": slug})
 

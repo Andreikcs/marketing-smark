@@ -50,6 +50,13 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .fmtb:hover{border-color:var(--rox);color:var(--txt)} .fmtb.b{font-weight:800} .fmtb.i{font-style:italic}
 .newpost{width:100%;margin-top:10px;padding:10px;border:1px dashed var(--line);background:transparent;color:var(--sub);border-radius:10px;cursor:pointer;font-size:13px}
 .newpost:hover{border-color:var(--rox);color:var(--txt)}
+.pitem{display:flex;align-items:flex-start;gap:7px}
+.pitem .cb{margin-top:3px;accent-color:var(--rox);flex:0 0 auto}
+.pitem .ptxt{flex:1;min-width:0}
+.sideacts{display:flex;gap:6px;margin-top:8px}
+.sideacts button{flex:1;font-size:11px;border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:8px;padding:7px;cursor:pointer}
+.sideacts button:hover{border-color:var(--rox);color:var(--txt)}
+.sideacts .del:hover{border-color:#c0392b;color:#ff8a80}
 .cardacts{display:flex;gap:6px;padding:0 14px 10px}
 .cardacts button{flex:1;border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:8px;padding:7px;font-size:12px;cursor:pointer}
 .cardacts button:hover{border-color:var(--rox);color:var(--txt)} .cardacts .del:hover{border-color:#c0392b;color:#ff8a80}
@@ -93,6 +100,7 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 
   <aside class=side><h4>Publicações</h4><div id=posts></div>
     <button class=newpost id=bnew>+ Novo post</button>
+    <div class=sideacts><button id=bdup>⧉ Duplicar</button><button class=del id=bdelpost>🗑 Excluir sel.</button></div>
   </aside>
 
   <div class=main>
@@ -131,9 +139,25 @@ function renderPosts(){
   D.posts.forEach((p,i)=>{
     const d=document.createElement('div');d.className='pitem'+(i===PI?' on':'');
     const st=(p.status==='salvo')?'<span class=stb style="color:var(--ok)">● salvo</span>':'<span class=stb style="color:var(--warn)">● rascunho</span>';
-    d.innerHTML='<b>'+(i+1)+'. '+p.titulo.split('—')[0].trim()+'</b><small>'+(p.marca||'smark')+' · '+p.frames.length+' frames '+st+'</small>';
+    const cb=document.createElement('input');cb.type='checkbox';cb.className='cb';cb.checked=SEL.has(i);
+    cb.onclick=e=>{e.stopPropagation();cb.checked?SEL.add(i):SEL.delete(i)};
+    const txt=document.createElement('div');txt.className='ptxt';
+    txt.innerHTML='<b>'+(i+1)+'. '+p.titulo.split('—')[0].trim()+'</b><small>'+(p.marca||'smark')+' · '+p.frames.length+' frames '+st+'</small>';
+    d.appendChild(cb);d.appendChild(txt);
     d.onclick=()=>sel(i,0);el.appendChild(d);
   });
+}
+async function dupPost(){
+  const p=JSON.parse(JSON.stringify(post()));p.titulo=(p.titulo||'')+' (cópia)';
+  p.slug=(p.slug||'post')+'-c'+Date.now().toString(36).slice(-4);p.status='rascunho';
+  D.posts.splice(PI+1,0,p);SEL.clear();await salvar(true);await reload(PI+1,0);toast('Post duplicado');
+}
+async function delSelected(){
+  const idx=SEL.size?[...SEL].sort((a,b)=>b-a):[PI];
+  if(!confirm('Excluir '+idx.length+' publicação(ões)? (a arte no disco não é apagada)'))return;
+  idx.forEach(i=>D.posts.splice(i,1));SEL.clear();
+  if(!D.posts.length){toast('Precisa de ao menos 1 post');await novoPost();return}
+  await salvar(true);await reload(Math.min(PI,D.posts.length-1),0);toast('Excluído(s)');
 }
 function renderStrip(){
   const el=$('#strip');el.innerHTML='';
@@ -300,6 +324,7 @@ async function moveCard(dir){
   [fr[FI],fr[j]]=[fr[j],fr[FI]];await salvar(true);await reload(PI,j);toast('Ordem alterada');
 }
 const COLLAPSED=new Set();
+const SEL=new Set();
 function applyCollapse(){
   document.querySelectorAll('#ctrl .grp').forEach(g=>{
     const h=g.querySelector('h5');if(!h)return;const key=h.textContent.replace(/[▾▸]/g,'').trim();
