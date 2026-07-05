@@ -101,6 +101,16 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .fsmodal{display:none;position:fixed;inset:0;background:#000e;z-index:300;align-items:center;justify-content:center}
 .fsmodal iframe{border:0;width:1080px;height:1350px;transform-origin:center center}
 .fsmodal .x{position:absolute;top:14px;right:18px;background:var(--rox);color:#fff;border:0;border-radius:8px;padding:9px 15px;cursor:pointer;z-index:2;font-size:13px}
+.npmodal{display:none;position:fixed;inset:0;background:#000b;z-index:250;align-items:center;justify-content:center}
+.npbox{background:#141019;border:1px solid var(--line);border-radius:14px;padding:20px;width:350px}
+.npbox h3{font-size:16px;margin-bottom:12px}.npbox label{display:block;margin:12px 0 5px;font-size:12px;color:var(--sub)}
+.npbox input{width:100%;background:#0f0d17;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:9px;font-size:13px}
+.npbrands{display:flex;gap:6px}
+.npbrands button{flex:1;padding:10px 6px;border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:8px;cursor:pointer;font-size:12px}
+.npbrands button.on{background:var(--rox);border-color:var(--rox);color:#fff;font-weight:600}
+.npbtns{display:flex;gap:8px;margin-top:18px}
+.npbtns button{flex:1;padding:10px;border:1px solid var(--line);background:#1b1729;color:var(--txt);border-radius:9px;cursor:pointer}
+.npbtns .go{background:var(--rox);border-color:var(--rox);font-weight:600}
 </style></head>
 <body>
 <div class=app>
@@ -149,6 +159,13 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 </div>
 <div id=igmodal class=igmodal></div>
 <div id=fsmodal class=fsmodal><button class=x id=fsx>✕ fechar</button><iframe id=fsif></iframe></div>
+<div id=npmodal class=npmodal><div class=npbox>
+  <h3>Novo post</h3>
+  <label>Título</label><input id=nptitle placeholder="ex.: Chegada do funcionário de IA">
+  <label>Marca</label>
+  <div class=npbrands><button data-m=smark class=on>smark</button><button data-m=provider-max>Provider Max</button><button data-m=elever-ai>Elever AI</button></div>
+  <div class=npbtns><button id=npcancel>Cancelar</button><button id=npok class=go>Criar post</button></div>
+</div></div>
 <div id=toast></div>
 
 <script>
@@ -532,12 +549,20 @@ async function delCard(){
   if(!confirm('Excluir este card do post?'))return;
   post().frames.splice(FI,1);await salvar(true);await reload(PI,Math.max(0,FI-1));toast('Card excluído');
 }
-async function novoPost(){
-  const t=prompt('Título do novo post:','Novo post');if(t===null)return;
-  const m=(prompt('Marca? (smark / provider-max / elever-ai)','smark')||'smark').trim();
-  const r=await(await fetch('/novo-post',{method:'POST',headers:HJSON,body:JSON.stringify({titulo:t,slug:t,marca:m})})).json();
-  if(r.ok){await reload(r.index,0);toast('Post criado ('+r.slug+')')}else toast('Erro ao criar post');
-}
+let NPBRAND='smark';
+function novoPost(){NPBRAND='smark';const m=document.getElementById('npmodal');
+  document.getElementById('nptitle').value='';
+  m.querySelectorAll('.npbrands button').forEach(b=>b.classList.toggle('on',b.dataset.m==='smark'));
+  m.style.display='flex';setTimeout(()=>document.getElementById('nptitle').focus(),50)}
+document.querySelectorAll('#npmodal .npbrands button').forEach(b=>b.onclick=()=>{NPBRAND=b.dataset.m;
+  document.querySelectorAll('#npmodal .npbrands button').forEach(x=>x.classList.toggle('on',x===b))});
+document.getElementById('npcancel').onclick=()=>document.getElementById('npmodal').style.display='none';
+document.getElementById('npok').onclick=async()=>{
+  const t=(document.getElementById('nptitle').value||'').trim()||'Novo post';
+  document.getElementById('npmodal').style.display='none';
+  const r=await(await fetch('/novo-post',{method:'POST',headers:HJSON,body:JSON.stringify({titulo:t,slug:t,marca:NPBRAND})})).json();
+  if(r.ok){await reload(r.index,0);toast('Post criado · '+NPBRAND)}else toast('Erro ao criar post');
+};
 $('#bnew').onclick=novoPost;$('#baddc').onclick=addCard;$('#bdelc').onclick=delCard;
 // setas laterais = NAVEGAR entre cards (visualizar próximo/anterior)
 $('#bmvl').onclick=()=>{if(FI>0)sel(PI,FI-1)};$('#bmvr').onclick=()=>{if(FI<post().frames.length-1)sel(PI,FI+1)};
