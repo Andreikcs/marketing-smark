@@ -7,6 +7,22 @@
       "size": "1080x1350",
       "frames": [
         {
+          "headline": "COMEÇA A RODAR|*AMANHÃ.*",
+          "sub": "Sem processo seletivo, sem folha, sem rotatividade. Essa é a smark — nos próximos dias, conheça como. 👇",
+          "cta": "",
+          "page": "03/03",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/contratacao-sem-curriculo-bg.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/contratacao-sem-curriculo/01.png",
+          "n": 1
+        },
+        {
           "headline": "SUA PRÓXIMA|CONTRATAÇÃO NÃO|PRECISA DE *CURRÍCULO.*",
           "sub": "Nem salário, nem treinamento de 3 meses.",
           "cta": "",
@@ -19,30 +35,14 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/contratacao-sem-curriculo/01.png",
-          "n": 1
+          "out": "marcas/smark/publicacoes/social/instagram/arte/contratacao-sem-curriculo/02.png",
+          "n": 2
         },
         {
           "headline": "CARO. LENTO.|*ARRISCADO.*",
           "sub": "Você entrevista, treina por meses, e ainda torce pra pessoa ficar. Enquanto isso, o trabalho não espera.",
           "cta": "",
           "page": "02/03",
-          "chip": false,
-          "tema": "escuro",
-          "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/contratacao-sem-curriculo-bg.png",
-          "cor": "",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/contratacao-sem-curriculo/02.png",
-          "n": 2
-        },
-        {
-          "headline": "COMEÇA A RODAR|*AMANHÃ.*",
-          "sub": "Sem processo seletivo, sem folha, sem rotatividade. Essa é a smark — nos próximos dias, conheça como. 👇",
-          "cta": "",
-          "page": "03/03",
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
@@ -158,25 +158,6 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "A SMARK SELECIONOU|3 PROFISSIONAIS PRA|*SUA EMPRESA.*",
-          "sub": "Nenhum deles vai pedir demissão. 👇",
-          "cta": "",
-          "page": "01/05",
-          "chip": true,
-          "tema": "escuro",
-          "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/01-854ae2.png",
-          "cor": "",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/01.png",
-          "n": 1,
-          "_v": 2,
-          "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
-          "overlay": "roxo"
-        },
-        {
           "headline": "*NINA*",
           "sub": "Pré-vendas. Nenhuma oportunidade fica sem resposta porque \"não deu tempo\". Seu time só investe energia em quem realmente importa.",
           "cta": "",
@@ -189,8 +170,8 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/02.png",
-          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/01.png",
+          "n": 1,
           "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n",
           "_v": 5
         },
@@ -207,8 +188,8 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/03.png",
-          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/02.png",
+          "n": 2,
           "_v": 7,
           "contexto": "\"o Téo, um caçador/atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
           "overlay": "none",
@@ -229,8 +210,8 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/04.png",
-          "n": 4,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/03.png",
+          "n": 3,
           "_v": 1
         },
         {
@@ -246,8 +227,27 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/04.png",
+          "n": 4
+        },
+        {
+          "headline": "A SMARK SELECIONOU|3 PROFISSIONAIS PRA|*SUA EMPRESA.*",
+          "sub": "Nenhum deles vai pedir demissão. 👇",
+          "cta": "",
+          "page": "01/05",
+          "chip": true,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/01-854ae2.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/05.png",
-          "n": 5
+          "n": 5,
+          "_v": 2,
+          "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
+          "overlay": "roxo"
         }
       ],
       "caption": "Apresentando a seleção da smark. 👋\n\nNão são robôs de \"aperte 1\". São funções inteiras da sua empresa, cobertas por IA que trabalha na mão do seu time — não no lugar dele.\n\nQual dessas áreas mais dói na sua operação hoje? Comenta. 👇\n\n#IAparaempresas #prevendas #prospeccao #relacionamento #pmesbrasil",
@@ -1509,6 +1509,110 @@
         }
       ],
       "caption": ""
+    },
+    {
+      "slug": "3-motivos-funcionarios-ia",
+      "marca": "smark",
+      "titulo": "3 motivos para funcionários de IA (post 5/5 — fecho)",
+      "status": "rascunho",
+      "size": "1080x1350",
+      "caption": "Se você espera \"porque atende 24 horas\" nessa lista, vai se decepcionar.\n\nOs motivos reais pra colocar IA na sua empresa são de gestão: custo, produtividade e escala.\n\nO diagnóstico gratuito mostra qual desses três pesa mais na sua operação — e por onde começar. Link na bio. 👇\n\n#gestao #produtividade #IAparaempresas #diagnosticogratuito #pmesbrasil",
+      "frames": [
+        {
+          "headline": "",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/01.png",
+          "raw": true,
+          "grade": false,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/01.png"
+        },
+        {
+          "headline": "",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/02.png",
+          "raw": true,
+          "grade": false,
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/02.png"
+        },
+        {
+          "headline": "",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/03.png",
+          "raw": true,
+          "grade": false,
+          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/03.png"
+        },
+        {
+          "headline": "",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/04.png",
+          "raw": true,
+          "grade": false,
+          "n": 4,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/04.png"
+        },
+        {
+          "headline": "",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/05.png",
+          "raw": true,
+          "grade": false,
+          "n": 5,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/05.png"
+        }
+      ],
+      "importado": true
+    },
+    {
+      "slug": "case-destaque",
+      "marca": "smark",
+      "titulo": "Case destaque (post 4/5 — PENDENTE dado real)",
+      "status": "rascunho",
+      "size": "1080x1350",
+      "caption": "Prova não é a smark dizendo que funciona. É o cliente mostrando o que mudou.\n\n[1-2 frases com o número principal do case.]\n\nO que essa empresa fez, a sua também pode fazer — e começa entendendo onde a IA se pagaria primeiro. Diagnóstico gratuito, link na bio. 👇\n\n#resultado #cases #produtividade #IAparaempresas #roi",
+      "frames": [
+        {
+          "headline": "CASE DESTAQUE (POST 4/5 — PENDENTE DADO REAL)",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/case-destaque/01.png"
+        }
+      ],
+      "importado": true
     }
   ]
 }
