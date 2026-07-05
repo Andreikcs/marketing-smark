@@ -24,6 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 VAULT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import compositor  # noqa: E402
+import estudio  # noqa: E402  (cérebro do chat: copy + conceito visual)
 
 PORT = 8765
 PAINEL = os.path.join(VAULT, "painel.html")
@@ -321,6 +322,16 @@ def _run_gen(job_id, cmd, out, pi, fi):
             JOBS[job_id] = {"status": "done", "path": rel}
         else:
             JOBS[job_id] = {"status": "erro", "erro": (r.stderr or r.stdout or "falhou")[-400:]}
+
+
+def _run_estudio(job_id, pedido, marca, n, tipo):
+    """Roda o cérebro do chat em background (chat é rápido, mas não trava a UI)."""
+    with GEN_SEM:
+        try:
+            res, prov = estudio.gerar(pedido, marca, n, tipo)
+            JOBS[job_id] = {"status": "done", "resultado": res, "provider": prov}
+        except Exception as e:
+            JOBS[job_id] = {"status": "erro", "erro": str(e)}
 
 
 def hl(text):
@@ -649,10 +660,28 @@ class H(http.server.BaseHTTPRequestHandler):
                            "--tema", req.get("tema", "claro"),
                            "--headline", (fr.get("headline", "") or "").replace("|", " "),
                            "--size", "1024x1536", "--quality", "high"]
+                    if req.get("conceito"):  # metáfora visual vinda do Estúdio IA
+                        cmd += ["--conceito", str(req["conceito"])[:400]]
                 job_id = secrets.token_hex(6)
                 JOBS[job_id] = {"status": "running"}
                 threading.Thread(target=_run_gen, args=(job_id, cmd, out, req["post"], req["frame"]),
                                  daemon=True).start()
+                return self._send(200, {"ok": True, "job": job_id})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/estudio":
+            try:
+                pedido = (req.get("prompt", "") or "").strip()
+                if not pedido:
+                    return self._send(400, {"ok": False, "erro": "pedido vazio"})
+                marca = safe_marca(req.get("marca", "smark"))
+                n = max(1, min(10, int(req.get("n", 3) or 3)))
+                tipo = req.get("tipo", "")
+                job_id = secrets.token_hex(6)
+                JOBS[job_id] = {"status": "running"}
+                threading.Thread(target=_run_estudio,
+                                 args=(job_id, pedido, marca, n, tipo), daemon=True).start()
                 return self._send(200, {"ok": True, "job": job_id})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
