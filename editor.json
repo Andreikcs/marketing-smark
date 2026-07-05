@@ -65,7 +65,7 @@
       "frames": [
         {
           "headline": "*78% das empresas*",
-          "sub": "já usam IA — quase o dobro de um ano atrás. Não é tendência distante. É o presente.  ·  Fonte: Stanford AI Index · 2025",
+          "sub": "já usam IA — quase o dobro de um ano atrás. Não é tendência distante. É o presente.  · _**Fonte:** Stanford AI Index · 2025_",
           "cta": "",
           "page": "02/06",
           "chip": false,
@@ -78,7 +78,9 @@
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/01.png",
           "n": 1,
-          "_v": 4
+          "_v": 4,
+          "zoom": 1.05,
+          "overlay": "none"
         },
         {
           "headline": "*+40%*",
