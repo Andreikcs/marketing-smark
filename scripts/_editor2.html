@@ -154,6 +154,9 @@ input[type=range]{accent-color:var(--accent)}
 #estudio{position:fixed;right:18px;bottom:18px;width:380px;max-width:92vw;max-height:78vh;display:none;flex-direction:column;
   background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);z-index:400;overflow:hidden}
 #estudio.on{display:flex}
+#estudio.min{max-height:none}
+#estudio.min .eslog,#estudio.min .esfoot{display:none}
+#estudio.min .eshead{border-bottom:0;cursor:pointer}
 .eshead{display:flex;align-items:center;gap:8px;padding:13px 15px;border-bottom:1px solid var(--line)}
 .eshead b{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:16px;flex:1}
 .eshead .prov{font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
@@ -750,7 +753,7 @@ carregar().then(()=>snapshot());
 </script>
 
 <div id=estudio>
-  <div class=eshead><b>Estúdio IA</b><span class=prov id=esprov></span><button class=x id=esclose title="fechar">✕</button></div>
+  <div class=eshead id=eshead><b>Estúdio IA</b><span class=prov id=esprov></span><button class=x id=esmin title="minimizar">–</button><button class=x id=esclose title="fechar">✕</button></div>
   <div class=eslog id=eslog><div class=esempty>Descreva o post que você quer — eu gero a copy (headline, sub, CTA, legenda, hashtags) já no markup do editor, e um conceito visual pro fundo.<br><br>Ex: <i>"carrossel de 3 sobre parar de perder tempo com tarefa repetitiva, tom leve"</i></div></div>
   <div class=esfoot>
     <div class=esopts>
@@ -772,18 +775,26 @@ carregar().then(()=>snapshot());
   const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const slugify=s=>(s||'post').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'post';
   function addMsg(cls,html){const d=document.createElement('div');d.className='esmsg '+cls;d.innerHTML=html;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;return d}
-  document.getElementById('bestudio').onclick=()=>{panel.classList.toggle('on');if(panel.classList.contains('on')){provEl.textContent='Claude';if(typeof D!=='undefined'&&D&&post())optMarca.value=post().marca||'smark';txt.focus()}};
+  const hist=[];  // memória da conversa (role/content)
+  function ctxAtual(){
+    if(typeof D==='undefined'||!D||!post())return '';
+    const p=post();const hs=(p.frames||[]).map((f,i)=>(i+1)+') '+((f.headline||'').replace(/\|/g,' ')).slice(0,60)).join(' | ');
+    return 'Post aberto: "'+(p.titulo||p.slug||'')+'" ('+(p.marca||'smark')+', '+(p.frames||[]).length+' frames). Headlines atuais: '+hs;
+  }
+  document.getElementById('bestudio').onclick=()=>{panel.classList.remove('min');panel.classList.toggle('on');if(panel.classList.contains('on')){provEl.textContent='Claude';if(typeof D!=='undefined'&&D&&post())optMarca.value=post().marca||'smark';txt.focus()}};
   document.getElementById('esclose').onclick=()=>panel.classList.remove('on');
+  document.getElementById('esmin').onclick=(e)=>{e.stopPropagation();panel.classList.toggle('min')};
+  document.getElementById('eshead').onclick=(e)=>{if(panel.classList.contains('min')&&e.target.tagName!=='BUTTON')panel.classList.remove('min')};
   function pollJob(id){return new Promise(res=>{let t=0;const iv=setInterval(async()=>{t++;let j;try{j=await(await fetch('/job?id='+id)).json()}catch(e){return}
     if(j.status==='done'||j.status==='erro'){clearInterval(iv);res(j)}else if(t>90){clearInterval(iv);res({status:'erro',erro:'tempo esgotado'})}},1300)})}
   async function gerar(){
     const pedido=txt.value.trim();if(!pedido)return;
     const emp=logEl.querySelector('.esempty');if(emp)emp.remove();
-    addMsg('u',esc(pedido));txt.value='';txt.style.height='auto';
+    addMsg('u',esc(pedido));txt.value='';txt.style.height='auto';hist.push({role:'user',content:pedido});
     send.disabled=true;const wait=addMsg('a','✍️ Claude está escrevendo a copy<span class=dots></span>');
     let d=0;const anim=setInterval(()=>{d=(d+1)%4;const el=wait.querySelector('.dots');if(el)el.textContent='.'.repeat(d)},380);
     try{
-      const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:pedido,marca:optMarca.value,n:+optN.value})})).json();
+      const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:pedido,marca:optMarca.value,n:+optN.value,contexto:ctxAtual(),historico:hist.slice(-6)})})).json();
       if(!st.ok){clearInterval(anim);wait.innerHTML='⚠️ '+esc(st.erro||'falhou');send.disabled=false;return}
       const j=await pollJob(st.job);clearInterval(anim);
       if(j.status!=='done'){wait.innerHTML='⚠️ '+esc(j.erro||'falhou');send.disabled=false;return}
@@ -793,7 +804,8 @@ carregar().then(()=>snapshot());
   }
   function renderResult(r,prov,fundo){
     provEl.textContent=prov==='claude'?'Claude':'OpenAI';
-    let h='<b>'+esc(r.titulo||'Post')+'</b>';
+    hist.push({role:'assistant',content:(r.resumo||r.titulo||'')});
+    let h='<b>'+esc(r.titulo||'Post')+'</b> <span style="font-size:11px;color:var(--muted)">· tema '+(r.tema==='escuro'?'escuro':'claro'+(r.forcado_claro?' (padrão)':''))+'</span>';
     if(r.resumo)h+='<br>'+esc(r.resumo);
     (r.frames||[]).forEach((f,i)=>{h+='<div style="margin-top:6px;font-size:12px;opacity:.85">'+(i+1)+'. '+esc((f.headline||'').replace(/\|/g,' / '))+(f.cta?(' — <i>'+esc(f.cta)+'</i>'):'')+'</div>'});
     if(r.conceito_visual)h+='<div style="margin-top:6px;font-size:11px;color:var(--muted)">🎨 '+esc(r.conceito_visual)+'</div>';

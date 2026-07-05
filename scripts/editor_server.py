@@ -289,8 +289,8 @@ body.sk{padding-bottom:50px}
 .post{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
 .ph{display:flex;align-items:center;gap:9px;padding:11px 13px;font-size:14px;font-weight:600}
 .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
-.media{position:relative;background:#000;aspect-ratio:4/5;cursor:pointer}
-.media img{width:100%;height:100%;object-fit:cover;display:block}
+.media{position:relative;background:#000;aspect-ratio:4/5;cursor:pointer;overflow:hidden}
+.vhost{position:absolute;inset:0;overflow:hidden;background:#000}
 .cbadge{position:absolute;top:10px;right:10px;background:#000a;color:#fff;font-size:12px;padding:2px 9px;border-radius:12px}
 .dots{position:absolute;bottom:10px;left:0;right:0;display:flex;gap:5px;justify-content:center}
 .dot{width:6px;height:6px;border-radius:50%;background:#ffffff88}.dot.on{background:#fff}
@@ -302,20 +302,30 @@ __TOPBAR__
 <div class=top><span>smark</span> &middot; vitrine · feed pra aprovar</div>
 <div class=feed id=feed></div>
 <script>
+const T="__EDITOR_TOKEN__";
+async function compose(host,fr,p){
+  try{
+    const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
+    const html=await r.text();const s=(host.clientWidth||424)/1080;
+    host.innerHTML='';const ifr=document.createElement('iframe');
+    ifr.style.cssText='position:absolute;top:0;left:0;border:0;width:1080px;height:1350px;transform-origin:top left;pointer-events:none;transform:scale('+s+')';
+    host.appendChild(ifr);ifr.srcdoc=html;
+  }catch(e){host.textContent=''}
+}
 async function load(){const D=await(await fetch('/dados')).json();const f=document.getElementById('feed');f.innerHTML='';let n=0;
   D.posts.forEach(p=>{
-    const imgs=(p.frames||[]).map(fr=>((fr.bgmode==='imagem'&&fr.bg)?fr.bg:fr.out)).filter(Boolean);
-    if(!imgs.length)return;n++;
+    const frames=(p.frames||[]);if(!frames.length)return;n++;
     const el=document.createElement('div');el.className='post';
     el.innerHTML='<div class=ph><div class=av></div>'+(p.marca||'smark')+'<span style="flex:1"></span>&middot;&middot;&middot;</div>'
-      +'<div class=media><img src="/'+imgs[0]+'"><div class=cbadge>1/'+imgs.length+'</div><div class=dots>'+imgs.map((_,i)=>'<span class="dot'+(i?'':' on')+'"></span>').join('')+'</div></div>'
+      +'<div class=media><div class=vhost></div><div class=cbadge>1/'+frames.length+'</div><div class=dots>'+frames.map((_,i)=>'<span class="dot'+(i?'':' on')+'"></span>').join('')+'</div></div>'
       +'<div class=icons><span>&#9825;</span><span>&#128172;</span><span>&#10148;</span><span style="flex:1"></span><span>&#128278;</span></div>'
       +'<div class=cap><b>'+(p.marca||'smark')+'</b> '+((p.caption||'').replace(/</g,'&lt;'))+'</div>';
-    let idx=0;const img=el.querySelector('img'),badge=el.querySelector('.cbadge'),dots=el.querySelectorAll('.dot');
-    el.querySelector('.media').onclick=()=>{idx=(idx+1)%imgs.length;img.src='/'+imgs[idx]+'?t='+Date.now();badge.textContent=(idx+1)+'/'+imgs.length;dots.forEach((d,i)=>d.classList.toggle('on',i===idx))};
-    f.appendChild(el);
+    const host=el.querySelector('.vhost'),badge=el.querySelector('.cbadge'),dots=el.querySelectorAll('.dot');
+    let idx=0;
+    el.querySelector('.media').onclick=()=>{idx=(idx+1)%frames.length;compose(host,frames[idx],p);badge.textContent=(idx+1)+'/'+frames.length;dots.forEach((d,i)=>d.classList.toggle('on',i===idx))};
+    f.appendChild(el);compose(host,frames[0],p);
   });
-  if(!n)f.innerHTML='<div class=empty>Nenhuma arte exportada ainda. Exporte no editor pra ver aqui.</div>';
+  if(!n)f.innerHTML='<div class=empty>Nenhum post ainda. Crie no editor pra ver aqui.</div>';
 }
 load();
 </script></body></html>""").replace("__TOPBAR__", topbar("vitrine"))
@@ -373,11 +383,11 @@ def _run_gen(job_id, cmd, out, pi, fi):
             JOBS[job_id] = {"status": "erro", "erro": (r.stderr or r.stdout or "falhou")[-400:]}
 
 
-def _run_estudio(job_id, pedido, marca, n, tipo):
+def _run_estudio(job_id, pedido, marca, n, tipo, contexto="", historico=None):
     """Roda o cérebro do chat em background (chat é rápido, mas não trava a UI)."""
     with GEN_SEM:
         try:
-            res, prov = estudio.gerar(pedido, marca, n, tipo)
+            res, prov = estudio.gerar(pedido, marca, n, tipo, contexto, historico)
             JOBS[job_id] = {"status": "done", "resultado": res, "provider": prov}
         except Exception as e:
             JOBS[job_id] = {"status": "erro", "erro": str(e)}
@@ -506,7 +516,7 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/painel-notas":
             return self._serve_module(PAINEL, "Painel (notas)")
         if path == "/vitrine":
-            return self._send(200, vitrine_html(), MIME[".html"])
+            return self._send(200, vitrine_html().replace("__EDITOR_TOKEN__", TOKEN), MIME[".html"])
         if path == "/vitrine-notas":
             return self._serve_module(VITRINE, "Vitrine (notas)")
         if path == "/config":
@@ -727,10 +737,12 @@ class H(http.server.BaseHTTPRequestHandler):
                 marca = safe_marca(req.get("marca", "smark"))
                 n = max(1, min(10, int(req.get("n", 3) or 3)))
                 tipo = req.get("tipo", "")
+                contexto = str(req.get("contexto", ""))[:1500]
+                historico = req.get("historico") if isinstance(req.get("historico"), list) else None
                 job_id = secrets.token_hex(6)
                 JOBS[job_id] = {"status": "running"}
                 threading.Thread(target=_run_estudio,
-                                 args=(job_id, pedido, marca, n, tipo), daemon=True).start()
+                                 args=(job_id, pedido, marca, n, tipo, contexto, historico), daemon=True).start()
                 return self._send(200, {"ok": True, "job": job_id})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})

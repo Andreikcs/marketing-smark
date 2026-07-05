@@ -57,6 +57,12 @@ CONCEITO VISUAL:
   sem logo, abstrato/editorial, premium). Ex pra Copa: "abstract stadium light trails,
   trophy silhouette in violet mist". O gerador aplica a paleta roxa e a moldura sozinho.
 
+REGRA DE COR (CRÍTICA): o tema padrão é SEMPRE **claro** (fundo branco/lavanda, texto escuro,
+acento roxo na palavra-chave). Só use "escuro" se o PEDIDO DO USUÁRIO disser explicitamente
+escuro / dark / noturno / preto / fundo escuro. Palavras como "premium", "automotivo", "dramático",
+"cinematográfico" NÃO são motivo pra escuro — mantenha CLARO. O conceito_visual também deve
+descrever uma cena CLARA (ex.: "clean white studio, soft violet light") quando o tema for claro.
+
 Responda SOMENTE com um objeto JSON válido, sem comentários, neste formato exato:
 {
   "titulo": "título curto do post (pt-BR)",
@@ -84,11 +90,27 @@ def load_env(path):
     return env
 
 
-def _instrucao(pedido, marca, n_frames, tipo):
+ESCURO_CUES = ("escuro", "dark", "noturno", "à noite", "a noite", " noite",
+               "preto", "black", "fundo escuro", "dramátic", "dramatic",
+               "night", "sombrio", "tom escuro")
+
+
+def _quer_escuro(txt):
+    t = (txt or "").lower()
+    return any(c in t for c in ESCURO_CUES)
+
+
+def _instrucao(pedido, marca, n_frames, tipo, contexto="", historico=None):
     t = f"Marca: {marca}. " + (f"Tipo sugerido: {tipo}. " if tipo else "")
     t += f"Gere um carrossel de EXATAMENTE {n_frames} frame(s). "
     t += "O CTA (diagnóstico gratuito / link na bio) fica só no último frame. "
-    t += f"\n\nPedido do usuário: {pedido}"
+    if contexto:
+        t += f"\n\nCONTEXTO (post que está aberto no editor agora — use pra manter coerência ou variar): {contexto}"
+    if historico:
+        h = "\n".join(f"{m.get('role', 'user')}: {m.get('content', '')}" for m in historico[-6:] if m.get("content"))
+        if h:
+            t += f"\n\nCONVERSA ATÉ AGORA (continue a partir dela):\n{h}"
+    t += f"\n\nPEDIDO AGORA: {pedido}"
     return t
 
 
@@ -138,14 +160,14 @@ def _via_openai(api_key, instrucao):
     return _extrai_json(data["choices"][0]["message"]["content"])
 
 
-def gerar(pedido, marca="smark", n_frames=3, tipo=""):
+def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=None):
     """Devolve (resultado_dict, provider_usado). Levanta RuntimeError em falha."""
     marca = marca if marca in MARCAS else "smark"
     n_frames = max(1, min(10, int(n_frames or 3)))
     env = load_env(os.path.join(VAULT, ".env"))
     ant = os.environ.get("ANTHROPIC_API_KEY") or env.get("ANTHROPIC_API_KEY")
     oai = os.environ.get("OPENAI_API_KEY") or env.get("OPENAI_API_KEY")
-    instr = _instrucao(pedido, marca, n_frames, tipo)
+    instr = _instrucao(pedido, marca, n_frames, tipo, contexto, historico)
     if ant:
         res, prov = _via_claude(ant, instr), "claude"
     elif oai:
@@ -153,6 +175,14 @@ def gerar(pedido, marca="smark", n_frames=3, tipo=""):
     else:
         raise RuntimeError("Sem chave: coloque OPENAI_API_KEY (ou ANTHROPIC_API_KEY) no .env")
     res = _sanea(res, marca, n_frames)
+    # PADRÃO CLARO forte (regra #9): se o usuário não pediu escuro em lugar nenhum, força claro.
+    hist_user = " ".join(m.get("content", "") for m in (historico or []) if m.get("role") == "user")
+    quer_esc = _quer_escuro(pedido + " " + hist_user + " " + (contexto or ""))
+    if not quer_esc:
+        res["tema"] = "claro"
+        for fr in res["frames"]:
+            fr["tema"] = "claro"
+    res["forcado_claro"] = not quer_esc
     return res, prov
 
 
