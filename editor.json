@@ -1305,24 +1305,24 @@
       "frames": [
         {
           "headline": "CRM com IA para|*lojas de móveis*",
-          "sub": "Cada cliente organizado, do primeiro contato à entrega do sofá.",
-          "cta": "Diagnóstico gratuito • link na bio",
+          "sub": "Cada cliente organizado, do primeiro contato à entrega",
+          "cta": "Diagnóstico gratuito — link na bio",
           "page": "",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/_regen/01-aad532.png",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/_uploads/12e3ffd8e6.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/01.png",
-          "_v": 2,
+          "_v": 5,
           "_accOpen": true
         }
       ],
-      "caption": "Na loja de móveis, o cliente some entre o orçamento e a entrega. O Elever CRM guarda cada conversa, cada pedido e cada prazo no lugar certo. Sua equipe gasta menos tempo procurando e mais tempo cuidando de quem chega.\n\n#crm #lojasdemoveis #gestao #ia",
+      "caption": "Na loja de móveis, cada cliente pede atenção: o que gostou, quando volta, o que ficou de fechar. O Elever CRM guarda tudo isso no lugar certo e lembra você na hora certa. Menos anotação solta, mais tempo pra vender bem.\n\n#lojasdemoveis #crm #inteligenciaartificial #gestao",
       "canais": [
         "instagram"
       ]
