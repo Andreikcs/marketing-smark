@@ -556,6 +556,34 @@ async function openFull(){
 $('#bfull').onclick=openFull;$('#fsx').onclick=()=>document.getElementById('fsmodal').style.display='none';
 document.getElementById('fsmodal').onclick=e=>{if(e.target.id==='fsmodal')e.currentTarget.style.display='none'};
 
-carregar();
+// ===== Desfazer / Refazer (histórico) =====
+let UNDO=[],REDO=[],snapT=null;
+function snapshot(){const s=JSON.stringify(D);if(UNDO[UNDO.length-1]!==s){UNDO.push(s);if(UNDO.length>60)UNDO.shift();REDO=[]}}
+function snapSoon(){clearTimeout(snapT);snapT=setTimeout(snapshot,450)}
+function fixSel(){if(PI>=D.posts.length)PI=D.posts.length-1;if(PI<0)PI=0;const fr=D.posts[PI].frames;if(FI>=fr.length)FI=fr.length-1;if(FI<0)FI=0}
+function afterHist(msg){fixSel();syncAllPages();renderPosts();renderStrip();renderCtrl();preview();setDirty(true);toast(msg)}
+function doUndo(){const cur=JSON.stringify(D);if(UNDO.length&&UNDO[UNDO.length-1]===cur)UNDO.pop();if(!UNDO.length){toast('Nada pra desfazer');return}REDO.push(cur);D=JSON.parse(UNDO.pop());afterHist('Desfeito ↶')}
+function doRedo(){if(!REDO.length){toast('Nada pra refazer');return}UNDO.push(JSON.stringify(D));D=JSON.parse(REDO.pop());afterHist('Refeito ↷')}
+// ===== Atalhos de teclado =====
+function fmtActive(m){const ta=(document.activeElement&&/TEXTAREA|INPUT/.test(document.activeElement.tagName))?document.activeElement:_lastTa;if(!ta)return;
+  const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value,sel=v.slice(s,e)||'texto';
+  ta.value=v.slice(0,s)+m+sel+m+v.slice(e);ta.focus();ta.selectionStart=s+m.length;ta.selectionEnd=s+m.length+sel.length;ta.dispatchEvent(new Event('input'))}
+document.addEventListener('keydown',e=>{
+  const typing=/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||'');
+  if(e.key==='Escape'){['fsmodal','igmodal'].forEach(id=>{const m=document.getElementById(id);if(m)m.style.display='none'});return}
+  if(e.ctrlKey||e.metaKey){const k=e.key.toLowerCase();
+    if(k==='s'){e.preventDefault();if(post())post().status='salvo';salvar(true).then(()=>{renderPosts();toast('Salvo ✓')});return}
+    if(k==='z'&&!e.shiftKey){e.preventDefault();doUndo();return}
+    if((k==='z'&&e.shiftKey)||k==='y'){e.preventDefault();doRedo();return}
+    if(k==='b'){e.preventDefault();fmtActive('**');return}
+    if(k==='i'){e.preventDefault();fmtActive('_');return}
+    return;
+  }
+  if(!typing){
+    if(e.key==='ArrowLeft'){e.preventDefault();if(FI>0)sel(PI,FI-1)}
+    else if(e.key==='ArrowRight'){e.preventDefault();if(FI<post().frames.length-1)sel(PI,FI+1)}
+  }
+});
+carregar().then(()=>snapshot());
 </script>
 </body></html>
