@@ -713,6 +713,38 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "titulo": "Torcida com Pelé pelo Brasil",
+      "slug": "prova-40-mais-qualidade-com-ia",
+      "marca": "smark",
+      "size": "1080x1350",
+      "status": "rascunho",
+      "canais": [
+        "instagram"
+      ],
+      "caption": "Todo craque precisa de um time inteiro do lado. Na sua empresa é igual: cada departamento pode ter um funcionário de IA cuidando do que trava o dia. A gente começa pelo diagnóstico gratuito e mostra onde dá pra ganhar tempo.\n\n#smark #inteligenciaartificial #gestao #produtividade",
+      "frames": [
+        {
+          "headline": "O Brasil joga|com *time completo*",
+          "sub": "Cada setor com seu funcionário de IA",
+          "cta": "Diagnóstico gratuito • link na bio",
+          "tema": "escuro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/prova-40-mais-qualidade-com-ia/_regen/01-60d818.png",
+          "_v": 1,
+          "zoom": 1,
+          "posx": 22,
+          "posy": 25,
+          "overlay": "none",
+          "overlay_op": 0,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/prova-40-mais-qualidade-com-ia/01.png"
+        }
+      ]
     }
   ]
 }
