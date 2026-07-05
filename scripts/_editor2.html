@@ -132,10 +132,14 @@ input[type=range]{width:100%;accent-color:var(--rox)}
     </div>
     <div class=gallery>
       <div class=cardacts>
-        <button id=baddc>＋ Adicionar card</button>
-        <button id=bsim><svg class=igicon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Visualizar (Instagram)</button>
+        <button id=baddc>＋ Adicionar</button>
+        <button id=bdupc>⧉ Duplicar</button>
+        <button id=bmoveL>◀ reordenar</button>
+        <button id=bmoveR>reordenar ▶</button>
+        <button id=bsim><svg class=igicon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Instagram</button>
         <button id=bfull>⛶ Tela cheia</button>
-        <button class=del id=bdelc>🗑 Excluir card</button>
+        <button id=bdl>⬇ Baixar</button>
+        <button class=del id=bdelc>🗑 Excluir</button>
       </div>
       <div class=strip id=strip></div>
     </div>
@@ -162,8 +166,10 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 function setDirty(v){dirty=v;const e=$('#dirty');e.className=v?'yes':'';e.textContent=v?'● não salvo':'✓ salvo'}
 function post(){return D.posts[PI]}
 function frame(){return post().frames[FI]}
+function syncPages(p){const n=(p.frames||[]).length;(p.frames||[]).forEach((fr,i)=>{fr.page=n>1?(String(i+1).padStart(2,'0')+'/'+String(n).padStart(2,'0')):''})}
+function syncAllPages(){((D&&D.posts)||[]).forEach(syncPages)}
 
-async function carregar(){D=await(await fetch('/dados')).json();renderPosts();
+async function carregar(){D=await(await fetch('/dados')).json();syncAllPages();renderPosts();
   const q=new URLSearchParams(location.search);let pi=parseInt(q.get('post'));
   if(isNaN(pi)||pi<0||pi>=D.posts.length)pi=0;sel(pi,0)}
 
@@ -237,7 +243,11 @@ function richField(label,val,onin,key){
    .forEach(([lb,cls,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.onclick=fn;bar.appendChild(b)});
   const col=document.createElement('input');col.type='color';col.value='#8b3cf7';col.className='fmtcol';col.title='cor';
   const cbtn=document.createElement('button');cbtn.type='button';cbtn.className='fmtb';cbtn.textContent='🎨';cbtn.title='colorir seleção';
-  cbtn.onclick=()=>wrap('{'+col.value+':','}');bar.appendChild(col);bar.appendChild(cbtn);
+  cbtn.onclick=()=>{const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value;
+    const sel=(v.slice(s,e)||'texto').replace(/\{#[0-9a-fA-F]{3,6}:/g,'').replace(/[{}]/g,'');
+    const ins='{'+col.value+':'+sel+'}';ta.value=v.slice(0,s)+ins+v.slice(e);ta.focus();
+    ta.selectionStart=s;ta.selectionEnd=s+ins.length;onin(ta.value)};
+  bar.appendChild(col);bar.appendChild(cbtn);
   w.appendChild(bar);w.appendChild(ta);return w;
 }
 
@@ -365,8 +375,8 @@ function renderCtrl(){
   applyCollapse();
 }
 
-function change(){markDraft();renderStrip();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
-function touch(){markDraft();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
+function change(){markDraft();snapSoon();renderStrip();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
+function touch(){markDraft();snapSoon();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
 function slider(label,val,min,max,step,onin){
   const w=document.createElement('div');w.style.marginTop='8px';
   const lab=document.createElement('label');lab.textContent=label;w.appendChild(lab);
@@ -422,6 +432,7 @@ function focusField(field){
 $('#pv').addEventListener('load',attachWysiwyg);
 
 async function salvar(silent){
+  syncAllPages();
   await fetch('/salvar',{method:'POST',headers:HJSON,body:JSON.stringify({dados:D})});
   setDirty(false);if(!silent)toast('Salvo');
 }
@@ -502,7 +513,7 @@ function openSim(){
 
 // novo post / adicionar / excluir card
 function newFrame(){return {headline:'NOVO|*CARD.*',sub:'',cta:'',page:'',chip:false,tema:'claro',bgmode:'claro',bg:'',cor:'#F4F2FB',accent:'',hsize:0,grade:true}}
-async function reload(pi,fi){D=await(await fetch('/dados')).json();sel(pi,fi)}
+async function reload(pi,fi){D=await(await fetch('/dados')).json();syncAllPages();sel(pi,fi)}
 async function addCard(){post().frames.splice(FI+1,0,newFrame());await salvar(true);await reload(PI,FI+1);toast('Card adicionado')}
 async function delCard(){
   if(post().frames.length<=1){toast('O post precisa de pelo menos 1 card');return}
@@ -516,9 +527,25 @@ async function novoPost(){
   if(r.ok){await reload(r.index,0);toast('Post criado ('+r.slug+')')}else toast('Erro ao criar post');
 }
 $('#bnew').onclick=novoPost;$('#baddc').onclick=addCard;$('#bdelc').onclick=delCard;
-$('#bmvl').onclick=()=>moveCard(-1);$('#bmvr').onclick=()=>moveCard(1);$('#bsim').onclick=openSim;
-$('#bdup').onclick=dupPost;$('#bdelpost').onclick=delSelected;
+// setas laterais = NAVEGAR entre cards (visualizar próximo/anterior)
+$('#bmvl').onclick=()=>{if(FI>0)sel(PI,FI-1)};$('#bmvr').onclick=()=>{if(FI<post().frames.length-1)sel(PI,FI+1)};
+$('#bsim').onclick=openSim;$('#bdup').onclick=dupPost;$('#bdelpost').onclick=delSelected;
+// menu do card = reordenar / duplicar / baixar
+$('#bmoveL').onclick=()=>{if(FI>0)reorderFrame(FI,FI-1)};$('#bmoveR').onclick=()=>{if(FI<post().frames.length-1)reorderFrame(FI,FI+1)};
+$('#bdupc').onclick=dupFrame;$('#bdl').onclick=baixar;
 $('#psearch').oninput=e=>{PSEARCH=e.target.value;renderPosts()};
+async function dupFrame(){const c=JSON.parse(JSON.stringify(frame()));delete c._v;post().frames.splice(FI+1,0,c);await salvar(true);await reload(PI,FI+1);toast('Card duplicado')}
+async function baixar(){
+  const todos=post().frames.length>1&&confirm('OK = baixar TODOS os frames · Cancelar = só o frame atual');
+  const idxs=todos?post().frames.map((_,i)=>i):[FI];
+  toast('Preparando download…');
+  for(const i of idxs){await fetch('/exportar',{method:'POST',headers:HJSON,body:JSON.stringify({post:PI,frame:i})})}
+  await reload(PI,FI);
+  idxs.forEach((i,k)=>setTimeout(()=>{const out=post().frames[i]&&post().frames[i].out;if(!out)return;
+    const a=document.createElement('a');a.href='/'+out+'?dl='+Date.now();a.download=(post().slug||'frame')+'-'+String(i+1).padStart(2,'0')+'.png';
+    document.body.appendChild(a);a.click();a.remove()},k*500));
+  toast('Baixando '+idxs.length+' imagem(ns)');
+}
 async function openFull(){
   const r=await fetch('/preview',{method:'POST',headers:HJSON,body:JSON.stringify({frame:frame(),size:post().size,marca:post().marca||'smark'})});
   document.getElementById('fsif').srcdoc=await r.text();
