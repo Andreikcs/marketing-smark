@@ -724,7 +724,7 @@ async function regen(btn,ref){
       if(pi===PI&&fi===FI){genStop(true);renderCtrl();preview();}else{renderStrip();}
       renderStrip();setDirty(true);toast('✨ Fundo pronto — tela atualizada.');}
     else if(s.status==='erro'){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Erro: '+String(s.erro||'').slice(0,120));}
-    else if(tries>80){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Ainda gerando… aparece ao recarregar.');}
+    else if(tries>180){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Ainda gerando… aparece ao recarregar em ~1 min.');}
   },2000);
 }
 
