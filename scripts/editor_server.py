@@ -150,6 +150,8 @@ h1{font-size:22px;margin:16px 0 4px}h1 span{color:#8b3cf7}.sub{color:#9a92ad;fon
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
 .card{background:#141019;border:1px solid #2a2338;border-radius:12px;overflow:hidden;position:relative}
 .card .cb{position:absolute;top:8px;left:8px;z-index:2;accent-color:#8b3cf7;width:18px;height:18px}
+.card .chbadge{position:absolute;top:8px;right:8px;z-index:2;display:flex;gap:3px}
+.card .acts button,.card .acts a{font-size:11px;padding:8px 3px}
 .card .th{aspect-ratio:4/5;width:100%;object-fit:cover;display:block}
 .card .thx{aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;color:#555;font-size:12px;background:#1a1524}
 .card .meta{padding:10px 11px}.card .meta b{font-size:13px;display:block;margin-bottom:2px}.card .meta small{color:#9a92ad;font-size:11px}
@@ -167,29 +169,38 @@ h1{font-size:22px;margin:16px 0 4px}h1 span{color:#8b3cf7}.sub{color:#9a92ad;fon
 <h1>Painel de <span>Conteudo</span></h1>
 <div class=sub>Todas as publicacoes, todas as marcas &mdash; integrado ao editor.</div>
 <div class=bar><button class=del id=delsel>&#128465; Excluir selecionados</button>
-<button id=imp>&#8681; Importar notas antigas</button>
-<a class=go href="/editor">+ Novo / abrir editor</a><div class=filters id=filters></div></div>
+<a class=go href="/editor">+ Novo / abrir editor</a>
+<div class=filters id=sfilters></div><div class=filters id=filters></div></div>
 <div class=grid id=grid></div>
 <div class=modal id=modal><div class=box><div class=mm><iframe id=mif></iframe></div>
 <div class=mnav><button id=mprev>&lsaquo;</button><span id=mpg></span><button id=mnext>&rsaquo;</button></div>
 <div style="padding:0 10px 12px"><button onclick="document.getElementById('modal').style.display='none'" style="width:100%;background:#8b3cf7;color:#fff;border:0;border-radius:8px;padding:9px;cursor:pointer">Fechar</button></div></div></div>
 <script>
-const T="__EDITOR_TOKEN__";let D=null,FILT='',MI=0,MP=0;
+const T="__EDITOR_TOKEN__";let D=null,FILT='',STATUSF='',MI=0,MP=0;
 async function load(){D=await(await fetch('/dados')).json();render()}
 function brands(){return [...new Set(D.posts.map(p=>p.marca||'smark'))]}
+function chIcon(c){if(c==='linkedin')return '<span title=LinkedIn style="background:#0a66c2;color:#fff;font:700 9px sans-serif;padding:2px 4px;border-radius:3px">in</span>';
+  return '<span title=Instagram style="background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);color:#fff;font:700 9px sans-serif;padding:2px 5px;border-radius:4px">IG</span>'}
 function render(){
+  const sf=document.getElementById('sfilters');sf.innerHTML='';
+  [['','status: todos'],['rascunho','rascunho'],['salvo','salvo']].forEach(([v,lb])=>{const b=document.createElement('button');b.textContent=lb;if(STATUSF===v)b.className='on';b.onclick=()=>{STATUSF=v;render()};sf.appendChild(b)});
   const fl=document.getElementById('filters');fl.innerHTML='';
-  [''].concat(brands()).forEach(b=>{const btn=document.createElement('button');btn.textContent=b||'todas';if(FILT===b)btn.className='on';btn.onclick=()=>{FILT=b;render()};fl.appendChild(btn)});
+  [''].concat(brands()).forEach(b=>{const btn=document.createElement('button');btn.textContent=b||'todas as marcas';if(FILT===b)btn.className='on';btn.onclick=()=>{FILT=b;render()};fl.appendChild(btn)});
   const g=document.getElementById('grid');g.innerHTML='';
-  D.posts.forEach((p,i)=>{if(FILT&&(p.marca||'smark')!==FILT)return;
+  const items=D.posts.map((p,i)=>({p,i})).reverse();  // mais novos primeiro
+  items.forEach(({p,i})=>{
+    if(FILT&&(p.marca||'smark')!==FILT)return;
+    if(STATUSF&&(p.status||'rascunho')!==STATUSF)return;
     const f0=p.frames&&p.frames[0];const cp=f0?((f0.bgmode==='imagem'&&f0.bg)?f0.bg:(f0.out||'')):'';
     const cov=cp?('/'+cp+'?t='+Date.now()):'';
     const st=p.status==='salvo'?'<span class="stt s">salvo</span>':'<span class="stt r">rascunho</span>';
+    const ch=(p.canais||['instagram']).map(chIcon).join(' ');
     const c=document.createElement('div');c.className='card';
     c.innerHTML='<input type=checkbox class=cb data-i="'+i+'">'
+      +'<div class=chbadge>'+ch+'</div>'
       +(cov?'<img class=th src="'+cov+'">':'<div class=thx>sem arte</div>')
       +'<div class=meta><b>'+(p.titulo||p.slug)+'</b><small>'+(p.marca||'smark')+' &middot; '+(p.frames?p.frames.length:0)+' frames'+st+'</small></div>'
-      +'<div class=acts><button onclick="ver('+i+')">&#128065; Ver</button><a href="/editor?post='+i+'">&#9998; Editar</a><button onclick="del(['+i+'])">&#128465;</button></div>';
+      +'<div class=acts><button onclick="ver('+i+')">&#128065; Ver</button><a href="/editor?post='+i+'">&#9998; Editar</a><button onclick="dupPost('+i+')">&#10697; Dup</button><button onclick="del(['+i+'])">&#128465;</button></div>';
     g.appendChild(c)});
 }
 async function ver(i){MP=i;MI=0;document.getElementById('modal').style.display='flex';mframe()}
@@ -201,11 +212,8 @@ document.getElementById('mnext').onclick=()=>{const n=D.posts[MP].frames.length;
 async function del(idx){if(!idx.length){alert('Selecione ao menos um');return}
   if(!confirm('Excluir '+idx.length+' publicacao(oes)?'))return;
   await fetch('/excluir-posts',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:idx})});await load()}
+async function dupPost(i){await fetch('/duplicar-post',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({idx:i})});await load()}
 document.getElementById('delsel').onclick=()=>del([...document.querySelectorAll('.cb:checked')].map(c=>+c.dataset.i));
-async function importar(){if(!confirm('Importar todas as notas antigas do vault pro editor?'))return;
-  const r=await(await fetch('/importar-notas',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:'{}'})).json();
-  alert('Importados: '+(r.novos||0)+' (total '+(r.total||0)+')');await load()}
-document.getElementById('imp').onclick=importar;
 load();
 </script></body></html>"""
 
