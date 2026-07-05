@@ -151,7 +151,10 @@ def frame_kwargs(fr, size, for_export):
     k = dict(marca="smark", headline=hl(fr.get("headline", "")), sub=fr.get("sub", ""),
              cta=fr.get("cta", ""), page=fr.get("page", ""), no_chip=not fr.get("chip", False),
              tema=fr.get("tema", "escuro"), size=size, hsize=int(fr.get("hsize", 0) or 0),
-             accent=fr.get("accent", ""), no_grade=not fr.get("grade", True))
+             accent=fr.get("accent", ""), no_grade=not fr.get("grade", True),
+             zoom=float(fr.get("zoom", 1.0) or 1.0), posx=int(fr.get("posx", 50)),
+             posy=int(fr.get("posy", 50)), overlay=fr.get("overlay", "none"),
+             overlay_op=float(fr.get("overlay_op", 0.85)))
     mode = fr.get("bgmode", "imagem")
     if mode == "imagem" and fr.get("bg"):
         if for_export:
@@ -327,11 +330,14 @@ class H(http.server.BaseHTTPRequestHandler):
                 os.makedirs(dd, exist_ok=True)
                 out = os.path.join(dd, f"{req['frame']+1:02d}-{hashlib.sha1(str(req).encode()).hexdigest()[:6]}.png")
                 ref = req.get("ref", "")
-                if ref:  # referência → openai_edit
+                if ref:  # referência → openai_edit (usa o contexto do usuário como prompt)
+                    ctx = (req.get("prompt", "") or "").strip()
+                    full = ((ctx + ". ") if ctx else "") + (
+                        "Brand key visual for smark — abstract, premium, violet/roxo palette, "
+                        "editorial, lower third kept clean for headline text, 4k, no text, no logos.")
                     cmd = ["python3", os.path.join(HERE, "openai_edit.py"),
                            "--image", os.path.join(VAULT, ref), "--out", out,
-                           "--prompt", req.get("prompt", "brand key visual, mesma composição, paleta roxa smark"),
-                           "--size", "1024x1536", "--quality", "high"]
+                           "--prompt", full, "--size", "1024x1536", "--quality", "high"]
                 else:  # direção de arte
                     tema = req.get("tema", "claro")  # PADRÃO CLARO (rule #9)
                     cmd = ["python3", os.path.join(HERE, "openai_image.py"), "--out", out, "--direcao",

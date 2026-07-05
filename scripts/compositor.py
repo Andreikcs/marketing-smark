@@ -157,7 +157,8 @@ CSS = """
 *{margin:0;padding:0;box-sizing:border-box;}
 body{width:%(W)spx;height:%(H)spx;overflow:hidden;}
 .card{position:relative;width:%(W)spx;height:%(H)spx;background:%(BASE)s;}
-.bg{position:absolute;inset:0;background-image:%(BG)s;background-size:cover;background-position:center;}
+.bg{position:absolute;inset:0;background-image:%(BG)s;background-size:cover;background-position:%(POSX)s%% %(POSY)s%%;transform:scale(%(ZOOM)s);transform-origin:%(POSX)s%% %(POSY)s%%;}
+.ovx{position:absolute;inset:0;background:%(OVX)s;opacity:%(OVXO)s;}
 .grade{position:absolute;inset:0;}
 .grade i{position:absolute;inset:0;display:block;}
 .grade .gt{background:%(GTINT)s;mix-blend-mode:soft-light;opacity:%(GTO)s;}
@@ -188,9 +189,19 @@ body{width:%(W)spx;height:%(H)spx;overflow:hidden;}
 PAGE = "<!doctype html><html><head><meta charset='utf-8'><style>%(CSS)s</style></head><body>%(BODY)s</body></html>"
 
 
+OVX_PRESETS = {
+    "none": "none",
+    "branco": "linear-gradient(180deg, rgba(255,255,255,0) 22%, rgba(255,255,255,1) 100%)",
+    "roxo": "linear-gradient(180deg, rgba(138,60,247,0) 12%, rgba(74,30,150,.96) 100%)",
+    "todo-branco": "#FFFFFF",
+    "todo-roxo": "#8A3CF7",
+}
+
+
 def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="claro",
                  size="1080x1350", hsize=0, accent="", bright="", base="", square="",
-                 bg="", bg_url="", placeholder=False, no_grade=False):
+                 bg="", bg_url="", placeholder=False, no_grade=False,
+                 zoom=1.0, posx=50, posy=50, overlay="none", overlay_op=0.85):
     """Constrói o HTML completo do frame (mesmo motor do PNG final).
     `bg` = caminho de imagem (embutida em base64, p/ render headless).
     `bg_url` = URL direta (ex.: rota estática do servidor, p/ preview leve no navegador)."""
@@ -245,8 +256,11 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
         bg_css = MESH_CLARO if tema == "claro" else MESH_ESCURO
 
     hsz = hsize if hsize > 0 else min(auto_hsize(headline), 92 if cta else 104)
+    ovx_bg = OVX_PRESETS.get(overlay, "none")
+    ovx_op = 0 if overlay == "none" else max(0.0, min(1.0, float(overlay_op)))
     cssvars = {"W": w, "H": h, "BG": bg_css, "ACCENT": accent_c, "SQUARE": square, "ONACC": on_acc,
-               "HSIZE": hsz, "TABF": tab_font(b["tab"]), "GRAIN": GRAIN}
+               "HSIZE": hsz, "TABF": tab_font(b["tab"]), "GRAIN": GRAIN,
+               "POSX": posx, "POSY": posy, "ZOOM": zoom, "OVX": ovx_bg, "OVXO": ovx_op}
     cssvars.update(T)
     css = CSS % cssvars
 
@@ -258,7 +272,7 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
               f'<div class="hd">{wordmark_html(b)}</div><div class="ck">&#10003;</div></div>')
     grade_on = (not no_grade) and (has_img or placeholder)
     grade_html = '<div class="grade"><i class="gt"></i><i class="gv"></i><i class="gg"></i></div>' if grade_on else ''
-    body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ov"></div>{page_h}'
+    body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ovx"></div><div class="ov"></div>{page_h}'
             f'<div class="tab"><div class="ic">{glyph_html(b, on_acc, 46)}</div><div class="vt">{esc(b["tab"])}</div></div>'
             f'<div class="ct">{chip_h}<div class="h">{render_rich(headline)}</div>{sub_h}{cta_h}</div>'
             f'<div class="footer"><div>{esc(b["handle"])}</div><div class="cred">{esc(rodape)}</div></div></div>')
