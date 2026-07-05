@@ -1797,6 +1797,38 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "xxxx",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "XXXx",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/xxxx/_uploads/6d1a25a0c6.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/xxxx/01.png",
+          "_v": 1,
+          "contexto": "grandes lendas do futebol comerando ajuse para ficar somente os dois jogadores ",
+          "_tipo": "autoridade"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }

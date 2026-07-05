@@ -1,9 +1,11 @@
-<!doctype html><html lang=pt-BR><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>smark · Super Editor</title>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css">
 <style>
-:root{--bg:#0d0b13;--pan:#141019;--pan2:#1a1524;--line:#2a2338;--txt:#ece9f4;--sub:#9a92ad;--rox:#8b3cf7;--ok:#37c26b;--warn:#e0a020}
+/* Design System smark: tokens locais herdam do DS (dark). Marcação intacta. */
+:root{--pan:var(--surface);--pan2:var(--surface-2);--rox:var(--accent);--ok:var(--good);--txt:var(--text)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;height:100vh;overflow:hidden}
+body{background:var(--bg);color:var(--txt);font-family:var(--font-text);height:100vh;overflow:hidden}
 .app{display:grid;grid-template-columns:200px 1fr 320px;grid-template-rows:52px 1fr;height:100vh}
 header{grid-column:1/4;display:flex;align-items:center;gap:14px;padding:0 18px;border-bottom:1px solid var(--line);background:var(--pan)}
 header b{font-size:15px}header .tag{font-size:11px;color:var(--sub);border:1px solid var(--line);padding:2px 8px;border-radius:999px}

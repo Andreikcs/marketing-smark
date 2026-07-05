@@ -29,30 +29,33 @@ PORT = 8765
 PAINEL = os.path.join(VAULT, "painel.html")
 VITRINE = os.path.join(VAULT, "lancamento.html")
 
-HUB = """<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
+HUB = """<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>smark · Sistema</title>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css">
 <style>
-:root{--rox:#8b3cf7}*{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d0b13;color:#ece9f4;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px}
-h1{font-size:26px;margin-bottom:6px}h1 span{color:var(--rox)}
-.sub{color:#9a92ad;font-size:14px;margin-bottom:34px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:760px;width:100%}
-a.card{display:block;background:#141019;border:1px solid #2a2338;border-radius:16px;padding:22px;text-decoration:none;color:inherit;transition:.15s}
-a.card:hover{border-color:var(--rox);transform:translateY(-2px)}
-.card .ic{font-size:30px;margin-bottom:12px}
-.card b{font-size:16px;display:block;margin-bottom:5px}
-.card p{color:#9a92ad;font-size:12.5px;line-height:1.45}
-.foot{color:#6a6480;font-size:11px;margin-top:30px}
-</style></head><body>
-<h1>Grupo <span>smark</span> · Sistema</h1>
-<div class=sub>Tudo local · localhost:8765</div>
+body.sk{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px}
+.wrap{max-width:820px;width:100%}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:30px}
+a.tile{display:block;text-decoration:none;color:inherit}
+a.tile .sk-card{transition:.15s;height:100%}
+a.tile:hover .sk-card{border-color:var(--accent);transform:translateY(-2px)}
+.ic{font-size:28px;margin-bottom:12px;display:block}
+.tile b{font-size:16px;display:block;margin-bottom:5px}
+.tile p{color:var(--muted);font-size:12.5px;line-height:1.45}
+.foot{color:var(--muted);font-size:11px;margin-top:30px;text-align:center}
+</style></head><body class="sk">
+<div class=wrap>
+<div class=sk-kicker>tudo local · localhost:8765</div>
+<h1 class=sk-h1 style="font-size:52px;margin-top:8px">Grupo <span class=sk-accent>smark</span> · Sistema</h1>
 <div class=grid>
-  <a class=card href="/editor"><div class=ic>✎</div><b>Super Editor</b><p>Edita arte frame a frame, preview ao vivo, troca de fundo, cor, upload e regenerar por IA.</p></a>
-  <a class=card href="/painel"><div class=ic>▦</div><b>Painel de Conteúdo</b><p>Todas as publicações com preview de Instagram/LinkedIn e download.</p></a>
-  <a class=card href="/vitrine"><div class=ic>▤</div><b>Vitrine</b><p>Galeria read-only por marca — feed pra aprovar copy e conceito.</p></a>
-  <a class=card href="/config"><div class=ic>⚙</div><b>Configurações</b><p>Como o sistema está se comportando: temas, cores, degradês, conceitos e estado.</p></a>
+  <a class=tile href="/editor"><div class=sk-card><span class=ic>✎</span><b>Super Editor</b><p>Edita arte frame a frame, preview ao vivo, troca de fundo, cor, upload e regenerar por IA.</p></div></a>
+  <a class=tile href="/painel"><div class=sk-card><span class=ic>▦</span><b>Painel de Conteúdo</b><p>Todas as publicações com preview de Instagram/LinkedIn e download.</p></div></a>
+  <a class=tile href="/vitrine"><div class=sk-card><span class=ic>▤</span><b>Vitrine</b><p>Galeria read-only por marca — feed pra aprovar copy e conceito.</p></div></a>
+  <a class=tile href="/config"><div class=sk-card><span class=ic>⚙</span><b>Configurações</b><p>Como o sistema está se comportando: temas, cores, degradês, conceitos e estado.</p></div></a>
+  <a class=tile href="/design-system/dist/smark-design-system.html"><div class="sk-card sk-card--brand"><span class=ic>◈</span><b style="color:#fff">Design System</b><p style="color:#ffffffcc">Catálogo vivo: tokens, botões, cards, badges e o toggle claro/escuro. Fonte visual do painel.</p></div></a>
 </div>
-<div class=foot>Editor, Painel e Vitrine servidos pelo mesmo servidor.</div>
+<div class=foot>Editor, Painel, Vitrine e Design System servidos pelo mesmo servidor.</div>
+</div>
 </body></html>"""
 
 def config_html():
@@ -81,20 +84,21 @@ def config_html():
         f"<tr><td>{i+1}</td><td>{p.get('titulo','')}</td><td>{p.get('slug','')}</td>"
         f"<td>{len(p.get('frames',[]))}</td></tr>" for i, p in enumerate(ed.get("posts", [])))
     chips = " ".join(f"<span class=chip>{c}</span>" for c in conceitos)
-    return f"""<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1"><title>Configurações · smark</title><style>
-*{{box-sizing:border-box;margin:0;padding:0}}body{{background:#0d0b13;color:#ece9f4;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:20px 30px 60px}}
-a.menu{{position:fixed;top:8px;left:8px;background:#8b3cf7;color:#fff;padding:6px 12px;border-radius:8px;font:600 12px sans-serif;text-decoration:none;z-index:9}}
-h1{{font-size:22px;margin:18px 0 4px}}h1 span{{color:#8b3cf7}} .sub{{color:#9a92ad;font-size:13px;margin-bottom:24px}}
-.grp{{background:#141019;border:1px solid #2a2338;border-radius:14px;padding:16px 18px;margin-bottom:16px;max-width:860px}}
-.grp h3{{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:#9a92ad;margin-bottom:12px}}
-table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:left;padding:7px 8px;border-bottom:1px solid #221c30}}th{{color:#9a92ad;font-weight:600;font-size:11px;text-transform:uppercase}}
-.kv{{display:flex;flex-wrap:wrap;gap:10px}}.kv div{{background:#1a1524;border:1px solid #2a2338;border-radius:9px;padding:8px 12px;font-size:13px}}.kv b{{color:#c9b6ff}}
-.chip{{display:inline-block;background:#241a38;border:1px solid #3a2b58;color:#c9b6ff;border-radius:999px;padding:4px 11px;font-size:12px;margin:2px}}
-.ok{{color:#37c26b}}
-.cfin,select.cfin{{background:#0f0d17;border:1px solid #3a2b58;color:#ece9f4;border-radius:8px;padding:7px 10px;font-size:13px}}
-.savebtn{{background:#8b3cf7;color:#fff;border:0;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px}}
-</style></head><body>
+    return f"""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><title>Configurações · smark</title>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
+body.sk{{padding:20px 30px 60px}}
+a.menu{{position:fixed;top:8px;left:8px;background:var(--accent);color:var(--accent-ink);padding:6px 12px;border-radius:8px;font:600 12px var(--font-text);text-decoration:none;z-index:9}}
+h1{{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:30px;margin:18px 0 4px}}h1 span{{color:var(--accent)}} .sub{{color:var(--muted);font-size:13px;margin-bottom:24px}}
+.grp{{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;max-width:860px}}
+.grp h3{{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:12px}}
+table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}}th{{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase}}
+.kv{{display:flex;flex-wrap:wrap;gap:10px}}.kv div{{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:13px}}.kv b{{color:var(--accent-2)}}
+.chip{{display:inline-block;background:var(--accent-soft);border:1px solid var(--line);color:var(--accent);border-radius:999px;padding:4px 11px;font-size:12px;margin:2px}}
+.ok{{color:var(--good)}}
+.cfin,select.cfin{{background:var(--field);border:1px solid var(--field-line);color:var(--text);border-radius:8px;padding:7px 10px;font-size:13px}}
+.savebtn{{background:var(--accent);color:var(--accent-ink);border:0;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px}}
+</style></head><body class="sk">
 <a class=menu href="/">☰ Menu</a>
 <h1>Configurações do <span>Sistema</span></h1>
 <div class=sub>Edite os padrões e os handles das marcas — salva no tokens.json.</div>
@@ -138,33 +142,34 @@ document.getElementById('cf_save').onclick=async()=>{{
 
 def painel_html():
     """Painel de Conteúdo integrado — galeria de TODAS as publicações do editor.json."""
-    return """<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1"><title>Painel de Conteúdo · smark</title><style>
-*{box-sizing:border-box;margin:0;padding:0}body{background:#0d0b13;color:#ece9f4;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:16px 26px 60px}
-a.menu{position:fixed;top:8px;left:8px;background:#8b3cf7;color:#fff;padding:6px 12px;border-radius:8px;font:600 12px sans-serif;text-decoration:none;z-index:9}
-h1{font-size:22px;margin:16px 0 4px}h1 span{color:#8b3cf7}.sub{color:#9a92ad;font-size:13px;margin-bottom:16px}
+    return """<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><title>Painel de Conteúdo · smark</title>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
+body.sk{padding:16px 26px 60px}
+a.menu{position:fixed;top:8px;left:8px;background:var(--accent);color:var(--accent-ink);padding:6px 12px;border-radius:8px;font:600 12px var(--font-text);text-decoration:none;z-index:9}
+h1{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:30px;margin:16px 0 4px}h1 span{color:var(--accent)}.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
 .bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
-.bar button,.bar a{border:1px solid #2a2338;background:#15121e;color:#ece9f4;border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer;text-decoration:none}
-.bar .del:hover{border-color:#c0392b;color:#ff8a80}.bar .go{background:#8b3cf7;border-color:#8b3cf7;font-weight:600}
-.filters{display:flex;gap:6px;margin-left:auto}.filters button{padding:6px 12px;font-size:12px}.filters button.on{background:#8b3cf7;border-color:#8b3cf7}
+.bar button,.bar a{border:1px solid var(--field-line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer;text-decoration:none}
+.bar .del:hover{border-color:var(--bad);color:var(--bad)}.bar .go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.filters{display:flex;gap:6px;margin-left:auto}.filters button{padding:6px 12px;font-size:12px}.filters button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
-.card{background:#141019;border:1px solid #2a2338;border-radius:12px;overflow:hidden;position:relative}
-.card .cb{position:absolute;top:8px;left:8px;z-index:2;accent-color:#8b3cf7;width:18px;height:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
+.card .cb{position:absolute;top:8px;left:8px;z-index:2;accent-color:var(--accent);width:18px;height:18px}
 .card .chbadge{position:absolute;top:8px;right:8px;z-index:2;display:flex;gap:3px}
 .card .acts button,.card .acts a{font-size:11px;padding:8px 3px}
 .card .th{aspect-ratio:4/5;width:100%;object-fit:cover;display:block}
-.card .thx{aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;color:#555;font-size:12px;background:#1a1524}
-.card .meta{padding:10px 11px}.card .meta b{font-size:13px;display:block;margin-bottom:2px}.card .meta small{color:#9a92ad;font-size:11px}
-.stt{font-size:10px;padding:1px 7px;border-radius:999px;margin-left:5px}.stt.r{background:#3a2f10;color:#e0a020}.stt.s{background:#12331f;color:#37c26b}
-.card .acts{display:flex;border-top:1px solid #2a2338}
-.card .acts a,.card .acts button{flex:1;border:0;background:transparent;color:#c9b6ff;padding:9px 4px;font-size:12px;cursor:pointer;border-right:1px solid #2a2338}
-.card .acts button:last-child{border-right:0;color:#ff8a80}
+.card .thx{aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;background:var(--surface-2)}
+.card .meta{padding:10px 11px}.card .meta b{font-size:13px;display:block;margin-bottom:2px}.card .meta small{color:var(--muted);font-size:11px}
+.stt{font-size:10px;padding:1px 7px;border-radius:999px;margin-left:5px}.stt.r{background:var(--warn-soft);color:var(--warn)}.stt.s{background:var(--good-soft);color:var(--good)}
+.card .acts{display:flex;border-top:1px solid var(--line)}
+.card .acts a,.card .acts button{flex:1;border:0;background:transparent;color:var(--accent-2);padding:9px 4px;font-size:12px;cursor:pointer;border-right:1px solid var(--line)}
+.card .acts button:last-child{border-right:0;color:var(--bad)}
 .modal{display:none;position:fixed;inset:0;background:#000c;z-index:50;align-items:center;justify-content:center;padding:20px}
-.modal .box{background:#111;border-radius:12px;overflow:hidden}
+.modal .box{background:var(--surface);border-radius:12px;overflow:hidden}
 .modal .mm{width:400px;max-width:90vw;height:500px;overflow:hidden;position:relative;background:#000}
 .modal iframe{border:0;width:1080px;height:1350px;transform:scale(.37);transform-origin:top left}
-.mnav{display:flex;justify-content:space-between;align-items:center;padding:8px 10px}.mnav button{background:#222;color:#fff;border:0;border-radius:6px;padding:6px 12px;cursor:pointer}
-</style></head><body>
+.mnav{display:flex;justify-content:space-between;align-items:center;padding:8px 10px}.mnav button{background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+</style></head><body class="sk">
 <a class=menu href="/">&#9776; Menu</a>
 <h1>Painel de <span>Conteudo</span></h1>
 <div class=sub>Todas as publicacoes, todas as marcas &mdash; integrado ao editor.</div>
