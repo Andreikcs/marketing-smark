@@ -63,22 +63,6 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "USAR IA VIROU Decisão|* ESTRATÉGICA da gestão.*",
-          "sub": "A pergunta mudou de \"se\" para \"quando\". 👉",
-          "cta": "",
-          "page": "01/06",
-          "chip": true,
-          "tema": "escuro",
-          "bgmode": "claro",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave-bg.png",
-          "cor": "",
-          "accent": "#8b14f7",
-          "hsize": 0,
-          "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/01.png",
-          "n": 1
-        },
-        {
           "headline": "*78% das empresas*",
           "sub": "já usam IA — quase o dobro de um ano atrás. Não é tendência distante. É o presente.  ·  Fonte: Stanford AI Index · 2025",
           "cta": "",
@@ -91,8 +75,8 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/02.png",
-          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/01.png",
+          "n": 1,
           "_v": 4
         },
         {
@@ -108,8 +92,8 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/03.png",
-          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/02.png",
+          "n": 2,
           "_v": 2
         },
         {
@@ -125,8 +109,8 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/04.png",
-          "n": 4,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/03.png",
+          "n": 3,
           "_v": 2
         },
         {
@@ -142,8 +126,8 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/05.png",
-          "n": 5
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/04.png",
+          "n": 4
         },
         {
           "headline": "ONDE A IA SE|*PAGARIA* PRIMEIRO?",
@@ -158,8 +142,8 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/06.png",
-          "n": 6
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/05.png",
+          "n": 5
         },
         {
           "headline": "NOVO|*CARD.*",
@@ -174,104 +158,8 @@
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "n": 7,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/07.png"
-        },
-        {
-          "headline": "NOVO|*CARD.*",
-          "sub": "",
-          "cta": "",
-          "page": "",
-          "chip": false,
-          "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 8,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/08.png"
-        },
-        {
-          "headline": "NOVO|*CARD.*",
-          "sub": "",
-          "cta": "",
-          "page": "",
-          "chip": false,
-          "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 9,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/09.png"
-        },
-        {
-          "headline": "NOVO|*CARD.*",
-          "sub": "",
-          "cta": "",
-          "page": "",
-          "chip": false,
-          "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 10,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/10.png"
-        },
-        {
-          "headline": "NOVO|*CARD.*",
-          "sub": "",
-          "cta": "",
-          "page": "",
-          "chip": false,
-          "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 11,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/11.png"
-        },
-        {
-          "headline": "NOVO|*CARD.*",
-          "sub": "",
-          "cta": "",
-          "page": "",
-          "chip": false,
-          "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 12,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/12.png"
-        },
-        {
-          "headline": "NOVO|*CARD.*",
-          "sub": "",
-          "cta": "",
-          "page": "",
-          "chip": false,
-          "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 13,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/13.png"
+          "n": 6,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/06.png"
         }
       ]
     },
@@ -536,30 +424,6 @@
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/3-motivos-funcionarios-ia/05.png",
           "n": 5
-        }
-      ]
-    },
-    {
-      "slug": "teste-web",
-      "marca": "smark",
-      "titulo": "Teste Web",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
-          "cta": "",
-          "page": "01/01",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-web/01.png"
         }
       ]
     }
