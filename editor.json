@@ -1307,7 +1307,7 @@
           "headline": "CRM COM IA PARA \n{#8B3CF7:LOJAS DE MOVEIS}",
           "sub": "",
           "cta": "",
-          "page": "",
+          "page": "01/02",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
@@ -1318,10 +1318,28 @@
           "grade": true,
           "n": 1,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/01.png",
+          "_v": 1,
+          "_accOpen": true
+        },
+        {
+          "headline": "NOVO|*CARD.*",
+          "sub": "",
+          "cta": "",
+          "page": "02/02",
+          "chip": false,
+          "tema": "claro",
+          "bgmode": "cor",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/_uploads/cbbd364e89.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 2,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/02.png",
           "_v": 1
         }
       ],
-      "caption": "",
+      "caption": "Loja de móveis vive de acompanhar cada cliente até a entrega. O Elver CRM organiza esse caminho com IA e agora ganhou um card novo pra deixar tudo mais claro na tela. Menos planilha perdida, mais controle do time. Fale com a gente e veja como funciona no seu dia a dia.\n\n#lojasdemoveis #crm #inteligenciaartificial #gestao",
       "canais": [
         "instagram"
       ]
