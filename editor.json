@@ -305,18 +305,18 @@
       "slug": "teste-amor",
       "marca": "smark",
       "status": "rascunho",
-      "titulo": "Teste Amor",
+      "titulo": "Brasil x Noruega: rivalidade que exige gestão",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
-          "cta": "",
+          "headline": "Cada camisa|precisa de um *time* por trás",
+          "sub": "No campo ou na sua empresa, quem organiza os bastidores vence o jogo.",
+          "cta": "Diagnóstico gratuito — link na bio",
           "page": "",
           "chip": true,
-          "tema": "claro",
-          "bgmode": "degrade",
-          "bg": "",
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/teste-amor/_regen/01-7c88b4.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
@@ -325,7 +325,7 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/teste-amor/01.png"
         }
       ],
-      "caption": "",
+      "caption": "Dois craques, dois lados, uma só verdade: por trás de cada jogada tem gente organizando tudo. Na sua empresa é igual — cada departamento pode ter um funcionário de IA cuidando do trabalho repetitivo. A gente mostra onde começar, sem custo.\n\n#providermax #gestao #inteligenciaartificial #produtividade",
       "canais": [
         "instagram"
       ]
