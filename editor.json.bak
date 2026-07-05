@@ -7,7 +7,7 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "COMEÇA A textoRODAR|*AMANHÃ.*",
+          "headline": "{#378138:COMEÇA A {#814d37:texto}R}ODAR|*AMANHÃ.*",
           "sub": "Sem processo seletivo, sem folha, sem rotatividade. Essa é a smark — nos próximos dias, conheça como. 👇",
           "cta": "",
           "page": "01/03",
@@ -91,7 +91,7 @@
         },
         {
           "headline": "*+40% das empresas*",
-          "sub": "relatam aumento de velociadade e qualidade nas entregas com apoio de IA. **_**·  ____Fonte: Harvard + BCG · 2023**_**____",
+          "sub": "relatam aumento de velociadade e qualidade nas entregas com apoio de IA. **_**·  ____{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:{#8b3cf7:Fonte: Harvard + BCG · 2023**_**____}}}}}}}}",
           "cta": "",
           "page": "02/05",
           "chip": false,
