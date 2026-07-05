@@ -242,7 +242,8 @@
           "n": 5
         }
       ],
-      "caption": "Apresentando a seleção da smark. 👋\n\nNão são robôs de \"aperte 1\". São funções inteiras da sua empresa, cobertas por IA que trabalha na mão do seu time — não no lugar dele.\n\nQual dessas áreas mais dói na sua operação hoje? Comenta. 👇\n\n#IAparaempresas #prevendas #prospeccao #relacionamento #pmesbrasil"
+      "caption": "Apresentando a seleção da smark. 👋\n\nNão são robôs de \"aperte 1\". São funções inteiras da sua empresa, cobertas por IA que trabalha na mão do seu time — não no lugar dele.\n\nQual dessas áreas mais dói na sua operação hoje? Comenta. 👇\n\n#IAparaempresas #prevendas #prospeccao #relacionamento #pmesbrasil",
+      "status": "salvo"
     },
     {
       "slug": "case-destaque",
@@ -435,7 +436,7 @@
           "page": "01/01",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
+          "bgmode": "imagem",
           "bg": "",
           "cor": "#F4F2FB",
           "accent": "",
@@ -445,7 +446,8 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/01.png"
         }
       ],
-      "caption": ""
+      "caption": "",
+      "status": "rascunho"
     },
     {
       "slug": "eloise",
