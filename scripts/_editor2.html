@@ -112,7 +112,10 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 const $=s=>document.querySelector(s);
 const TOKEN="__EDITOR_TOKEN__";
 const HJSON={'Content-Type':'application/json','X-Editor-Token':TOKEN};
-let D=null, PI=0, FI=0, dirty=false, tmr=null;
+let D=null, PI=0, FI=0, dirty=false, tmr=null, _lastTa=null;
+function insEmoji(e){const ta=_lastTa;if(!ta){toast('Clique num campo de texto primeiro');return}
+  const s=ta.selectionStart,v=ta.value;ta.value=v.slice(0,s)+e+v.slice(ta.selectionEnd);
+  ta.focus();ta.selectionStart=ta.selectionEnd=s+e.length;ta.dispatchEvent(new Event('input'))}
 
 const TIPOS=["manifesto","dor","provoca","educativo","antihype","prova","autoridade","diferencial","nucleo","cta"];
 
@@ -127,7 +130,8 @@ function renderPosts(){
   const el=$('#posts');el.innerHTML='';
   D.posts.forEach((p,i)=>{
     const d=document.createElement('div');d.className='pitem'+(i===PI?' on':'');
-    d.innerHTML='<b>'+(i+1)+'. '+p.titulo.split('—')[0].trim()+'</b><small>'+p.frames.length+' frames</small>';
+    const st=(p.status==='salvo')?'<span class=stb style="color:var(--ok)">● salvo</span>':'<span class=stb style="color:var(--warn)">● rascunho</span>';
+    d.innerHTML='<b>'+(i+1)+'. '+p.titulo.split('—')[0].trim()+'</b><small>'+(p.marca||'smark')+' · '+p.frames.length+' frames '+st+'</small>';
     d.onclick=()=>sel(i,0);el.appendChild(d);
   });
 }
@@ -137,8 +141,18 @@ function renderStrip(){
     const d=document.createElement('div');d.className='th'+(i===FI?' on':'');
     const src=f.out?('/'+f.out+'?t='+(f._v||0)):'';
     d.innerHTML='<span class=n>'+(i+1)+'</span>'+(src?'<img src="'+src+'">':'');
-    d.onclick=()=>sel(PI,i);el.appendChild(d);
+    d.onclick=()=>sel(PI,i);
+    d.draggable=true;
+    d.ondragstart=e=>{e.dataTransfer.setData('i',i);d.classList.add('drag')};
+    d.ondragend=()=>d.classList.remove('drag');
+    d.ondragover=e=>e.preventDefault();
+    d.ondrop=e=>{e.preventDefault();reorderFrame(+e.dataTransfer.getData('i'),i)};
+    el.appendChild(d);
   });
+}
+async function reorderFrame(from,to){
+  if(from===to||isNaN(from))return;const fr=post().frames;const[m]=fr.splice(from,1);fr.splice(to,0,m);
+  await salvar(true);await reload(PI,to);toast('Reordenado');
 }
 function sel(pi,fi){PI=pi;FI=fi;renderPosts();renderStrip();renderCtrl();preview()}
 
@@ -150,7 +164,7 @@ function fld(label,val,onin,ph,rows){
 function richField(label,val,onin){
   const w=document.createElement('div');w.innerHTML='<label>'+label+'</label>';
   const bar=document.createElement('div');bar.className='fmtbar';
-  const ta=document.createElement('textarea');ta.rows=3;ta.value=val||'';ta.oninput=()=>onin(ta.value);
+  const ta=document.createElement('textarea');ta.rows=3;ta.value=val||'';ta.oninput=()=>onin(ta.value);ta.onfocus=()=>_lastTa=ta;
   const wrap=(pre,suf)=>{const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value,sel=v.slice(s,e)||'texto';
     ta.value=v.slice(0,s)+pre+sel+(suf||pre)+v.slice(e);ta.focus();
     ta.selectionStart=s+pre.length;ta.selectionEnd=s+pre.length+sel.length;onin(ta.value)};
@@ -168,6 +182,9 @@ function renderCtrl(){
   g1.appendChild(richField('Headline (| quebra · *acento* · **negrito** · _itálico_)',f.headline,v=>{f.headline=v;change()}));
   g1.appendChild(richField('Apoio (sub)',f.sub,v=>{f.sub=v;change()}));
   g1.appendChild(fld('CTA',f.cta,v=>{f.cta=v;change()}));
+  const emo=document.createElement('div');emo.className='emobar';
+  '👉 👇 🔥 ✅ 🚀 💡 📈 ⚡ 🎯 ❤️ 🙌 ✨ 💜 ⚽ 🏆 📱'.split(' ').forEach(e=>{const b=document.createElement('button');b.type='button';b.className='emob';b.textContent=e;b.onclick=()=>insEmoji(e);emo.appendChild(b)});
+  g1.appendChild(emo);
   const rowpc=document.createElement('div');rowpc.className='row';rowpc.style.marginTop='8px';
   const pg=fld('Paginação',f.page,v=>{f.page=v;change()});pg.style.flex='1';rowpc.appendChild(pg);
   c.appendChild(g1);
@@ -193,6 +210,10 @@ function renderCtrl(){
     g2.appendChild(slider('Zoom da imagem: '+(f.zoom||1).toFixed(2)+'x',(f.zoom||1),1,2.5,0.05,(v,l)=>{f.zoom=v;l.textContent='Zoom da imagem: '+v.toFixed(2)+'x';touch()}));
     g2.appendChild(slider('Posição horizontal',(f.posx==null?50:f.posx),0,100,1,v=>{f.posx=v;touch()}));
     g2.appendChild(slider('Posição vertical',(f.posy==null?50:f.posy),0,100,1,v=>{f.posy=v;touch()}));
+    // brilho / contraste / saturação
+    g2.appendChild(slider('Brilho: '+Math.round((f.brilho||1)*100)+'%',(f.brilho||1),0.4,1.8,0.05,(v,l)=>{f.brilho=v;l.textContent='Brilho: '+Math.round(v*100)+'%';touch()}));
+    g2.appendChild(slider('Contraste: '+Math.round((f.contraste||1)*100)+'%',(f.contraste||1),0.4,1.8,0.05,(v,l)=>{f.contraste=v;l.textContent='Contraste: '+Math.round(v*100)+'%';touch()}));
+    g2.appendChild(slider('Saturação: '+Math.round((f.satur||1)*100)+'%',(f.satur||1),0,2,0.05,(v,l)=>{f.satur=v;l.textContent='Saturação: '+Math.round(v*100)+'%';touch()}));
     // camada por cima
     const ol=document.createElement('div');ol.style.marginTop='10px';ol.innerHTML='<label>Camada por cima da imagem</label>';
     const os=document.createElement('div');os.className='seg';
@@ -202,6 +223,10 @@ function renderCtrl(){
     ol.appendChild(os);g2.appendChild(ol);
     if((f.overlay||'none')!=='none')
       g2.appendChild(slider('Opacidade da camada: '+Math.round((f.overlay_op==null?.85:f.overlay_op)*100)+'%',(f.overlay_op==null?.85:f.overlay_op),0,1,0.05,(v,l)=>{f.overlay_op=v;l.textContent='Opacidade da camada: '+Math.round(v*100)+'%';touch()}));
+    if(['branco','roxo'].includes(f.overlay||'')){
+      g2.appendChild(slider('Rotação do degradê: '+(f.ov_ang==null?180:f.ov_ang)+'°',(f.ov_ang==null?180:f.ov_ang),0,360,5,(v,l)=>{f.ov_ang=v;l.textContent='Rotação do degradê: '+v+'°';touch()}));
+      g2.appendChild(slider('Mover o degradê: '+(f.ov_pos==null?20:f.ov_pos)+'%',(f.ov_pos==null?20:f.ov_pos),0,90,2,(v,l)=>{f.ov_pos=v;l.textContent='Mover o degradê: '+v+'%';touch()}));
+    }
     // gerar por IA
     const reg=document.createElement('div');reg.style.marginTop='12px';reg.innerHTML='<label>Gerar fundo por IA</label>';
     const selm=document.createElement('select');selm.className='regsel';
@@ -261,8 +286,8 @@ function renderCtrl(){
   c.appendChild(g4);
 }
 
-function change(){renderStrip();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
-function touch(){clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
+function change(){markDraft();renderStrip();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
+function touch(){markDraft();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
 function slider(label,val,min,max,step,onin){
   const w=document.createElement('div');w.style.marginTop='8px';
   const lab=document.createElement('label');lab.textContent=label;w.appendChild(lab);
@@ -271,7 +296,15 @@ function slider(label,val,min,max,step,onin){
 }
 async function moveCard(dir){
   const fr=post().frames,j=FI+dir;if(j<0||j>=fr.length)return;
-  [fr[FI],fr[j]]=[fr[j],fr[FI]];await salvar();await reload(PI,j);toast('Ordem alterada');
+  [fr[FI],fr[j]]=[fr[j],fr[FI]];await salvar(true);await reload(PI,j);toast('Ordem alterada');
+}
+const COLLAPSED=new Set();
+function applyCollapse(){
+  document.querySelectorAll('#ctrl .grp').forEach(g=>{
+    const h=g.querySelector('h5');if(!h)return;const key=h.textContent.replace(/[▾▸]/g,'').trim();
+    if(COLLAPSED.has(key))g.classList.add('collapsed');
+    h.onclick=()=>{g.classList.toggle('collapsed');g.classList.contains('collapsed')?COLLAPSED.add(key):COLLAPSED.delete(key)};
+  });
 }
 
 async function preview(){
@@ -290,15 +323,18 @@ function fit(){
 }
 window.addEventListener('resize',fit);
 
-async function salvar(){
+async function salvar(silent){
   await fetch('/salvar',{method:'POST',headers:HJSON,body:JSON.stringify({dados:D})});
-  setDirty(false);toast('Salvo em editor.json');
+  setDirty(false);if(!silent)toast('Salvo');
 }
-$('#bsave').onclick=salvar;
+function markDraft(){if(D&&D.posts[PI])D.posts[PI].status='rascunho'}
+$('#bsave').onclick=async()=>{if(post())post().status='salvo';await salvar(true);renderPosts();toast('Salvo — finalizado ✓')};
+// auto-save de estado a cada 30s (mantém status rascunho até salvar final)
+setInterval(()=>{if(dirty){salvar(true);toast('Auto-salvo (rascunho)')}},30000);
 
 async function exportar(btn,scope){
   btn.disabled=true;const old=btn.textContent;btn.textContent='Exportando…';
-  await salvar();
+  await salvar(true);
   const r=await(await fetch('/exportar',{method:'POST',headers:HJSON,
     body:JSON.stringify({post:PI,frame:scope})})).json();
   btn.disabled=false;btn.textContent=old;
@@ -311,7 +347,7 @@ async function upload(file){
   rd.onload=async()=>{
     toast('Enviando imagem…');
     const r=await(await fetch('/upload',{method:'POST',headers:HJSON,
-      body:JSON.stringify({slug:post().slug,dataurl:rd.result})})).json();
+      body:JSON.stringify({slug:post().slug,marca:post().marca||'smark',dataurl:rd.result})})).json();
     if(r.ok){const f=frame();f.bgmode='imagem';f.bg=r.path;f._v=(f._v||0)+1;renderCtrl();change();toast('Fundo trocado');}
     else toast('Erro no upload: '+(r.erro||''));
   };rd.readAsDataURL(file);
@@ -334,7 +370,7 @@ async function regen(btn,ref){
 let IG=0;
 async function igPreview(){
   const p=post(),fr=p.frames[IG];
-  const r=await fetch('/preview',{method:'POST',headers:HJSON,body:JSON.stringify({frame:fr,size:p.size})});
+  const r=await fetch('/preview',{method:'POST',headers:HJSON,body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
   const fEl=document.getElementById('igframe');if(fEl)fEl.srcdoc=await r.text();
   document.querySelectorAll('.igdot').forEach((d,i)=>d.classList.toggle('on',i===IG));
 }
@@ -362,18 +398,18 @@ function openSim(){
   document.getElementById('igcapedit').oninput=e=>{p.caption=e.target.value;setDirty(true);
     document.getElementById('igcaptxt').textContent=e.target.value.slice(0,90)+(e.target.value.length>90?'…':'')};
   document.getElementById('igclose').onclick=()=>m.style.display='none';
-  document.getElementById('igsave').onclick=async()=>{await salvar();toast('Legenda salva')};
+  document.getElementById('igsave').onclick=async()=>{await salvar(true);toast('Legenda salva')};
   m.onclick=e=>{if(e.target===m)m.style.display='none'};
 }
 
 // novo post / adicionar / excluir card
 function newFrame(){return {headline:'NOVO|*CARD.*',sub:'',cta:'',page:'',chip:false,tema:'claro',bgmode:'claro',bg:'',cor:'#F4F2FB',accent:'',hsize:0,grade:true}}
 async function reload(pi,fi){D=await(await fetch('/dados')).json();sel(pi,fi)}
-async function addCard(){post().frames.splice(FI+1,0,newFrame());await salvar();await reload(PI,FI+1);toast('Card adicionado')}
+async function addCard(){post().frames.splice(FI+1,0,newFrame());await salvar(true);await reload(PI,FI+1);toast('Card adicionado')}
 async function delCard(){
   if(post().frames.length<=1){toast('O post precisa de pelo menos 1 card');return}
   if(!confirm('Excluir este card do post?'))return;
-  post().frames.splice(FI,1);await salvar();await reload(PI,Math.max(0,FI-1));toast('Card excluído');
+  post().frames.splice(FI,1);await salvar(true);await reload(PI,Math.max(0,FI-1));toast('Card excluído');
 }
 async function novoPost(){
   const t=prompt('Título do novo post:','Novo post');if(t===null)return;

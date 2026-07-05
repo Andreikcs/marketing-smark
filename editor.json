@@ -164,13 +164,16 @@
           "chip": true,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-bg.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/01-854ae2.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/01.png",
-          "n": 1
+          "n": 1,
+          "_v": 2,
+          "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
+          "overlay": "roxo"
         },
         {
           "headline": "*NINA*",
@@ -180,13 +183,15 @@
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-bg.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_uploads/c0b6204912.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/02.png",
-          "n": 2
+          "n": 2,
+          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n",
+          "_v": 1
         },
         {
           "headline": "*TÉO*",
