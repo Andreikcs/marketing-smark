@@ -1747,7 +1747,7 @@
           "cta": "ACESSE AGORA  ",
           "page": "",
           "chip": true,
-          "tema": "claro",
+          "tema": "escuro",
           "bgmode": "imagem",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/xxx/_regen/01-2bf772.png",
           "cor": "#F4F2FB",
@@ -1757,7 +1757,7 @@
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/xxx/01.png",
           "_tipo": "dor",
-          "overlay": "branco",
+          "overlay": "roxo",
           "_v": 1,
           "_regtema": "claro"
         }
