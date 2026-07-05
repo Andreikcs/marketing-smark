@@ -174,6 +174,14 @@ input[type=range]{accent-color:var(--accent)}
 .esopts{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--sub)}
 .esopts select{background:var(--field);border:1px solid var(--field-line);color:var(--text);border-radius:8px;padding:5px 7px;font-size:12px}
 .esopts label{display:flex;align-items:center;gap:5px;cursor:pointer;margin:0}
+.esattach{display:none;align-items:center;gap:9px;margin-bottom:8px;background:var(--inset);border:1px solid var(--line);border-radius:10px;padding:6px 9px}
+.esattach.on{display:flex}
+.esattach img{width:42px;height:42px;object-fit:cover;border-radius:7px;flex:0 0 auto}
+.esattach .rm{margin-left:auto;background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:15px}
+.esattach .rm:hover{color:var(--bad)}
+.esplus{width:44px;height:44px;flex:0 0 auto;background:var(--surface);border:1px solid var(--field-line);border-radius:11px;color:var(--sub);font-size:22px;cursor:pointer;transition:.15s}
+.esplus:hover{border-color:var(--accent);color:var(--text)}
+.esplus.has{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
 .esrow{display:flex;gap:8px;align-items:flex-end}
 .esrow textarea{flex:1;min-height:42px;max-height:120px;background:var(--field);border:1px solid var(--field-line);border-radius:11px;color:var(--text);padding:10px 11px;font-size:13px;font-family:var(--font-text);resize:none}
 .esrow textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -763,7 +771,12 @@ carregar().then(()=>snapshot());
       <select id=esn><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
       <label><input type=checkbox id=esfundo> gerar fundo (pago)</label>
     </div>
-    <div class=esrow><textarea id=estxt placeholder="ex: post sobre a Copa, tom leve…" rows=1></textarea><button class=send id=essend title="gerar (Enter)">➤</button></div>
+    <div class=esattach id=esattach></div>
+    <div class=esrow>
+      <button class=esplus id=esplus title="anexar imagem de exemplo (Claude analisa e usa de referência)">＋</button>
+      <input type=file id=esfile accept="image/*" style="display:none">
+      <textarea id=estxt placeholder="ex: post sobre a Copa, tom leve…" rows=1></textarea>
+      <button class=send id=essend title="gerar (Enter)">➤</button></div>
   </div>
 </div>
 <script>
@@ -785,6 +798,24 @@ carregar().then(()=>snapshot());
   document.getElementById('esclose').onclick=()=>panel.classList.remove('on');
   document.getElementById('esmin').onclick=(e)=>{e.stopPropagation();panel.classList.toggle('min')};
   document.getElementById('eshead').onclick=(e)=>{if(panel.classList.contains('min')&&e.target.tagName!=='BUTTON')panel.classList.remove('min')};
+  // ===== Anexar imagem de exemplo (Claude analisa + usa de referência do fundo) =====
+  let attB64=null,attMime='image/jpeg',attPath=null;
+  const esfile=document.getElementById('esfile'),esplus=document.getElementById('esplus'),esattach=document.getElementById('esattach');
+  function fileToScaled(file){return new Promise(res=>{const img=new Image();const url=URL.createObjectURL(file);
+    img.onload=()=>{URL.revokeObjectURL(url);let w=img.width,h=img.height;const sc=Math.min(1,1280/Math.max(w,h));w=Math.round(w*sc);h=Math.round(h*sc);
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);res(cv.toDataURL('image/jpeg',0.85))};
+    img.onerror=()=>res(null);img.src=url})}
+  function clearAtt(){attB64=null;attPath=null;esattach.className='esattach';esattach.innerHTML='';esplus.classList.remove('has')}
+  esplus.onclick=()=>esfile.click();
+  esfile.onchange=async e=>{const file=e.target.files[0];if(!file)return;
+    const dataUrl=await fileToScaled(file);if(!dataUrl){toast('Não consegui ler a imagem');return}
+    attB64=dataUrl.split(',')[1];attMime='image/jpeg';
+    esattach.className='esattach on';
+    esattach.innerHTML='<img src="'+dataUrl+'"><span style="font-size:12px;color:var(--sub);line-height:1.3">Exemplo anexado — Claude analisa e usa de referência do fundo</span><button class=rm title=remover>✕</button>';
+    esattach.querySelector('.rm').onclick=clearAtt;esplus.classList.add('has');
+    try{const r=await(await fetch('/estudio-upload',{method:'POST',headers:HJSON,body:JSON.stringify({data:attB64,mime:attMime,marca:optMarca.value})})).json();attPath=r.path||null}catch(e){attPath=null}
+    esfile.value='';
+  };
   function pollJob(id){return new Promise(res=>{let t=0;const iv=setInterval(async()=>{t++;let j;try{j=await(await fetch('/job?id='+id)).json()}catch(e){return}
     if(j.status==='done'||j.status==='erro'){clearInterval(iv);res(j)}else if(t>90){clearInterval(iv);res({status:'erro',erro:'tempo esgotado'})}},1300)})}
   async function gerar(){
@@ -794,7 +825,7 @@ carregar().then(()=>snapshot());
     send.disabled=true;const wait=addMsg('a','✍️ Claude está escrevendo a copy<span class=dots></span>');
     let d=0;const anim=setInterval(()=>{d=(d+1)%4;const el=wait.querySelector('.dots');if(el)el.textContent='.'.repeat(d)},380);
     try{
-      const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:pedido,marca:optMarca.value,n:+optN.value,contexto:ctxAtual(),historico:hist.slice(-6)})})).json();
+      const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:pedido,marca:optMarca.value,n:+optN.value,contexto:ctxAtual(),historico:hist.slice(-6),imagem:attB64,imagem_mime:attMime})})).json();
       if(!st.ok){clearInterval(anim);wait.innerHTML='⚠️ '+esc(st.erro||'falhou');send.disabled=false;return}
       const j=await pollJob(st.job);clearInterval(anim);
       if(j.status!=='done'){wait.innerHTML='⚠️ '+esc(j.erro||'falhou');send.disabled=false;return}
@@ -839,7 +870,7 @@ carregar().then(()=>snapshot());
   async function gerarFundo(pi,fi,conceito,tipo,tema){
     try{
       if(pi===PI){FI=fi;renderPosts();renderStrip();renderCtrl();preview();if(typeof genStart==='function')genStart('Gerando fundo '+(fi+1)+' ('+(tema==='claro'?'claro':'escuro')+')…')}
-      const st=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,body:JSON.stringify({post:pi,frame:fi,conceito:conceito,tipo:tipo||'manifesto',tema:tema||'claro'})})).json();
+      const st=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,body:JSON.stringify({post:pi,frame:fi,conceito:conceito,tipo:tipo||'manifesto',tema:tema||'claro',ref:attPath||'',prompt:attPath?(conceito||''):''})})).json();
       if(!st.ok){if(pi===PI&&typeof genStop==='function')genStop(false);return}
       const j=await pollJob(st.job);
       if(j.status==='done'){const tf=D.posts[pi]&&D.posts[pi].frames[fi];if(tf){tf.bg=j.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(typeof applyTom==='function')applyTom(tf,tema)}

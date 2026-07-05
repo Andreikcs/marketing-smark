@@ -136,31 +136,43 @@ def _extrai_json(txt):
     return json.loads(s[i:j + 1])
 
 
-def _via_claude(api_key, instrucao):
+def _via_claude(api_key, instrucao, imagem_b64=None, imagem_mime="image/jpeg"):
+    content = []
+    if imagem_b64:  # visão: Claude analisa a imagem de exemplo anexada
+        content.append({"type": "image", "source": {"type": "base64",
+                        "media_type": imagem_mime, "data": imagem_b64}})
+    content.append({"type": "text", "text": instrucao})
     data = _post_json(
         "https://api.anthropic.com/v1/messages",
         {"x-api-key": api_key, "anthropic-version": "2023-06-01",
          "content-type": "application/json"},
         {"model": os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-8"),
-         "max_tokens": 2000, "system": SISTEMA,
-         "messages": [{"role": "user", "content": instrucao}]})
+         "max_tokens": 6000, "system": SISTEMA,
+         "thinking": {"type": "adaptive"},          # + inteligência: raciocina antes
+         "output_config": {"effort": "high"},        # esforço alto (trabalho sensível)
+         "messages": [{"role": "user", "content": content}]})
     parts = [b.get("text", "") for b in data.get("content", []) if b.get("type") == "text"]
     return _extrai_json("".join(parts))
 
 
-def _via_openai(api_key, instrucao):
+def _via_openai(api_key, instrucao, imagem_b64=None, imagem_mime="image/jpeg"):
     model = os.environ.get("OPENAI_CHAT_MODEL", "gpt-4o")
+    content = [{"type": "text", "text": instrucao}]
+    if imagem_b64:
+        content.insert(0, {"type": "image_url",
+                           "image_url": {"url": f"data:{imagem_mime};base64,{imagem_b64}"}})
     data = _post_json(
         "https://api.openai.com/v1/chat/completions",
         {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         {"model": model, "temperature": 0.8,
          "response_format": {"type": "json_object"},
          "messages": [{"role": "system", "content": SISTEMA},
-                      {"role": "user", "content": instrucao}]})
+                      {"role": "user", "content": content}]})
     return _extrai_json(data["choices"][0]["message"]["content"])
 
 
-def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=None):
+def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=None,
+          imagem_b64=None, imagem_mime="image/jpeg"):
     """Devolve (resultado_dict, provider_usado). Levanta RuntimeError em falha."""
     marca = marca if marca in MARCAS else "smark"
     n_frames = max(1, min(10, int(n_frames or 3)))
@@ -168,10 +180,15 @@ def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=Non
     ant = os.environ.get("ANTHROPIC_API_KEY") or env.get("ANTHROPIC_API_KEY")
     oai = os.environ.get("OPENAI_API_KEY") or env.get("OPENAI_API_KEY")
     instr = _instrucao(pedido, marca, n_frames, tipo, contexto, historico)
+    if imagem_b64:
+        instr += ("\n\nO usuário ANEXOU UMA IMAGEM DE EXEMPLO. Analise o estilo, composição, "
+                  "enquadramento, luz e mood dela e escreva o 'conceito_visual' refletindo esse "
+                  "exemplo — porém SEMPRE adaptado à identidade da marca (paleta roxa, editorial premium). "
+                  "Descreva no 'resumo' o que você entendeu da imagem.")
     if ant:
-        res, prov = _via_claude(ant, instr), "claude"
+        res, prov = _via_claude(ant, instr, imagem_b64, imagem_mime), "claude"
     elif oai:
-        res, prov = _via_openai(oai, instr), "openai"
+        res, prov = _via_openai(oai, instr, imagem_b64, imagem_mime), "openai"
     else:
         raise RuntimeError("Sem chave: coloque OPENAI_API_KEY (ou ANTHROPIC_API_KEY) no .env")
     res = _sanea(res, marca, n_frames)

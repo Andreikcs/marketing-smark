@@ -383,11 +383,13 @@ def _run_gen(job_id, cmd, out, pi, fi):
             JOBS[job_id] = {"status": "erro", "erro": (r.stderr or r.stdout or "falhou")[-400:]}
 
 
-def _run_estudio(job_id, pedido, marca, n, tipo, contexto="", historico=None):
+def _run_estudio(job_id, pedido, marca, n, tipo, contexto="", historico=None,
+                 imagem_b64=None, imagem_mime="image/jpeg"):
     """Roda o cérebro do chat em background (chat é rápido, mas não trava a UI)."""
     with GEN_SEM:
         try:
-            res, prov = estudio.gerar(pedido, marca, n, tipo, contexto, historico)
+            res, prov = estudio.gerar(pedido, marca, n, tipo, contexto, historico,
+                                      imagem_b64, imagem_mime)
             JOBS[job_id] = {"status": "done", "resultado": res, "provider": prov}
         except Exception as e:
             JOBS[job_id] = {"status": "erro", "erro": str(e)}
@@ -739,11 +741,33 @@ class H(http.server.BaseHTTPRequestHandler):
                 tipo = req.get("tipo", "")
                 contexto = str(req.get("contexto", ""))[:1500]
                 historico = req.get("historico") if isinstance(req.get("historico"), list) else None
+                img_b64 = req.get("imagem") or None
+                img_mime = req.get("imagem_mime", "image/jpeg")
                 job_id = secrets.token_hex(6)
                 JOBS[job_id] = {"status": "running"}
                 threading.Thread(target=_run_estudio,
-                                 args=(job_id, pedido, marca, n, tipo, contexto, historico), daemon=True).start()
+                                 args=(job_id, pedido, marca, n, tipo, contexto, historico,
+                                       img_b64, img_mime), daemon=True).start()
                 return self._send(200, {"ok": True, "job": job_id})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/estudio-upload":
+            # salva a imagem de exemplo do Estúdio pra usar como REFERÊNCIA do fundo (openai_edit)
+            try:
+                data = req.get("data", "")
+                if "," in data:
+                    data = data.split(",", 1)[1]
+                raw = base64.b64decode(data)
+                marca = safe_marca(req.get("marca", "smark"))
+                dd = os.path.join(VAULT, "marcas", marca, "publicacoes", "social",
+                                  "instagram", "arte", "_estudio")
+                os.makedirs(dd, exist_ok=True)
+                ext = ".png" if "png" in req.get("mime", "") else ".jpg"
+                out = os.path.join(dd, f"ref-{secrets.token_hex(4)}{ext}")
+                with open(out, "wb") as f:
+                    f.write(raw)
+                return self._send(200, {"ok": True, "path": os.path.relpath(out, VAULT)})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 
