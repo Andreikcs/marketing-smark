@@ -280,6 +280,31 @@ def save(d):
         json.dump(d, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
 
+def _run_gen(job_id, cmd, out, pi, fi):
+    """Roda a geração de IA em background (cap de 2 simultâneas). Persiste o fundo no editor.json."""
+    with GEN_SEM:
+        try:
+            r = subprocess.run(cmd, cwd=VAULT, capture_output=True, text=True)
+        except Exception as e:
+            JOBS[job_id] = {"status": "erro", "erro": str(e)}
+            return
+        if os.path.exists(out):
+            rel = os.path.relpath(out, VAULT)
+            try:  # persiste pra não perder ao sair da tela
+                with IO_LOCK:
+                    d = load()
+                    if pi < len(d["posts"]) and fi < len(d["posts"][pi].get("frames", [])):
+                        f = d["posts"][pi]["frames"][fi]
+                        f["bg"] = rel
+                        f["bgmode"] = "imagem"
+                        save(d)
+            except Exception:
+                pass
+            JOBS[job_id] = {"status": "done", "path": rel}
+        else:
+            JOBS[job_id] = {"status": "erro", "erro": (r.stderr or r.stdout or "falhou")[-400:]}
+
+
 def hl(text):
     """headline do editor usa '|' como quebra; o compositor usa '\\n'."""
     return (text or "").replace("|", "\\n")
@@ -404,6 +429,9 @@ class H(http.server.BaseHTTPRequestHandler):
             return self._serve_module(VITRINE, "Vitrine (notas)")
         if path == "/config":
             return self._send(200, config_html().replace("__EDITOR_TOKEN__", TOKEN), MIME[".html"])
+        if path == "/job":
+            jid = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("id", [""])[0]
+            return self._send(200, JOBS.get(jid, {"status": "unknown"}))
         if path == "/dados":
             return self._send(200, load())
         # arquivo estático dentro do vault (imagens)
@@ -599,9 +627,11 @@ class H(http.server.BaseHTTPRequestHandler):
 def main():
     if not os.path.isfile(DATA):
         sys.exit(f"ERRO: {DATA} não existe. Gere o editor.json primeiro.")
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("127.0.0.1", PORT), H) as httpd:
-        print(f"\n  ✎ SUPER EDITOR rodando em  http://localhost:{PORT}   (Ctrl+C pra parar)\n")
+    http.server.ThreadingHTTPServer.allow_reuse_address = True
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), H)
+    httpd.daemon_threads = True
+    with httpd:
+        print(f"\n  ✎ SUPER EDITOR (multi-thread) em  http://localhost:{PORT}   (Ctrl+C pra parar)\n")
         httpd.serve_forever()
 
 
