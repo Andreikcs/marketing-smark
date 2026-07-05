@@ -87,6 +87,15 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .fmthex{width:66px;background:var(--field);border:1px solid var(--field-line);color:var(--txt);border-radius:6px;padding:3px 7px;font-size:11px;font-family:var(--font-mono)}
 .fmthex:focus{outline:none;border-color:var(--accent)}
 .fmthint{font-size:10px;color:var(--muted);align-self:center;margin-left:auto}
+.capsheet{position:fixed;left:0;right:0;bottom:0;z-index:250;display:none;justify-content:center;pointer-events:none}
+.capsheet.on{display:flex}
+.capbox{pointer-events:auto;width:660px;max-width:94vw;background:var(--pan);border:1px solid var(--line);border-top:2px solid var(--accent);border-radius:16px 16px 0 0;box-shadow:0 -22px 60px #000a;padding:16px 18px;animation:capup .22s ease}
+@keyframes capup{from{transform:translateY(34px);opacity:0}to{transform:translateY(0);opacity:1}}
+.caphead{display:flex;align-items:center;gap:10px;margin-bottom:10px}.caphead b{font-size:15px;flex:1}
+.capcount{font-size:11px;color:var(--muted)}.capx{background:transparent;border:0;color:var(--sub);font-size:16px;cursor:pointer;padding:2px 6px;border-radius:6px}.capx:hover{background:var(--pan2);color:var(--txt)}
+#captext{width:100%;min-height:130px;max-height:40vh;background:var(--field);border:1px solid var(--field-line);border-radius:11px;color:var(--txt);padding:11px 13px;font-size:14px;line-height:1.5;font-family:var(--font-text);resize:vertical}
+#captext:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.capbtns{display:flex;gap:8px;margin-top:10px}.capbtns .btn{width:auto;flex:1}
 .newpost{width:100%;margin-top:10px;padding:10px;border:1px dashed var(--line);background:transparent;color:var(--sub);border-radius:10px;cursor:pointer;font-size:13px}
 .newpost:hover{border-color:var(--rox);color:var(--txt)}
 .pitem{display:flex;align-items:flex-start;gap:7px}
@@ -294,6 +303,7 @@ input[type=range]{accent-color:var(--accent)}
         <button id=baddc>＋ Adicionar</button>
         <button id=bdupc>⧉ Duplicar card</button>
         <button id=bsim><svg class=igicon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Instagram</button>
+        <button id=blegenda>📝 Legenda</button>
         <button id=bfull>⛶ Tela cheia</button>
         <button class=del id=bdelc>🗑 Excluir</button>
       </div>
@@ -318,6 +328,17 @@ input[type=range]{accent-color:var(--accent)}
   </div>
 </div>
 <div id=igmodal class=igmodal></div>
+<div id=capsheet class=capsheet>
+  <div class=capbox>
+    <div class=caphead><b>📝 Legenda do post</b><span class=capcount id=capcount></span><button class=capx id=capclose title=fechar>✕</button></div>
+    <textarea id=captext placeholder="Escreva a legenda do post (com hashtags no fim)…" spellcheck=false></textarea>
+    <div class=capbtns>
+      <button class="btn ai" id=capgen>✦ Gerar legenda com IA</button>
+      <button class="btn" id=capcopy>⧉ Copiar</button>
+    </div>
+    <div class=mini style="margin-top:8px">A legenda é do post inteiro (o carrossel todo) — não vai na arte, é o texto que você cola ao publicar. Salva sozinho.</div>
+  </div>
+</div>
 <div id=fsmodal class=fsmodal><button class=x id=fsx>✕ fechar</button><iframe id=fsif></iframe></div>
 <div id=npmodal class=npmodal><div class=npbox>
   <h3>Novo post</h3>
@@ -774,6 +795,25 @@ $('#bsim').onclick=openSim;$('#bdup').onclick=dupPost;$('#bdelpost').onclick=del
 $('#bdupc').onclick=dupFrame;
 $('#bsidecol').onclick=()=>$('.app').classList.add('sidecol');
 $('#reopenside').onclick=()=>$('.app').classList.remove('sidecol');
+// ===== LEGENDA do post (bottom-sheet, separada do texto da imagem) =====
+function updCapCount(){const n=($('#captext').value||'').length;$('#capcount').textContent=n+' / 2200'+(n>2200?' ⚠️':'')}
+function openLegenda(){if(!post()){toast('Abra um post primeiro');return}$('#captext').value=post().caption||'';updCapCount();$('#capsheet').classList.add('on');setTimeout(()=>$('#captext').focus(),40)}
+$('#blegenda').onclick=openLegenda;
+$('#capclose').onclick=()=>$('#capsheet').classList.remove('on');
+$('#captext').oninput=()=>{if(post())post().caption=$('#captext').value;updCapCount();setDirty(true)};
+$('#capcopy').onclick=async()=>{try{await navigator.clipboard.writeText($('#captext').value||'');toast('Legenda copiada ✓')}catch(e){toast('Não consegui copiar')}};
+$('#capgen').onclick=async()=>{if(!post())return;const b=$('#capgen');b.disabled=true;const old=b.textContent;b.textContent='Gerando…';
+  try{
+    const ctx='Post "'+(post().titulo||'')+'" ('+(post().marca||'smark')+'). Headlines: '+(post().frames||[]).map((f,i)=>(i+1)+') '+((f.headline||'').replace(/\|/g,' ')).slice(0,60)).join(' | ');
+    const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:'Escreva SÓ a legenda do Instagram pra este post (2-4 frases + hashtags no fim). Não mude as headlines, só a legenda.',marca:post().marca||'smark',n:(post().frames||[]).length||1,contexto:ctx})})).json();
+    if(!st.ok||!st.job){b.disabled=false;b.textContent=old;toast('Erro ao iniciar');return}
+    let tries=0;const poll=setInterval(async()=>{tries++;let s;try{s=await(await fetch('/job?id='+st.job)).json()}catch(e){return}
+      if(s.status==='done'){clearInterval(poll);b.disabled=false;b.textContent=old;const r=s.resultado||{};
+        const cap=(r.caption||'')+(r.hashtags?('\n\n'+r.hashtags):'');$('#captext').value=cap;if(post())post().caption=cap;updCapCount();setDirty(true);toast('✦ Legenda gerada')}
+      else if(s.status==='erro'||tries>60){clearInterval(poll);b.disabled=false;b.textContent=old;toast('Erro ao gerar')}
+    },1500);
+  }catch(e){b.disabled=false;b.textContent=old;toast('Erro')}
+};
 $('#psearch').oninput=e=>{PSEARCH=e.target.value;renderPosts()};
 async function dupFrame(){const c=JSON.parse(JSON.stringify(frame()));delete c._v;post().frames.splice(FI+1,0,c);await salvar(true);await reload(PI,FI+1);toast('Card duplicado')}
 async function baixar(){
@@ -840,7 +880,7 @@ carregar().then(()=>snapshot());
       <select id=esmarca><option value=smark>smark</option><option value=provider-max>provider-max</option><option value=elever-ai>elever-ai</option></select>
       <span>Frames</span>
       <select id=esn><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
-      <label><input type=checkbox id=esfundo> gerar fundo (pago)</label>
+      <label title="Marcado: Claude escreve a copy E gera a arte de fundo (OpenAI, pago ~40s/frame). Desmarcado: só a copy (grátis) — o fundo fica no preset atual."><input type=checkbox id=esfundo> gerar arte de fundo <span style="color:var(--warn)">(IA paga)</span></label>
     </div>
     <div class=esattach id=esattach></div>
     <div class=esrow>
