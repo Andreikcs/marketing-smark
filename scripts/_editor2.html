@@ -278,7 +278,7 @@ function renderCtrl(){
     const cta2=document.createElement('textarea');cta2.rows=2;cta2.placeholder='contexto do novo slide (ex.: o Téo entrando em campo, mesma luz e composição da referência)';cta2.value=f.contexto||'';
     cta2.oninput=()=>{f.contexto=cta2.value;setDirty(true)};ctxw.appendChild(cta2);reg.appendChild(ctxw);
     const rb2=document.createElement('button');rb2.className='btn ai';rb2.style.marginTop='6px';rb2.textContent='✨ Gerar mantendo a referência + contexto (pago)';
-    rb2.onclick=()=>regen(rb2,f._ref||f.bg||'');reg.appendChild(rb2);
+    rb2.onclick=()=>{const rf=f._ref||f.bg;if(!rf){toast('Escolha um slide de referência (ou tenha uma imagem no fundo)');return}regen(rb2,rf)};reg.appendChild(rb2);
     const hintp=document.createElement('div');hintp.className='mini';hintp.style.marginTop='6px';
     hintp.textContent='Escolha o slide-modelo (ex.: a Nina) + o contexto do novo (ex.: o Téo). A IA mantém luz, cor e composição da referência.';
     reg.appendChild(hintp);g2.appendChild(reg);
@@ -416,7 +416,7 @@ async function upload(file){
 
 async function regen(btn,ref){
   const f=frame(),tema=f._regtema||'claro',tipo=f._tipo||'manifesto',ctx=(f.contexto||'').trim();
-  const msg=ref?('Gerar uma NOVA imagem baseada na atual?\n\n'+(ctx?('Contexto: '+ctx):'(sem contexto — vai variar o estilo)')+'\n\n(pago · ~40s)')
+  const msg=ref?('Gerar mantendo o ESTILO da referência (luz, cor, composição)'+(ctx?(', com o contexto:\n"'+ctx+'"'):' — sem contexto')+'\n\n(pago · ~40s)')
                 :('Gerar fundo por IA?\n\n• Tom: '+tema+'\n• Conceito: '+tipo+'\n\n(pago · ~40s)');
   if(!confirm(msg))return;
   btn.disabled=true;const old=btn.textContent;btn.textContent='Gerando…';toast('Gerando por IA (pago)…');
