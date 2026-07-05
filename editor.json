@@ -337,7 +337,7 @@
           "chip": true,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/xxx/_regen/01-2bf772.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/xxx/_regen/01-5d7fb3.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
@@ -346,8 +346,10 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/xxx/01.png",
           "_tipo": "dor",
           "overlay": "roxo",
-          "_v": 1,
-          "_regtema": "claro"
+          "_v": 3,
+          "_regtema": "claro",
+          "_ref": "marcas/smark/publicacoes/social/instagram/arte/teste-amor/_uploads/6d1a25a0c6.png",
+          "contexto": "imagem de publicidade, caze e astros do futebol"
         }
       ],
       "caption": "",
