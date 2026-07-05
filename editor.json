@@ -699,7 +699,7 @@
       ]
     },
     {
-      "titulo": "Torcida com Pelé pelo Brasil",
+      "titulo": "Um funcionário de IA em cada departamento",
       "slug": "prova-40-mais-qualidade-com-ia",
       "marca": "smark",
       "size": "1080x1350",
@@ -707,17 +707,17 @@
       "canais": [
         "instagram"
       ],
-      "caption": "Todo craque precisa de um time inteiro do lado. Na sua empresa é igual: cada departamento pode ter um funcionário de IA cuidando do que trava o dia. A gente começa pelo diagnóstico gratuito e mostra onde dá pra ganhar tempo.\n\n#smark #inteligenciaartificial #gestao #produtividade",
+      "caption": "Imagina ter alguém em cada departamento que trabalha o dia todo, sem cansar e sem deixar nada cair. É isso que a Smark coloca na sua empresa: funcionários de IA com função definida. Quer saber por onde começar? O diagnóstico é gratuito.\n\n#smark #inteligenciaartificial #gestao #produtividade",
       "frames": [
         {
-          "headline": "O Brasil joga|com *time completo*",
-          "sub": "Cada setor com seu funcionário de IA",
-          "cta": "Diagnóstico gratuito • link na bio",
-          "tema": "escuro",
+          "headline": "Cada setor pode ter|um *funcionário* de IA",
+          "sub": "Trabalha sem parar, sem folga, sem esquecer.",
+          "cta": "",
+          "tema": "claro",
           "chip": false,
           "grade": true,
           "bgmode": "imagem",
-          "page": "01/02",
+          "page": "01/03",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/prova-40-mais-qualidade-com-ia/_regen/01-60d818.png",
           "_v": 1,
           "zoom": 1,
@@ -729,10 +729,10 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/prova-40-mais-qualidade-com-ia/01.png"
         },
         {
-          "headline": "NOVO|*CARD.*",
-          "sub": "",
+          "headline": "Nina atende, Clara cuida|do provedor, *Téo* prospecta",
+          "sub": "Cada um com uma função clara na sua empresa.",
           "cta": "",
-          "page": "02/02",
+          "page": "02/03",
           "chip": false,
           "tema": "claro",
           "bgmode": "claro",
@@ -743,6 +743,18 @@
           "grade": true,
           "n": 2,
           "out": "marcas/smark/publicacoes/social/instagram/arte/prova-40-mais-qualidade-com-ia/02.png"
+        },
+        {
+          "headline": "Comece pelo *diagnóstico*|é de graça",
+          "sub": "A gente mostra onde a IA já pode ajudar hoje.",
+          "cta": "Diagnóstico gratuito · link na bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "03/03",
+          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/prova-40-mais-qualidade-com-ia/03.png"
         }
       ]
     },
@@ -777,6 +789,261 @@
       "caption": "",
       "canais": [
         "instagram"
+      ]
+    },
+    {
+      "slug": "copa-teste",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "COPA TESTE",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/copa-teste/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
+    },
+    {
+      "slug": "selecao-nina-teo-clara-c33c8",
+      "marca": "smark",
+      "titulo": "A seleção — post 3/5 (cópia)",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "A SMARK SELECIONOU|3 PROFISSIONAIS PRA|*SUA EMPRESA.*",
+          "sub": "Nenhum deles vai pedir demissão. 👇",
+          "cta": "",
+          "page": "01/09",
+          "chip": true,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/01-854ae2.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/01.png",
+          "n": 1,
+          "_v": 2,
+          "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
+          "overlay": "roxo"
+        },
+        {
+          "headline": "A SMARK SELECIONOU|3 PROFISSIONAIS PRA|*SUA EMPRESA.*",
+          "sub": "Nenhum deles vai pedir demissão. 👇",
+          "cta": "",
+          "page": "02/09",
+          "chip": true,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/01-854ae2.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/02.png",
+          "n": 2,
+          "contexto": "MAnternha exatamente igual a imagem do fundo mas altere a camisa dos 3 jogadores para amarela, como a da nina, camisa da selecao padrao como nina ",
+          "overlay": "roxo",
+          "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-5af6a9.png"
+        },
+        {
+          "headline": "NOVO|*CARD.*",
+          "sub": "",
+          "cta": "",
+          "page": "03/09",
+          "chip": false,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/03.png"
+        },
+        {
+          "headline": "*NINA*",
+          "sub": "Pré-vendas. Nenhuma {#8b3cf7:oportunidade} fica sem resposta porque \"não deu tempo\". Seu time só investe energia em quem realmente importa.",
+          "cta": "",
+          "page": "04/09",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/04.png",
+          "n": 4,
+          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n"
+        },
+        {
+          "headline": "*NINA*",
+          "sub": "Pré-vendas. Nenhuma {#8b3cf7:oportunidade} fica sem resposta porque \"não deu tempo\". Seu time só investe energia em quem realmente importa.",
+          "cta": "",
+          "page": "05/09",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/05.png",
+          "n": 5,
+          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n"
+        },
+        {
+          "headline": "*NINA*",
+          "sub": "Pré-vendas. Nenhuma {#8b3cf7:oportunidade} fica sem resposta porque \"não deu tempo\". Seu time só investe energia em quem realmente importa.",
+          "cta": "",
+          "page": "06/09",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/06.png",
+          "n": 6,
+          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n"
+        },
+        {
+          "headline": "*Clara*",
+          "sub": "Prospecção. A agenda comercial que vive vazia porque prospectar toma tempo que ninguém tem — abastecida sem depender de ânimo",
+          "cta": "fdfddfd",
+          "page": "07/09",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/04-5dd660.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/07.png",
+          "n": 7,
+          "contexto": "\"a Clara, é quem salva a patrica atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
+          "overlay": "none",
+          "overlay_op": 0,
+          "posx": 0,
+          "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "_v": 2
+        },
+        {
+          "headline": "*TÉO*",
+          "sub": "Prospecção. A agenda comercial que vive vazia porque prospectar toma tempo que ninguém tem — abastecida sem depender de ânimo",
+          "cta": "",
+          "page": "08/09",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-5af6a9.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/08.png",
+          "n": 8,
+          "contexto": "\"o Téo, um caçador/atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
+          "overlay": "none",
+          "overlay_op": 0,
+          "posx": 0,
+          "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png"
+        },
+        {
+          "headline": "NINA, TÉO|E *CLARA.*",
+          "sub": "Sua próxima contratação começa com uma conversa. 👇 Link na bio.",
+          "cta": "fale com a smark →",
+          "page": "09/09",
+          "chip": false,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-bg.png",
+          "cor": "",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/09.png",
+          "n": 9
+        }
+      ],
+      "caption": "Apresentando a seleção da smark. 👋\n\nNão são robôs de \"aperte 1\". São funções inteiras da sua empresa, cobertas por IA que trabalha na mão do seu time — não no lugar dele.\n\nQual dessas áreas mais dói na sua operação hoje? Comenta. 👇\n\n#IAparaempresas #prevendas #prospeccao #relacionamento #pmesbrasil",
+      "status": "rascunho",
+      "canais": [
+        "instagram"
+      ]
+    },
+    {
+      "titulo": "Um funcionário de IA em cada departamento",
+      "slug": "um-funcionario-de-ia-em-cada-departament",
+      "marca": "smark",
+      "size": "1080x1350",
+      "status": "rascunho",
+      "canais": [
+        "instagram"
+      ],
+      "caption": "Imagina ter alguém em cada departamento que trabalha o dia todo, sem cansar e sem deixar nada cair. É isso que a Smark coloca na sua empresa: funcionários de IA com função definida. Quer saber por onde começar? O diagnóstico é gratuito.\n\n#smark #inteligenciaartificial #gestao #produtividade",
+      "frames": [
+        {
+          "headline": "Cada setor pode ter|um *funcionário* de IA",
+          "sub": "Trabalha sem parar, sem folga, sem esquecer.",
+          "cta": "",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "01/03",
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/um-funcionario-de-ia-em-cada-departament/01.png"
+        },
+        {
+          "headline": "Nina atende, Clara cuida|do provedor, *Téo* prospecta",
+          "sub": "Cada um com uma função clara na sua empresa.",
+          "cta": "",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "02/03",
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/um-funcionario-de-ia-em-cada-departament/02.png"
+        },
+        {
+          "headline": "Comece pelo *diagnóstico*|é de graça",
+          "sub": "A gente mostra onde a IA já pode ajudar hoje.",
+          "cta": "Diagnóstico gratuito · link na bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "03/03",
+          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/um-funcionario-de-ia-em-cada-departament/03.png"
+        }
       ]
     }
   ]
