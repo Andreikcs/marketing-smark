@@ -5,6 +5,6 @@
 # Sistema
 .DS_Store
 
-# Imagens geradas (drafts pesados; regeneráveis pela ficha). As fichas .md ficam versionadas.
-# Cobre tanto arte/<slug>.png (post único) quanto arte/<slug>/NN.png (carrossel).
-**/publicacoes/**/arte/**
+# Artes geradas: AGORA versionadas (decisão 2026-07-05 — backup real, não perder o que foi aprovado).
+# As artes aplicadas ficam em arte/<slug>/_regen/ e são referenciadas pelo editor.json,
+# então versionamos toda a árvore arte/. Só os PNG entram; nada de segredo aqui.
