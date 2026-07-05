@@ -1613,6 +1613,33 @@
         }
       ],
       "importado": true
+    },
+    {
+      "slug": "xxx",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "XXX",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "01/01",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/xxx/_uploads/da7b564b67.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/xxx/01.png",
+          "_v": 1
+        }
+      ],
+      "caption": ""
     }
   ]
 }
