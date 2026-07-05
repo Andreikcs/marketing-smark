@@ -59,6 +59,22 @@ a.tile:hover .sk-card{border-color:var(--accent);transform:translateY(-2px)}
 </div>
 </body></html>"""
 
+def topbar(active=""):
+    """App shell topbar (.sk-topbar) — substitui o botão flutuante de menu em todas as telas."""
+    def lk(href, label, key):
+        cls = "sk-navlink is-active" if key == active else "sk-navlink"
+        return f'<a class="{cls}" href="{href}">{label}</a>'
+    return ('<div class="sk-topbar">'
+            '<a href="/" style="font-family:var(--font-display);text-transform:uppercase;font-size:20px;'
+            'letter-spacing:.01em;color:var(--text);text-decoration:none;margin-right:4px">smark'
+            '<span style="color:var(--accent)">.</span></a>'
+            + lk("/painel", "Painel", "painel") + lk("/vitrine", "Vitrine", "vitrine")
+            + lk("/config", "Config", "config")
+            + '<span class="sk-spacer"></span>'
+            '<a class="sk-btn sk-btn--secondary sk-btn--sm" href="/editor">✎ Abrir editor</a>'
+            '</div>')
+
+
 def config_html():
     """Tela read-only das configurações do sistema (como ele está se comportando)."""
     try:

@@ -5,11 +5,29 @@ Claro por padrão, escuro sob demanda. Roxo é a marca, lime é o segundo acento
 
 ## Arquivos
 
-| Arquivo | O que é |
-|---|---|
-| `smark-ds.css` | Folha única: tokens (CSS variables) + classes de componentes. Drop-in. |
-| `smark-design-system.html` | Página de referência interativa (offline), com todos os componentes e o toggle de tema. |
-| `README.md` | Este guia. |
+| Arquivo | O que é | Você usa? |
+|---|---|---|
+| `smark-ds.css` | **Folha única: tokens + TODAS as classes de componente (incl. editor).** Drop-in. | ✅ **É este que entra no seu sistema** |
+| `painel-corrigido.html` | Protótipo navegável de referência (Painel → Studio, Vitrine, Config). Abra no navegador. | 👁️ Alvo visual / de comportamento |
+| `smark-design-system.html` | Galeria de todos os componentes com toggle de tema. | 👁️ Consulta |
+| `README.md` | Este guia. | 📖 |
+
+## ⬇️ O que baixar e implementar
+
+Baixe a **pasta inteira**. Para colocar no seu sistema, o único arquivo que entra no código é **`smark-ds.css`**. Os `.html` são referência — abra no navegador pra ver como deve ficar/navegar.
+
+Passos:
+1. Copie `smark-ds.css` para os assets do seu projeto (ex.: `static/css/smark-ds.css`).
+2. No `<head>` do seu `painel.html` / editor, adicione o link e defina o tema na raiz:
+   ```html
+   <html data-theme="escuro">   <!-- seu painel é escuro; use "claro" na vitrine -->
+   <head><link rel="stylesheet" href="/static/css/smark-ds.css"></head>
+   <body class="sk"> … </body>
+   ```
+3. Troque a marcação das telas pelas classes `.sk-*` (mapa abaixo). Comece pela topbar e pela toolbar de filtros — é o que mais estava fora do padrão.
+4. Abra `painel-corrigido.html` lado a lado e vá casando tela por tela.
+
+
 
 ## Instalação
 
@@ -62,6 +80,27 @@ Todos os tokens (`--bg`, `--surface`, `--accent`, ...) recalculam sozinhos. Nenh
 - **Feedback:** `.sk-badge--info/warn/good/bad/accent` · `.sk-alert--info/warn/bad` · `.sk-toast` · `.sk-overlay/.sk-modal`
 - **Dados:** `.sk-table` `.sk-table-head` `.sk-table-row` `.sk-mono`
 
+## Padrões compostos (o que faltava)
+
+Cor sozinha não conserta layout. Estes padrões resolvem "menus, filtros e grupos de elementos fora do padrão":
+
+- **App shell:** `.sk-topbar` (barra fixa no topo — substitui botão flutuante de menu) + `.sk-navlink.is-active`
+- **Cabeçalho de página:** `.sk-pagehead` + `.sk-pagehead-actions` (título à esquerda, ações à direita)
+- **Barra de ferramentas:** `.sk-toolbar` com `.sk-filter-group` (rótulo + controle) e `.sk-toolbar-sep` (divisória)
+- **Filtro segmentado:** `.sk-segmented > button.is-active` — o padrão certo para status/marca (em vez de pills soltas espalhadas)
+- **Grade de cards:** `.sk-cardgrid` (auto-fill, colunas uniformes)
+- **Card de post:** `.sk-post` (`.is-selected`) → `.sk-post-thumb` (`.sk-post-check.is-on`, `.sk-post-channel`) · `.sk-post-body` · `.sk-post-title` (clamp 2 linhas) · `.sk-post-meta` · `.sk-post-actions` (grid de 4 ações uniformes; `.act-edit` / `.act-del` com hover próprio)
+- **Editor 3 colunas:** `.sk-editor` (`.sk-editor-rail` / `.sk-editor-canvas` / `.sk-editor-props`) + `.sk-prop-section`
+
+Veja `painel-corrigido.html` para o painel montado com esses padrões — use como alvo visual e de estrutura.
+
+### Antes → depois (as 4 correções principais)
+
+1. **Menu flutuante → topbar.** Troque o botão `≡ Menu` roxo solto por `.sk-topbar` com nav e busca.
+2. **Pills de filtro espalhadas → grupos segmentados.** `status:` e `marca:` viram dois `.sk-filter-group` com `.sk-segmented`, dentro de uma `.sk-toolbar`.
+3. **Ações do card desalinhadas → grid de 4.** `.sk-post-actions` força Ver/Editar/Dup/Excluir em 4 colunas iguais, sem quebra de linha.
+4. **Cards de altura irregular → estrutura fixa.** `.sk-post` é flex-column; thumb com `aspect-ratio`, título com clamp, meta e ações sempre no mesmo lugar.
+
 ### Exemplos
 
 ```html
@@ -96,6 +135,29 @@ Todos os tokens (`--bg`, `--surface`, `--accent`, ...) recalculam sozinhos. Nenh
 ```
 
 Os grids de `.sk-table-*` usam `grid-template-columns` inline para você controlar as colunas por tabela.
+
+## Navegação & telas (o novo layout)
+
+- **Topbar fixa** (`.sk-topbar`): marca à esquerda, `.sk-navlink` (Painel / Vitrine / Config — o ativo leva `.is-active`), busca e ações à direita. Substitui o botão flutuante `≡ Menu`.
+- **Troca de tela**: cada link mostra/esconde a `<section>` da view. No seu app pode ser rota (`/painel`, `/vitrine`, `/config`, `/editor`) ou toggle de `display`. O card e o "Novo post" levam ao editor.
+- Veja o fluxo montado em `painel-corrigido.html`.
+
+## Editor / Studio (a tela principal)
+
+Classes da seção 11 do CSS que compõem o super editor:
+
+- **Botão Estúdio IA:** `.sk-btn.sk-btn--studio`
+- **Shell 3 colunas:** `.sk-editor` → `.sk-editor-rail` (lista) · `.sk-editor-canvas` · `.sk-editor-props`
+- **Seção de propriedade:** `.sk-prop-section` + `.sk-prop-title`
+- **Rich toolbar:** `.sk-richbar` (`| quebra`, `★ acento`, **B**, *I*, cor) — acima de cada textarea
+- **Emojis:** `.sk-emojigrid`
+- **Sliders:** `.sk-slider-row > label + input.sk-slider` (zoom, posição, brilho, contraste, saturação)
+- **Grade de escolha:** `.sk-choicegrid > .sk-choice.is-active` (Camada por cima da imagem)
+- **Ação de IA paga:** `.sk-btn.sk-btn--ai` (contorno verde)
+- **Acordeão:** `.sk-accordion(.is-open) > .sk-accordion-head (.sk-accordion-chev) + .sk-accordion-body` (Estilo / Assinatura / Exportar)
+- **Selo na capa:** `.sk-selo > .sk-selo-mark`
+
+Comportamento (como no protótipo): os sliders aplicam `filter: brightness()/contrast()/saturate()` na camada de fundo do canvas; a Camada é um `<div>` sobreposto; o Tema do texto troca a cor do texto do canvas.
 
 ## Regras da marca
 

@@ -686,35 +686,6 @@
       ]
     },
     {
-      "slug": "teste-ia",
-      "marca": "smark",
-      "status": "rascunho",
-      "titulo": "Teste IA",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
-          "cta": "",
-          "page": "",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "imagem",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-ia/01.png"
-        }
-      ],
-      "caption": "",
-      "canais": [
-        "instagram"
-      ]
-    },
-    {
       "titulo": "Torcida com Pelé pelo Brasil",
       "slug": "prova-40-mais-qualidade-com-ia",
       "marca": "smark",
@@ -733,7 +704,7 @@
           "chip": false,
           "grade": true,
           "bgmode": "imagem",
-          "page": "",
+          "page": "01/02",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/prova-40-mais-qualidade-com-ia/_regen/01-60d818.png",
           "_v": 1,
           "zoom": 1,
@@ -743,7 +714,54 @@
           "overlay_op": 0,
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/prova-40-mais-qualidade-com-ia/01.png"
+        },
+        {
+          "headline": "NOVO|*CARD.*",
+          "sub": "",
+          "cta": "",
+          "page": "02/02",
+          "chip": false,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/prova-40-mais-qualidade-com-ia/02.png"
         }
+      ]
+    },
+    {
+      "slug": "elever-crm",
+      "marca": "elever-ai",
+      "status": "rascunho",
+      "titulo": "ELEVER CRM",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_regen/01-7e608f.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/01.png",
+          "_v": 2,
+          "overlay": "todo-branco"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
       ]
     }
   ]
