@@ -1319,7 +1319,11 @@
           "n": 1,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/01.png",
           "_v": 6,
-          "_accOpen": true
+          "_accOpen": true,
+          "overlay": "branco",
+          "overlay_op": 1,
+          "ov_ang": 0,
+          "ov_pos": 0
         }
       ],
       "caption": "Na loja de móveis, cada cliente pede atenção: o que gostou, quando volta, o que ficou de fechar. O Elever CRM guarda tudo isso no lugar certo e lembra você na hora certa. Menos anotação solta, mais tempo pra vender bem.\n\n#lojasdemoveis #crm #inteligenciaartificial #gestao",
