@@ -1015,7 +1015,7 @@
           "tema": "claro",
           "chip": false,
           "grade": true,
-          "bgmode": "cor",
+          "bgmode": "imagem",
           "page": "01/03",
           "cor": "#0d0821",
           "n": 1,

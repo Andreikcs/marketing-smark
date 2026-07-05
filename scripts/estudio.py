@@ -195,11 +195,13 @@ def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=Non
     # PADRÃO CLARO forte (regra #9): se o usuário não pediu escuro em lugar nenhum, força claro.
     hist_user = " ".join(m.get("content", "") for m in (historico or []) if m.get("role") == "user")
     quer_esc = _quer_escuro(pedido + " " + hist_user + " " + (contexto or ""))
-    if not quer_esc:
+    # com imagem de exemplo, o exemplo dita o tom (não força claro)
+    forcar = (not quer_esc) and (not imagem_b64)
+    if forcar:
         res["tema"] = "claro"
         for fr in res["frames"]:
             fr["tema"] = "claro"
-    res["forcado_claro"] = not quer_esc
+    res["forcado_claro"] = forcar
     return res, prov
 
 
