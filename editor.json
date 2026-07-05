@@ -33,14 +33,14 @@
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_regen/04-51cbfd.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_uploads/5f3afa1194.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/02.png",
           "n": 2,
-          "_v": 2
+          "_v": 3
         },
         {
           "headline": "NINGUÉM FALA EM|*SUBSTITUIR GENTE.*",
@@ -142,21 +142,20 @@
           "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-5af6a9.png"
         },
         {
-          "headline": "*NINA*",
-          "sub": "Pré-vendas. Nenhuma {#8b3cf7:oportunidade} fica sem resposta porque \"não deu tempo\". Seu time só investe energia em quem realmente importa.",
+          "headline": "NOVO|*CARD.*",
+          "sub": "",
           "cta": "",
           "page": "03/09",
           "chip": false,
-          "tema": "escuro",
+          "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
-          "cor": "",
+          "bg": "",
+          "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/03.png",
           "n": 3,
-          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n"
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/03.png"
         },
         {
           "headline": "*NINA*",
@@ -193,26 +192,21 @@
           "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n"
         },
         {
-          "headline": "*TÉO*",
-          "sub": "Prospecção. A agenda comercial que vive vazia porque prospectar toma tempo que ninguém tem — abastecida sem depender de ânimo",
+          "headline": "*NINA*",
+          "sub": "Pré-vendas. Nenhuma {#8b3cf7:oportunidade} fica sem resposta porque \"não deu tempo\". Seu time só investe energia em quem realmente importa.",
           "cta": "",
           "page": "06/09",
           "chip": false,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-5af6a9.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
           "cor": "",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/06.png",
           "n": 6,
-          "_v": 7,
-          "contexto": "\"o Téo, um caçador/atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
-          "overlay": "none",
-          "overlay_op": 0,
-          "posx": 0,
-          "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-5af6a9.png"
+          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n"
         },
         {
           "headline": "*Clara*",

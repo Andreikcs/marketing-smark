@@ -176,6 +176,17 @@ input[type=range]{accent-color:var(--accent)}
 .esrow textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .esrow .send{background:var(--accent);color:var(--accent-ink);border:0;border-radius:11px;padding:0 16px;height:44px;font-weight:600;cursor:pointer}
 .esrow .send:disabled{opacity:.5;cursor:wait}
+
+/* ===================== PROGRESSO DE GERAÇÃO DE IA ===================== */
+.genprog{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;gap:13px;background:color-mix(in srgb,var(--bg) 74%,transparent);backdrop-filter:blur(4px);border-radius:4px;text-align:center;padding:20px}
+.genprog.on{display:flex}
+.genprog .ring{width:52px;height:52px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--accent);animation:genspin .9s linear infinite}
+@keyframes genspin{to{transform:rotate(360deg)}}
+.genprog .lbl{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:19px;color:var(--text)}
+.genprog .stg{font-size:13px;color:var(--sub)}
+.genprog .barw{width:240px;max-width:72%;height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+.genprog .bar{height:100%;width:4%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:99px;transition:width .5s ease}
+.genprog .gent{font-size:11px;color:var(--muted)}
 </style></head>
 <body>
 <div class=app>
@@ -205,6 +216,13 @@ input[type=range]{accent-color:var(--accent)}
       <button class="stagenav l" id=bmvl title="mover card p/ esquerda">◀</button>
       <div class=framebox id=fbox><iframe id=pv></iframe></div>
       <button class="stagenav r" id=bmvr title="mover card p/ direita">▶</button>
+      <div class=genprog id=genprog>
+        <div class=ring></div>
+        <div class=lbl id=genlbl>Gerando fundo com IA…</div>
+        <div class=stg id=genstg>enviando pedido…</div>
+        <div class=barw><div class=bar id=genbar></div></div>
+        <div class=gent id=gent>0s · fica na tela, atualiza sozinho quando terminar</div>
+      </div>
     </div>
     <div class=gallery>
       <div class=cardacts>
