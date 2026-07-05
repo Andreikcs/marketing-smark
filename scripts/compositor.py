@@ -260,11 +260,12 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
         bg_css = MESH_CLARO if tema == "claro" else MESH_ESCURO
 
     hsz = hsize if hsize > 0 else min(auto_hsize(headline), 92 if cta else 104)
-    ovx_bg = OVX_PRESETS.get(overlay, "none")
+    ovx_bg = _ovx_bg(overlay, ov_ang, ov_pos)
     ovx_op = 0 if overlay == "none" else max(0.0, min(1.0, float(overlay_op)))
     cssvars = {"W": w, "H": h, "BG": bg_css, "ACCENT": accent_c, "SQUARE": square, "ONACC": on_acc,
                "HSIZE": hsz, "TABF": tab_font(b["tab"]), "GRAIN": GRAIN,
-               "POSX": posx, "POSY": posy, "ZOOM": zoom, "OVX": ovx_bg, "OVXO": ovx_op}
+               "POSX": posx, "POSY": posy, "ZOOM": zoom, "OVX": ovx_bg, "OVXO": ovx_op,
+               "BRI": brilho, "CON": contraste, "SAT": satur}
     cssvars.update(T)
     css = CSS % cssvars
 

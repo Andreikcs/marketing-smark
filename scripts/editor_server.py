@@ -145,16 +145,19 @@ def hl(text):
     return (text or "").replace("|", "\\n")
 
 
-def frame_kwargs(fr, size, for_export):
+def frame_kwargs(fr, size, for_export, marca="smark"):
     """Traduz um frame do editor.json nos kwargs do compose_html.
     for_export=True embute a imagem (base64, render headless); False usa URL estática (preview leve)."""
-    k = dict(marca="smark", headline=hl(fr.get("headline", "")), sub=fr.get("sub", ""),
+    k = dict(marca=marca, headline=hl(fr.get("headline", "")), sub=fr.get("sub", ""),
              cta=fr.get("cta", ""), page=fr.get("page", ""), no_chip=not fr.get("chip", False),
              tema=fr.get("tema", "escuro"), size=size, hsize=int(fr.get("hsize", 0) or 0),
              accent=fr.get("accent", ""), no_grade=not fr.get("grade", True),
              zoom=float(fr.get("zoom", 1.0) or 1.0), posx=int(fr.get("posx", 50)),
              posy=int(fr.get("posy", 50)), overlay=fr.get("overlay", "none"),
-             overlay_op=float(fr.get("overlay_op", 0.85)))
+             overlay_op=float(fr.get("overlay_op", 0.85)),
+             ov_ang=int(fr.get("ov_ang", 180)), ov_pos=int(fr.get("ov_pos", 20)),
+             brilho=float(fr.get("brilho", 1.0)), contraste=float(fr.get("contraste", 1.0)),
+             satur=float(fr.get("satur", 1.0)))
     mode = fr.get("bgmode", "imagem")
     if mode == "imagem" and fr.get("bg"):
         if for_export:
@@ -174,8 +177,9 @@ def frame_kwargs(fr, size, for_export):
 
 def normaliza(d):
     """Garante n sequencial e caminho 'out' pra todo frame (permite adicionar/remover cards)."""
-    A = "marcas/smark/publicacoes/social/instagram/arte"
     for p in d.get("posts", []):
+        marca = p.get("marca", "smark")
+        A = f"marcas/{marca}/publicacoes/social/instagram/arte"
         for i, fr in enumerate(p.get("frames", []), 1):
             fr["n"] = i
             fr["out"] = f"{A}/{p['slug']}/{i:02d}.png"
@@ -262,7 +266,8 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/preview":
             try:
                 html, _, _ = compositor.compose_html(**frame_kwargs(req.get("frame", {}),
-                                                     req.get("size", "1080x1350"), for_export=False))
+                                                     req.get("size", "1080x1350"), for_export=False,
+                                                     marca=req.get("marca", "smark")))
                 return self._send(200, html, MIME[".html"])
             except Exception as e:
                 return self._send(200, f"<pre style='color:#f66;font-family:monospace;padding:20px'>preview erro: {e}</pre>", MIME[".html"])
@@ -277,10 +282,13 @@ class H(http.server.BaseHTTPRequestHandler):
                 or ("novo-" + secrets.token_hex(3))
             if any(p["slug"] == slug for p in d["posts"]):
                 slug = slug + "-" + secrets.token_hex(2)
+            marca = req.get("marca", "smark")
+            if marca not in ("smark", "provider-max", "elever-ai"):
+                marca = "smark"
             fr = {"headline": "SEU TÍTULO|*AQUI.*", "sub": "", "cta": "", "page": "01/01",
                   "chip": True, "tema": "claro", "bgmode": "claro", "bg": "", "cor": "#F4F2FB",
                   "accent": "", "hsize": 0, "grade": True}
-            d["posts"].append({"slug": slug, "marca": "smark",
+            d["posts"].append({"slug": slug, "marca": marca, "status": "rascunho",
                                "titulo": req.get("titulo") or "Novo post", "size": "1080x1350",
                                "frames": [fr]})
             save(normaliza(d))
@@ -295,7 +303,8 @@ class H(http.server.BaseHTTPRequestHandler):
                 feitas = []
                 for i in idxs:
                     fr = post["frames"][i]
-                    kw = frame_kwargs(fr, post.get("size", "1080x1350"), for_export=True)
+                    kw = frame_kwargs(fr, post.get("size", "1080x1350"), for_export=True,
+                                      marca=post.get("marca", "smark"))
                     html, w, h = compositor.compose_html(**kw)
                     out = fr.get("out") or f"{os.path.dirname(post['frames'][0].get('out',''))}/{i+1:02d}.png"
                     if compositor.render_html_to_png(html, out, w, h):
@@ -309,7 +318,8 @@ class H(http.server.BaseHTTPRequestHandler):
                 data = req["dataurl"].split(",", 1)[1]
                 raw = base64.b64decode(data)
                 slug = req.get("slug", "avulso")
-                dd = os.path.join(VAULT, "marcas", "smark", "publicacoes", "social", "instagram",
+                marca = req.get("marca", "smark")
+                dd = os.path.join(VAULT, "marcas", marca, "publicacoes", "social", "instagram",
                                   "arte", slug, "_uploads")
                 os.makedirs(dd, exist_ok=True)
                 name = hashlib.sha1(raw).hexdigest()[:10] + ".png"
@@ -325,7 +335,8 @@ class H(http.server.BaseHTTPRequestHandler):
                 post = d["posts"][req["post"]]
                 fr = post["frames"][req["frame"]]
                 slug = post["slug"]
-                dd = os.path.join(VAULT, "marcas", "smark", "publicacoes", "social", "instagram",
+                marca = post.get("marca", "smark")
+                dd = os.path.join(VAULT, "marcas", marca, "publicacoes", "social", "instagram",
                                   "arte", slug, "_regen")
                 os.makedirs(dd, exist_ok=True)
                 out = os.path.join(dd, f"{req['frame']+1:02d}-{hashlib.sha1(str(req).encode()).hexdigest()[:6]}.png")
@@ -341,7 +352,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 else:  # direção de arte
                     tema = req.get("tema", "claro")  # PADRÃO CLARO (rule #9)
                     cmd = ["python3", os.path.join(HERE, "openai_image.py"), "--out", out, "--direcao",
-                           "--marca", "smark", "--tipo", req.get("tipo", "manifesto"),
+                           "--marca", marca, "--tipo", req.get("tipo", "manifesto"),
                            "--tema", tema, "--headline", (fr.get("headline", "") or "").replace("|", " "),
                            "--size", "1024x1536", "--quality", "high"]
                 r = subprocess.run(cmd, cwd=VAULT, capture_output=True, text=True)

@@ -68,6 +68,15 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .igcap{padding:0 14px;font-size:13px;line-height:1.4}
 .igcard textarea{width:calc(100% - 28px);margin:0 14px;background:#f4f2f8;border:1px solid #ddd;border-radius:8px;color:#111;padding:9px;font-size:13px;font-family:inherit}
 .igbtns{display:flex;gap:8px;padding:12px 14px 0}.igbtns .btn{color:#111;background:#eee;border-color:#ddd}.igbtns .btn.go{background:#8b3cf7;color:#fff;border-color:#8b3cf7}
+.grp h5{cursor:pointer;user-select:none;display:flex;justify-content:space-between}
+.grp h5::after{content:'▾';color:var(--sub)} .grp.collapsed h5::after{content:'▸'}
+.grp.collapsed>*:not(h5){display:none}
+.emobar{display:flex;flex-wrap:wrap;gap:3px;margin-top:8px}
+.emob{border:1px solid var(--line);background:#15121e;border-radius:6px;padding:2px 6px;font-size:15px;cursor:pointer;line-height:1.2}
+.emob:hover{border-color:var(--rox)}
+.gallery{border-top:1px solid var(--line);background:var(--pan)}
+.pitem small .stb{margin-left:6px}
+.th{cursor:grab} .th.drag{opacity:.4}
 </style></head>
 <body>
 <div class=app>
@@ -87,9 +96,11 @@ input[type=range]{width:100%;accent-color:var(--rox)}
   </aside>
 
   <div class=main>
-    <div class=strip id=strip></div>
-    <div class=cardacts><button id=bmvl>◀ Mover</button><button id=baddc>＋ Adicionar card</button><button id=bsim>📱 Instagram</button><button class=del id=bdelc>🗑 Excluir card</button><button id=bmvr>Mover ▶</button></div>
     <div class=stage><div class=framebox id=fbox><iframe id=pv></iframe></div></div>
+    <div class=gallery>
+      <div class=cardacts><button id=bmvl>◀ Mover</button><button id=baddc>＋ Adicionar card</button><button id=bsim>📱 Instagram</button><button class=del id=bdelc>🗑 Excluir card</button><button id=bmvr>Mover ▶</button></div>
+      <div class=strip id=strip></div>
+    </div>
   </div>
 
   <aside class=ctrl id=ctrl></aside>
@@ -265,7 +276,7 @@ async function moveCard(dir){
 
 async function preview(){
   const r=await fetch('/preview',{method:'POST',headers:HJSON,
-    body:JSON.stringify({frame:frame(),size:post().size})});
+    body:JSON.stringify({frame:frame(),size:post().size,marca:post().marca||'smark'})});
   const html=await r.text();
   $('#pv').srcdoc=html;
   fit();
