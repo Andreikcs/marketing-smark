@@ -1046,6 +1046,59 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/um-funcionario-de-ia-em-cada-departament/03.png"
         }
       ]
+    },
+    {
+      "slug": "elever-crm-bbdd",
+      "marca": "elever-ai",
+      "status": "rascunho",
+      "titulo": "IA para o setor automotivo",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "Sua loja de carros e motos|com um *funcionário de IA*",
+          "sub": "Ele atende, organiza e não dorme.",
+          "cta": "",
+          "page": "01/03",
+          "chip": true,
+          "tema": "escuro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/01.png"
+        },
+        {
+          "headline": "Ele *responde* cada cliente|e agenda a visita",
+          "sub": "Enquanto sua equipe cuida do que importa.",
+          "cta": "",
+          "tema": "escuro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "02/03",
+          "n": 2,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/02.png"
+        },
+        {
+          "headline": "Coloque a *IA* pra pilotar|a rotina do seu negócio",
+          "sub": "Menos tempo perdido, mais controle.",
+          "cta": "Diagnóstico gratuito • link na bio",
+          "tema": "escuro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "03/03",
+          "n": 3,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm-bbdd/03.png"
+        }
+      ],
+      "caption": "Concessionária, loja de motos ou revenda: seu time perde horas respondendo a mesma coisa. Um funcionário de IA atende, tira dúvida e agenda a visita sem parar. Sua equipe fica livre pra fechar negócio olho no olho. Comece com um diagnóstico gratuito.\n\n#automotivo #concessionaria #revenda #inteligenciaartificial",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
