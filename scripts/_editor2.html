@@ -7,6 +7,18 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--txt);font-family:var(--font-text);height:100vh;overflow:hidden}
 .app{display:grid;grid-template-columns:200px 1fr 320px;grid-template-rows:52px 1fr;height:100vh}
+#welcome{display:none;grid-column:2/4;background:var(--bg);align-items:center;justify-content:center;overflow:auto;padding:40px}
+.app.welcome #welcome{display:flex}
+.app.welcome .main,.app.welcome .ctrl{display:none}
+.wc{max-width:840px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.wicon{width:76px;height:76px;border-radius:20px;background:linear-gradient(155deg,#9A4DFF,#2A1CA8);display:flex;align-items:center;justify-content:center;box-shadow:0 14px 44px rgba(139,60,247,.4)}
+.wtitle{font-family:var(--font-text);font-weight:800;font-size:34px;color:var(--txt);margin:6px 0 0}.wlt{color:var(--muted);font-weight:600}
+.wsub{color:var(--sub);font-size:15px;line-height:1.6;max-width:540px}
+.wcards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px;width:100%}
+.wcard{text-align:left;background:var(--pan);border:1px solid var(--line);border-radius:14px;padding:18px 16px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:6px;min-height:104px;box-shadow:var(--shadow)}
+.wcard:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--pan2)}
+.wcard b{font-size:15px;color:var(--txt)}.wcard span{font-size:12.5px;color:var(--muted);line-height:1.4}
+.wtip{color:var(--muted);font-size:12px;margin-top:10px}
 header{grid-column:1/4;display:flex;align-items:center;gap:10px;padding:0 18px;border-bottom:1px solid var(--line);background:var(--pan)}
 header .sp{flex:1}
 .hlogo{display:inline-flex;align-items:center;gap:8px;text-decoration:none;margin-right:4px}
@@ -290,6 +302,20 @@ input[type=range]{accent-color:var(--accent)}
   </div>
 
   <aside class=ctrl id=ctrl></aside>
+  <div id=welcome>
+    <div class=wc>
+      <div class=wicon><svg viewBox="0 0 100 100" width=34 height=34><path fill-rule=evenodd fill=#fff d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></div>
+      <h1 class=wtitle>smark<span style="color:var(--accent)">.</span> <span class=wlt>studio</span></h1>
+      <div class=wsub>Bem-vindo 👋 Comece um projeto novo, peça pro Estúdio IA criar, ou continue de onde parou.</div>
+      <div class=wcards>
+        <button class=wcard data-a=novo><b>＋ Novo projeto</b><span>Um post do zero</span></button>
+        <button class=wcard data-a=ia><b>✦ Criar com Estúdio IA</b><span>Você descreve, a IA monta copy + arte</span></button>
+        <button class=wcard data-a=painel><b>▦ Abrir o Painel</b><span>Ver todas as publicações</span></button>
+        <button class=wcard data-a=ultimo><b>↩ Continuar o último</b><span>Retoma o projeto mais recente</span></button>
+      </div>
+      <div class=wtip>ou escolha uma publicação na lista à esquerda</div>
+    </div>
+  </div>
 </div>
 <div id=igmodal class=igmodal></div>
 <div id=fsmodal class=fsmodal><button class=x id=fsx>✕ fechar</button><iframe id=fsif></iframe></div>
@@ -327,7 +353,15 @@ function syncAllPages(){((D&&D.posts)||[]).forEach(syncPages)}
 
 async function carregar(){D=await(await fetch('/dados')).json();syncAllPages();renderPosts();
   const q=new URLSearchParams(location.search);let pi=parseInt(q.get('post'));
-  if(isNaN(pi)||pi<0||pi>=D.posts.length)pi=0;sel(pi,0)}
+  if(!isNaN(pi)&&pi>=0&&pi<D.posts.length){hideWelcome();sel(pi,0)}else{showWelcome()}}
+function showWelcome(){$('.app').classList.add('welcome');PI=-1;renderPosts()}
+function hideWelcome(){$('.app').classList.remove('welcome')}
+document.querySelectorAll('#welcome .wcard').forEach(c=>c.onclick=()=>{const a=c.dataset.a;
+  if(a==='novo')novoPost();
+  else if(a==='ia'){const b=document.getElementById('bestudio');if(b)b.click()}
+  else if(a==='painel')location.href='/painel';
+  else if(a==='ultimo'){if(D&&D.posts.length){sel(D.posts.length-1,0)}else novoPost()}
+});
 
 let PSEARCH='';
 function renderPosts(){
@@ -360,6 +394,7 @@ async function delSelected(){
   await salvar(true);await reload(Math.min(PI,D.posts.length-1),0);toast('Excluído(s)');
 }
 function renderStrip(){
+  if(!D||!D.posts[PI])return;
   const el=$('#strip');el.innerHTML='';
   post().frames.forEach((f,i)=>{
     const d=document.createElement('div');d.className='th'+(i===FI?' on':'');
@@ -379,7 +414,7 @@ async function reorderFrame(from,to){
   if(from===to||isNaN(from))return;const fr=post().frames;const[m]=fr.splice(from,1);fr.splice(to,0,m);
   await salvar(true);await reload(PI,to);toast('Reordenado');
 }
-function sel(pi,fi){PI=pi;FI=fi;renderPosts();renderStrip();renderCtrl();preview()}
+function sel(pi,fi){hideWelcome();PI=pi;FI=fi;renderPosts();renderStrip();renderCtrl();preview()}
 
 function fmtSize(s){return ({'1080x1350':'Feed 4:5','1080x1080':'Quadrado 1:1','1080x1920':'Story 9:16'})[s]||'Feed 4:5'}
 function fld(label,val,onin,ph,rows,key){
@@ -424,6 +459,7 @@ function richField(label,val,onin,key){
 }
 
 function renderCtrl(){
+  if(!D||!D.posts[PI]){const c=$('#ctrl');if(c)c.innerHTML='';return}
   const f=frame(),c=$('#ctrl');c.innerHTML='';
   // PUBLICAÇÃO (canais)
   const gp=document.createElement('div');gp.className='grp';gp.innerHTML='<h5>Publicação — canais</h5>';
@@ -543,6 +579,7 @@ function applyCollapse(){
 }
 
 async function preview(){
+  if(!D||!D.posts[PI])return;
   const r=await fetch('/preview',{method:'POST',headers:HJSON,
     body:JSON.stringify({frame:frame(),size:post().size,marca:post().marca||'smark'})});
   const html=await r.text();
@@ -781,7 +818,7 @@ document.addEventListener('keydown',e=>{
     if(k==='i'){e.preventDefault();fmtActive('_');return}
     return;
   }
-  if(!typing){
+  if(!typing&&post()){
     if(e.key==='ArrowLeft'){e.preventDefault();if(FI>0)sel(PI,FI-1)}
     else if(e.key==='ArrowRight'){e.preventDefault();if(FI<post().frames.length-1)sel(PI,FI+1)}
   }
