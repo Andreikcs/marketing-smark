@@ -1706,6 +1706,75 @@
         }
       ],
       "caption": ""
+    },
+    {
+      "slug": "amor-f41b",
+      "marca": "provider-max",
+      "status": "rascunho",
+      "titulo": "Amor",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "01/02",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "cor",
+          "bg": "",
+          "cor": "#947ee2",
+          "accent": "#53347f",
+          "hsize": 63,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/amor-f41b/01.png",
+          "overlay": "branco"
+        },
+        {
+          "headline": "NOVO|*CARD.*",
+          "sub": "",
+          "cta": "",
+          "page": "02/02",
+          "chip": false,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 2,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/amor-f41b/02.png"
+        }
+      ],
+      "caption": ""
+    },
+    {
+      "slug": "novo-post",
+      "marca": "elever-ai",
+      "status": "rascunho",
+      "titulo": "Novo post",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "CRM DE IA |para {#8b3cf7:lojas de móveis}",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/01.png"
+        }
+      ],
+      "caption": ""
     }
   ]
 }
