@@ -1753,25 +1753,28 @@
     {
       "slug": "novo-post",
       "marca": "elever-ai",
-      "status": "rascunho",
+      "status": "salvo",
       "titulo": "Novo post",
       "size": "1080x1350",
       "frames": [
         {
           "headline": "CRM DE IA |para {#8b3cf7:lojas de móveis}",
-          "sub": "",
-          "cta": "",
+          "sub": "Como R$ 200,00",
+          "cta": "Teste agora e veja",
           "page": "",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
+          "bgmode": "imagem",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/_uploads/61883a72dc.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/01.png"
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/01.png",
+          "_v": 1,
+          "overlay": "branco",
+          "overlay_op": 1
         }
       ],
       "caption": ""
