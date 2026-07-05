@@ -112,6 +112,15 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .pitem small .stb{margin-left:6px}
 .th{cursor:grab} .th.drag{opacity:.4}
 .sidehead{position:sticky;top:0;background:var(--pan);padding-bottom:9px;margin-bottom:9px;border-bottom:1px solid var(--line);z-index:3}
+.sidetop{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sidetitle{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}
+#bsidecol{background:transparent;border:0;color:var(--sub);cursor:pointer;font-size:16px;padding:2px 7px;border-radius:6px}
+#bsidecol:hover{background:var(--pan2);color:var(--txt)}
+.app.sidecol{grid-template-columns:0 1fr 320px}
+.app.sidecol .side{display:none}
+#reopenside{display:none;position:fixed;left:0;top:60px;z-index:20;width:30px;height:46px;border:1px solid var(--line);border-left:0;background:var(--pan);color:var(--txt);border-radius:0 10px 10px 0;cursor:pointer;font-size:16px}
+.app.sidecol #reopenside{display:flex;align-items:center;justify-content:center}
+#reopenside:hover{background:var(--pan2);border-color:var(--accent)}
 .psearch{width:100%;background:#0f0d17;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 9px;font-size:12px;margin-top:7px}
 .psearch:focus{outline:none;border-color:var(--rox)}
 .vermais{display:block;text-align:center;color:var(--rox);font-size:12px;text-decoration:none;padding:9px;margin-top:8px;border:1px dashed var(--line);border-radius:9px}
@@ -246,12 +255,14 @@ input[type=range]{accent-color:var(--accent)}
 
   <aside class=side>
     <div class=sidehead>
+      <div class=sidetop><span class=sidetitle>Publicações</span><button id=bsidecol title="recolher lista">«</button></div>
       <div class=sideacts><button id=bnew>＋ Novo</button><button id=bdup>⧉ Duplicar</button><button class=del id=bdelpost>🗑 Excluir</button></div>
       <input id=psearch class=psearch placeholder="buscar publicação…">
     </div>
     <div id=posts></div>
     <a class=vermais id=vermais href="/painel">ver todas no Painel →</a>
   </aside>
+  <button id=reopenside title="abrir lista">»</button>
 
   <div class=main>
     <div class=stage>
@@ -522,7 +533,6 @@ async function moveCard(dir){
   [fr[FI],fr[j]]=[fr[j],fr[FI]];await salvar(true);await reload(PI,j);toast('Ordem alterada');
 }
 const COLLAPSED=new Set();
-['Estilo','Assinatura (rodapé)','Exportar'].forEach(t=>COLLAPSED.add(t));
 const SEL=new Set();
 function applyCollapse(){
   document.querySelectorAll('#ctrl .grp').forEach(g=>{
@@ -722,7 +732,9 @@ $('#bnew').onclick=novoPost;$('#baddc').onclick=addCard;$('#bdelc').onclick=delC
 $('#bmvl').onclick=()=>{if(FI>0)sel(PI,FI-1)};$('#bmvr').onclick=()=>{if(FI<post().frames.length-1)sel(PI,FI+1)};
 $('#bsim').onclick=openSim;$('#bdup').onclick=dupPost;$('#bdelpost').onclick=delSelected;
 // menu do card = duplicar / baixar (reordenar = arrastar na tira, ou ◀▶ do teclado com card focado)
-$('#bdupc').onclick=dupFrame;$('#bdl').onclick=baixar;
+$('#bdupc').onclick=dupFrame;
+$('#bsidecol').onclick=()=>$('.app').classList.add('sidecol');
+$('#reopenside').onclick=()=>$('.app').classList.remove('sidecol');
 $('#psearch').oninput=e=>{PSEARCH=e.target.value;renderPosts()};
 async function dupFrame(){const c=JSON.parse(JSON.stringify(frame()));delete c._v;post().frames.splice(FI+1,0,c);await salvar(true);await reload(PI,FI+1);toast('Card duplicado')}
 async function baixar(){

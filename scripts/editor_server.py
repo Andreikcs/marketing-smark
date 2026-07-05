@@ -160,6 +160,16 @@ tr:last-child td{{border-bottom:0}}
 <div style="margin-top:14px"><button class="sk-btn" id=cf_save>💾 Salvar configurações</button> <span id=cf_msg class=ok></span></div>
 </div>
 
+<div class="sk-card"><div class=gh>Estilo padrão (automático)</div>
+<div style="color:var(--muted);font-size:13px;line-height:1.7">
+Saíram do editor pra cá — o editor fica limpo e tudo automático. Ajuste aqui só se precisar:
+<div class=kv style="margin-top:10px">
+<div class=cell><b>Acento</b> (palavra em *): cor da marca (edite na tabela de marcas abaixo)</div>
+<div class=cell><b>Tamanho do título</b>: automático</div>
+<div class=cell><b>Grade de acabamento</b> (duotone+grão): ligada</div>
+<div class=cell><b>Assinatura</b> (rodapé/handle): padrão da marca/sistema</div>
+</div></div></div>
+
 <div class="sk-card"><div class=gh>Marcas (cores / degradê / handle editável)</div>
 <table><tr><th>Marca</th><th>Acento</th><th>Acento claro</th><th>Degradê</th><th>Handle</th></tr>{rows_m}</table></div>
 
