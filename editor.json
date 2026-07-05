@@ -503,7 +503,7 @@
           "page": "",
           "chip": false,
           "tema": "escuro",
-          "bgmode": "imagem",
+          "bgmode": "degrade",
           "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/claude-code-10x/01.png",
           "raw": true,
           "grade": false,
