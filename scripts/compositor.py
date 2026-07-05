@@ -124,22 +124,24 @@ def render_headline(text):
 
 
 def render_rich(text):
-    """Formatação: '|' ou '\\n' = quebra · **negrito** · _itálico_ · *acento* · {#hex|texto} = cor livre."""
-    lines = []
-    for line in (text or "").replace("|", "\\n").split("\\n"):
-        s = esc(line)
-        # cor {#hex:texto} — resolve de dentro pra fora (tolera aninhamento) e limpa artefatos
-        for _ in range(12):
-            new = re.sub(r"\{(#[0-9a-fA-F]{3,6}):([^{}]*)\}", r'<span style="color:\1">\2</span>', s)
-            if new == s:
-                break
-            s = new
-        s = s.replace("{", "").replace("}", "")
-        s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
-        s = re.sub(r"_(.+?)_", r"<i>\1</i>", s)
-        s = re.sub(r"\*(.+?)\*", r'<span class="v">\1</span>', s)
-        lines.append(s)
-    return "<br>".join(lines)
+    """Formatação: '|' ou '\\n'/Enter = quebra · **negrito** · _itálico_ · *acento* · {#hex:texto} = cor.
+    Processa os marcadores no TEXTO INTEIRO antes de quebrar linhas — assim uma quebra dentro de
+    {#hex:...} ou *...* não parte o marcador (bug corrigido)."""
+    # normaliza toda quebra (| e \\n do hl e newline real) para um marcador único invisível
+    s = esc((text or "").replace("\r", "").replace("|", "\n").replace("\\n", "\n"))
+    BR = "\x00BR\x00"
+    s = s.replace("\n", BR)
+    # cor {#hex:texto} — resolve aninhamento e limpa artefatos
+    for _ in range(12):
+        new = re.sub(r"\{(#[0-9a-fA-F]{3,6}):([^{}]*)\}", r'<span style="color:\1">\2</span>', s)
+        if new == s:
+            break
+        s = new
+    s = s.replace("{", "").replace("}", "")
+    s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    s = re.sub(r"_(.+?)_", r"<i>\1</i>", s)
+    s = re.sub(r"\*(.+?)\*", r'<span class="v">\1</span>', s)
+    return s.replace(BR, "<br>")
 
 
 # Degradê claro da marca (fundo instantâneo, sem IA) — off-white → lavanda → roxo suave

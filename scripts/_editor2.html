@@ -380,33 +380,35 @@ function fld(label,val,onin,ph,rows,key){
 function richField(label,val,onin,key){
   const w=document.createElement('div');w.innerHTML='<label>'+label+'</label>';
   const ta=document.createElement('textarea');ta.rows=3;ta.value=val||'';ta.oninput=()=>onin(ta.value);ta.onfocus=()=>_lastTa=ta;if(key)ta.id='fld_'+key;
-  const wrap=(pre,suf)=>{const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value,sel=v.slice(s,e)||'texto';
-    ta.value=v.slice(0,s)+pre+sel+(suf||pre)+v.slice(e);ta.focus();
-    ta.selectionStart=s+pre.length;ta.selectionEnd=s+pre.length+sel.length;onin(ta.value)};
-  // pinta a seleção com a cor (hex). Preserva a seleção via savedSel (chips usam preventDefault).
-  const paint=(hex,ss)=>{const s=ss?ss.s:ta.selectionStart,e=ss?ss.e:ta.selectionEnd,v=ta.value;
-    if(s===e){toast('Selecione a palavra que quer pintar primeiro');return}
-    const txt=v.slice(s,e).replace(/\{#[0-9a-fA-F]{3,6}:/g,'').replace(/[{}]/g,'');
-    const insv='{'+hex+':'+txt+'}';ta.value=v.slice(0,s)+insv+v.slice(e);ta.focus();
-    ta.selectionStart=s;ta.selectionEnd=s+insv.length;onin(ta.value)};
-  // ATALHOS DE TECLADO: Ctrl/Cmd+B / I ; Enter = quebra de linha natural (já quebra na arte)
+  const getSel=ss=>ss||{s:ta.selectionStart,e:ta.selectionEnd};
+  const commit=(s,e,t)=>{ta.value=ta.value.slice(0,s)+t+ta.value.slice(e);ta.focus();ta.selectionStart=s;ta.selectionEnd=s+t.length;onin(ta.value)};
+  // remove marcador de cor e de acento (single *) de um trecho — evita aninhamento quebrado
+  const bare=t=>{t=t.replace(/\{#[0-9a-fA-F]{3,6}:/g,'').replace(/\}/g,'');
+    if(t.length>=2&&t[0]==='*'&&t[1]!=='*'&&t.slice(-1)==='*'&&t.slice(-2,-1)!=='*')t=t.slice(1,-1);return t};
+  const wrapBI=m=>{const{s,e}=getSel();const sel=ta.value.slice(s,e)||'texto';commit(s,e,m+sel+m)};
+  const accent=()=>{const{s,e}=getSel();if(s===e){toast('Selecione a palavra primeiro');return}commit(s,e,'*'+bare(ta.value.slice(s,e))+'*')};
+  const paint=(hex,ss)=>{const{s,e}=getSel(ss);if(s===e){toast('Selecione a palavra que quer pintar');return}commit(s,e,'{'+hex+':'+bare(ta.value.slice(s,e))+'}')};
   ta.addEventListener('keydown',ev=>{if(ev.ctrlKey||ev.metaKey){const k=ev.key.toLowerCase();
-    if(k==='b'){ev.preventDefault();wrap('**')}else if(k==='i'){ev.preventDefault();wrap('_')}}});
-  // linha 1: acento / B / I (+ dica de Enter e teclado)
+    if(k==='b'){ev.preventDefault();wrapBI('**')}else if(k==='i'){ev.preventDefault();wrapBI('_')}}});
+  // linha 1: acento / B / I
   const bar=document.createElement('div');bar.className='fmtbar';
-  [['★ acento','','realçar palavra (roxo)',()=>wrap('*')],['B','b','negrito · Ctrl+B',()=>wrap('**')],['I','i','itálico · Ctrl+I',()=>wrap('_')]]
+  [['★ acento','','realçar em roxo (exclusivo com cor)',accent],['B','b','negrito · Ctrl+B',()=>wrapBI('**')],['I','i','itálico · Ctrl+I',()=>wrapBI('_')]]
    .forEach(([lb,cls,tip,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.title=tip;
      b.onmousedown=e=>e.preventDefault();b.onclick=fn;bar.appendChild(b)});
   const hint=document.createElement('span');hint.className='fmthint';hint.textContent='Enter = quebra';bar.appendChild(hint);
   w.appendChild(bar);
-  // linha 2: cores — chips (acento/claro/escuro) + hex. Seleciona → clica → pinta.
-  const bar2=document.createElement('div');bar2.className='fmtbar';
+  // linha 2: cor — seletor visual (hex) + presets + campo hex. Seleciona a palavra e clica.
+  const bar2=document.createElement('div');bar2.className='fmtbar';let savedSel=null;
+  const col=document.createElement('input');col.type='color';col.value='#8B3CF7';col.className='fmtcol';col.title='escolher cor (visual) — aplica na seleção';
+  col.onmousedown=()=>savedSel=getSel();
+  col.oninput=()=>{const h=col.value.toUpperCase();hx.value=h;paint(h,(savedSel&&savedSel.s!==savedSel.e)?savedSel:null)};
+  bar2.appendChild(col);
   [['acento','#8B3CF7'],['claro','#FFFFFF'],['escuro','#100D1C']].forEach(([nm,hex])=>{
-    const b=document.createElement('button');b.type='button';b.className='fmtchip';b.title='pintar seleção · '+hex;
+    const b=document.createElement('button');b.type='button';b.className='fmtchip';b.title='pintar · '+hex;
     b.innerHTML='<span class=sw style="background:'+hex+'"></span>'+nm;b.onmousedown=e=>e.preventDefault();b.onclick=()=>paint(hex);bar2.appendChild(b)});
-  const hx=document.createElement('input');hx.type='text';hx.className='fmthex';hx.placeholder='#hex';hx.maxLength=7;hx.title='cor em hexadecimal — Enter aplica na seleção';
-  let sel2=null;hx.onfocus=()=>{sel2={s:ta.selectionStart,e:ta.selectionEnd}};
-  hx.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();let h=hx.value.trim();if(!/^#?[0-9a-fA-F]{6}$/.test(h)){toast('hex inválido (ex.: #8B3CF7)');return}if(h[0]!=='#')h='#'+h;paint(h,sel2);hx.value=''}};
+  const hx=document.createElement('input');hx.type='text';hx.className='fmthex';hx.placeholder='#hex';hx.maxLength=7;hx.value='#8B3CF7';hx.title='cor hexadecimal — Enter aplica na seleção';
+  hx.onfocus=()=>savedSel=getSel();
+  hx.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();let h=hx.value.trim();if(!/^#?[0-9a-fA-F]{6}$/.test(h)){toast('hex inválido (ex.: #8B3CF7)');return}if(h[0]!=='#')h='#'+h;h=h.toUpperCase();col.value=h;paint(h,savedSel)}};
   bar2.appendChild(hx);w.appendChild(bar2);
   w.appendChild(ta);return w;
 }
