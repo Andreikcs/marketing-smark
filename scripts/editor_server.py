@@ -169,6 +169,9 @@ def painel_html():
 .sk-pagehead h1{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:34px;line-height:.96;margin:6px 0 4px}
 .sk-pagehead .sub{color:var(--muted);font-size:13px}
 .thumbimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.thumbhost{position:absolute;inset:0;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px}
+.thumbfr{position:absolute;top:0;left:0;border:0;transform-origin:top left;pointer-events:none;background:#000}
+.chpill{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .chIG{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}.chIN{background:#0a66c2}
 </style></head><body class="sk">
 __TOPBAR__
@@ -204,7 +207,20 @@ __TOPBAR__
 const T="__EDITOR_TOKEN__";let D=null,FILT='',STATUSF='',MI=0,MP=0;const SEL=new Set();
 async function load(){D=await(await fetch('/dados')).json();render()}
 function brands(){return [...new Set(D.posts.map(p=>p.marca||'smark'))]}
-function chIcon(c){const cl=c==='linkedin'?'chIN':'chIG';const t=c==='linkedin'?'in':'IG';return '<span class="'+cl+'" style="padding:1px 5px;border-radius:4px">'+t+'</span>'}
+function chIcon(c){
+  if(c==='linkedin')return '<span class="chpill chIN" title=LinkedIn><svg viewBox="0 0 24 24" width=13 height=13 fill="#fff"><path d="M4.98 3.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.4 8.65 21 11 21 14v7h-4v-6.2c0-1.48-.03-3.4-2.07-3.4-2.07 0-2.39 1.62-2.39 3.29V21H9z"/></svg></span>';
+  return '<span class="chpill chIG" title=Instagram><svg viewBox="0 0 24 24" width=13 height=13 fill="none" stroke="#fff" stroke-width="2.1"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.6" cy="6.4" r="1.2" fill="#fff" stroke="none"/></svg></span>';}
+async function loadThumb(host,p){
+  try{
+    const fr=(p.frames||[])[0];if(!fr){host.innerHTML='sem arte';return}
+    const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
+    const html=await r.text();
+    const w=host.clientWidth||228,s=w/1080;
+    const ifr=document.createElement('iframe');ifr.className='thumbfr';
+    ifr.style.width='1080px';ifr.style.height='1350px';ifr.style.transform='scale('+s+')';
+    host.innerHTML='';host.appendChild(ifr);ifr.srcdoc=html;
+  }catch(e){host.textContent='sem arte'}
+}
 function seg(host,opts,cur,cb){host.innerHTML='';opts.forEach(([v,lb])=>{const b=document.createElement('button');b.textContent=lb;if(cur===v)b.className='is-active';b.onclick=()=>cb(v);host.appendChild(b)})}
 function render(){
   seg(document.getElementById('sfilters'),[['','Todos'],['rascunho','Rascunho'],['salvo','Salvo']],STATUSF,v=>{STATUSF=v;render()});
@@ -215,17 +231,16 @@ function render(){
     if(FILT&&(p.marca||'smark')!==FILT)return;
     if(STATUSF&&(p.status||'rascunho')!==STATUSF)return;
     n++;
-    const f0=p.frames&&p.frames[0];const cp=f0?((f0.bgmode==='imagem'&&f0.bg)?f0.bg:(f0.out||'')):'';
-    const cov=cp?('/'+cp+'?t='+Date.now()):'';
     const salvo=p.status==='salvo';
     const badge='<span class="sk-badge '+(salvo?'sk-badge--good':'sk-badge--warn')+'">'+(salvo?'salvo':'rascunho')+'</span>';
     const ch=(p.canais||['instagram']).map(chIcon).join('');
     const on=SEL.has(i);
     const c=document.createElement('div');c.className='sk-post'+(on?' is-selected':'');
+    c.dataset.pi=i;
     c.innerHTML='<div class="sk-post-thumb">'
+      +'<div class="thumbhost">carregando…</div>'
       +'<div class="sk-post-check'+(on?' is-on':'')+'" data-i="'+i+'">✓</div>'
       +'<div class="sk-post-channel">'+ch+'</div>'
-      +(cov?'<img class=thumbimg src="'+cov+'">':'sem arte')
       +'</div><div class="sk-post-body">'
       +'<div class="sk-post-title">'+(p.titulo||p.slug)+'</div>'
       +'<div class="sk-post-meta">'+(p.marca||'smark')+'<span class=sk-dot></span>'+(p.frames?p.frames.length:0)+' frames<span class=sk-dot></span>'+badge+'</div>'
@@ -237,6 +252,10 @@ function render(){
       +'</div></div>';
     g.appendChild(c)});
   document.getElementById('count').textContent=n+' publicação'+(n===1?'':'ões');
+  // lazy-load das miniaturas compiladas (mostra a headline, nunca quebra)
+  const io=new IntersectionObserver((es)=>{es.forEach(en=>{if(en.isIntersecting){const card=en.target;io.unobserve(card);
+    const host=card.querySelector('.thumbhost');const pi=+card.dataset.pi;if(host&&D.posts[pi])loadThumb(host,D.posts[pi])}})},{rootMargin:'200px'});
+  g.querySelectorAll('.sk-post').forEach(card=>io.observe(card));
 }
 document.getElementById('grid').addEventListener('click',e=>{
   const chk=e.target.closest('.sk-post-check');if(chk){const i=+chk.dataset.i;SEL.has(i)?SEL.delete(i):SEL.add(i);render();return}

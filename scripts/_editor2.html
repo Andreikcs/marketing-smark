@@ -338,16 +338,21 @@ function richField(label,val,onin,key){
     ta.selectionStart=s+pre.length;ta.selectionEnd=s+pre.length+sel.length;onin(ta.value)};
   const ins=t=>{const s=ta.selectionStart,v=ta.value;ta.value=v.slice(0,s)+t+v.slice(ta.selectionEnd);
     ta.focus();ta.selectionStart=ta.selectionEnd=s+t.length;onin(ta.value)};
-  [['↵ quebra','',()=>ins('|')],['★ acento','',()=>wrap('*')],['B','b',()=>wrap('**')],['I','i',()=>wrap('_')]]
-   .forEach(([lb,cls,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.onclick=fn;bar.appendChild(b)});
-  const col=document.createElement('input');col.type='color';col.value='#8b3cf7';col.className='fmtcol';col.title='cor';
-  const cbtn=document.createElement('button');cbtn.type='button';cbtn.className='fmtb';cbtn.textContent='🎨';cbtn.title='colorir seleção';
-  cbtn.onclick=()=>{const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value;
-    if(s===e){toast('Selecione o texto que quer colorir primeiro');return}
-    const sel=v.slice(s,e).replace(/\{#[0-9a-fA-F]{3,6}:/g,'').replace(/[{}]/g,'');
-    const ins='{'+col.value+':'+sel+'}';ta.value=v.slice(0,s)+ins+v.slice(e);ta.focus();
-    ta.selectionStart=s;ta.selectionEnd=s+ins.length;onin(ta.value)};
-  bar.appendChild(col);bar.appendChild(cbtn);
+  [['↵ quebra','','quebra de linha',()=>ins('|')],['★ acento','','destaque roxo (palavra-chave)',()=>wrap('*')],['B','b','negrito',()=>wrap('**')],['I','i','itálico',()=>wrap('_')]]
+   .forEach(([lb,cls,tip,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.title=tip;
+     b.onmousedown=e=>e.preventDefault();/* não perde a seleção */ b.onclick=fn;bar.appendChild(b)});
+  // COR: seleciona a palavra → escolhe a cor → aplica na hora (sem clique extra)
+  const col=document.createElement('input');col.type='color';col.value='#8b3cf7';col.className='fmtcol';col.title='cor: selecione a palavra e escolha a cor — aplica na hora';
+  let savedSel=null;
+  col.onmousedown=()=>{savedSel={s:ta.selectionStart,e:ta.selectionEnd}};
+  col.oninput=()=>{
+    const sel=(savedSel&&savedSel.s!==savedSel.e)?savedSel:{s:ta.selectionStart,e:ta.selectionEnd};
+    if(sel.s===sel.e){toast('Selecione a palavra ANTES de escolher a cor');return}
+    const v=ta.value,txt=v.slice(sel.s,sel.e).replace(/\{#[0-9a-fA-F]{3,6}:/g,'').replace(/[{}]/g,'');
+    const insv='{'+col.value+':'+txt+'}';ta.value=v.slice(0,sel.s)+insv+v.slice(sel.e);
+    ta.focus();ta.selectionStart=sel.s;ta.selectionEnd=sel.s+insv.length;onin(ta.value);savedSel=null;
+  };
+  bar.appendChild(col);
   w.appendChild(bar);w.appendChild(ta);return w;
 }
 
