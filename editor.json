@@ -345,7 +345,7 @@
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/xxx/01.png",
           "_tipo": "dor",
-          "overlay": "roxo",
+          "overlay": "branco",
           "_v": 3,
           "_regtema": "claro",
           "_ref": "marcas/smark/publicacoes/social/instagram/arte/teste-amor/_uploads/6d1a25a0c6.png",
@@ -413,7 +413,8 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/xxxx/01.png",
           "_v": 1,
           "contexto": "grandes lendas do futebol comerando ajuse para ficar somente os dois jogadores ",
-          "_tipo": "autoridade"
+          "_tipo": "autoridade",
+          "overlay": "branco"
         }
       ],
       "caption": "",
