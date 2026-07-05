@@ -1148,8 +1148,8 @@
           "cta": "",
           "page": "",
           "chip": true,
-          "tema": "claro",
-          "bgmode": "imagem",
+          "tema": "escuro",
+          "bgmode": "escuro",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/teste-novo-modelo/_regen/01-147aa1.png",
           "cor": "#F4F2FB",
           "accent": "",
@@ -1158,8 +1158,13 @@
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/teste-novo-modelo/01.png",
           "_v": 2,
-          "overlay": "branco",
-          "overlay_op": 0.5
+          "overlay": "roxo",
+          "overlay_op": 0,
+          "ov_ang": 165,
+          "ov_pos": 24,
+          "_accOpen": true,
+          "zoom": 1.1,
+          "posx": 85
         }
       ],
       "caption": "Imagina cada canto da sua loja com alguém de IA cuidando: um pra atender quem chega, outro pra organizar os pedidos. Na smark, cada departamento ganha o seu. Você foca em vender móvel bonito, o resto anda sozinho.\n\n#smark #lojademoveis #inteligenciaartificial #gestao",
