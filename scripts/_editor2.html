@@ -54,6 +54,20 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .cardacts button{flex:1;border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:8px;padding:7px;font-size:12px;cursor:pointer}
 .cardacts button:hover{border-color:var(--rox);color:var(--txt)} .cardacts .del:hover{border-color:#c0392b;color:#ff8a80}
 .regsel{width:100%;background:#0f0d17;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px;font-size:12px;margin-bottom:6px}
+.igmodal{display:none;position:fixed;inset:0;background:#000b;z-index:200;align-items:center;justify-content:center;padding:20px}
+.igcard{background:#fff;color:#111;width:392px;max-width:94vw;max-height:94vh;overflow:auto;border-radius:14px;padding:0 0 14px}
+.ighead{display:flex;align-items:center;gap:9px;padding:11px 13px;font-size:14px}
+.igav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#8b3cf7,#5a28b4)}
+.igmedia{position:relative;width:392px;max-width:94vw;height:490px;overflow:hidden;background:#111}
+.igmedia iframe{border:0;width:1080px;height:1350px;transform:scale(.363);transform-origin:top left}
+.ignav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:#000000aa;color:#fff;border:0;width:30px;height:30px;border-radius:50%;font-size:18px;cursor:pointer}
+.ignav.l{left:8px}.ignav.r{right:8px}
+.igdots{position:absolute;bottom:10px;left:0;right:0;display:flex;gap:5px;justify-content:center;z-index:2}
+.igdot{width:6px;height:6px;border-radius:50%;background:#ffffff77}.igdot.on{background:#fff}
+.igicons{display:flex;gap:14px;padding:10px 14px;font-size:20px}
+.igcap{padding:0 14px;font-size:13px;line-height:1.4}
+.igcard textarea{width:calc(100% - 28px);margin:0 14px;background:#f4f2f8;border:1px solid #ddd;border-radius:8px;color:#111;padding:9px;font-size:13px;font-family:inherit}
+.igbtns{display:flex;gap:8px;padding:12px 14px 0}.igbtns .btn{color:#111;background:#eee;border-color:#ddd}.igbtns .btn.go{background:#8b3cf7;color:#fff;border-color:#8b3cf7}
 </style></head>
 <body>
 <div class=app>
@@ -74,12 +88,13 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 
   <div class=main>
     <div class=strip id=strip></div>
-    <div class=cardacts><button id=baddc>＋ Adicionar card</button><button class=del id=bdelc>🗑 Excluir card</button></div>
+    <div class=cardacts><button id=bmvl>◀ Mover</button><button id=baddc>＋ Adicionar card</button><button id=bsim>📱 Instagram</button><button class=del id=bdelc>🗑 Excluir card</button><button id=bmvr>Mover ▶</button></div>
     <div class=stage><div class=framebox id=fbox><iframe id=pv></iframe></div></div>
   </div>
 
   <aside class=ctrl id=ctrl></aside>
 </div>
+<div id=igmodal class=igmodal></div>
 <div id=toast></div>
 
 <script>
@@ -160,13 +175,24 @@ function renderCtrl(){
   const mode=f.bgmode||'imagem';
   if(mode==='imagem'){
     if(f.bg){const im=document.createElement('img');im.className='bgthumb';im.src='/'+f.bg+'?t='+(f._v||0);g2.appendChild(im)}
-    const up=document.createElement('div');up.style.marginTop='6px';
-    up.innerHTML='<label>Trocar fundo</label>';
-    const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.style.fontSize='12px';fi.style.color='var(--sub)';
+    const up=document.createElement('div');up.style.marginTop='6px';up.innerHTML='<label>Trocar fundo (upload)</label>';
+    const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.style.cssText='font-size:12px;color:var(--sub)';
     fi.onchange=e=>upload(e.target.files[0]);up.appendChild(fi);g2.appendChild(up);
-    // regerar IA
-    const reg=document.createElement('div');reg.style.marginTop='10px';
-    reg.innerHTML='<label>Regerar fundo por IA</label>';
+    // ajuste da imagem
+    g2.appendChild(slider('Zoom da imagem: '+(f.zoom||1).toFixed(2)+'x',(f.zoom||1),1,2.5,0.05,(v,l)=>{f.zoom=v;l.textContent='Zoom da imagem: '+v.toFixed(2)+'x';touch()}));
+    g2.appendChild(slider('Posição horizontal',(f.posx==null?50:f.posx),0,100,1,v=>{f.posx=v;touch()}));
+    g2.appendChild(slider('Posição vertical',(f.posy==null?50:f.posy),0,100,1,v=>{f.posy=v;touch()}));
+    // camada por cima
+    const ol=document.createElement('div');ol.style.marginTop='10px';ol.innerHTML='<label>Camada por cima da imagem</label>';
+    const os=document.createElement('div');os.className='seg';
+    [['none','Nenhuma'],['branco','Degradê branco'],['roxo','Degradê roxo'],['todo-branco','Todo branco'],['todo-roxo','Todo roxo']].forEach(([k,lb])=>{
+      const b=document.createElement('button');b.textContent=lb;if((f.overlay||'none')===k)b.classList.add('on');
+      b.onclick=()=>{f.overlay=k;renderCtrl();change()};os.appendChild(b)});
+    ol.appendChild(os);g2.appendChild(ol);
+    if((f.overlay||'none')!=='none')
+      g2.appendChild(slider('Opacidade da camada: '+Math.round((f.overlay_op==null?.85:f.overlay_op)*100)+'%',(f.overlay_op==null?.85:f.overlay_op),0,1,0.05,(v,l)=>{f.overlay_op=v;l.textContent='Opacidade da camada: '+Math.round(v*100)+'%';touch()}));
+    // gerar por IA
+    const reg=document.createElement('div');reg.style.marginTop='12px';reg.innerHTML='<label>Gerar fundo por IA</label>';
     const selm=document.createElement('select');selm.className='regsel';
     [['claro','Tom claro (padrão)'],['escuro','Tom escuro']].forEach(([v,lb])=>{const o=document.createElement('option');o.value=v;o.textContent=lb;if((f._regtema||'claro')===v)o.selected=true;selm.appendChild(o)});
     selm.onchange=()=>f._regtema=selm.value;reg.appendChild(selm);
@@ -175,12 +201,15 @@ function renderCtrl(){
     selt.onchange=()=>f._tipo=selt.value;reg.appendChild(selt);
     const rb=document.createElement('button');rb.className='btn ai';rb.textContent='✨ Regerar fundo IA (pago ~40s)';
     rb.onclick=()=>regen(rb);reg.appendChild(rb);
-    const rb2=document.createElement('button');rb2.className='btn ai';rb2.style.marginTop='6px';rb2.textContent='✨ Gerar a partir do fundo atual (referência)';
-    rb2.onclick=()=>regen(rb2,f.bg);if(f.bg)reg.appendChild(rb2);
+    // contexto + gerar baseado na imagem
+    const ctxw=document.createElement('div');ctxw.style.marginTop='10px';ctxw.innerHTML='<label>Contexto pra gerar A PARTIR da imagem</label>';
+    const cta2=document.createElement('textarea');cta2.rows=2;cta2.placeholder='ex.: craques da Copa como a seleção de funcionários de IA entrando em campo';cta2.value=f.contexto||'';
+    cta2.oninput=()=>{f.contexto=cta2.value;setDirty(true)};ctxw.appendChild(cta2);reg.appendChild(ctxw);
+    if(f.bg){const rb2=document.createElement('button');rb2.className='btn ai';rb2.style.marginTop='6px';rb2.textContent='✨ Gerar NOVA baseada nela + contexto (pago)';
+      rb2.onclick=()=>regen(rb2,f.bg);reg.appendChild(rb2)}
     const hintp=document.createElement('div');hintp.className='mini';hintp.style.marginTop='6px';
-    hintp.textContent='Preview grátis do layout claro: clique "Degradê" ou "Claro" acima antes de gastar com IA.';
-    reg.appendChild(hintp);
-    g2.appendChild(reg);
+    hintp.textContent='Sem contexto = a imagem vira o fundo. Com contexto = a IA cria uma nova inspirada nela.';
+    reg.appendChild(hintp);g2.appendChild(reg);
   }else if(mode==='cor'){
     const cw=document.createElement('div');cw.className='row';cw.style.marginTop='8px';
     cw.innerHTML='<label style=margin:0>Cor do fundo</label>';
@@ -222,6 +251,17 @@ function renderCtrl(){
 }
 
 function change(){renderStrip();clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
+function touch(){clearTimeout(tmr);tmr=setTimeout(preview,90);setDirty(true)}
+function slider(label,val,min,max,step,onin){
+  const w=document.createElement('div');w.style.marginTop='8px';
+  const lab=document.createElement('label');lab.textContent=label;w.appendChild(lab);
+  const r=document.createElement('input');r.type='range';r.min=min;r.max=max;r.step=step;r.value=val;
+  r.oninput=()=>onin(+r.value,lab);w.appendChild(r);return w;
+}
+async function moveCard(dir){
+  const fr=post().frames,j=FI+dir;if(j<0||j>=fr.length)return;
+  [fr[FI],fr[j]]=[fr[j],fr[FI]];await salvar();await reload(PI,j);toast('Ordem alterada');
+}
 
 async function preview(){
   const r=await fetch('/preview',{method:'POST',headers:HJSON,
@@ -267,16 +307,52 @@ async function upload(file){
 }
 
 async function regen(btn,ref){
-  const f=frame(),tema=f._regtema||'claro',tipo=f._tipo||'manifesto';
-  const msg=ref?'Gerar fundo usando a imagem atual como REFERÊNCIA?\n(pago · ~40s)'
+  const f=frame(),tema=f._regtema||'claro',tipo=f._tipo||'manifesto',ctx=(f.contexto||'').trim();
+  const msg=ref?('Gerar uma NOVA imagem baseada na atual?\n\n'+(ctx?('Contexto: '+ctx):'(sem contexto — vai variar o estilo)')+'\n\n(pago · ~40s)')
                 :('Gerar fundo por IA?\n\n• Tom: '+tema+'\n• Conceito: '+tipo+'\n\n(pago · ~40s)');
   if(!confirm(msg))return;
-  btn.disabled=true;const old=btn.textContent;btn.textContent='Gerando fundo…';toast('Gerando fundo por IA (pago)…');
+  btn.disabled=true;const old=btn.textContent;btn.textContent='Gerando…';toast('Gerando por IA (pago)…');
   const r=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,
-    body:JSON.stringify({post:PI,frame:FI,tipo:tipo,tema:tema,ref:ref||''})})).json();
+    body:JSON.stringify({post:PI,frame:FI,tipo:tipo,tema:tema,ref:ref||'',prompt:ctx})})).json();
   btn.disabled=false;btn.textContent=old;
-  if(r.ok){f.bgmode='imagem';f.bg=r.path;if(r.tema)f.tema=r.tema;f._v=(f._v||0)+1;renderCtrl();change();toast('Fundo regerado');}
+  if(r.ok){f.bgmode='imagem';f.bg=r.path;if(r.tema&&!ref)f.tema=r.tema;f._v=(f._v||0)+1;renderCtrl();change();toast('Imagem gerada');}
   else toast('Erro: '+(r.erro||''));
+}
+
+// ===== Simulação de Instagram =====
+let IG=0;
+async function igPreview(){
+  const p=post(),fr=p.frames[IG];
+  const r=await fetch('/preview',{method:'POST',headers:HJSON,body:JSON.stringify({frame:fr,size:p.size})});
+  const fEl=document.getElementById('igframe');if(fEl)fEl.srcdoc=await r.text();
+  document.querySelectorAll('.igdot').forEach((d,i)=>d.classList.toggle('on',i===IG));
+}
+function openSim(){
+  IG=FI;const p=post();
+  const m=document.getElementById('igmodal');
+  const dots=p.frames.map((_,i)=>'<span class="igdot" data-i="'+i+'"></span>').join('');
+  m.innerHTML='<div class=igcard><div class=ighead><div class=igav></div><b>smark</b>'
+    +'<span style="flex:1"></span><span>⋯</span></div>'
+    +'<div class=igmedia><button class="ignav l" id=igprev>‹</button><iframe id=igframe></iframe>'
+    +'<button class="ignav r" id=ignext>›</button><div class=igdots>'+dots+'</div></div>'
+    +'<div class=igicons><span>♡</span><span>💬</span><span>➤</span><span style="flex:1"></span><span>🔖</span></div>'
+    +'<div class=igcap><b>smark</b> <span id=igcaptxt></span></div>'
+    +'<label style="color:#888;font-size:11px;margin:10px 14px 4px;display:block">Editar legenda</label>'
+    +'<textarea id=igcapedit rows=6></textarea>'
+    +'<div class=igbtns><button class=btn id=igclose>Fechar</button><button class="btn go" id=igsave>💾 Salvar legenda</button></div></div>';
+  m.style.display='flex';
+  const cap=p.caption||'';
+  document.getElementById('igcapedit').value=cap;
+  document.getElementById('igcaptxt').textContent=cap.slice(0,90)+(cap.length>90?'… mais':'');
+  igPreview();
+  document.getElementById('igprev').onclick=()=>{IG=(IG-1+p.frames.length)%p.frames.length;igPreview()};
+  document.getElementById('ignext').onclick=()=>{IG=(IG+1)%p.frames.length;igPreview()};
+  m.querySelectorAll('.igdot').forEach(d=>d.onclick=()=>{IG=+d.dataset.i;igPreview()});
+  document.getElementById('igcapedit').oninput=e=>{p.caption=e.target.value;setDirty(true);
+    document.getElementById('igcaptxt').textContent=e.target.value.slice(0,90)+(e.target.value.length>90?'…':'')};
+  document.getElementById('igclose').onclick=()=>m.style.display='none';
+  document.getElementById('igsave').onclick=async()=>{await salvar();toast('Legenda salva')};
+  m.onclick=e=>{if(e.target===m)m.style.display='none'};
 }
 
 // novo post / adicionar / excluir card
@@ -294,6 +370,7 @@ async function novoPost(){
   if(r.ok){await reload(r.index,0);toast('Post criado — comece a editar')}else toast('Erro ao criar post');
 }
 $('#bnew').onclick=novoPost;$('#baddc').onclick=addCard;$('#bdelc').onclick=delCard;
+$('#bmvl').onclick=()=>moveCard(-1);$('#bmvr').onclick=()=>moveCard(1);$('#bsim').onclick=openSim;
 
 carregar();
 </script>
