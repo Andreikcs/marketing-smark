@@ -1256,7 +1256,10 @@
           "n": 1,
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/teste/01.png",
           "_accOpen": true,
-          "overlay": "branco"
+          "overlay": "branco",
+          "overlay_op": 0.05,
+          "ov_ang": 345,
+          "ov_pos": 56
         }
       ],
       "caption": "",
