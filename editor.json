@@ -374,18 +374,18 @@
       "slug": "xxx",
       "marca": "smark",
       "status": "rascunho",
-      "titulo": "XXX",
+      "titulo": "Copa 2026: dado e IA jogando junto",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "Dado & IA {#da6110:_CONECTADOS_}",
-          "sub": "VAMOS PRA CIMAAAAAAAA👇👇👇",
-          "cta": "ACESSE AGORA  ",
-          "page": "",
+          "headline": "A copa mudou|o *jogo* mudou",
+          "sub": "Quem lê o dado a tempo sai na frente",
+          "cta": "",
+          "page": "01/04",
           "chip": true,
           "tema": "escuro",
           "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/xxx/_regen/01-5d7fb3.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/xxx/_regen/01-44132a.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
@@ -393,14 +393,50 @@
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/xxx/01.png",
           "_tipo": "dor",
-          "overlay": "branco",
-          "_v": 3,
+          "overlay": "roxo",
+          "_v": 4,
           "_regtema": "claro",
           "_ref": "marcas/smark/publicacoes/social/instagram/arte/teste-amor/_uploads/6d1a25a0c6.png",
           "contexto": "imagem de publicidade, caze e astros do futebol"
+        },
+        {
+          "headline": "Time bom perde|quando *ninguém vê* o dado",
+          "sub": "Informação parada é gol contra",
+          "cta": "",
+          "tema": "escuro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "02/04",
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/xxx/02.png"
+        },
+        {
+          "headline": "Cada setor|com seu *craque de IA*",
+          "sub": "Atende, organiza e cuida do trabalho repetido",
+          "cta": "",
+          "tema": "escuro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "03/04",
+          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/xxx/03.png"
+        },
+        {
+          "headline": "Coloque a IA|pra *jogar por você*",
+          "sub": "Diagnóstico gratuito pra começar",
+          "cta": "Fale com a smark — link na bio",
+          "tema": "escuro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "04/04",
+          "n": 4,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/xxx/04.png"
         }
       ],
-      "caption": "",
+      "caption": "A Copa de 2026 mostra o óbvio: quem lê o dado na hora certa decide melhor. Na sua empresa é igual — informação parada não ajuda ninguém. A smark coloca um funcionário de IA em cada setor pra cuidar do trabalho repetido e liberar o time. Comece pelo diagnóstico gratuito.\n\n#smark #copa2026 #inteligenciaartificial #gestao",
       "canais": [
         "instagram"
       ]
