@@ -1291,11 +1291,11 @@
           "_v": 1
         },
         {
-          "headline": "Você cuida do time.|A *smark* cuida do resto.",
-          "sub": "Menos tarefa repetida, mais tempo pra decidir.",
-          "cta": "Diagnóstico gratuito — link na bio",
+          "headline": "Acessoria tecnológica",
+          "sub": "Ajudamos sua empresa criar funcionários de IA personalizados.",
+          "cta": "Solicite um Diagnóstico gratuito  ",
           "tema": "claro",
-          "chip": false,
+          "chip": true,
           "grade": true,
           "bgmode": "imagem",
           "page": "02/02",
