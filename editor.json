@@ -1270,27 +1270,42 @@
       "slug": "novo-post-9382",
       "marca": "smark",
       "status": "rascunho",
-      "titulo": "Novo post",
+      "titulo": "Funcionários de IA por departamento",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
+          "headline": "Cada setor|com um *funcionário de IA*",
+          "sub": "Ele trabalha sem parar, sem folga, sem esquecer nada.",
           "cta": "",
-          "page": "01/01",
+          "page": "01/02",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/_regen/01-022341.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/01.png"
+          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/01.png",
+          "_v": 1
+        },
+        {
+          "headline": "Você cuida do time.|A *smark* cuida do resto.",
+          "sub": "Menos tarefa repetida, mais tempo pra decidir.",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "02/02",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/_regen/02-1c4fd6.png",
+          "_v": 1,
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/02.png"
         }
       ],
-      "caption": "",
+      "caption": "Imagina cada departamento com um ajudante que não cansa e não deixa nada cair. É isso que a smark coloca dentro da sua empresa: funcionários de IA pra tarefas repetidas, pra sua equipe focar no que importa. Comece pelo diagnóstico gratuito.\n\n#smark #inteligenciaartificial #gestao #produtividade",
       "canais": [
         "instagram"
       ]
