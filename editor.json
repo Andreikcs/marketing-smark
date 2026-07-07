@@ -818,8 +818,8 @@
           "overlay": "roxo"
         },
         {
-          "headline": "*NINA*",
-          "sub": "MEIO CAMPISTA \n\nRecebe todas as demandas do time, em qualquer horário da partida, escolhe a melhor jogada e passa  a bola para o time comercial. Pré-vendas. Nenhuma  fica sem resposta porque \"não deu tempo\". Seu time só investe energia em quem realmente importa.",
+          "headline": "*NINA |{#FFFFFF:MEIO CAMPO}*",
+          "sub": "Recebe todas as demandas do time, em qualquer horário da partida, escolhe a melhor jogada e passa  a bola para o time comercial marcar o gol. ",
           "cta": "",
           "page": "02/05",
           "chip": false,
@@ -836,8 +836,8 @@
           "overlay": "roxo"
         },
         {
-          "headline": "*TÉO*",
-          "sub": "ATACANTE DE NOVAS OPORTUNIDADES.\n\nProspecção. A agenda comercial que vive vazia porque prospectar toma tempo que ninguém tem — abastecida sem depender de ânimo",
+          "headline": "*TÉO |{#FFFFFF:ATACANTE}*",
+          "sub": "ATACANTE DE NOVAS OPORTUNIDADES.\n\nAProspecção. A agenda comercial que vive vazia porque prospectar toma tempo que ninguém tem — abastecida sem depender de ânimo",
           "cta": "",
           "page": "03/05",
           "chip": false,
@@ -851,8 +851,8 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/03.png",
           "n": 3,
           "contexto": "\"o Téo, um caçador/atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
-          "overlay": "none",
-          "overlay_op": 0,
+          "overlay": "roxo",
+          "overlay_op": 0.85,
           "posx": 0,
           "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png"
         },
