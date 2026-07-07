@@ -1277,7 +1277,7 @@
           "headline": "Cada setor com um \n*funcionário de IA*",
           "sub": "Menos tarefas repetidas, mais tempo para decidir.",
           "cta": "Solicite um Diagnóstico gratuito  ",
-          "page": "01/02",
+          "page": "01/03",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
@@ -1291,6 +1291,22 @@
           "_v": 1
         },
         {
+          "headline": "Acessoria sob medi\n*funcionários de IA*\n",
+          "sub": "Menos tarefas repetidas, mais tempo para decidir.",
+          "cta": "Solicite um Diagnóstico gratuito  ",
+          "page": "02/03",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/_regen/01-022341.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/02.png"
+        },
+        {
           "headline": "Acessoria tecnológica",
           "sub": "Ajudamos sua empresa criar funcionários de IA personalizados.",
           "cta": "Solicite um Diagnóstico gratuito  ",
@@ -1298,14 +1314,14 @@
           "chip": true,
           "grade": true,
           "bgmode": "imagem",
-          "page": "02/02",
+          "page": "03/03",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/_regen/02-1c4fd6.png",
           "_v": 1,
-          "n": 2,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/02.png"
+          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/03.png"
         }
       ],
-      "caption": "A Smark acessoria desenvolve funcionários de IA sob medida para a sua operação.  \n\nComente \"EU QUERO\" e receba um diagnóstico gratuito da sua operação para entender quais funcionários podem complementar o seu time. \n\n\n\n#smark #inteligenciaartificial #gestao #produtividade",
+      "caption": "A Smark acessoria desenvolve funcionários de IA sob medida para a sua operação.  \n\nComente \"EU QUERO\"  e receba um diagnóstico gratuito da sua operação para entender quais funcionários podem complementar o seu time.  Ou acesse nosso site na BIO e agende com um de nossos especialistas.\n\n\n\n#smark #inteligenciaartificial #gestao #produtividade",
       "canais": [
         "instagram"
       ]
