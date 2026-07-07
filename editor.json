@@ -815,11 +815,11 @@
           "n": 1,
           "_v": 2,
           "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
-          "overlay": "branco"
+          "overlay": "roxo"
         },
         {
           "headline": "*NINA*",
-          "sub": "Pré-vendas. Nenhuma {#8b3cf7:oportunidade} fica sem resposta porque \"não deu tempo\". Seu time só investe energia em quem realmente importa.",
+          "sub": "MEIO CAMPISTA \n\nRecebe todas as demandas do time, em qualquer horário da partida, escolhe a melhor jogada e passa  a bola para o time comercial. Pré-vendas. Nenhuma  fica sem resposta porque \"não deu tempo\". Seu time só investe energia em quem realmente importa.",
           "cta": "",
           "page": "02/05",
           "chip": false,
@@ -832,7 +832,8 @@
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/02.png",
           "n": 2,
-          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n"
+          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n",
+          "overlay": "roxo"
         },
         {
           "headline": "*TÉO*",
