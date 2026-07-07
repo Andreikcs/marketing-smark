@@ -800,7 +800,7 @@
       "frames": [
         {
           "headline": "A SMARK SELECIONOU|3 PROFISSIONAIS PRA|*SUA EMPRESA.*",
-          "sub": "Nenhum deles vai pedir demissão. 👇",
+          "sub": "{#8B3CF7:Arraste e veja quem pode fazer parte da sua seleção}",
           "cta": "",
           "page": "01/07",
           "chip": true,
