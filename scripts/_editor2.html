@@ -655,13 +655,20 @@ $('#bexport').onclick=(e)=>{
 setInterval(()=>{if(dirty){salvar(true);toast('Auto-salvo (rascunho)')}},30000);
 
 async function exportar(btn,scope){
-  btn.disabled=true;const old=btn.textContent;btn.textContent='Exportando…';
+  btn.disabled=true;btn.style.opacity='.5';  // ícone SVG — NÃO mexer em textContent (apaga o ícone)
   await salvar(true);
   const r=await(await fetch('/exportar',{method:'POST',headers:HJSON,
     body:JSON.stringify({post:PI,frame:scope})})).json();
-  btn.disabled=false;btn.textContent=old;
-  if(r.ok){post().frames.forEach(f=>f._v=(f._v||0)+1);renderStrip();renderCtrl();toast('Exportado: '+r.feitas.length+' PNG');}
-  else toast('Erro no export: '+(r.erro||''));
+  btn.disabled=false;btn.style.opacity='';
+  if(r.ok&&r.feitas&&r.feitas.length){
+    post().frames.forEach(f=>f._v=(f._v||0)+1);renderStrip();renderCtrl();
+    r.feitas.forEach((out,k)=>setTimeout(()=>{  // baixa cada PNG pra pasta Downloads do navegador
+      const a=document.createElement('a');a.href='/'+out+'?dl='+Date.now();
+      a.download=(post().slug||'frame')+'-'+(out.split('/').pop());
+      document.body.appendChild(a);a.click();a.remove();
+    },k*400));
+    toast('⬇ '+r.feitas.length+' PNG salvos em Downloads');
+  } else toast('Erro no export: '+(r.erro||''));
 }
 
 async function upload(file){

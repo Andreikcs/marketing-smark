@@ -842,7 +842,16 @@ class H(http.server.BaseHTTPRequestHandler):
                     kw = frame_kwargs(fr, post.get("size", "1080x1350"), for_export=True,
                                       marca=post.get("marca", "smark"))
                     html, w, h = compositor.compose_html(**kw)
-                    out = fr.get("out") or f"{os.path.dirname(post['frames'][0].get('out',''))}/{i+1:02d}.png"
+                    base_out = fr.get("out") or post["frames"][0].get("out", "")
+                    if base_out:
+                        out = fr.get("out") or f"{os.path.dirname(base_out)}/{i+1:02d}.png"
+                    else:  # post novo sem arte ainda → caminho seguro no vault (nunca escreve em '/')
+                        marca = safe_marca(post.get("marca", "smark"))
+                        slug = safe_slug(post.get("slug", "avulso"))
+                        dd = os.path.join(VAULT, "marcas", marca, "publicacoes", "social",
+                                          "instagram", "arte", slug)
+                        os.makedirs(dd, exist_ok=True)
+                        out = os.path.join(dd, f"{i+1:02d}.png")
                     if compositor.render_html_to_png(html, out, w, h):
                         feitas.append(out)
                 return self._send(200, {"ok": True, "feitas": feitas})
