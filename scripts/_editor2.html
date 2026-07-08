@@ -962,31 +962,63 @@ carregar().then(()=>snapshot());
     (r.frames||[]).forEach((f,i)=>{h+='<div style="margin-top:6px;font-size:12px;opacity:.85">'+(i+1)+'. '+esc((f.headline||'').replace(/\|/g,' / '))+(f.cta?(' — <i>'+esc(f.cta)+'</i>'):'')+'</div>'});
     if(r.conceito_visual)h+='<div style="margin-top:6px;font-size:11px;color:var(--muted)">🎨 '+esc(r.conceito_visual)+'</div>';
     if(r.alertas&&r.alertas.length)h+='<div class=alert>⚠️ revisar: '+esc(r.alertas.join(', '))+'</div>';
-    h+='<div class=apply><button class=go data-a=aplicar>✓ Aplicar neste post</button><button data-a=novo>＋ Novo post</button></div>';
+    // Escopo: se o post já tem vários cards, PROTEGE — o principal vira "só o card atual".
+    const M=(post()&&post().frames&&post().frames.length)||0;
+    if(M>1){
+      h+='<div class=apply><button class=go data-a=card>✓ Só no card atual ('+(FI+1)+'/'+M+')</button>'
+       +'<button data-a=todos>Substituir os '+M+' cards</button>'
+       +'<button data-a=novo>＋ Novo post</button></div>';
+    } else {
+      h+='<div class=apply><button class=go data-a=todos>✓ Aplicar neste post</button>'
+       +'<button data-a=novo>＋ Novo post</button></div>';
+    }
     const m=addMsg('a',h);
-    m.querySelector('[data-a=aplicar]').onclick=()=>aplicar(r,false,fundo);
-    m.querySelector('[data-a=novo]').onclick=()=>aplicar(r,true,fundo);
+    const bind=(a,scope)=>{const el=m.querySelector('[data-a='+a+']');if(el)el.onclick=()=>aplicar(r,scope,fundo)};
+    bind('card','card');bind('todos','todos');bind('novo','novo');
   }
-  function aplicar(r,novo,fundo){
+  // monta um frame novo herdando o que já existia (bg, sliders, chip) e sobrescrevendo só copy/tema
+  function mkFrame(f,o,r,fundo){
+    const fr=Object.assign({},o,{headline:f.headline||'',sub:f.sub||'',cta:f.cta||'',tema:f.tema||r.tema||'claro',chip:o.chip||false,grade:o.grade!==undefined?o.grade:true,bgmode:o.bgmode||(fundo?'imagem':(f.tema||r.tema||'claro'))});
+    if(typeof applyTom==='function')applyTom(fr,fr.tema);
+    return fr;
+  }
+  function genFundos(pi,idxs,r){
+    if(!r.conceito_visual)return;
+    toast('🎨 Gerando '+idxs.length+' fundo(s)…');
+    (async()=>{for(const i of idxs){await gerarFundo(pi,i,r.conceito_visual,r.tipo,(D.posts[pi].frames[i]||{}).tema)}})();
+  }
+  // scope: 'card' (só o card atual, NÃO toca nos outros) · 'todos' (substitui tudo, com confirmação) · 'novo'
+  function aplicar(r,scope,fundo){
     if(typeof D==='undefined'||!D){toast('Editor ainda carregando');return}
-    let p;
-    if(novo){p={titulo:r.titulo||'Post',slug:slugify(r.titulo),marca:r.marca||optMarca.value,size:(post()&&post().size)||'1080x1350',status:'rascunho',canais:['instagram'],caption:'',frames:[]};D.posts.push(p);PI=D.posts.length-1;FI=0}
-    else{p=post()}
+    if(scope==='novo'){
+      const p={titulo:r.titulo||'Post',slug:slugify(r.titulo),marca:r.marca||optMarca.value,size:(post()&&post().size)||'1080x1350',status:'rascunho',canais:['instagram'],caption:(r.caption||'')+(r.hashtags?('\n\n'+r.hashtags):''),frames:[]};
+      D.posts.push(p);PI=D.posts.length-1;FI=0;
+      p.frames=(r.frames||[]).map(f=>mkFrame(f,{},r,fundo));
+      if(typeof syncPages==='function')syncPages(p);
+      sel(PI,0);setDirty(true);toast('Novo post criado ✓');
+      if(fundo)genFundos(PI,p.frames.map((_,i)=>i),r);
+      return;
+    }
+    const p=post();if(!p){toast('Sem post ativo');return}
+    if(scope==='card'){                        // ← SÓ O CARD ATUAL. Os outros ficam intactos.
+      const nf=r.frames&&r.frames[0];
+      if(!nf){toast('Resultado sem card pra aplicar');return}
+      const fi=Math.min(FI,(p.frames||[]).length-1);if(fi<0){toast('Sem card ativo');return}
+      p.frames[fi]=mkFrame(nf,p.frames[fi]||{},r,fundo);   // não mexe na legenda nem nos outros cards
+      if(typeof syncPages==='function')syncPages(p);
+      sel(PI,fi);setDirty(true);toast('✓ Card '+(fi+1)+' atualizado — os outros ficaram intactos');
+      if(fundo)genFundos(PI,[fi],r);
+      return;
+    }
+    // scope==='todos' → substitui o post inteiro (destrutivo) — confirma se há trabalho a perder
+    if((p.frames||[]).length>1 && !confirm('Isto substitui TODOS os '+p.frames.length+' cards deste post pelos '+((r.frames||[]).length)+' gerados. Os atuais serão perdidos. Continuar?'))return;
     p.titulo=r.titulo||p.titulo;
     p.caption=(r.caption||'')+(r.hashtags?('\n\n'+r.hashtags):'');
-    const old=novo?[]:(p.frames||[]);
-    p.frames=(r.frames||[]).map((f,i)=>{
-      const o=old[i]||{};
-      const fr=Object.assign({},o,{headline:f.headline||'',sub:f.sub||'',cta:f.cta||'',tema:f.tema||r.tema||'claro',chip:o.chip||false,grade:o.grade!==undefined?o.grade:true,bgmode:o.bgmode||(fundo?'imagem':(f.tema||r.tema||'claro'))});
-      if(typeof applyTom==='function')applyTom(fr,fr.tema);  // claro respeitado (sem roxo forçado)
-      return fr;
-    });
+    const old=p.frames||[];
+    p.frames=(r.frames||[]).map((f,i)=>mkFrame(f,old[i]||{},r,fundo));
     if(typeof syncPages==='function')syncPages(p);
-    sel(PI,0);setDirty(true);toast('Copy aplicada ✓');
-    if(fundo&&r.conceito_visual){
-      toast('🎨 Gerando '+p.frames.length+' fundo(s) em sequência…');
-      (async()=>{for(let i=0;i<p.frames.length;i++){await gerarFundo(PI,i,r.conceito_visual,r.tipo,p.frames[i].tema)}})();
-    }
+    sel(PI,0);setDirty(true);toast('Post inteiro atualizado ✓');
+    if(fundo)genFundos(PI,p.frames.map((_,i)=>i),r);
   }
   async function gerarFundo(pi,fi,conceito,tipo,tema){
     const total=(D.posts[pi]&&D.posts[pi].frames.length)||1;
