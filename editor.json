@@ -1513,6 +1513,59 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "novo-post-c477",
+      "marca": "provider-max",
+      "status": "rascunho",
+      "titulo": "Gestão do provedor na palma da mão",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "Seu provedor|em *cartõezinhos* soltos",
+          "sub": "Pedido aqui, nota fiscal ali, cobrança acolá. Cansa.",
+          "cta": "",
+          "page": "01/03",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/novo-post-c477/01.png"
+        },
+        {
+          "headline": "Cada número|no *lugar certo*",
+          "sub": "Faturas, atendimentos e contratos organizados sozinhos.",
+          "cta": "",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "02/03",
+          "n": 2,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/novo-post-c477/02.png"
+        },
+        {
+          "headline": "Menos tempo|na *papelada*",
+          "sub": "A Clara cuida da rotina do seu provedor todos os dias.",
+          "cta": "Diagnóstico gratuito • link na bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "03/03",
+          "n": 3,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/novo-post-c477/03.png"
+        }
+      ],
+      "caption": "Tocar o provedor é juntar mil informações que vivem espalhadas: pedido, nota, cobrança, atendimento. A Clara, da provider-max, organiza essa rotina pra você olhar tudo num lugar só. Sobra tempo pra pensar no que importa.\n\n#provedor #isp #gestao #provedores",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
