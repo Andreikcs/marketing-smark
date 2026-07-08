@@ -1386,7 +1386,7 @@
           "_v": 1
         },
         {
-          "headline": "*CLARA*|ZAGA - Cs & Receita",
+          "headline": "*CLARA*|ZAGA - Relcaionamento e Receita",
           "sub": "Apoia o time na retaguarda, protege a operação e  ataca quando é necessário.",
           "cta": "Escale seu time de IA para entrar em campo.",
           "page": "04/05",
@@ -1401,8 +1401,8 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8-ce452/04.png",
           "n": 4,
           "contexto": "\"a Clara, é quem salva a patrica atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
-          "overlay": "none",
-          "overlay_op": 0,
+          "overlay": "roxo",
+          "overlay_op": 0.85,
           "posx": 0,
           "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
           "_v": 2
