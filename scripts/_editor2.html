@@ -30,6 +30,20 @@ header .sp{flex:1}
 .autosave .stdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto} .autosave .stdot.ok{background:var(--good)} .autosave .stdot.warn{background:var(--warn)}
 .hicon{width:38px;height:38px;border:1px solid var(--field-line);background:var(--surface);color:var(--txt);border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
 .hicon:hover{border-color:var(--accent);color:var(--accent)}
+.histpanel{position:fixed;top:0;right:0;width:340px;max-width:92vw;height:100vh;background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow-lg);z-index:600;display:flex;flex-direction:column;animation:histin .18s ease}
+@keyframes histin{from{transform:translateX(24px);opacity:.3}to{transform:none;opacity:1}}
+.histhead{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;font-size:16px;font-weight:700}
+.histsub{padding:0 16px 12px;color:var(--muted);font-size:13px;border-bottom:1px solid var(--line)}
+.histlist{overflow-y:auto;padding:8px;flex:1}
+.histmsg{padding:26px 18px;color:var(--muted);font-size:13px;text-align:center;line-height:1.5}
+.histitem{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;border-radius:10px;border:1px solid transparent}
+.histitem:hover{background:var(--pan2)}
+.histitem.cur{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.histtime{font-weight:600;font-size:13px}
+.histcards{font-size:12px;color:var(--muted);margin-top:2px}
+.histnow{color:var(--accent);margin-left:6px;font-weight:600}
+.histrestore{border:1px solid var(--field-line);background:var(--surface);color:var(--txt);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;flex:0 0 auto}
+.histrestore:hover{border-color:var(--accent);color:var(--accent)}
 .expmenu{position:fixed;z-index:500;background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow-lg);padding:6px;display:flex;flex-direction:column;gap:4px;min-width:170px}
 .expmenu button{border:0;background:transparent;color:var(--txt);text-align:left;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px}
 .expmenu button:hover{background:var(--pan2)}
@@ -274,6 +288,12 @@ input[type=range]{accent-color:var(--accent)}
     <button class="sk-btn sk-btn--studio" style="width:auto" id=bestudio><svg viewBox="0 0 24 24" width=15 height=15 fill=currentColor style="margin-right:5px;vertical-align:-2px"><path d="M12 2l1.7 5.5L19 9l-5.3 1.5L12 16l-1.7-5.5L5 9l5.3-1.5z"/><path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>Estúdio IA</button>
     <button class="btn" style="width:auto" id=bsave>💾 Salvar</button>
   </header>
+
+  <div id=histpanel class=histpanel hidden>
+    <div class=histhead><span>📜 Histórico de versões</span><button class=hicon id=histclose title=fechar>✕</button></div>
+    <div class=histsub id=histsub></div>
+    <div id=histlist class=histlist></div>
+  </div>
 
   <aside class=side>
     <div class=sidehead>
@@ -775,6 +795,45 @@ function openSim(){
 // novo post / adicionar / excluir card
 function newFrame(){return {headline:'NOVO|*CARD.*',sub:'',cta:'',page:'',chip:false,tema:'claro',bgmode:'claro',bg:'',cor:'#F4F2FB',accent:'',hsize:0,grade:true}}
 async function reload(pi,fi){D=await(await fetch('/dados')).json();syncAllPages();sel(pi,fi)}
+
+// ===== Histórico de versões (estilo Google Docs) — recupera qualquer versão salva pelo autosave =====
+$('#bhist').onclick=abrirHist;
+$('#histclose').onclick=()=>{$('#histpanel').hidden=true};
+function fmtHistData(d){
+  const now=new Date(),hh=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  if(now.toDateString()===d.toDateString())return 'hoje '+hh;
+  const o=new Date(now);o.setDate(now.getDate()-1);
+  if(o.toDateString()===d.toDateString())return 'ontem '+hh;
+  const M=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  return d.getDate()+' '+M[d.getMonth()]+' '+hh;
+}
+async function abrirHist(){
+  if(typeof post!=='function'||!post()){toast('Abra um post primeiro');return}
+  const list=$('#histlist');$('#histpanel').hidden=false;
+  $('#histsub').textContent='"'+((post().titulo)||'post')+'"';
+  list.innerHTML='<div class=histmsg>carregando versões…</div>';
+  let r;try{r=await(await fetch('/historico?post='+PI)).json()}catch(e){list.innerHTML='<div class=histmsg>erro ao carregar histórico</div>';return}
+  if(!r.ok){list.innerHTML='<div class=histmsg>'+String(r.erro||'erro').replace(/[<>&]/g,'')+'</div>';return}
+  if(!r.versoes||!r.versoes.length){list.innerHTML='<div class=histmsg>Sem histórico ainda.<br>O autosave grava uma versão a cada ~5 min.</div>';return}
+  list.innerHTML=r.versoes.map((v,i)=>{
+    const label=fmtHistData(new Date(v.ts*1000)),cards=v.frames+' card'+(v.frames>1?'s':'');
+    return '<div class="histitem'+(i===0?' cur':'')+'">'
+      +'<div><div class=histtime>'+label+'</div>'
+      +'<div class=histcards>'+cards+(i===0?'<span class=histnow>· atual</span>':'')+'</div></div>'
+      +(i===0?'':'<button class=histrestore data-c="'+v.commit+'" data-f="'+v.frames+'">Restaurar</button>')
+      +'</div>';
+  }).join('');
+  list.querySelectorAll('.histrestore').forEach(b=>b.onclick=()=>restaurarVersao(b.dataset.c,+b.dataset.f));
+}
+async function restaurarVersao(commit,frames){
+  if(!confirm('Restaurar esta versão? Este post vira a versão de '+frames+' card'+(frames>1?'s':'')+'.\n\nA versão atual continua no histórico — dá pra voltar depois.'))return;
+  let r;try{r=await(await fetch('/restaurar',{method:'POST',headers:HJSON,body:JSON.stringify({post:PI,commit:commit})})).json()}catch(e){toast('Erro ao restaurar');return}
+  if(!r.ok){toast('Erro: '+(r.erro||''));return}
+  await reload(PI,0);                                 // sincroniza navegador↔disco
+  if(typeof setDirty==='function')setDirty(false);    // impede a aba de re-salvar por cima
+  $('#histpanel').hidden=true;
+  toast('✓ Versão restaurada — '+r.frames+' card'+(r.frames>1?'s':''));
+}
 async function addCard(){post().frames.splice(FI+1,0,newFrame());await salvar(true);await reload(PI,FI+1);toast('Card adicionado')}
 async function delCard(){
   if(post().frames.length<=1){toast('O post precisa de pelo menos 1 card');return}
