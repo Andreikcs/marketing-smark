@@ -1340,7 +1340,7 @@
           "grade": true,
           "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8-ce452/01.png",
           "n": 1,
-          "_v": 3,
+          "_v": 4,
           "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
           "overlay": "roxo"
         },
@@ -1361,7 +1361,7 @@
           "n": 2,
           "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n",
           "overlay": "roxo",
-          "_v": 1
+          "_v": 2
         },
         {
           "headline": "*TÉO |{#FFFFFF:ATACANTE}* - prospecção",
@@ -1383,7 +1383,7 @@
           "overlay_op": 0.85,
           "posx": 0,
           "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
-          "_v": 1
+          "_v": 2
         },
         {
           "headline": "*CLARA*|ZAGA - Relacionamento e Receita",
@@ -1405,10 +1405,10 @@
           "overlay_op": 0.85,
           "posx": 0,
           "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
-          "_v": 2
+          "_v": 3
         }
       ],
-      "caption": "Apresentando a seleção da smark. 👋\n\nNão são robôs de \"aperte 1\". São funções inteiras da sua empresa, cobertas por IA que trabalha na mão do seu time — não no lugar dele.\n\nQual dessas áreas mais dói na sua operação hoje? Comenta. 👇\n\n#IAparaempresas #prevendas #prospeccao #relacionamento #pmesbrasil",
+      "caption": "A smark acessoria ",
       "status": "rascunho",
       "canais": [
         "instagram"
