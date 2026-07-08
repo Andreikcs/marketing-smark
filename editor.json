@@ -1488,7 +1488,7 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "CRM com IA + \nFuncionario \n{#8B3CF7:whatsapp }",
+          "headline": "CRM com IA + \nFuncionário \n{#8B3CF7:whatsapp }",
           "sub": "",
           "cta": "Para loja de móveis planejados",
           "page": "",
@@ -1502,14 +1502,14 @@
           "grade": true,
           "n": 1,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/01.png",
-          "_v": 1,
+          "_v": 2,
           "overlay": "branco",
           "overlay_op": 0.2,
           "ov_ang": 180,
           "ov_pos": 48
         }
       ],
-      "caption": "Sabemos que cada cliente que chega até sua loja quer ser bem atendido e está com pressa.\n\nQuer saber mais sobre um projeto,  quer um orçamento\n\n\nNa loja de móveis, cada cliente que chama no WhatsApp já entra organizado no CRM, sem ninguém precisar copiar nada na mão. O funcionário de IA anota, separa e deixa tudo pronto pra equipe. Assim o time gasta menos tempo com planilha e mais tempo cuidando de quem quer comprar. Quer ver como isso funciona no seu negócio?\n\n#crm #atendimento #whatsapp #gestao",
+      "caption": "Atender ",
       "canais": [
         "instagram"
       ]
