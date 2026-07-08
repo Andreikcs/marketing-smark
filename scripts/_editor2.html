@@ -31,6 +31,7 @@ header .sp{flex:1}
 .hicon{width:38px;height:38px;border:1px solid var(--field-line);background:var(--surface);color:var(--txt);border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
 .hicon:hover{border-color:var(--accent);color:var(--accent)}
 .histpanel{position:fixed;top:0;right:0;width:340px;max-width:92vw;height:100vh;background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow-lg);z-index:600;display:flex;flex-direction:column;animation:histin .18s ease}
+.histpanel[hidden]{display:none}  /* vence o display:flex acima — sem isso o hidden não esconde */
 @keyframes histin{from{transform:translateX(24px);opacity:.3}to{transform:none;opacity:1}}
 .histhead{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;font-size:16px;font-weight:700}
 .histsub{padding:0 16px 12px;color:var(--muted);font-size:13px;border-bottom:1px solid var(--line)}
@@ -798,7 +799,9 @@ async function reload(pi,fi){D=await(await fetch('/dados')).json();syncAllPages(
 
 // ===== Histórico de versões (estilo Google Docs) — recupera qualquer versão salva pelo autosave =====
 $('#bhist').onclick=abrirHist;
-$('#histclose').onclick=()=>{$('#histpanel').hidden=true};
+function fecharHist(){$('#histpanel').hidden=true}
+$('#histclose').onclick=fecharHist;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#histpanel').hidden)fecharHist()});
 function fmtHistData(d){
   const now=new Date(),hh=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
   if(now.toDateString()===d.toDateString())return 'hoje '+hh;
