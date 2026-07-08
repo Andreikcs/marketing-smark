@@ -1418,27 +1418,54 @@
       "slug": "contrata-o",
       "marca": "smark",
       "status": "rascunho",
-      "titulo": "Contratação",
+      "titulo": "Contratação sem dor de cabeça",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "Contratar também é difícil e \ndemorado na sua empresa?",
-          "sub": "",
+          "headline": "Contratar é|*difícil e demorado*",
+          "sub": "Vaga aberta, currículos parados, sessões de entrevistas",
           "cta": "",
-          "page": "",
+          "page": "01/03",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
+          "bgmode": "imagem",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/_regen/01-149cd6.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/01.png"
+          "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/01.png",
+          "_v": 1
+        },
+        {
+          "headline": "E se cada área|tivesse um *funcionário de IA*?",
+          "sub": "Sem anúncio de vaga, sem espera, sem treinamento longo.",
+          "cta": "",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "02/03",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/_regen/02-fe97ca.png",
+          "_v": 1,
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/02.png"
+        },
+        {
+          "headline": "Comece pelo|*diagnóstico gratuito*",
+          "sub": "A gente mostra onde a IA entra no seu time.",
+          "cta": "Fala com a gente • link na bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "03/03",
+          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/03.png"
         }
       ],
-      "caption": "",
+      "caption": "Abrir vaga, ler currículo, treinar, esperar. Cada contratação come semanas do seu time. Com a smark, cada departamento ganha um funcionário de IA que já entra pronto pra trabalhar. Quer ver onde isso encaixa na sua empresa? Comece pelo diagnóstico gratuito.\n\n#inteligenciaartificial #gestao #produtividade #smark",
       "canais": [
         "instagram"
       ]
