@@ -1258,18 +1258,18 @@
       "slug": "elver-crm",
       "marca": "elever-ai",
       "status": "rascunho",
-      "titulo": "Living que vende sozinho",
+      "titulo": "CRM com IA para loja de móveis",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "CRM COM IA PARA ",
-          "sub": "Cada visita que chega vira um lead organizado",
-          "cta": "Diagnóstico gratuito · link na bio",
+          "headline": "CADA ORÇAMENTO|CHEGA *ORGANIZADO*",
+          "sub": "A Nina recebe o pedido, anota o cliente e avisa você na hora.",
+          "cta": "Diagnóstico gratuito • link na bio",
           "page": "",
           "chip": true,
-          "tema": "escuro",
+          "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/_regen/01-248f2a.png",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/_regen/01-97cfce.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
@@ -1288,7 +1288,7 @@
           "contraste": 0.9
         }
       ],
-      "caption": "A sala de estar é o cartão de visitas da sua loja: encanta na hora. A Nina cuida da parte que não aparece na foto — responder cada pessoa que chega e organizar tudo em ordem. Assim nenhum interessado fica esperando.\n\n#moveisplanejados #lojademoveis #atendimento #inteligenciaartificial",
+      "caption": "Novo projeto chegou. Cinco pessoas pedindo orçamento ao mesmo tempo. Sem CRM, alguém fica esperando resposta. A Nina atende cada cliente, guarda os dados e organiza a fila pra sua loja de móveis não perder ninguém. Quer ver como fica na sua loja? Diagnóstico gratuito no link da bio.\n\n#lojademoveis #crm #atendimento #gestao",
       "canais": [
         "instagram"
       ]
