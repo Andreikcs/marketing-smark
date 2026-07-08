@@ -1491,7 +1491,7 @@
           "headline": "CRM com IA + \nFuncionario \n{#8B3CF7:whatsapp }",
           "sub": "",
           "cta": "Para loja de móveis planejados",
-          "page": "01/02",
+          "page": "",
           "chip": true,
           "tema": "escuro",
           "bgmode": "imagem",
@@ -1507,29 +1507,9 @@
           "overlay_op": 0.2,
           "ov_ang": 180,
           "ov_pos": 48
-        },
-        {
-          "headline": "CRM com IA + \nFuncionario \n{#8B3CF7:whatsapp }",
-          "sub": "",
-          "cta": "Para loja de móveis planejados",
-          "page": "02/02",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "imagem",
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/_uploads/7a78ac8141.png",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 2,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/02.png",
-          "overlay": "branco",
-          "overlay_op": 0.2,
-          "ov_ang": 180,
-          "ov_pos": 48
         }
       ],
-      "caption": "Na loja de móveis, cada cliente que chama no WhatsApp já entra organizado no CRM, sem ninguém precisar copiar nada na mão. O funcionário de IA anota, separa e deixa tudo pronto pra equipe. Assim o time gasta menos tempo com planilha e mais tempo cuidando de quem quer comprar. Quer ver como isso funciona no seu negócio?\n\n#crm #atendimento #whatsapp #gestao",
+      "caption": "Sabemos que cada cliente que chega até sua loja quer ser bem atendido e está com pressa.\n\nQuer saber mais sobre um projeto,  quer um orçamento\n\n\nNa loja de móveis, cada cliente que chama no WhatsApp já entra organizado no CRM, sem ninguém precisar copiar nada na mão. O funcionário de IA anota, separa e deixa tudo pronto pra equipe. Assim o time gasta menos tempo com planilha e mais tempo cuidando de quem quer comprar. Quer ver como isso funciona no seu negócio?\n\n#crm #atendimento #whatsapp #gestao",
       "canais": [
         "instagram"
       ]
