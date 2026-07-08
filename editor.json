@@ -1258,33 +1258,34 @@
       "slug": "elver-crm",
       "marca": "elever-ai",
       "status": "rascunho",
-      "titulo": "Elever CRM para lojas de móveis",
+      "titulo": "Living que vende sozinho",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "CRM com IA para|*lojas de móveis*",
-          "sub": "Cada cliente organizado, do primeiro contato à entrega",
-          "cta": "Diagnóstico gratuito — link na bio",
+          "headline": "O living encanta,|a *Nina* atende",
+          "sub": "Cada visita vira cliente organizado no CRM",
+          "cta": "Diagnóstico gratuito • link na bio",
           "page": "",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/_regen/01-4516f2.png",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/_regen/01-009420.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/01.png",
-          "_v": 6,
+          "_v": 7,
           "_accOpen": true,
           "overlay": "branco",
           "overlay_op": 1,
           "ov_ang": 0,
-          "ov_pos": 0
+          "ov_pos": 0,
+          "brilho": 1
         }
       ],
-      "caption": "Na loja de móveis, cada cliente pede atenção: o que gostou, quando volta, o que ficou de fechar. O Elever CRM guarda tudo isso no lugar certo e lembra você na hora certa. Menos anotação solta, mais tempo pra vender bem.\n\n#lojasdemoveis #crm #inteligenciaartificial #gestao",
+      "caption": "A sala de estar é o cartão de visitas da sua loja de móveis: amplitude, luz natural e acolhimento que fazem o cliente se imaginar morando ali. Enquanto o ambiente encanta, a Nina cuida de cada pessoa que chega — responde na hora, organiza os dados e não deixa nenhum contato esfriar. Assim seu time ganha tempo pra vender melhor.\n\n#lojasdemoveis #moveisplanejados #crm #atendimento",
       "canais": [
         "instagram"
       ]
@@ -1409,7 +1410,7 @@
         }
       ],
       "caption": "A smark acessoria treina e coloca profissionais de IA para jogarem no seu time. \nMas você é o treinador, e quem define quem faz cada lance. Quem ataca, quem resolve e como o time vai jogar. \n\nComente time de IA para um diagnóstico gratuito da sua operação e ver quem você pode escalar.",
-      "status": "rascunho",
+      "status": "salvo",
       "canais": [
         "instagram"
       ]
@@ -1491,11 +1492,27 @@
           "chip": false,
           "grade": true,
           "bgmode": "imagem",
-          "page": "",
+          "page": "01/02",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/_regen/01-20cfa8.png",
           "_v": 1,
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/01.png"
+        },
+        {
+          "headline": "NOVO|*CARD.*",
+          "sub": "",
+          "cta": "",
+          "page": "02/02",
+          "chip": false,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/02.png"
         }
       ]
     }
