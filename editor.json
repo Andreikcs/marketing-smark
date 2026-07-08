@@ -1479,6 +1479,40 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/02.png"
         }
       ]
+    },
+    {
+      "slug": "crm-com-ia---loj-m-veis",
+      "marca": "elever-ai",
+      "status": "rascunho",
+      "titulo": "CRM com IA - Lojá Móveis",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "CRM com IA + \nFuncionario \n{#8B3CF7:whatsapp }",
+          "sub": "Feito para loja de móveis planejados",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/_uploads/7a78ac8141.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/01.png",
+          "_v": 1,
+          "overlay": "branco",
+          "overlay_op": 0.4,
+          "ov_ang": 175,
+          "ov_pos": 50
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
