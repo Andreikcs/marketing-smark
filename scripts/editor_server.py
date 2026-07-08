@@ -700,6 +700,46 @@ class H(http.server.BaseHTTPRequestHandler):
             return self._send(200, JOBS.get(jid, {"status": "unknown"}))
         if path == "/dados":
             return self._send(200, load())
+        if path == "/historico":
+            # versões de UM post ao longo dos autosaves do git (dedupe: só quando o post mudou)
+            try:
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                pi = int(qs.get("post", ["-1"])[0])
+                d = load()
+                if not (0 <= pi < len(d["posts"])):
+                    return self._send(400, {"ok": False, "erro": "post inválido"})
+                slug = d["posts"][pi].get("slug", "")
+                try:
+                    log = subprocess.check_output(
+                        ["git", "-C", VAULT, "log", "--format=%h %ct", "-60", "--", "editor.json"],
+                        stderr=subprocess.DEVNULL).decode().splitlines()
+                except Exception:
+                    log = []
+                versoes, last_fp = [], None
+                for line in log:
+                    parts = line.split()
+                    if len(parts) != 2:
+                        continue
+                    commit, ts = parts
+                    try:
+                        cd = json.loads(subprocess.check_output(
+                            ["git", "-C", VAULT, "show", f"{commit}:editor.json"],
+                            stderr=subprocess.DEVNULL).decode())
+                    except Exception:
+                        continue
+                    p = next((x for x in cd.get("posts", []) if x.get("slug") == slug), None)
+                    if not p:
+                        continue
+                    fp = json.dumps(p, sort_keys=True, ensure_ascii=False)
+                    if fp == last_fp:  # mesma versão do post → não repete
+                        continue
+                    last_fp = fp
+                    versoes.append({"commit": commit, "ts": int(ts),
+                                    "frames": len(p.get("frames", [])),
+                                    "titulo": p.get("titulo", "")})
+                return self._send(200, {"ok": True, "slug": slug, "versoes": versoes})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
         # arquivo estático dentro do vault (imagens)
         rel = urllib.parse.unquote(path.lstrip("/"))
         full = os.path.realpath(os.path.join(VAULT, rel))
@@ -730,6 +770,33 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/salvar":
             save(normaliza(req.get("dados", load())))
             return self._send(200, {"ok": True})
+
+        if path == "/restaurar":
+            # troca UM post pela sua versão de um commit — só esse post, o resto do editor.json fica igual
+            try:
+                with IO_LOCK:
+                    d = load()
+                    pi = int(req.get("post", -1))
+                    commit = str(req.get("commit", ""))
+                    if not (0 <= pi < len(d["posts"])):
+                        return self._send(400, {"ok": False, "erro": "post inválido"})
+                    if not re.fullmatch(r"[0-9a-f]{4,40}", commit):
+                        return self._send(400, {"ok": False, "erro": "commit inválido"})
+                    slug = d["posts"][pi].get("slug", "")
+                    try:
+                        cd = json.loads(subprocess.check_output(
+                            ["git", "-C", VAULT, "show", f"{commit}:editor.json"],
+                            stderr=subprocess.DEVNULL).decode())
+                    except Exception:
+                        return self._send(404, {"ok": False, "erro": "commit não encontrado"})
+                    old = next((x for x in cd.get("posts", []) if x.get("slug") == slug), None)
+                    if not old:
+                        return self._send(404, {"ok": False, "erro": "essa versão não tem este post"})
+                    d["posts"][pi] = old
+                    save(d)
+                return self._send(200, {"ok": True, "frames": len(old.get("frames", []))})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
 
         if path == "/excluir-posts":
             d = load()
