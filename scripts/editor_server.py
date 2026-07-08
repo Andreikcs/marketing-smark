@@ -586,6 +586,9 @@ def frame_kwargs(fr, size, for_export, marca="smark"):
              satur=float(fr.get("satur", 1.0)),
              handle_over=fr.get("handle", ""), rodape_over=fr.get("rodape", ""),
              raw=bool(fr.get("raw", False)))
+    if fr.get("paleta") == "lima":  # acento secundário da marca — pinta selo, tab, CTA, logo e destaque
+        k["accent"] = "#C6F24E"
+        k["square"] = "#C6F24E"
     mode = fr.get("bgmode", "imagem")
     if mode == "imagem" and fr.get("bg"):
         if for_export:

@@ -536,6 +536,15 @@ function renderCtrl(){
   const chk=document.createElement('label');chk.className='chk';chk.style.marginTop='8px';
   chk.innerHTML='<input type=checkbox '+(f.chip?'checked':'')+'> Mostrar selo (chip da capa)';
   chk.querySelector('input').onchange=e=>{f.chip=e.target.checked;change()};g1.appendChild(chk);
+  // cor de marca do template (selo, tab, CTA, logo, palavra-destaque)
+  const palw=document.createElement('div');palw.style.marginTop='10px';
+  palw.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:5px">Cor do template</div>';
+  const palseg=document.createElement('div');palseg.className='seg';
+  [['roxo','🟣 Roxo'],['lima','🟢 Verde lima']].forEach(([k,lb])=>{
+    const b=document.createElement('button');b.textContent=lb;if((f.paleta||'roxo')===k)b.classList.add('on');
+    b.onclick=()=>{f.paleta=k;renderCtrl();change()};palseg.appendChild(b);
+  });
+  palw.appendChild(palseg);g1.appendChild(palw);
 
   // FUNDO
   const g2=document.createElement('div');g2.className='grp';g2.innerHTML='<h5>Fundo</h5>';
@@ -811,7 +820,7 @@ function openSim(){
 }
 
 // novo post / adicionar / excluir card
-function newFrame(){return {headline:'NOVO|*CARD.*',sub:'',cta:'',page:'',chip:false,tema:'claro',bgmode:'claro',bg:'',cor:'#F4F2FB',accent:'',hsize:0,grade:true}}
+function newFrame(){return {headline:'NOVO|*CARD.*',sub:'',cta:'',page:'',chip:false,tema:'claro',bgmode:'claro',bg:'',cor:'#F4F2FB',accent:'',paleta:'roxo',hsize:0,grade:true}}
 async function reload(pi,fi){D=await(await fetch('/dados')).json();syncAllPages();sel(pi,fi)}
 
 // ===== Histórico de versões (estilo Google Docs) — recupera qualquer versão salva pelo autosave =====
