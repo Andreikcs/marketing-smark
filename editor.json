@@ -1408,7 +1408,7 @@
           "_v": 2
         }
       ],
-      "caption": "A smark acessoria treina e coloca profissionais de IA para jogarem no seu time. \nMas você é o treinador, e quem define quem faz cada lance. Quem ataca, quem resolve e como o time vai jogar estratégicamente. \n\nComente time de IA para um diagnóstico gratuito da sua operação e ver quem você pode escalar.",
+      "caption": "A smark acessoria treina e coloca profissionais de IA para jogarem no seu time. \nMas você é o treinador, e quem define quem faz cada lance. Quem ataca, quem resolve e como o time vai jogar. \n\nComente time de IA para um diagnóstico gratuito da sua operação e ver quem você pode escalar.",
       "status": "rascunho",
       "canais": [
         "instagram"
@@ -1436,7 +1436,7 @@
           "grade": true,
           "n": 1,
           "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/01.png",
-          "_v": 1
+          "_v": 2
         },
         {
           "headline": "E se cada área|tivesse um *funcionário de IA*?",
@@ -1448,7 +1448,7 @@
           "bgmode": "imagem",
           "page": "02/03",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/_regen/02-fe97ca.png",
-          "_v": 1,
+          "_v": 2,
           "n": 2,
           "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/02.png"
         },
@@ -1462,7 +1462,7 @@
           "bgmode": "imagem",
           "page": "03/03",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/_regen/03-dfaf30.png",
-          "_v": 1,
+          "_v": 2,
           "n": 3,
           "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/03.png"
         }
