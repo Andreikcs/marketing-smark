@@ -1255,69 +1255,6 @@
       ]
     },
     {
-      "slug": "elver-crm",
-      "marca": "elever-ai",
-      "status": "rascunho",
-      "titulo": "CRM com IA para loja de móveis",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "SUA LOJA NUNCA|ESQUECE UM *CLIENTE*",
-          "sub": "Cada visita, cada orçamento, tudo no lugar certo.",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "page": "01/03",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "imagem",
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/_regen/01-e3cb57.png",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/01.png",
-          "_v": 9,
-          "_accOpen": true,
-          "overlay": "none",
-          "overlay_op": 0.45,
-          "ov_ang": 225,
-          "ov_pos": 36,
-          "brilho": 1.35,
-          "zoom": 1.4,
-          "satur": 2,
-          "contraste": 0.9
-        },
-        {
-          "headline": "CADA ORÇAMENTO|CHEGA *ORGANIZADO*",
-          "sub": "A IA anota, separa e lembra você de retornar.",
-          "cta": "",
-          "tema": "claro",
-          "chip": false,
-          "grade": true,
-          "bgmode": "claro",
-          "page": "02/03",
-          "n": 2,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/02.png"
-        },
-        {
-          "headline": "SUA LOJA NUNCA|ESQUECE UM *CLIENTE*",
-          "sub": "Um funcionário de IA cuidando de cada contato.",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "tema": "claro",
-          "chip": false,
-          "grade": true,
-          "bgmode": "claro",
-          "page": "03/03",
-          "n": 3,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/03.png"
-        }
-      ],
-      "caption": "Na loja de móveis, o cliente pede orçamento, some e ninguém retorna. Um funcionário de IA da elever-ai organiza cada contato, guarda o histórico e lembra você da hora certa de falar de novo. Menos anotação perdida, mais atendimento no controle.\n\n#lojademoveis #crm #inteligenciaartificial #atendimento",
-      "canais": [
-        "instagram"
-      ]
-    },
-    {
       "slug": "novo-post-9382",
       "marca": "smark",
       "status": "salvo",
