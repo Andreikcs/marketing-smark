@@ -903,7 +903,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 post = d["posts"][req["post"]]
                 idxs = [req["frame"]] if req.get("frame") is not None and req.get("frame") != "all" \
                     else list(range(len(post["frames"])))
-                feitas = []
+                feitas, faltaram = [], []
                 for i in idxs:
                     fr = post["frames"][i]
                     kw = frame_kwargs(fr, post.get("size", "1080x1350"), for_export=True,
@@ -920,8 +920,12 @@ class H(http.server.BaseHTTPRequestHandler):
                         os.makedirs(dd, exist_ok=True)
                         out = os.path.join(dd, f"{i+1:02d}.png")
                     if compositor.render_html_to_png(html, out, w, h):
-                        feitas.append(out)
-                return self._send(200, {"ok": True, "feitas": feitas})
+                        feitas.append(os.path.relpath(out, VAULT) if os.path.isabs(out) else out)
+                    else:
+                        faltaram.append(i + 1)
+                # esperado = quantos frames pedimos; se faltou algum, o cliente avisa em vez de baixar a menos
+                return self._send(200, {"ok": True, "feitas": feitas,
+                                        "faltaram": faltaram, "esperado": len(idxs)})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 

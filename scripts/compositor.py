@@ -14,6 +14,7 @@ import html as htmlmod
 import json
 import os
 import re
+import secrets
 import subprocess
 import sys
 
@@ -299,21 +300,39 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     return PAGE % {"CSS": css, "BODY": body}, w, h
 
 
-def render_html_to_png(page_html, out, w, h):
-    """Renderiza o HTML do frame pra PNG via Chrome headless (2x). Retorna True se gerou."""
-    html_path = os.path.join(VAULT, f".compositor.tmp.{os.getpid()}.html")
-    open(html_path, "w", encoding="utf-8").write(page_html)
+def render_html_to_png(page_html, out, w, h, tries=3):
+    """Renderiza o HTML do frame pra PNG via Chrome headless (2x). Retorna True se gerou.
+    Robusto: nome de tmp único (sem colisão entre renders simultâneos), timeout que mata
+    Chrome travado, e retry — evita frame faltando no 'exportar carrossel todo'."""
     out_abs = out if os.path.isabs(out) else os.path.join(VAULT, out)
     os.makedirs(os.path.dirname(out_abs), exist_ok=True)
-    subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
-                    "--force-device-scale-factor=2", f"--window-size={w},{h}",
-                    "--virtual-time-budget=4000", f"--screenshot={out_abs}", f"file://{html_path}"],
-                   check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    tag = f"{os.getpid()}.{secrets.token_hex(4)}"
+    html_path = os.path.join(VAULT, f".compositor.tmp.{tag}.html")
+    open(html_path, "w", encoding="utf-8").write(page_html)
     try:
-        os.remove(html_path)
-    except OSError:
-        pass
-    return os.path.exists(out_abs)
+        for _ in range(max(1, tries)):
+            try:
+                if os.path.exists(out_abs):
+                    os.remove(out_abs)  # garante que exists() reflita ESTE render, não um antigo
+            except OSError:
+                pass
+            try:
+                subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
+                                "--force-device-scale-factor=2", f"--window-size={w},{h}",
+                                "--virtual-time-budget=4000", f"--screenshot={out_abs}",
+                                f"file://{html_path}"],
+                               check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                               timeout=60)
+            except subprocess.TimeoutExpired:
+                continue  # Chrome travou → o subprocess é morto; tenta de novo
+            if os.path.exists(out_abs) and os.path.getsize(out_abs) > 0:
+                return True
+        return False
+    finally:
+        try:
+            os.remove(html_path)
+        except OSError:
+            pass
 
 
 def main():

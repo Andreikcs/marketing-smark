@@ -688,15 +688,26 @@ async function exportar(btn,scope){
   const r=await(await fetch('/exportar',{method:'POST',headers:HJSON,
     body:JSON.stringify({post:PI,frame:scope})})).json();
   btn.disabled=false;btn.style.opacity='';
-  if(r.ok&&r.feitas&&r.feitas.length){
+  if(!r.ok){toast('Erro no export: '+(r.erro||''));return}
+  let feitas=r.feitas||[], faltaram=r.faltaram||[];
+  // 1 tentativa extra pros frames que falharam (Chrome às vezes trava uma vez)
+  if(faltaram.length){
+    toast('↻ Refazendo '+faltaram.length+' card(s) que falharam…');
+    for(const n of faltaram.slice()){
+      const rr=await(await fetch('/exportar',{method:'POST',headers:HJSON,body:JSON.stringify({post:PI,frame:n-1})})).json();
+      if(rr.ok&&(rr.feitas||[]).length){feitas=feitas.concat(rr.feitas);faltaram=faltaram.filter(x=>x!==n)}
+    }
+  }
+  if(feitas.length){
     post().frames.forEach(f=>f._v=(f._v||0)+1);renderStrip();renderCtrl();
-    r.feitas.forEach((out,k)=>setTimeout(()=>{  // baixa cada PNG pra pasta Downloads do navegador
+    feitas.forEach((out,k)=>setTimeout(()=>{  // baixa cada PNG pra pasta Downloads do navegador
       const a=document.createElement('a');a.href='/'+out+'?dl='+Date.now();
       a.download=(post().slug||'frame')+'-'+(out.split('/').pop());
       document.body.appendChild(a);a.click();a.remove();
-    },k*400));
-    toast('⬇ '+r.feitas.length+' PNG salvos em Downloads');
-  } else toast('Erro no export: '+(r.erro||''));
+    },k*500));
+  }
+  if(faltaram.length)toast('⚠️ Baixei '+feitas.length+'/'+(r.esperado||feitas.length)+' — card(s) '+faltaram.join(', ')+' não renderizaram. Tente de novo.');
+  else toast('⬇ '+feitas.length+' PNG salvos em Downloads · carrossel completo');
 }
 
 async function upload(file){
