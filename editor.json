@@ -1413,6 +1413,35 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "contrata-o",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "Contratação",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "Contratar também é difícil e \ndemorado na sua empresa?",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
