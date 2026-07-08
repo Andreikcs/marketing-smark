@@ -1471,6 +1471,33 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "titulo": "A sala de estar que vira lead",
+      "slug": "crm-com-ia-para-loja-de-moveis",
+      "marca": "smark",
+      "size": "1080x1350",
+      "status": "rascunho",
+      "canais": [
+        "instagram"
+      ],
+      "caption": "A sala de estar integrada com a cozinha é o cartão de visitas do imóvel: transmite espaço, aconchego e movimenta as redes. Só que atenção sozinha não vira nada. A Nina, funcionária de IA da smark, recebe cada pessoa que chega, responde na hora e guarda tudo no lugar certo. Assim o interesse pela foto bonita não esfria no caminho.\n\n#lojademoveis #moveisplanejados #atendimento #gestao",
+      "frames": [
+        {
+          "headline": "A SALA DE ESTAR|CHAMA. A *NINA* ATENDE",
+          "sub": "O living rende as fotos mais desejadas. Cada visita que chega vira cliente organizado.",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/_regen/01-20cfa8.png",
+          "_v": 1,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/01.png"
+        }
+      ]
     }
   ]
 }
