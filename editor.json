@@ -1489,9 +1489,9 @@
       "frames": [
         {
           "headline": "CRM com IA + \nFuncionario \n{#8B3CF7:whatsapp }",
-          "sub": "Feito para loja de móveis planejados",
-          "cta": "",
-          "page": "",
+          "sub": "",
+          "cta": "Para loja de móveis planejados",
+          "page": "01/02",
           "chip": true,
           "tema": "escuro",
           "bgmode": "imagem",
@@ -1504,12 +1504,32 @@
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/01.png",
           "_v": 1,
           "overlay": "branco",
-          "overlay_op": 0.4,
-          "ov_ang": 175,
-          "ov_pos": 50
+          "overlay_op": 0.2,
+          "ov_ang": 180,
+          "ov_pos": 48
+        },
+        {
+          "headline": "CRM com IA + \nFuncionario \n{#8B3CF7:whatsapp }",
+          "sub": "",
+          "cta": "Para loja de móveis planejados",
+          "page": "02/02",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "imagem",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/_uploads/7a78ac8141.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 2,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/02.png",
+          "overlay": "branco",
+          "overlay_op": 0.2,
+          "ov_ang": 180,
+          "ov_pos": 48
         }
       ],
-      "caption": "",
+      "caption": "Na loja de móveis, cada cliente que chama no WhatsApp já entra organizado no CRM, sem ninguém precisar copiar nada na mão. O funcionário de IA anota, separa e deixa tudo pronto pra equipe. Assim o time gasta menos tempo com planilha e mais tempo cuidando de quem quer comprar. Quer ver como isso funciona no seu negócio?\n\n#crm #atendimento #whatsapp #gestao",
       "canais": [
         "instagram"
       ]
