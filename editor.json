@@ -1536,7 +1536,10 @@
           "grade": true,
           "n": 1,
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/novo-post-c477/01.png",
-          "_v": 1
+          "_v": 1,
+          "overlay": "roxo",
+          "overlay_op": 0.5,
+          "paleta": "roxo"
         },
         {
           "headline": "Cada número|no *lugar certo*",
