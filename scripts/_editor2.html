@@ -443,8 +443,14 @@ function renderStrip(){
   const el=$('#strip');el.innerHTML='';
   post().frames.forEach((f,i)=>{
     const d=document.createElement('div');d.className='th'+(i===FI?' on':'');
-    const src=f.out?('/'+f.out+'?t='+(f._v||0)):'';
-    d.innerHTML='<span class=n>'+(i+1)+'</span>'+(src?'<img src="'+src+'">':'');
+    const n=document.createElement('span');n.className='n';n.textContent=i+1;d.appendChild(n);
+    const outSrc=f.out?('/'+f.out+'?t='+(f._v||0)):'';
+    const bgSrc=f.bg?('/'+f.bg+'?t='+(f._v||0)):'';
+    if(outSrc||bgSrc){
+      const img=document.createElement('img');img.src=outSrc||bgSrc;
+      if(outSrc&&bgSrc)img.onerror=()=>{img.onerror=null;img.src=bgSrc};  // export não renderizado → mostra o fundo (nunca quebra)
+      d.appendChild(img);
+    }
     d.onclick=()=>sel(PI,i);
     d.draggable=true;
     d.ondragstart=e=>{e.dataTransfer.setData('i',i);d.classList.add('drag')};
