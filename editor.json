@@ -1423,7 +1423,7 @@
       "frames": [
         {
           "headline": "Contratar é|*difícil e demorado*",
-          "sub": "Vaga aberta, currículos parados, sessões de entrevistas",
+          "sub": "Vaga aberta, currículos parados, horas e horas em sessões de entrevistas...",
           "cta": "",
           "page": "01/03",
           "chip": true,
@@ -1461,11 +1461,13 @@
           "grade": true,
           "bgmode": "imagem",
           "page": "03/03",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/_regen/03-dfaf30.png",
+          "_v": 1,
           "n": 3,
           "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/03.png"
         }
       ],
-      "caption": "Abrir vaga, ler currículo, treinar, esperar. Cada contratação come semanas do seu time. Com a smark, cada departamento ganha um funcionário de IA que já entra pronto pra trabalhar. Quer ver onde isso encaixa na sua empresa? Comece pelo diagnóstico gratuito.\n\n#inteligenciaartificial #gestao #produtividade #smark",
+      "caption": "Se ",
       "canais": [
         "instagram"
       ]
