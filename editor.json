@@ -1262,12 +1262,12 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "O living encanta,|a *Nina* atende",
+          "headline": "CRM COM IA PARA ",
           "sub": "Cada visita que chega vira um lead organizado",
           "cta": "Diagnóstico gratuito · link na bio",
           "page": "",
           "chip": true,
-          "tema": "claro",
+          "tema": "escuro",
           "bgmode": "imagem",
           "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elver-crm/_regen/01-248f2a.png",
           "cor": "#F4F2FB",
@@ -1279,10 +1279,13 @@
           "_v": 8,
           "_accOpen": true,
           "overlay": "branco",
-          "overlay_op": 1,
-          "ov_ang": 0,
-          "ov_pos": 0,
-          "brilho": 1
+          "overlay_op": 0.45,
+          "ov_ang": 225,
+          "ov_pos": 36,
+          "brilho": 1.5,
+          "zoom": 1.4,
+          "satur": 2,
+          "contraste": 0.9
         }
       ],
       "caption": "A sala de estar é o cartão de visitas da sua loja: encanta na hora. A Nina cuida da parte que não aparece na foto — responder cada pessoa que chega e organizar tudo em ordem. Assim nenhum interessado fica esperando.\n\n#moveisplanejados #lojademoveis #atendimento #inteligenciaartificial",
