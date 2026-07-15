@@ -11,12 +11,10 @@
             "id": "f2700d1fdefc9f17",
             "type": "leaf",
             "state": {
-              "type": "image",
-              "state": {
-                "file": "design-system/assets/logos-perfil/03-empilhado-claro.png"
-              },
-              "icon": "lucide-image",
-              "title": "03-empilhado-claro"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Visualização em gráfico"
             }
           }
         ]
@@ -183,6 +181,8 @@
   },
   "active": "f2700d1fdefc9f17",
   "lastOpenFiles": [
+    "design-system/assets/logos-perfil/03-empilhado-claro.png",
+    "Sem título",
     "sites/smark-v2/img/renovador-v1.png",
     "sites/smark-v2/img/garimpeiro-v1.png",
     "sites/smark-v2/img/cacador-v1.png",
@@ -196,14 +196,12 @@
     "docs/funcionarios-visual/renovador-v1.png",
     "docs/funcionarios-visual/mensageiro-v2.png",
     "docs/funcionarios-visual/mensageiro-v1.png",
-    "docs/funcionarios-visual/olheiro-v2.png",
     "docs/funcionarios-visual",
     "docs/_build_objetivos.py",
     "docs/_build_formatos.py",
     "docs/_build_hub.py",
     "docs/time-de-ia-mockup",
     "docs/_build_agentes.py",
-    "sites/_build_smark.py",
     "docs/plano-eficiencia-sistema.md",
     "marcas/smark/branding/fora-da-vitrine.md",
     "marcas/smark/branding/metodo-maia.md",
