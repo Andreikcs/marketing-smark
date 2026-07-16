@@ -1524,19 +1524,19 @@
         {
           "headline": "Seu provedor|em *cartõezinhos* soltos",
           "sub": "Pedido aqui, nota fiscal ali, cobrança acolá. Cansa.",
-          "cta": "",
+          "cta": "gkhvkhkjbjk",
           "page": "01/03",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/novo-post-c477/_regen/01-f107a9.png",
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/novo-post-c477/_uploads/d7c4f8b71f.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/novo-post-c477/01.png",
-          "_v": 1,
+          "_v": 2,
           "overlay": "roxo",
           "overlay_op": 0.5,
           "paleta": "roxo"
@@ -1635,7 +1635,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "sub": "",
           "cta": "",
-          "page": "01/01",
+          "page": "",
           "chip": true,
           "tema": "claro",
           "bgmode": "claro",
@@ -1645,7 +1645,8 @@
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/gvkhjgvkh/01.png"
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/gvkhjgvkh/01.png",
+          "paleta": "lima"
         }
       ],
       "caption": "",
