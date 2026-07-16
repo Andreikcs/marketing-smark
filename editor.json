@@ -1583,7 +1583,7 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "Ia para {#8B3CF7:négócios}, {#FFFFFF:hoje}!",
+          "headline": "dgsdfghdfIa para {#8B3CF7:négócios}, {#FFFFFF:hoje}!",
           "sub": "",
           "cta": "Comenta IA",
           "page": "01/02",
@@ -1599,7 +1599,7 @@
           "out": "marcas/smark/publicacoes/social/instagram/arte/uytfuy/01.png",
           "paleta": "roxo",
           "_v": 1,
-          "overlay": "roxo"
+          "overlay": "none"
         },
         {
           "headline": "NOVO|*CARD.*",
@@ -1617,6 +1617,35 @@
           "grade": true,
           "n": 2,
           "out": "marcas/smark/publicacoes/social/instagram/arte/uytfuy/02.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
+    },
+    {
+      "slug": "gvkhjgvkh",
+      "marca": "elever-ai",
+      "status": "rascunho",
+      "titulo": "gvkhjgvkh",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "01/01",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/gvkhjgvkh/01.png"
         }
       ],
       "caption": "",
