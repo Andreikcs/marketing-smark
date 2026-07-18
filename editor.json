@@ -1707,6 +1707,35 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "campanha-provedor",
+      "marca": "provider-max",
+      "status": "rascunho",
+      "titulo": "Campanha Provedor",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "01/01",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/campanha-provedor/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
