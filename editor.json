@@ -1653,6 +1653,60 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "teste-eloise",
+      "marca": "elever-ai",
+      "status": "rascunho",
+      "titulo": "Final da Copa e o time que trabalha por você",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "Toda final|tem um *time* pronto",
+          "sub": "Cada jogador no seu lugar, sem improviso.",
+          "cta": "",
+          "page": "01/03",
+          "chip": false,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/teste-eloise/01.png",
+          "paleta": "roxo"
+        },
+        {
+          "headline": "Sua empresa|também merece *escalação*",
+          "sub": "Um funcionário de IA em cada setor, cuidando do que trava seu dia.",
+          "cta": "",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "02/03",
+          "n": 2,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/teste-eloise/02.png"
+        },
+        {
+          "headline": "Monte seu time|com a *elever-ai*",
+          "sub": "Menos tarefa manual, mais tempo pra decidir.",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "03/03",
+          "n": 3,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/teste-eloise/03.png"
+        }
+      ],
+      "caption": "Final de Copa é isso: cada um no seu lugar, jogando junto. Na sua empresa dá pra montar o mesmo tipo de time, só que com funcionários de IA em cada setor. Eles cuidam da parte repetitiva e liberam seu pessoal pro que importa. Faça o diagnóstico gratuito e veja onde começar.\n\n#copadomundo #inteligenciaartificial #gestao #produtividade",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
