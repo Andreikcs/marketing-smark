@@ -1718,7 +1718,7 @@
         {
           "headline": "Funcionário de IA para seu provedor.👇",
           "sub": "Faz {#8B3CF7:upgrades} de planos e {#8B3CF7:renovação} de contratos 24/7.  ",
-          "cta": "conheça mais",
+          "cta": "Toque no botão para saber mais",
           "page": "",
           "chip": true,
           "tema": "claro",
@@ -1732,7 +1732,9 @@
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/campanha-provedor/01.png",
           "paleta": "roxo",
           "overlay": "roxo",
-          "ov_ang": 220
+          "ov_ang": 45,
+          "ov_pos": 48,
+          "overlay_op": 0.65
         }
       ],
       "caption": "Já pensou em ter um funcionário de IA que chama seus clientes no whatsApp, oferece upgrade de plano, renegocia, renova contrato e atualiza seu IXC automaticamente? ",
