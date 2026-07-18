@@ -1,0 +1,265 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-18T10:00:00-03:00",
+  "project": {
+    "name": "Smark Vault — Estúdio de Conteúdo Multi-marca",
+    "one_liner": "Estúdio local que gera publicações sociais on-brand para 3 marcas: a IA escreve a copy e monta a arte; o operador aprova e exporta.",
+    "description": "Ferramenta local (roda no Mac do operador) que produz carrosséis e posts de Instagram/LinkedIn com identidade de marca consistente em multi-marca (Smark, Provider Max, Elever AI). Um servidor HTTP em Python stdlib (localhost:8765) serve editor, painel de conteúdo, vitrine e configuração. A geração é em 2 camadas: a copy vem do Claude (Anthropic) via um 'Estúdio IA' e a arte é composta por um pipeline de fundo por IA (OpenAI gpt-image-1.5) + tipografia programática nítida a 2x renderizada por Chrome headless. Tem quality gate que bloqueia jargão e promessa de venda, histórico de versões estilo Google Docs e backup automático no GitHub a cada 5 min.",
+    "repo_path": "/Users/andreik/smark",
+    "public_url": null,
+    "github_url": "https://github.com/Andreikcs/marketing-smark",
+    "status": "production"
+  },
+  "people": {
+    "author_name": null,
+    "author_role": "sócio / operação e gestão (smark)",
+    "company_name": "Smark",
+    "company_public": false
+  },
+  "segmentation": {
+    "industry": "tech",
+    "company_size": "2-10",
+    "user_type": "internal-team",
+    "primary_job": "content",
+    "ai_usage": "core-feature",
+    "maturity": "production",
+    "deployment": "local-only",
+    "stack_family": "internal-tool"
+  },
+  "product": {
+    "problem": "Produzir conteúdo social on-brand em volume, para 3 marcas diferentes, sem depender de designer para o dia a dia e sem quebrar a consistência de voz/identidade — evitando também jargão e promessas de venda proibidas pela marca.",
+    "target_user": "Time interno da assessoria (operação/marketing) que precisa gerar carrosséis e posts para Smark, Provider Max e Elever AI mantendo paleta, voz e regras de cada marca.",
+    "main_flows": [
+      "Estúdio IA: briefing em linguagem natural -> Claude gera copy + conceito visual (tema claro por padrão) por card",
+      "Geração de fundo por IA (OpenAI) com direção de arte estruturada + composição de texto por Chrome headless (2x)",
+      "Editor card a card com preview ao vivo, cor de template (roxo/verde lima), ajuste fino de imagem",
+      "Painel de conteúdo: biblioteca com filtros por marca/status, preview Instagram/LinkedIn, download",
+      "Vitrine read-only por marca (galeria de aprovação)",
+      "Quality gate (revisar.py): valida marca, bloqueia palavras-proibidas e promessa de venda/faturamento, checa CTA/hashtags/alt-text",
+      "Histórico de versões: restaurar qualquer versão salva (autosave git a cada ~5 min)",
+      "Exportar PNG 2x (frame ou carrossel) com download para a pasta Downloads"
+    ],
+    "modules": [
+      "editor_server.py (1068 LOC) — servidor HTTP, rotas, segurança, jobs",
+      "compositor.py (378 LOC) — composição HTML/CSS + render Chrome headless 2x",
+      "estudio.py (256 LOC) — cérebro do chat: copy + conceito (Claude, fallback OpenAI)",
+      "painel.py / lancamento.py / lancamento_server.py — painel e editor de lançamento",
+      "revisar.py (159 LOC) — quality gate de marca",
+      "_direcao.py (90 LOC) — construtor de prompt nível agência por tipo de post",
+      "openai_image.py / openai_edit.py / gemini_image.py — geradores de imagem",
+      "design-system/ — tokens (claro/escuro) + CSS de componentes (fonte única visual)"
+    ],
+    "integrations": [
+      "Anthropic API (Claude claude-opus-4-8) — geração de copy",
+      "OpenAI API (gpt-image-1.5) — geração/edição de fundo de arte",
+      "Google Gemini API (gemini_image.py) — gerador alternativo (secundário)",
+      "GitHub (git push automático via launchd)",
+      "Google Chrome headless — render de PNG",
+      "Obsidian (o repositório é um vault)"
+    ],
+    "stack": {
+      "frontend": ["HTML/CSS/JS vanilla (editor single-file _editor2.html)", "design-system CSS (tokens claro/escuro)", "sem framework"],
+      "backend": ["Python 3 stdlib (http.server, socketserver, threading)", "sem framework web", "urllib para chamadas de API"],
+      "database": ["JSON flat-file (editor.json) como store de estado", "notas Markdown com frontmatter YAML", "sem banco relacional"],
+      "auth": ["token de sessão por boot + guarda Host/Origin (CSRF/DNS-rebinding)", "acesso restrito a localhost", "sem autenticação de usuário (single-operator)"],
+      "ai": ["Claude (Anthropic) para copy", "OpenAI gpt-image-1.5 para imagem", "Gemini como alternativo"],
+      "infra": ["macOS local", "launchd (autosave commit+push a cada 5 min)", "Chrome headless para rendering", "GitHub como backup/versionamento"]
+    }
+  },
+  "impact": {
+    "summary": "Ferramenta interna em uso real (production single-team). Sem telemetria embarcada, então tempos e volume mensal são estimativas/proxies com premissas explícitas, nunca medições. O que é medível e verificado: artefatos produzidos (31 posts / 80 cards / 330 PNGs), 227 commits em ~2 semanas, quality gate com ~7 checagens automáticas de marca, e histórico de versões que já evitou perda real de trabalho. O valor mais defensável é (a) custo de construção do sistema e (b) tempo de produção por carrossel vs. fluxo manual com designer.",
+    "metrics": [
+      {
+        "id": "time_saved_hours_month",
+        "label": "Horas economizadas / mês",
+        "unit": "hours/month",
+        "value": 60,
+        "low": 18,
+        "high": 143,
+        "currency": null,
+        "formula": "(tempo_antes_min - tempo_depois_min) * volume_mes / 60",
+        "assumptions": [
+          "tempo_antes = 210 min/carrossel (design ~2,5h em Figma/Canva + copy ~1h) — PROXY de mercado, não cronometrado aqui",
+          "tempo_depois = 30 min/carrossel (briefing + gerar + revisar + exportar) — PROXY observacional, não cronometrado",
+          "volume_mes = 20 carrosséis/mês (steady-state estimado; medido: 31 posts produzidos durante ~2 semanas de construção/testes, o que não representa regime permanente)",
+          "faixa low usa 10 carrosséis/mês e deltas menores; high usa 40/mês e deltas maiores"
+        ],
+        "confidence": "estimated",
+        "evidence": [
+          "editor.json: 31 posts / 80 cards (measured)",
+          "330 PNGs em marcas/*/publicacoes/*/arte (measured)",
+          "existência do pipeline Estúdio->compositor (scripts/estudio.py, scripts/compositor.py)"
+        ]
+      },
+      {
+        "id": "money_saved_brl_month",
+        "label": "Economia financeira / mês",
+        "unit": "BRL/month",
+        "value": 4800,
+        "low": 1080,
+        "high": 17160,
+        "currency": "BRL",
+        "formula": "horas_economizadas_mes * custo_hora",
+        "assumptions": [
+          "custo_hora = R$80/h (blended designer+copywriter freelance BR) — premissa",
+          "low: 18h * R$60; base: 60h * R$80; high: 143h * R$120",
+          "depende inteiramente das premissas de time_saved_hours_month (estimadas)"
+        ],
+        "confidence": "estimated",
+        "evidence": ["derivado de time_saved_hours_month (estimated)"]
+      },
+      {
+        "id": "process_cycle_time_reduction_pct",
+        "label": "Redução do tempo de ciclo do processo",
+        "unit": "percent",
+        "value": 86,
+        "low": 70,
+        "high": 90,
+        "currency": null,
+        "formula": "(tempo_antes - tempo_depois) / tempo_antes * 100",
+        "assumptions": [
+          "base: (210-30)/210 = 85,7% -> 86%",
+          "usa os mesmos tempos PROXY de time_saved_hours_month; não cronometrado"
+        ],
+        "confidence": "estimated",
+        "evidence": ["mesmas premissas de tempo (proxy)"]
+      },
+      {
+        "id": "error_reduction_pct",
+        "label": "Redução de erros / retrabalho",
+        "unit": "percent",
+        "value": null,
+        "low": null,
+        "high": null,
+        "currency": null,
+        "formula": "(taxa_erro_antes - taxa_erro_depois) * 100 / taxa_erro_antes",
+        "assumptions": [
+          "Sem baseline medido de taxa de erro antes/depois. PROXY qualitativo: o gate revisar.py automatiza ~7 checagens de marca (marca válida, palavras-proibidas, promessa absoluta, promessa de venda/faturamento, métrica de vaidade, presença de CTA, hashtags, alt-text) e bloqueia (erro) promessa de venda.",
+          "Para virar measured: registrar quantos posts foram reprovados/corrigidos pelo gate ao longo de N publicações."
+        ],
+        "confidence": "proxy",
+        "evidence": ["scripts/revisar.py (159 LOC) — regras de gate", "regra #10 do CLAUDE.md (gate bloqueia promessa de venda)"]
+      },
+      {
+        "id": "build_value_brl",
+        "label": "Valor estimado de construção do sistema",
+        "unit": "BRL",
+        "value": 32500,
+        "low": 15000,
+        "high": 63000,
+        "currency": "BRL",
+        "formula": "horas_dev_estimadas * custo_hora_dev",
+        "assumptions": [
+          "horas_dev base = 250h (3.054 LOC Python em 13 scripts + editor single-file ~1.5k LOC HTML/JS + design-system CSS + integrações Claude/OpenAI + compositor headless + histórico de versões + quality gate + camada de segurança)",
+          "custo_hora_dev = R$130/h (dev sênior BR / consultoria); low 150h*R$100; high 350h*R$180",
+          "estimativa de esforço de reconstrução do zero, não de gasto real (grande parte foi construída com assistência de IA)"
+        ],
+        "confidence": "estimated",
+        "evidence": [
+          "wc -l scripts/*.py = 3054 (measured)",
+          "editor_server.py 1068 LOC, compositor.py 378 LOC (measured)",
+          "227 commits entre 2026-07-04 e 2026-07-18 (measured)"
+        ]
+      }
+    ],
+    "qualitative_wins": [
+      "Consistência de marca em multi-marca (3 marcas com paleta e voz herdadas de um DNA de grupo)",
+      "Compliance automatizado: gate impede jargão e promessa de venda/faturamento antes de publicar",
+      "Recuperação de trabalho: histórico de versões (estilo Google Docs) já resgatou um carrossel de 5 cards perdido — evitou refazer horas",
+      "Produção sem designer no fluxo diário (arte composta programaticamente + fundo por IA)",
+      "Backup automático e versionado (git commit+push a cada 5 min via launchd)",
+      "Flexibilidade de tema por card (template roxo ou verde lima) respeitando a paleta oficial"
+    ],
+    "before_after": [
+      {
+        "process": "Escrever copy on-brand",
+        "before": "Copywriter escreve manualmente; risco de jargão e de prometer venda (proibido pela marca)",
+        "after": "Claude gera copy por card + gate revisar.py valida marca e bloqueia jargão/promessa",
+        "metric": "~7 checagens de marca automatizadas por post",
+        "evidence": "scripts/estudio.py, scripts/revisar.py",
+        "confidence": "measured"
+      },
+      {
+        "process": "Produzir arte do carrossel",
+        "before": "Designer monta cada card em Figma/Canva (~2,5h/carrossel)",
+        "after": "Fundo por IA + tipografia programática nítida a 2x (Chrome headless)",
+        "metric": "tempo/carrossel (proxy ~2,5h -> ~0,5h)",
+        "evidence": "scripts/compositor.py, scripts/openai_image.py, 330 PNGs gerados",
+        "confidence": "estimated"
+      },
+      {
+        "process": "Versionar / recuperar trabalho",
+        "before": "Edições sobrescreviam estado; perda de trabalho possível (ocorreu: 5 cards perdidos)",
+        "after": "Histórico de versões + autosave git a cada 5 min; restauração por commit",
+        "metric": "granularidade de recuperação ~5 min",
+        "evidence": "rota /historico e /restaurar em editor_server.py; 227 commits de autosave",
+        "confidence": "measured"
+      },
+      {
+        "process": "Exportar carrossel completo",
+        "before": "Exportar 1 a 1; risco de faltar frame sem aviso",
+        "after": "Export em lote com timeout+retry por frame e aviso de faltas; download para Downloads",
+        "metric": "5/5 frames exportados em ~32s (teste)",
+        "evidence": "rota /exportar em editor_server.py; render_html_to_png com retry",
+        "confidence": "measured"
+      }
+    ]
+  },
+  "screenshots": [
+    {
+      "file": "screenshots/01-hub.png",
+      "title": "HUB / Menu",
+      "what_it_proves": "Ponto de entrada local (localhost:8765) com acesso a Editor, Painel, Vitrine, Config e Design System.",
+      "status": "captured"
+    },
+    {
+      "file": "screenshots/02-editor.png",
+      "title": "Super Editor (fluxo principal)",
+      "what_it_proves": "Edição card a card com preview ao vivo, painéis de Texto/Fundo, Estúdio IA e a tira de cards do carrossel — o core job do sistema.",
+      "status": "captured"
+    },
+    {
+      "file": "screenshots/03-painel.png",
+      "title": "Painel de Conteúdo",
+      "what_it_proves": "Biblioteca com 31 publicações reais, filtros por marca/status, previews multi-marca (Smark/Provider Max/Elever) e ações por card (ver/editar/baixar/duplicar/excluir).",
+      "status": "captured"
+    },
+    {
+      "file": "screenshots/04-vitrine.png",
+      "title": "Vitrine (galeria de aprovação)",
+      "what_it_proves": "Visão read-only por marca para revisar copy e conceito antes de publicar.",
+      "status": "captured"
+    },
+    {
+      "file": "screenshots/05-config.png",
+      "title": "Configuração / Estado do sistema",
+      "what_it_proves": "Configuração de temas, cores e comportamento; indica proteção CSRF/token ativa.",
+      "status": "captured"
+    }
+  ],
+  "marketing": {
+    "headline": "Um estúdio de conteúdo multi-marca que roda no seu Mac: a IA escreve a copy e monta a arte; você aprova e exporta.",
+    "quote_candidate": null,
+    "bullets_3": [
+      "Copy on-brand pelo Claude + gate que bloqueia jargão e promessa de venda antes de publicar",
+      "Arte de carrossel em 2 camadas (fundo por IA + tipografia nítida a 2x) sem designer no fluxo diário",
+      "Histórico de versões estilo Google Docs + backup automático no GitHub a cada 5 min"
+    ],
+    "can_publish_publicly": false,
+    "anonymize": true
+  },
+  "gaps": [
+    "Sem telemetria/analytics embarcada: tempos de produção e volume mensal são estimados, não medidos.",
+    "Sem baseline cronometrado 'com vs sem sistema' — necessário para virar time_saved measured.",
+    "Volume steady-state mensal desconhecido (os 31 posts foram produzidos durante ~2 semanas de construção/testes).",
+    "Custo real de API por post (Claude + OpenAI) não instrumentado — é estimável mas hoje unknown.",
+    "Sem dados de conversão/engajamento dos posts publicados (o sistema não publica nem mede resultado nas redes).",
+    "Nenhum depoimento de cliente/usuário coletado (não inventar).",
+    "Taxa de reprovação pelo quality gate não registrada em log agregável."
+  ],
+  "quality_score": {
+    "completeness_0_to_100": 80,
+    "evidence_strength_0_to_100": 55,
+    "notes": "Descoberta de produto e stack é forte e verificada no código (LOC, rotas, integrações, artefatos, git). Impacto financeiro/tempo é honestamente estimado/proxy por falta de telemetria e baseline cronometrado. Métricas measured limitam-se a artefatos produzidos, checagens do gate, features de versionamento/export e histórico git."
+  }
+}
