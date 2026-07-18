@@ -1731,7 +1731,7 @@
     {
       "slug": "campanha-provedor",
       "marca": "provider-max",
-      "status": "salvo",
+      "status": "rascunho",
       "titulo": "Campanha Provedor",
       "size": "1080x1350",
       "frames": [
@@ -1756,7 +1756,8 @@
           "ov_pos": 48,
           "overlay_op": 0.65,
           "_accOpen": true,
-          "posx": 26
+          "posx": 26,
+          "_v": 1
         },
         {
           "headline": "Funcionário de IA para seu provedor.👇",
@@ -1779,17 +1780,18 @@
           "ov_pos": 48,
           "overlay_op": 0.65,
           "_accOpen": true,
-          "posx": 26
+          "posx": 26,
+          "_v": 1
         },
         {
-          "headline": "Funcionário de IA para seu provedor.👇",
-          "sub": "Faz {#8B3CF7:upgrades} de planos e {#8B3CF7:renovação} de contratos 24/7.  \n",
-          "cta": "Toque no botão para saber mais",
+          "headline": "SEU PROVEDOR PODE TER|UM *FUNCIONÁRIO DE IA*",
+          "sub": "Atende assinante, resolve chamado e organiza a fila do suporte",
+          "cta": "Diagnóstico gratuito — link na bio",
           "page": "03/03",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
+          "bgmode": "imagem",
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/campanha-provedor/_regen/03-7819b0.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
@@ -1797,12 +1799,16 @@
           "n": 3,
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/campanha-provedor/03.png",
           "paleta": "roxo",
-          "overlay": "roxo",
+          "overlay": "todo-branco",
           "ov_ang": 45,
           "ov_pos": 48,
-          "overlay_op": 0.65,
+          "overlay_op": 0.45,
           "_accOpen": true,
-          "posx": 26
+          "posx": 100,
+          "_v": 2,
+          "satur": 0.75,
+          "contraste": 0.7,
+          "posy": 9
         }
       ],
       "caption": "Já pensou em ter um funcionário de IA que chama seus clientes no whatsApp, oferece upgrade de plano, renegocia, renova contrato e atualiza seu IXC automaticamente? ",
