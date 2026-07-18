@@ -1716,23 +1716,24 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
-          "cta": "",
-          "page": "01/01",
+          "headline": "Funcionário de IA para seu provedor",
+          "sub": "Faz {#8B3CF7:upgrades} de planos e {#8B3CF7:renovação} de contratos 24/7.  ",
+          "cta": "Conheça mais",
+          "page": "",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
+          "bgmode": "degrade",
           "bg": "",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/provider-max/publicacoes/social/instagram/arte/campanha-provedor/01.png"
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/campanha-provedor/01.png",
+          "paleta": "roxo"
         }
       ],
-      "caption": "",
+      "caption": "Já pensou em ter um funcionário de IA, que chama seus clientes automatic",
       "canais": [
         "instagram"
       ]
