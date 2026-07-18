@@ -1483,7 +1483,7 @@
     {
       "slug": "crm-com-ia---loj-m-veis",
       "marca": "elever-ai",
-      "status": "rascunho",
+      "status": "salvo",
       "titulo": "CRM com IA - Lojá Móveis",
       "size": "1080x1350",
       "frames": [
@@ -1510,8 +1510,8 @@
         },
         {
           "headline": "Clientes sem respostas \n= projetos perdidos.",
-          "sub": "",
-          "cta": "Clique no botão para saber ",
+          "sub": "Se isso ainda acontece na sua loja,\nnós temos uma oportunidade para você.",
+          "cta": "Clique no botão",
           "page": "02/02",
           "chip": true,
           "tema": "escuro",
