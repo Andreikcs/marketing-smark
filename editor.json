@@ -1509,7 +1509,7 @@
           "ov_pos": 48
         }
       ],
-      "caption": "Atender ",
+      "caption": "Já pensou ter um funcionário de IA que atende todos seus clientes no whatsApp, captura interesse de projeto, alinha expectativa de prazos,",
       "canais": [
         "instagram"
       ]
@@ -1711,15 +1711,15 @@
     {
       "slug": "campanha-provedor",
       "marca": "provider-max",
-      "status": "rascunho",
+      "status": "salvo",
       "titulo": "Campanha Provedor",
       "size": "1080x1350",
       "frames": [
         {
           "headline": "Funcionário de IA para seu provedor.👇",
-          "sub": "Faz {#8B3CF7:upgrades} de planos e {#8B3CF7:renovação} de contratos 24/7.  ",
+          "sub": "Faz {#8B3CF7:upgrades} de planos e {#8B3CF7:renovação} de contratos 24/7.  \n",
           "cta": "Toque no botão para saber mais",
-          "page": "",
+          "page": "01/03",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
@@ -1734,7 +1734,55 @@
           "overlay": "roxo",
           "ov_ang": 45,
           "ov_pos": 48,
-          "overlay_op": 0.65
+          "overlay_op": 0.65,
+          "_accOpen": true,
+          "posx": 26
+        },
+        {
+          "headline": "Funcionário de IA para seu provedor.👇",
+          "sub": "Faz {#8B3CF7:upgrades} de planos e {#8B3CF7:renovação} de contratos 24/7.  \n",
+          "cta": "Toque no botão para saber mais",
+          "page": "02/03",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 2,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/campanha-provedor/02.png",
+          "paleta": "roxo",
+          "overlay": "roxo",
+          "ov_ang": 45,
+          "ov_pos": 48,
+          "overlay_op": 0.65,
+          "_accOpen": true,
+          "posx": 26
+        },
+        {
+          "headline": "Funcionário de IA para seu provedor.👇",
+          "sub": "Faz {#8B3CF7:upgrades} de planos e {#8B3CF7:renovação} de contratos 24/7.  \n",
+          "cta": "Toque no botão para saber mais",
+          "page": "03/03",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 3,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/campanha-provedor/03.png",
+          "paleta": "roxo",
+          "overlay": "roxo",
+          "ov_ang": 45,
+          "ov_pos": 48,
+          "overlay_op": 0.65,
+          "_accOpen": true,
+          "posx": 26
         }
       ],
       "caption": "Já pensou em ter um funcionário de IA que chama seus clientes no whatsApp, oferece upgrade de plano, renegocia, renova contrato e atualiza seu IXC automaticamente? ",
