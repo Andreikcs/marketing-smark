@@ -1952,6 +1952,35 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "dgssdgdf",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "dgssdgdf",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "fksjadhfasd",
+          "sub": "fsdafgasd",
+          "cta": "gasdgasdgas",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/dgssdgdf/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
