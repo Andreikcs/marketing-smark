@@ -1815,6 +1815,89 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "telecom",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "Telecom",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/telecom/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
+    },
+    {
+      "titulo": "Funcionário de IA para provedor",
+      "slug": "funcionario-de-ia-para-provedor",
+      "marca": "provider-max",
+      "size": "1080x1350",
+      "status": "rascunho",
+      "canais": [
+        "instagram"
+      ],
+      "caption": "No provedor, o telefone não para: instalação, boleto, sinal caindo. A Clara atende o assinante na hora, registra o chamado e deixa sua equipe livre pro que é técnico. Sem fila, sem cliente esperando resposta. Faça o diagnóstico gratuito e veja onde ela encaixa no seu ISP.\n\n#provedor #internet #isp #suporte",
+      "frames": [
+        {
+          "headline": "SEU PROVEDOR PODE TER|UM *FUNCIONÁRIO DE IA*",
+          "sub": "Atende assinante, resolve chamado e organiza a fila do suporte",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "imagem",
+          "page": "",
+          "n": 1,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/funcionario-de-ia-para-provedor/01.png"
+        }
+      ]
+    },
+    {
+      "slug": "telecom-f810",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "Telecom",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "01/01",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/telecom-f810/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
