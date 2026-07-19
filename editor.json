@@ -1874,7 +1874,60 @@
       "slug": "telecom-f810",
       "marca": "smark",
       "status": "rascunho",
-      "titulo": "Telecom",
+      "titulo": "Fundo Telecom no estilo Vivo — versão smark",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU PROVEDOR|COM UM *FUNCIONÁRIO DE IA*",
+          "sub": "A Clara cuida do seu ISP dia e noite",
+          "cta": "",
+          "page": "01/03",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/telecom-f810/01.png"
+        },
+        {
+          "headline": "MENOS FILA|MAIS *ATENDIMENTO*",
+          "sub": "Ela responde clientes na hora, sem pausa",
+          "cta": "",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "02/03",
+          "n": 2,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/telecom-f810/02.png"
+        },
+        {
+          "headline": "COMECE PELO|*DIAGNÓSTICO* GRATUITO",
+          "sub": "A gente mostra onde a IA encaixa no seu provedor",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "tema": "claro",
+          "chip": false,
+          "grade": true,
+          "bgmode": "claro",
+          "page": "03/03",
+          "n": 3,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/telecom-f810/03.png"
+        }
+      ],
+      "caption": "Você mandou a referência e a gente adaptou: mesmo enquadramento e clima editorial, só que na nossa cara. Aqui a estrela não é o preço — é a Clara, a funcionária de IA que atende os clientes do seu provedor sem parar. Menos fila, mais tempo pra sua equipe. Quer ver onde ela encaixa? Comece pelo diagnóstico gratuito.\n\n#provedor #isp #inteligenciaartificial #atendimento",
+      "canais": [
+        "instagram"
+      ]
+    },
+    {
+      "slug": "teleco",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "TELECO",
       "size": "1080x1350",
       "frames": [
         {
@@ -1891,7 +1944,7 @@
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/telecom-f810/01.png"
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teleco/01.png"
         }
       ],
       "caption": "",
