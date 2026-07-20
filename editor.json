@@ -1942,9 +1942,9 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "Uma funcionária de IA para seu provedor.",
-          "sub": "A Clara cuida de renovação de contrato e dúvidas do assinante, dia e noite.",
-          "cta": "Diagnóstico gratuito — link na bio",
+          "headline": "Clara, a funcionária \nde IA para o seu provedor.",
+          "sub": "Renova contrato e negocia upgrade, \nsem o custo de contratar mais uma pessoa.",
+          "cta": "Toque no botão abaixo",
           "page": "",
           "chip": true,
           "tema": "claro",
@@ -1958,7 +1958,7 @@
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/01.png",
           "_v": 1,
           "overlay": "todo-branco",
-          "overlay_op": 0.45,
+          "overlay_op": 0.6,
           "_accOpen": true,
           "satur": 0.45
         }
