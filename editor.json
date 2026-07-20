@@ -1907,9 +1907,9 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "{#FFFFFF:Upgrade e renovação no automático  24/7.}",
-          "sub": "{#FFFFFF:Clara, a funcionária de IA que faz upgrade de plano e renegocia fidelidade antes do seu cliente cancelar. }",
-          "cta": "clique no botão",
+          "headline": "{#FFFFFF:Upgrade e renovação \nno automático  24/7.}",
+          "sub": "{#FFFFFF:Clara, a funcionária de IA que faz upgrade de plano e renegocia fidelidade antes do seu cliente cancelar. 👇}",
+          "cta": "Toque no botão abaixo",
           "page": "",
           "chip": true,
           "tema": "claro",
@@ -1921,7 +1921,12 @@
           "grade": true,
           "n": 1,
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-a-dark---provedor/01.png",
-          "_v": 1
+          "_v": 1,
+          "paleta": "roxo",
+          "overlay": "roxo",
+          "overlay_op": 0.9,
+          "ov_ang": 175,
+          "ov_pos": 28
         }
       ],
       "caption": "Todo dia um cliente manda mensagem e ninguém responde a tempo. Ele espera, cansa e vai embora calado. A Clara, funcionária de IA pra provedores, atende na hora e mantém cada conversa viva. Faça o diagnóstico gratuito e veja quantas conversas você está deixando escapar.\n\n#provedor #internet #atendimento #gestao",
