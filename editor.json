@@ -1937,7 +1937,7 @@
     {
       "slug": "lote-b-light---provedor",
       "marca": "provider-max",
-      "status": "rascunho",
+      "status": "salvo",
       "titulo": "Suporte que não dorme para provedores",
       "size": "1080x1350",
       "frames": [
@@ -1960,7 +1960,11 @@
           "overlay": "todo-branco",
           "overlay_op": 0.6,
           "_accOpen": true,
-          "satur": 0.45
+          "satur": 1.35,
+          "posx": 36,
+          "zoom": 1,
+          "brilho": 1,
+          "contraste": 1.25
         }
       ],
       "caption": "No provedor, atendimento parado é cliente esperando. A Clara, funcionária de IA para ISP, responde dúvidas e cuida de renovação de contrato a qualquer hora. Menos fila, menos custo de plantão. Comece pelo diagnóstico gratuito.\n\n#provedor #isp #suporte #atendimento",
