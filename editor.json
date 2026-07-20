@@ -1610,14 +1610,14 @@
     {
       "slug": "lote-a-dark---m-veis",
       "marca": "elever-ai",
-      "status": "rascunho",
+      "status": "salvo",
       "titulo": "Cliente esperando resposta",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "Quantos orçamentos \nsua loja perde sem nem saber?",
-          "sub": "Loja sem resposta rápida perde a venda em silêncio.",
-          "cta": "Diagnóstico gratuito — link na bio",
+          "headline": "Quantos orçamentos \nvocê perde sem saber?",
+          "sub": "Loja sem resposta rápida perde a venda em silêncio. 👇",
+          "cta": "Toque no botão abaixo.",
           "page": "",
           "chip": true,
           "tema": "claro",
@@ -1631,8 +1631,8 @@
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---m-veis/01.png",
           "_v": 1,
           "overlay": "branco",
-          "overlay_op": 0.9,
-          "ov_ang": 180
+          "overlay_op": 1,
+          "ov_ang": 195
         }
       ],
       "caption": "O casal escolhe o móvel, manda a dúvida e fica olhando a tela. Se ninguém responde na hora, eles fecham o app e vão pra outra loja. Com um funcionário de IA no atendimento, cada pergunta tem resposta na mesma hora, dia e noite. Menos espera, menos cliente perdido.\n\n#atendimento #inteligenciaartificial #varejo #gestao",
