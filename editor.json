@@ -1702,9 +1702,9 @@
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "Sua loja de carros|com um *funcionário de IA*",
-          "sub": "Atende cada cliente sem deixar ninguém esperando.",
-          "cta": "Diagnóstico gratuito • link na bio",
+          "headline": "{#FFFFFF:Quantos carros você deixa \nde vender sem perceber?}",
+          "sub": "{#C1A4EA:Um funcionário de IA que responde \nantes que o comprador vá pra outra loja.👇}",
+          "cta": "Toque no botão abaixo.",
           "page": "",
           "chip": true,
           "tema": "claro",
@@ -1718,7 +1718,8 @@
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/01.png",
           "_v": 2,
           "overlay": "roxo",
-          "overlay_op": 1
+          "overlay_op": 1,
+          "ov_pos": 0
         }
       ],
       "caption": "Todo dia chega gente perguntando preço, ficha técnica e condições. Um funcionário de IA responde na hora, organiza os interessados e passa pro vendedor só quem está pronto. Menos cliente perdido, mais tempo pra fechar negócio no pátio.\n\n#concessionaria #revenda #funcionariodeia #eleverai",
