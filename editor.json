@@ -1938,27 +1938,30 @@
       "slug": "lote-b-light---provedor",
       "marca": "provider-max",
       "status": "rascunho",
-      "titulo": "Lote B (light) - Provedor",
+      "titulo": "Suporte que não para para provedores",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
-          "cta": "",
-          "page": "01/01",
+          "headline": "SEU SUPORTE PODE ATENDER|*SEM PARAR*",
+          "sub": "Clara cuida dos seus assinantes dia e noite",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "page": "",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
+          "bgmode": "imagem",
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/_regen/01-edd351.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/01.png"
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/01.png",
+          "_v": 2,
+          "overlay": "todo-branco",
+          "overlay_op": 0.9
         }
       ],
-      "caption": "",
+      "caption": "No provedor, chamado parado é cliente irritado. A Clara atende, responde e organiza as demandas de suporte a qualquer hora, sem fila e sem cansar. Sua equipe humana foca no que é difícil; o resto anda sozinho.\n\n#provedores #ISP #suporte #atendimento",
       "canais": [
         "instagram"
       ]
