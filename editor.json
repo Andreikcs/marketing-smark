@@ -1703,22 +1703,25 @@
       "frames": [
         {
           "headline": "Sua loja de carros|com um *funcionário de IA*",
-          "sub": "Atende, organiza e nunca deixa cliente esperando.",
+          "sub": "Atende cada cliente sem deixar ninguém esperando.",
           "cta": "Diagnóstico gratuito • link na bio",
           "page": "",
           "chip": true,
           "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
+          "bgmode": "imagem",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/_regen/01-7fb9d9.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/01.png"
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/01.png",
+          "_v": 2,
+          "overlay": "roxo",
+          "overlay_op": 1
         }
       ],
-      "caption": "Numa concessionária, cliente que espera resposta é cliente que some. O funcionário de IA da elever-ai responde na hora, organiza os interessados e cuida do que é repetitivo — pra sua equipe focar na venda cara a cara. Menos tempo perdido, mais controle do dia a dia.\n\n#concessionaria #revenda #lojademulti marcas #inteligenciaartificial",
+      "caption": "Todo dia chega gente perguntando preço, ficha técnica e condições. Um funcionário de IA responde na hora, organiza os interessados e passa pro vendedor só quem está pronto. Menos cliente perdido, mais tempo pra fechar negócio no pátio.\n\n#concessionaria #revenda #funcionariodeia #eleverai",
       "canais": [
         "instagram"
       ]
