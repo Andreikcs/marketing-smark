@@ -1937,31 +1937,31 @@
     {
       "slug": "lote-b-light---provedor",
       "marca": "provider-max",
-      "status": "rascunho",
+      "status": "salvo",
       "titulo": "Suporte que não para para provedores",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "SEU SUPORTE PODE ATENDER|*SEM PARAR*",
-          "sub": "Clara cuida dos seus assinantes dia e noite",
+          "headline": "SEU SUPORTE PODE|ATENDER *SEM PARAR*",
+          "sub": "A Clara cuida de contrato e renovação enquanto seu time respira.",
           "cta": "Diagnóstico gratuito — link na bio",
           "page": "",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/_regen/01-edd351.png",
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/_regen/01-703063.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/01.png",
-          "_v": 2,
+          "_v": 3,
           "overlay": "todo-branco",
-          "overlay_op": 0.9
+          "overlay_op": 1
         }
       ],
-      "caption": "No provedor, chamado parado é cliente irritado. A Clara atende, responde e organiza as demandas de suporte a qualquer hora, sem fila e sem cansar. Sua equipe humana foca no que é difícil; o resto anda sozinho.\n\n#provedores #ISP #suporte #atendimento",
+      "caption": "No provedor, ninguém pode ficar esperando resposta. A Clara é a funcionária de IA da provider-max que atende, resolve dúvida de contrato e cuida de renovação a qualquer hora. Seu time humano foca no que importa e o cliente nunca fica no vácuo.\n\n#provedores #ISP #atendimento #suporte",
       "canais": [
         "instagram"
       ]
