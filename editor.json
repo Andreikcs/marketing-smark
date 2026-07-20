@@ -1639,6 +1639,60 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "crm-com-ia---loj-m-veis-c8902",
+      "marca": "elever-ai",
+      "status": "rascunho",
+      "titulo": "CRM com IA - Lojá Móveis (cópia)",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "CRM com IA + \nFuncionário \n{#8B3CF7:whatsapp }",
+          "sub": "",
+          "cta": "Para loja de móveis",
+          "page": "01/02",
+          "chip": true,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/_uploads/7a78ac8141.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis-c8902/01.png",
+          "_v": 2,
+          "overlay": "branco",
+          "overlay_op": 0.2,
+          "ov_ang": 180,
+          "ov_pos": 48
+        },
+        {
+          "headline": "Clientes sem respostas \n= projetos perdidos.",
+          "sub": "Se isso ainda acontece na sua loja,\nnós temos uma oportunidade para você.",
+          "cta": "Clique no botão",
+          "page": "02/02",
+          "chip": true,
+          "tema": "escuro",
+          "bgmode": "imagem",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/_uploads/7a78ac8141.png",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 2,
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis-c8902/02.png",
+          "overlay": "branco",
+          "overlay_op": 0.2,
+          "ov_ang": 180,
+          "ov_pos": 48
+        }
+      ],
+      "caption": "Já pensou ter um funcionário de IA que atende todos seus clientes no whatsApp, captura interesse de projeto,  identifica orçamento, alinha expectativa de prazos e entrega para seu time comercial ou de projetos somente quem realmente tem potencial e interesse. Clique no botão e saiba mais.",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
