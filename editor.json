@@ -1871,89 +1871,6 @@
       ]
     },
     {
-      "slug": "telecom-f810",
-      "marca": "smark",
-      "status": "rascunho",
-      "titulo": "Fundo Telecom no estilo Vivo — versão smark",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "SEU PROVEDOR|COM UM *FUNCIONÁRIO DE IA*",
-          "sub": "A Clara cuida do seu ISP dia e noite",
-          "cta": "",
-          "page": "01/03",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "claro",
-          "bg": "",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/telecom-f810/01.png"
-        },
-        {
-          "headline": "MENOS FILA|MAIS *ATENDIMENTO*",
-          "sub": "Ela responde clientes na hora, sem pausa",
-          "cta": "",
-          "tema": "claro",
-          "chip": false,
-          "grade": true,
-          "bgmode": "claro",
-          "page": "02/03",
-          "n": 2,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/telecom-f810/02.png"
-        },
-        {
-          "headline": "COMECE PELO|*DIAGNÓSTICO* GRATUITO",
-          "sub": "A gente mostra onde a IA encaixa no seu provedor",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "tema": "claro",
-          "chip": false,
-          "grade": true,
-          "bgmode": "claro",
-          "page": "03/03",
-          "n": 3,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/telecom-f810/03.png"
-        }
-      ],
-      "caption": "Você mandou a referência e a gente adaptou: mesmo enquadramento e clima editorial, só que na nossa cara. Aqui a estrela não é o preço — é a Clara, a funcionária de IA que atende os clientes do seu provedor sem parar. Menos fila, mais tempo pra sua equipe. Quer ver onde ela encaixa? Comece pelo diagnóstico gratuito.\n\n#provedor #isp #inteligenciaartificial #atendimento",
-      "canais": [
-        "instagram"
-      ]
-    },
-    {
-      "slug": "teleco",
-      "marca": "smark",
-      "status": "rascunho",
-      "titulo": "Fundo estilo Vivo empresas",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "sub": "",
-          "cta": "Diagnóstico gratuito • link na bio",
-          "page": "",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "imagem",
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/teleco/_regen/01-762dd4.png",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/teleco/01.png",
-          "_v": 1
-        }
-      ],
-      "caption": "Cada departamento pode ter um funcionário de IA cuidando do trabalho repetitivo. A gente mostra onde começar, sem enrolação. Faça o diagnóstico gratuito e veja o que dá pra automatizar hoje.\n\n#smark #inteligenciaartificial #automacao #gestao",
-      "canais": [
-        "instagram"
-      ]
-    },
-    {
       "slug": "dgssdgdf",
       "marca": "smark",
       "status": "rascunho",
@@ -1983,16 +1900,16 @@
       ]
     },
     {
-      "slug": "provedor-dark",
+      "slug": "lote-a-dark---provedor",
       "marca": "provider-max",
       "status": "rascunho",
-      "titulo": "Provedor Dark",
+      "titulo": "Lote A (dark) - Provedor",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "Quantos clientes seu \nprovedor perde sem nem saber?",
-          "sub": "Um funcionário de IA que negocia antes que o seu assinante cancele.",
-          "cta": "Toque no botão e saiba mais",
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
           "page": "",
           "chip": true,
           "tema": "claro",
@@ -2003,10 +1920,10 @@
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/provider-max/publicacoes/social/instagram/arte/provedor-dark/01.png"
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-a-dark---provedor/01.png"
         }
       ],
-      "caption": "Oi! Aqui é o Robson, da smark. Quantos clientes seu provedor perde por demorar pra negociar upgrade ou renovação de contrato? Isso é assinante indo pro concorrente. Posso te mostrar como resolver?",
+      "caption": "",
       "canais": [
         "instagram"
       ]
