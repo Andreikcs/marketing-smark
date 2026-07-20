@@ -1921,7 +1921,7 @@
           "grade": true,
           "n": 1,
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-a-dark---provedor/01.png",
-          "_v": 1,
+          "_v": 2,
           "paleta": "roxo",
           "overlay": "roxo",
           "overlay_op": 0.9,
@@ -1937,31 +1937,33 @@
     {
       "slug": "lote-b-light---provedor",
       "marca": "provider-max",
-      "status": "salvo",
-      "titulo": "Suporte que não para para provedores",
+      "status": "rascunho",
+      "titulo": "Suporte que não dorme para provedores",
       "size": "1080x1350",
       "frames": [
         {
-          "headline": "SEU SUPORTE PODE|ATENDER *SEM PARAR*",
-          "sub": "A Clara cuida de contrato e renovação enquanto seu time respira.",
+          "headline": "SEU SUPORTE|PODE ATENDER *SEM PARAR*",
+          "sub": "A Clara cuida de renovação de contrato e dúvidas do assinante, dia e noite.",
           "cta": "Diagnóstico gratuito — link na bio",
           "page": "",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/_regen/01-703063.png",
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/_regen/01-66ebf0.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
           "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/01.png",
-          "_v": 3,
+          "_v": 1,
           "overlay": "todo-branco",
-          "overlay_op": 1
+          "overlay_op": 0.45,
+          "_accOpen": true,
+          "satur": 0.45
         }
       ],
-      "caption": "No provedor, ninguém pode ficar esperando resposta. A Clara é a funcionária de IA da provider-max que atende, resolve dúvida de contrato e cuida de renovação a qualquer hora. Seu time humano foca no que importa e o cliente nunca fica no vácuo.\n\n#provedores #ISP #atendimento #suporte",
+      "caption": "No provedor, atendimento parado é cliente esperando. A Clara, funcionária de IA para ISP, responde dúvidas e cuida de renovação de contrato a qualquer hora. Menos fila, menos custo de plantão. Comece pelo diagnóstico gratuito.\n\n#provedor #isp #suporte #atendimento",
       "canais": [
         "instagram"
       ]
