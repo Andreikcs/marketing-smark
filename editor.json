@@ -1981,6 +1981,35 @@
       "canais": [
         "instagram"
       ]
+    },
+    {
+      "slug": "provedor-dark",
+      "marca": "provider-max",
+      "status": "rascunho",
+      "titulo": "Provedor Dark",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "Quantos clientes seu \nprovedor perde sem nem saber?",
+          "sub": "Um funcionário de IA que negocia antes que o seu assinante cancele.",
+          "cta": "Toque no botão e saiba mais",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "escuro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/provedor-dark/01.png"
+        }
+      ],
+      "caption": "Oi! Aqui é o Robson, da smark. Quantos clientes seu provedor perde por demorar pra negociar upgrade ou renovação de contrato? Isso é assinante indo pro concorrente. Posso te mostrar como resolver?",
+      "canais": [
+        "instagram"
+      ]
     }
   ]
 }
