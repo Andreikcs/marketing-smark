@@ -1875,7 +1875,7 @@
           "page": "",
           "chip": false,
           "tema": "claro",
-          "bgmode": "imagem",
+          "bgmode": "escuro",
           "bg": "marcas/smark/publicacoes/social/instagram/arte/operacao-pede-ia/bg.png",
           "cor": "",
           "accent": "#D6478A",
@@ -1885,8 +1885,9 @@
           "n": 1,
           "_v": 4,
           "zoom": 1.05,
-          "overlay": "branco",
-          "overlay_op": 1
+          "overlay": "roxo",
+          "overlay_op": 0.85,
+          "ov_ang": 145
         }
       ]
     },
