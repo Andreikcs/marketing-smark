@@ -1892,37 +1892,6 @@
       ]
     },
     {
-      "slug": "ademir",
-      "marca": "smark",
-      "status": "rascunho",
-      "titulo": "Ultra velocidade Smark",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "Sua empresa|na *velocidade da IA*",
-          "sub": "Cada departamento com um funcionário de IA que não descansa",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "page": "",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "cor",
-          "bg": "",
-          "cor": "#341994",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/smark/publicacoes/social/instagram/arte/ademir/01.png",
-          "_v": 1,
-          "paleta": "roxo"
-        }
-      ],
-      "caption": "Enquanto sua equipe cuida do que importa, os funcionários de IA da Smark seguem trabalhando: atendendo, organizando e ganhando tempo pra você. Sem correria, sem gargalo. Quer ver onde a IA encaixa no seu dia a dia? Fala com a gente.\n\n#smark #inteligenciaartificial #gestao #produtividade",
-      "canais": [
-        "instagram"
-      ]
-    },
-    {
       "slug": "novo-post-1c64",
       "marca": "smark",
       "status": "rascunho",
