@@ -1728,39 +1728,6 @@
       ]
     },
     {
-      "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c394d",
-      "marca": "elever-ai",
-      "status": "salvo",
-      "titulo": "Concessionária com funcionário de IA (cópia)",
-      "size": "1080x1350",
-      "frames": [
-        {
-          "headline": "Quantos carros você deixa \nde vender sem perceber?}",
-          "sub": "Um funcionário de IA que responde \nantes que o comprador vá pra outra loja.👇",
-          "cta": "Toque no botão abaixo.",
-          "page": "",
-          "chip": true,
-          "tema": "claro",
-          "bgmode": "imagem",
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/_regen/01-7fb9d9.png",
-          "cor": "#F4F2FB",
-          "accent": "",
-          "hsize": 0,
-          "grade": true,
-          "n": 1,
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c394d/01.png",
-          "_v": 2,
-          "overlay": "branco",
-          "overlay_op": 1,
-          "ov_pos": 0
-        }
-      ],
-      "caption": "Todo dia chega gente perguntando preço, ficha técnica e condições. Um funcionário de IA responde na hora, organiza os interessados e passa pro vendedor só quem está pronto. Menos cliente perdido, mais tempo pra fechar negócio no pátio.\n\n#concessionaria #revenda #funcionariodeia #eleverai",
-      "canais": [
-        "instagram"
-      ]
-    },
-    {
       "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c8913",
       "marca": "elever-ai",
       "status": "rascunho",
