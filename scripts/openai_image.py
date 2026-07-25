@@ -1,31 +1,30 @@
 #!/usr/bin/env python3
 """
-Gera UMA imagem via OpenAI Images API (gpt-image-*) e salva como PNG.
-Análogo a gemini_image.py — escolha o gerador por qualidade/custo.
+Gera UMA imagem de fundo (sem texto) e salva como PNG. Orquestrador: resolve o
+perfil da marca via `_perfil.py` (modelo, provider, seed), chama `_provedor.py`
+(OpenRouter ou OpenAI atrás da mesma interface) e cai no suplente uma vez se o
+modelo principal falhar. Registra custo/uso em `_ledger.py`.
 
 Exemplos:
   python3 scripts/openai_image.py --out arte/01.png --prompt-file /tmp/frame01.txt
-  python3 scripts/openai_image.py --out arte/01.png --prompt "..." --quality medium --size 1024x1536
+  python3 scripts/openai_image.py --out arte/01.png --direcao --marca smark --tipo manifesto --tema claro
 
-Chave: OPENAI_API_KEY no .env da raiz do vault. Nunca passada por linha de comando.
-Modelos disponíveis (na conta): gpt-image-1.5 (default), gpt-image-2, gpt-image-1, gpt-image-1-mini.
+Chaves: OPENROUTER_API_KEY / OPENAI_API_KEY no .env da raiz do vault (ou variável
+de ambiente). Nunca passadas por linha de comando.
 Sizes válidos: 1024x1024, 1024x1536 (retrato), 1536x1024 (paisagem), auto.
 Quality: low | medium | high | auto.
 """
 import argparse
-import base64
-import json
 import os
 import sys
-import urllib.error
-import urllib.request
 
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _sidecar import meta_block  # noqa: E402
 from _paleta import aplicar_guard  # noqa: E402
-DEFAULT_MODEL = "gpt-image-1.5"
-ENDPOINT = "https://api.openai.com/v1/images/generations"
+import _perfil  # noqa: E402
+import _provedor  # noqa: E402
+import _ledger  # noqa: E402
 
 
 def load_env(path):
@@ -39,6 +38,40 @@ def load_env(path):
     return env
 
 
+def carregar_chaves(env):
+    """Chaves dos dois provedores; ambiente tem precedência sobre o .env."""
+    return {
+        "openrouter": os.environ.get("OPENROUTER_API_KEY") or env.get("OPENROUTER_API_KEY"),
+        "openai": os.environ.get("OPENAI_API_KEY") or env.get("OPENAI_API_KEY"),
+    }
+
+
+def fora_do_roster(modelo, roster, suplente):
+    """True se o modelo não está no roster do contrato nem é o suplente declarado.
+
+    `roster` é o dict de capacidades (`_base.roster`); basta testar as chaves."""
+    return modelo not in (roster or {}) and modelo != suplente
+
+
+def gerar_com_suplente(prompt, perfil, chaves, size, quality, refs=None):
+    """Tenta o modelo do perfil; em falha, uma tentativa no suplente."""
+    try:
+        r = _provedor.gerar(prompt, perfil["modelo"], perfil["provider"], chaves,
+                            resolution=perfil.get("resolution"),
+                            aspect_ratio=perfil.get("aspect_ratio"),
+                            seed=perfil.get("seed") if perfil.get("enviar_seed") else None,
+                            size=size, quality=quality, refs=refs)
+        r["suplente_usado"] = False
+        return r
+    except _provedor.ErroProvedor as e:
+        print(f"AVISO: {perfil['modelo']} falhou ({e}). Tentando suplente "
+              f"{perfil['suplente_modelo']}.", file=sys.stderr)
+        r = _provedor.gerar(prompt, perfil["suplente_modelo"], perfil["suplente_provider"],
+                            chaves, size=size, quality=quality)
+        r["suplente_usado"] = True
+        return r
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
@@ -46,8 +79,10 @@ def main():
     ap.add_argument("--prompt-file")
     ap.add_argument("--size", default="1024x1536", help="1024x1024 | 1024x1536 | 1536x1024 | auto")
     ap.add_argument("--quality", default="high", help="low | medium | high | auto")
-    ap.add_argument("--model", default=None)
-    # Metadados p/ a ficha (sidecar .md) — opcionais mas recomendados
+    ap.add_argument("--model", default=None, help="sobrescreve o modelo do perfil")
+    ap.add_argument("--provider", default="auto", help="auto | openrouter | openai")
+    ap.add_argument("--reroll", type=int, default=0, help="varia a seed de propósito")
+    ap.add_argument("--slug", default="", help="slug do post — entra na seed determinística")
     ap.add_argument("--marca", default="")
     ap.add_argument("--canal", default="")
     ap.add_argument("--formato", default="")
@@ -57,9 +92,9 @@ def main():
     ap.add_argument("--legenda-file", default="")
     ap.add_argument("--no-guard", action="store_true", help="desliga a trava de paleta (cor on-brand)")
     ap.add_argument("--direcao", action="store_true", help="monta o prompt do fundo via _direcao (nível agência)")
-    ap.add_argument("--tipo", default="", help="tipo do post (manifesto/dor/prova/cta...) p/ a biblioteca de conceitos")
-    ap.add_argument("--tema", default="escuro", help="escuro | claro (afeta cor/luz da direção de arte)")
-    ap.add_argument("--conceito", default="", help="sobrescreve a metáfora visual (temas especiais, ex: Copa)")
+    ap.add_argument("--tipo", default="", help="tipo do post (manifesto/dor/prova/cta...)")
+    ap.add_argument("--tema", default="escuro", help="escuro | claro")
+    ap.add_argument("--conceito", default="", help="sobrescreve a metáfora visual")
     args = ap.parse_args()
 
     if not args.prompt and not args.prompt_file and not args.direcao:
@@ -74,36 +109,50 @@ def main():
     prompt = aplicar_guard(prompt, args.paleta, not args.no_guard)
 
     env = load_env(os.path.join(VAULT, ".env"))
-    api_key = os.environ.get("OPENAI_API_KEY") or env.get("OPENAI_API_KEY")
-    if not api_key:
-        sys.exit("ERRO: OPENAI_API_KEY não encontrada (.env na raiz do vault)")
-    model = args.model or env.get("OPENAI_IMAGE_MODEL") or DEFAULT_MODEL
+    chaves = carregar_chaves(env)
 
-    body = {"model": model, "prompt": prompt, "size": args.size,
-            "quality": args.quality, "n": 1}
-    req = urllib.request.Request(
-        ENDPOINT, data=json.dumps(body).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        payload = json.loads(urllib.request.urlopen(req, timeout=180).read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        sys.exit(f"ERRO HTTP {e.code}: {e.read().decode('utf-8', 'ignore')[:600]}")
+    slug = args.slug or os.path.splitext(os.path.basename(args.out))[0]
+    perfil = _perfil.resolver(args.marca or "smark", slug=slug,
+                              tipo=args.tipo, reroll=args.reroll, size=args.size)
+    if args.model:
+        roster = _perfil.carregar().get("_base", {}).get("roster", {})
+        if fora_do_roster(args.model, roster, perfil["suplente_modelo"]):
+            sys.exit(f"ERRO: '{args.model}' não está no roster do contrato "
+                     f"(design-system/tokens/perfis-imagem.json).\n"
+                     f"Roster: {', '.join(roster)} | suplente: {perfil['suplente_modelo']}")
+        perfil["modelo"] = args.model
+    if args.provider != "auto":
+        perfil["provider"] = args.provider
+    if perfil["nao_calibrado"]:
+        print(f"AVISO: família '{perfil['familia']}' sem calibração — usando suplente "
+              f"{perfil['modelo']}. Rode scripts/calibrar.py.", file=sys.stderr)
 
     try:
-        b64 = payload["data"][0]["b64_json"]
-    except (KeyError, IndexError):
-        sys.exit(f"ERRO: resposta sem imagem. Trecho: {json.dumps(payload)[:600]}")
+        r = gerar_com_suplente(prompt, perfil, chaves, args.size, args.quality)
+    except _provedor.ErroProvedor as e:
+        sys.exit(f"ERRO: {e}")
 
     out = args.out if os.path.isabs(args.out) else os.path.join(VAULT, args.out)
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "wb") as f:
-        f.write(base64.b64decode(b64))
+        f.write(r["png"])
 
-    print(f"OK: {out}  ({model}, {args.size}, {args.quality})")
-    print(meta_block(out, {"modelo": model, "qualidade": args.quality,
-                           "tamanho": args.size, "paleta": args.paleta}))
+    _ledger.registrar({
+        "familia": perfil["familia"], "marca": args.marca, "slug": slug,
+        "tipo": args.tipo, "modelo": r["modelo"],
+        "provider": r["provider"], "seed": perfil["seed"],
+        "resolucao": perfil["resolution"], "custo_usd": r["custo_usd"],
+        "ok": True, "suplente_usado": r["suplente_usado"],
+        "nao_calibrado": perfil["nao_calibrado"], "arquivo": os.path.basename(out),
+    })
+
+    print(f"OK: {out}  ({r['modelo']} via {r['provider']}, "
+          f"seed={perfil['seed']}, custo=${r['custo_usd'] if r['custo_usd'] is not None else '?'})")
+    print(meta_block(out, {"modelo": r["modelo"], "provider": r["provider"],
+                           "qualidade": args.quality,
+                           "tamanho": args.size, "paleta": args.paleta,
+                           "seed": perfil["seed"], "custo_usd": r["custo_usd"],
+                           "suplente_usado": r["suplente_usado"]}))
 
 
 if __name__ == "__main__":
