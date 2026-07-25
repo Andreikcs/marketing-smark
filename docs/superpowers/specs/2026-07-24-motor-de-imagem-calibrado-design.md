@@ -27,7 +27,7 @@ depende-de: docs/superpowers/specs/2026-07-21-distribuicao-plataforma-agencias-d
 >
 > **2. O default é `google/gemini-3-pro-image`.** Quatro gerações, zero texto
 > espúrio, paleta exata, terço inferior limpo, robusto ao prompt atual (não exige
-> reescrever `_direcao`). US$ 0,135/imagem medido.
+> reescrever `_direcao`). US$ 0,244/imagem em 4K medido (1K e 2K sairiam por 0,135).
 >
 > **3. Seed não é reprodutibilidade — o acervo é a consistência.** A Seção 4
 > inteira parte de "mesma seed, mesma imagem". O modelo default **não suporta
@@ -40,7 +40,7 @@ depende-de: docs/superpowers/specs/2026-07-21-distribuicao-plataforma-agencias-d
 > paleta. O fosso da Seção 6 se confirma; a promessa de determinismo da Seção 4, não.
 >
 > **4. Tiers morreram.** A Seção 4 mantinha `rascunho`/`final` por latência e
-> fidelidade. Medido: **1K, 2K e 4K custam exatamente o mesmo** (US$ 0,135). Não há
+> fidelidade. Medido: **1K e 2K custam o mesmo (US$ 0,135); 4K custa US$ 0,244** — a medição original só comparou 1K e 2K e concluiu errado que resolução não afeta custo. Ainda assim não há
 > rascunho barato sem trocar de modelo, e trocar de modelo destrói a fidelidade de
 > enquadramento que o compositor precisa. Resolução passa a ser única (`4K`).
 >

@@ -7,8 +7,8 @@
         "provider": "openrouter",
         "suporta_seed": false,
         "max_refs": 14,
-        "custo_medido_usd": 0.135,
-        "nota": "default. 1K/2K/4K custam o mesmo. Robusto ao prompt do _direcao."
+        "custo_medido_usd": 0.244,
+        "nota": "default. Medido: 1K e 2K custam US$ 0,135; 4K custa US$ 0,244. Usamos 4K porque o compositor renderiza a 2x (2160x2700 no feed, 2160x3840 no story) e ainda aplica zoom/crop — abaixo disso o fundo amolece. Robusto ao prompt do _direcao."
       },
       "google/gemini-2.5-flash-image": {
         "provider": "openrouter",

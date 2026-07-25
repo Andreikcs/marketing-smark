@@ -14,9 +14,9 @@
 - **CLI preservada.** Todo comando documentado em `shared/direcao-de-arte.md`, `.claude/commands/` e `editor_server.py:974` continua funcionando sem argumento novo.
 - **Chave nunca em linha de comando.** Só via `.env` na raiz ou variável de ambiente.
 - **Nada quebra sem crédito.** Falha de saldo (402), auth (401) ou rede na OpenRouter cai para o suplente OpenAI, com aviso em stderr.
-- **Modelo default:** `google/gemini-3-pro-image` (backend `openrouter`, US$ 0,135/imagem medido). Suplente: `gpt-image-1.5` no backend `openai` direto.
+- **Modelo default:** `google/gemini-3-pro-image` (backend `openrouter`, **US$ 0,244/imagem em 4K** medido). Suplente: `gpt-image-1.5` no backend `openai` direto.
 - **`bytedance-seed/seedream-4.5` está BANIDO do roster.** Reprovado no bake-off de 2026-07-24: com o prompt real do `_direcao` ele tipografa o próprio prompt na arte (renderizou `#9A4DFF`, `#F4F2FB`, `85mm`, 時裝, "BAZATUR" e corpo de texto falso) mesmo com `NEGATIVE: no text, no letters, no words` explícito. Não reintroduzir sem novo bake-off aprovado.
-- **Resolução única: `4K`.** Medido: 1K, 2K e 4K custam exatamente o mesmo (US$ 0,135) no modelo default. **Não existe tier de rascunho barato** — tier de resolução não economiza nada, e trocar de modelo para baratear destrói a fidelidade de enquadramento que o compositor precisa. O plano não implementa tiers.
+- **Resolução única: `4K`.** Medido no modelo default: 1K e 2K custam US$ 0,135; **4K custa US$ 0,244**. Escolhemos 4K com o custo na mão (decisão do usuário, 2026-07-25): o compositor renderiza a 2x — 2160x2700 no feed, 2160x3840 no story — e ainda aplica zoom/crop, então um fundo 2K (~2048 px) entraria ampliado e amolecido. **Não existe tier de rascunho barato:** trocar de modelo para baratear destrói a fidelidade de enquadramento que o compositor precisa, e a única alavanca de resolução custa nitidez. O plano não implementa tiers.
 - **Seed é consultiva, não garantia.** O modelo default não suporta `seed` (aceita e ignora — duas chamadas idênticas devolveram composições diferentes). A seed determinística continua sendo calculada, gravada nos metadados e usada pelo `--reroll`, mas só é ENVIADA ao provedor quando o roster marca `suporta_seed: true` para aquele modelo. Quem garante consistência é o acervo (`input_references`), validado empiricamente.
 - **Formato de saída é imprevisível.** A mesma chamada devolveu `image/jpeg` numa execução e `image/png` na outra. `_provedor` normaliza tudo para PNG antes de devolver — a convenção `![[arte/<slug>.png]]` (regra 6 do CLAUDE.md) depende disso.
 - **Arquivos que NÃO podem ser modificados:** `scripts/compositor.py`, `scripts/_direcao.py`, `scripts/_paleta.py`, `scripts/estudio.py`.
@@ -155,7 +155,7 @@ Expected: FAIL com `ModuleNotFoundError: No module named '_perfil'`
         "provider": "openrouter",
         "suporta_seed": false,
         "max_refs": 14,
-        "custo_medido_usd": 0.135,
+        "custo_medido_usd": 0.244,
         "nota": "default. 1K/2K/4K custam o mesmo. Robusto ao prompt do _direcao."
       },
       "google/gemini-2.5-flash-image": {
@@ -1065,7 +1065,7 @@ Run: `cd /Users/andreik/smark && python3 scripts/openai_image.py --help`
 Expected: a ajuda lista `--out --prompt --prompt-file --size --quality --model --provider --reroll --slug --marca ... --direcao --tipo --tema --conceito` sem erro.
 
 Run: `cd /Users/andreik/smark && python3 scripts/openai_image.py --out /tmp/regressao.png --direcao --marca smark --tipo manifesto --tema claro`
-Expected: gera o PNG via `google/gemini-3-pro-image` na OpenRouter (a família já vem calibrada no contrato), custo ~US$ 0,135 impresso na linha OK. Confirmar com `ls -la /tmp/regressao.png`, `file /tmp/regressao.png` (tem que dizer **PNG**, mesmo se a API devolver JPEG) e `tail -1 design-system/custos/geracoes.jsonl`.
+Expected: gera o PNG via `google/gemini-3-pro-image` na OpenRouter (a família já vem calibrada no contrato), custo ~US$ 0,244 impresso na linha OK. Confirmar com `ls -la /tmp/regressao.png`, `file /tmp/regressao.png` (tem que dizer **PNG**, mesmo se a API devolver JPEG) e `tail -1 design-system/custos/geracoes.jsonl`.
 
 - [ ] **Step 6: Commit**
 
@@ -1786,7 +1786,7 @@ Logo após a regra 10:
 Substituir a linha 29 (o comando de fundo dirigido) por:
 
 ```markdown
-- **Fundo dirigido:** `python3 scripts/openai_image.py --out <bg.png> --direcao --marca <marca> --tipo <tipo> --tema <claro|escuro> --headline "..." [--reroll N] [--conceito "override p/ tema especial"]` — **claro é o default**; só passe `--tema escuro` sob pedido. O modelo sai do contrato (`design-system/tokens/perfis-imagem.json`), sempre em 4K (1K/2K/4K custam o mesmo). Não gostou do resultado? `--reroll 1`, `--reroll 2` — cada um é uma tentativa nova, ~US$ 0,135.
+- **Fundo dirigido:** `python3 scripts/openai_image.py --out <bg.png> --direcao --marca <marca> --tipo <tipo> --tema <claro|escuro> --headline "..." [--reroll N] [--conceito "override p/ tema especial"]` — **claro é o default**; só passe `--tema escuro` sob pedido. O modelo sai do contrato (`design-system/tokens/perfis-imagem.json`), sempre em 4K (US$ 0,244; 2K sairia por 0,135 mas amolece o fundo). Não gostou do resultado? `--reroll 1`, `--reroll 2` — cada um é uma tentativa nova, ~US$ 0,244.
 ```
 
 - [ ] **Step 4: Criar `design-system/custos/README.md`**
@@ -1842,7 +1842,7 @@ Depois da Task 10, com crédito na OpenRouter (~US$ 1,20 no total):
 
 - [ ] `python3 scripts/openai_image.py --out /tmp/a.png --direcao --marca smark --tipo manifesto --tema claro` usa `google/gemini-3-pro-image` sem aviso de não-calibrado
 - [ ] `file /tmp/a.png` diz **PNG** (a API pode ter devolvido JPEG — a normalização é obrigatória)
-- [ ] `tail -1 design-system/custos/geracoes.jsonl` traz `custo_usd` ≈ 0.135 e o modelo correto
+- [ ] `tail -1 design-system/custos/geracoes.jsonl` traz `custo_usd` ≈ 0.244 e o modelo correto
 - [ ] `--reroll 1` grava seed diferente no ledger
 - [ ] Derrubar a rede (ou apagar `OPENROUTER_API_KEY` do ambiente) e confirmar que cai no suplente `gpt-image-1.5` com aviso em stderr, sem quebrar
 - [ ] Ativar o acervo (`"ativo": true` na família), adicionar 2 peças com `acervo.py add` e confirmar a linha `acervo: 2 peça(s)` na geração seguinte
