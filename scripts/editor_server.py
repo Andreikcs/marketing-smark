@@ -531,6 +531,53 @@ def save(d):
         json.dump(d, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
 
+def _parse_arte_meta(stdout):
+    """Extrai custo/modelo/provider/seed do stdout de openai_image / openai_edit.
+
+    Lê as linhas `arte-*` do meta_block e a linha OK: como fallback.
+    """
+    meta = {}
+    text = stdout or ""
+    for line in text.splitlines():
+        s = line.strip()
+        if s.startswith("arte-modelo:"):
+            meta["modelo"] = s.split(":", 1)[1].strip()
+        elif s.startswith("arte-provider:"):
+            meta["provider"] = s.split(":", 1)[1].strip()
+        elif s.startswith("arte-seed:"):
+            seed = s.split(":", 1)[1].strip()
+            if seed:
+                try:
+                    meta["seed"] = int(seed)
+                except ValueError:
+                    meta["seed"] = seed
+        elif s.startswith("arte-custo-usd:"):
+            raw = s.split(":", 1)[1].strip()
+            if raw:
+                try:
+                    meta["custo_usd"] = float(raw)
+                except ValueError:
+                    meta["custo_usd"] = raw
+        elif s.startswith("arte-suplente:"):
+            meta["suplente"] = s.split(":", 1)[1].strip().lower() in ("true", "1", "sim")
+        elif s.startswith("OK:") and "custo=$" in s:
+            # OK: path  (modelo via provider, seed=N, custo=$0.24)
+            m = re.search(r"custo=\$([0-9.]+|\?)", s)
+            if m and m.group(1) != "?" and "custo_usd" not in meta:
+                try:
+                    meta["custo_usd"] = float(m.group(1))
+                except ValueError:
+                    pass
+            m = re.search(r"\(([^,\s]+)\s+via\s+([^,\s]+)", s)
+            if m:
+                meta.setdefault("modelo", m.group(1))
+                meta.setdefault("provider", m.group(2))
+            m = re.search(r"seed=(\d+)", s)
+            if m:
+                meta.setdefault("seed", int(m.group(1)))
+    return meta
+
+
 def _run_gen(job_id, cmd, out, pi, fi):
     """Roda a geração de IA em background (cap de 2 simultâneas). Persiste o fundo no editor.json."""
     with GEN_SEM:
@@ -541,6 +588,7 @@ def _run_gen(job_id, cmd, out, pi, fi):
             return
         if os.path.exists(out):
             rel = os.path.relpath(out, VAULT)
+            meta = _parse_arte_meta(r.stdout or "")
             try:  # persiste pra não perder ao sair da tela
                 with IO_LOCK:
                     d = load()
@@ -548,10 +596,23 @@ def _run_gen(job_id, cmd, out, pi, fi):
                         f = d["posts"][pi]["frames"][fi]
                         f["bg"] = rel
                         f["bgmode"] = "imagem"
+                        if meta.get("custo_usd") is not None:
+                            f["bg_custo_usd"] = meta["custo_usd"]
+                        if meta.get("modelo"):
+                            f["bg_modelo"] = meta["modelo"]
+                        if meta.get("provider"):
+                            f["bg_provider"] = meta["provider"]
+                        if meta.get("seed") is not None:
+                            f["bg_seed"] = meta["seed"]
+                        if "suplente" in meta:
+                            f["bg_suplente"] = meta["suplente"]
                         save(d)
             except Exception:
                 pass
-            JOBS[job_id] = {"status": "done", "path": rel}
+            job = {"status": "done", "path": rel}
+            job.update({k: meta[k] for k in ("custo_usd", "modelo", "provider", "seed", "suplente")
+                        if k in meta})
+            JOBS[job_id] = job
         else:
             JOBS[job_id] = {"status": "erro", "erro": (r.stderr or r.stdout or "falhou")[-400:]}
 

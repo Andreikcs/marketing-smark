@@ -376,6 +376,7 @@ input[type=range]{accent-color:var(--accent)}
 const $=s=>document.querySelector(s);
 const TOKEN="__EDITOR_TOKEN__";
 const HJSON={'Content-Type':'application/json','X-Editor-Token':TOKEN};
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let D=null, PI=0, FI=0, dirty=false, tmr=null, _lastTa=null;
 function insEmoji(e){const ta=_lastTa;if(!ta){toast('Clique num campo de texto primeiro');return}
   const s=ta.selectionStart,v=ta.value;ta.value=v.slice(0,s)+e+v.slice(ta.selectionEnd);
@@ -558,6 +559,27 @@ function renderCtrl(){
   const mode=f.bgmode||'imagem';
   if(mode==='imagem'){
     if(f.bg){const im=document.createElement('img');im.className='bgthumb';im.src='/'+f.bg+'?t='+(f._v||0);g2.appendChild(im)}
+    // card de info da geração (custo, modelo, provider) — preenchido após regerar
+    const info=document.createElement('div');
+    info.className='bginfo';
+    info.style.cssText='margin:8px 0 4px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:12px;line-height:1.45';
+    if(f.bg_custo_usd!=null||f.bg_modelo||f.bg_provider){
+      const custo=f.bg_custo_usd!=null
+        ?('US$ '+Number(f.bg_custo_usd).toFixed(3))
+        :'— (sem telemetria)';
+      info.innerHTML=
+        '<div style="font-weight:700;margin-bottom:4px;color:var(--text)">ℹ Geração desta imagem</div>'
+        +'<div><span style="color:var(--muted)">Custo</span> · <b style="color:var(--accent)">'+custo+'</b></div>'
+        +(f.bg_modelo?('<div><span style="color:var(--muted)">Modelo</span> · '+esc(String(f.bg_modelo))+'</div>'):'')
+        +(f.bg_provider?('<div><span style="color:var(--muted)">Provider</span> · '+esc(String(f.bg_provider))+'</div>'):'')
+        +(f.bg_seed!=null?('<div><span style="color:var(--muted)">Seed</span> · '+esc(String(f.bg_seed))+'</div>'):'')
+        +(f.bg_suplente?('<div style="color:#c47">⚠ gerado no suplente (principal falhou)</div>'):'');
+    }else if(f.bg){
+      info.innerHTML='<div style="color:var(--muted)">Sem custo registrado nesta arte (upload ou geração anterior ao ledger). Regere o fundo pra ver o valor.</div>';
+    }else{
+      info.innerHTML='<div style="color:var(--muted)">Ainda sem fundo. Gere no Estúdio IA — o custo aparece aqui.</div>';
+    }
+    g2.appendChild(info);
     const up=document.createElement('div');up.style.marginTop='6px';up.innerHTML='<label>Trocar fundo (upload)</label>';
     const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.style.cssText='font-size:12px;color:var(--sub)';
     fi.onchange=e=>upload(e.target.files[0]);up.appendChild(fi);g2.appendChild(up);
@@ -776,9 +798,18 @@ async function regen(btn,ref){
     tries++;let s;try{s=await(await fetch('/job?id='+st.job)).json()}catch(e){return}
     if(s.status==='done'){clearInterval(poll);btn.disabled=false;btn.textContent=old;
       const tf=D.posts[pi]&&D.posts[pi].frames[fi];
-      if(tf){tf.bg=s.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(!ref)applyTom(tf,tema);}  // claro respeitado
+      if(tf){
+        tf.bg=s.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(!ref)applyTom(tf,tema);
+        if(s.custo_usd!=null)tf.bg_custo_usd=s.custo_usd;
+        if(s.modelo)tf.bg_modelo=s.modelo;
+        if(s.provider)tf.bg_provider=s.provider;
+        if(s.seed!=null)tf.bg_seed=s.seed;
+        if(s.suplente!=null)tf.bg_suplente=!!s.suplente;
+      }
       if(pi===PI&&fi===FI){genStop(true);renderCtrl();preview();}else{renderStrip();}
-      renderStrip();setDirty(true);toast('✨ Fundo pronto — tela atualizada.');}
+      renderStrip();setDirty(true);
+      const cst=s.custo_usd!=null?(' · US$ '+Number(s.custo_usd).toFixed(3)):'';
+      toast('✨ Fundo pronto'+cst+(s.modelo?(' · '+s.modelo):''));}
     else if(s.status==='erro'){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Erro: '+String(s.erro||'').slice(0,120));}
     else if(tries>180){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Ainda gerando… aparece ao recarregar em ~1 min.');}
   },2000);
@@ -1131,8 +1162,16 @@ carregar().then(()=>snapshot());
       const st=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,body:JSON.stringify({post:pi,frame:fi,conceito:conceito,tipo:tipo||'manifesto',tema:tema||'claro',ref:attPath||'',prompt:attPath?(conceito||''):''})})).json();
       if(!st.ok||!st.job){prog.innerHTML='⚠️ Falha ao iniciar o fundo '+(fi+1)+(st.erro?': '+esc(st.erro):'');if(pi===PI&&typeof genStop==='function')genStop(false);return}
       const j=await pollJob(st.job,(sec)=>{prog.innerHTML='🎨 Gerando arte de fundo <b>'+(fi+1)+'/'+total+'</b> · '+sec+'s'+(withRef?' · com referência (1-3 min)':'')});
-      if(j.status==='done'){const tf=D.posts[pi]&&D.posts[pi].frames[fi];if(tf){tf.bg=j.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(typeof applyTom==='function')applyTom(tf,tema)}
-        prog.innerHTML='✨ Fundo <b>'+(fi+1)+'/'+total+'</b> pronto';
+      if(j.status==='done'){const tf=D.posts[pi]&&D.posts[pi].frames[fi];if(tf){
+          tf.bg=j.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(typeof applyTom==='function')applyTom(tf,tema);
+          if(j.custo_usd!=null)tf.bg_custo_usd=j.custo_usd;
+          if(j.modelo)tf.bg_modelo=j.modelo;
+          if(j.provider)tf.bg_provider=j.provider;
+          if(j.seed!=null)tf.bg_seed=j.seed;
+          if(j.suplente!=null)tf.bg_suplente=!!j.suplente;
+        }
+        const cst=j.custo_usd!=null?(' · <b>US$ '+Number(j.custo_usd).toFixed(3)+'</b>'):'';
+        prog.innerHTML='✨ Fundo <b>'+(fi+1)+'/'+total+'</b> pronto'+cst+(j.modelo?(' · '+esc(j.modelo)):'');
         if(pi===PI){if(typeof genStop==='function')genStop(true);renderStrip();if(fi===FI){renderCtrl();preview()}}setDirty(true)}
       else{prog.innerHTML=(j.status==='timeout'?'⏳ Fundo '+(fi+1)+' ainda gerando — recarregue a página em 1 min pra ver.':'⚠️ Fundo '+(fi+1)+' falhou'+(j.erro?': '+esc(String(j.erro).slice(0,120)):''));if(pi===PI&&typeof genStop==='function')genStop(false)}
     }catch(e){prog.innerHTML='⚠️ Erro no fundo '+(fi+1)+': '+esc(e.message);if(pi===PI&&typeof genStop==='function')genStop(false)}
