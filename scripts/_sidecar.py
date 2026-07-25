@@ -21,14 +21,20 @@ def meta_block(out_png, meta):
     today = datetime.date.today().isoformat()
     size = meta.get("tamanho", "")
     fn = os.path.basename(out_png)
+    custo = meta.get("custo_usd", "")
+    supl = meta.get("suplente_usado", "")
     return "\n".join([
         "----- METADADOS DA ARTE (cole no frontmatter + corpo da nota do post) -----",
         f"arte: arte/{fn}",
         f"arte-modelo: {meta.get('modelo', '')}",
+        f"arte-provider: {meta.get('provider', '')}",
         f"arte-qualidade: {meta.get('qualidade', '')}",
         f"arte-tamanho: {size}",
         f"arte-proporcao: {_aspect(size)}",
+        f"arte-seed: {meta.get('seed', '')}",
         f"arte-paleta: {meta.get('paleta', '')}",
+        f"arte-custo-usd: {custo if custo != '' else ''}",
+        f"arte-suplente: {str(supl).lower() if supl != '' else ''}",
         f"arte-gerada-em: {today}",
         f"embed-no-corpo: ![[arte/{fn}]]",
     ])
