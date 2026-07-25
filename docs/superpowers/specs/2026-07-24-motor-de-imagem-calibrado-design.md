@@ -24,13 +24,15 @@ Este design resolve os três e converte o terceiro em diferencial competitivo.
 
 ### Fatos levantados na sessão (verificados via API da OpenRouter, 2026-07-24)
 
-| Modelo | seed | refs | resoluções | custo |
-|---|---|---|---|---|
-| `black-forest-labs/flux.2-pro` | ✅ | 8 | por megapixel | US$ 0,03/MP |
-| `bytedance-seed/seedream-4.5` | ✅ | 14 | 1K / 2K / 4K | US$ 0,04/imagem (plano) |
-| `google/gemini-3-pro-image` | ❌ | 14 | 1K / 2K | ~US$ 0,134/imagem |
-| `openai/gpt-image-2` | ❌ | 16 | — | ~US$ 0,19/imagem |
-| `recraft/recraft-v4.1-vector` | — | — | SVG | US$ 0,072/imagem |
+| Modelo | seed | refs | retrato 4:5 | resoluções | custo |
+|---|---|---|---|---|---|
+| `bytedance-seed/seedream-4.5` | ✅ | 14 | ✅ | 1K / 2K / 4K | US$ 0,04/imagem (plano) |
+| `black-forest-labs/flux.2-pro` | ✅ | 8 | ❌ | sem controle | US$ 0,03/MP |
+| `google/gemini-3-pro-image` | ❌ | 14 | ✅ | 1K / 2K | ~US$ 0,134/imagem |
+| `openai/gpt-image-2` | ❌ | 16 | ❌ | sem controle | ~US$ 0,19/imagem |
+| `recraft/recraft-v4.1-vector` | ❌ | 1 | ❌ | SVG | US$ 0,08/imagem |
+
+A varredura completa dos 40 modelos e o descarte de cada candidato estão na Seção 2.
 
 Outros fatos:
 
@@ -65,14 +67,38 @@ A hipótese inicial era mapear segmento → modelo (clínica → X, tecnologia �
 
 **O que determina é o registro visual**, que já está descrito em `marcas/<marca>/branding/identidade-visual.md`.
 
-| Registro visual | Modelo do roster | Justificativa |
-|---|---|---|
-| `abstrato-material` | `flux.2-pro` | Aderência a prompt, luz estável, textura nítida, consistência de estilo entre múltiplas referências. Tem seed. |
-| `fotografico-editorial` | `seedream-4.5` | Preservação de detalhe de sujeito e consistência de edição. Tem seed, 4K por custo plano. |
-| `ilustracao-vetor` | `recraft-v4.1-vector` | Saída SVG real, escala infinita. |
-| `personagem-fotorreal` (exceção) | `gemini-3-pro-image` | Melhor consistência de rosto. **Sem seed** — só sob justificativa registrada no perfil. |
+### Requisitos duros e o que o catálogo oferece
 
-**Aplicação imediata:** o `_direcao.py` produz hoje *"abstract premium technology key visual"* — sem pessoas. Pelo registro, a família smark é `abstrato-material`, o que aponta pro `flux.2-pro` como hipótese de partida. O bake-off (Seção 6) confirma ou refuta.
+O sistema impõe quatro requisitos não-negociáveis ao modelo: **seed** (reprodutibilidade, Seção 4), **proporção retrato 4:5** (`shared/formatos-canais.md`), **múltiplas referências** (acervo, Seção 6) e **escada de resolução** (tiers).
+
+Varredura dos 40 modelos com saída de imagem da OpenRouter (2026-07-24):
+
+| Modelo | seed | 4:5 | refs | escada | Veredito |
+|---|---|---|---|---|---|
+| **`bytedance-seed/seedream-4.5`** | ✅ | ✅ | 14 | 1K/2K/4K | **único que atende os quatro** |
+| `black-forest-labs/flux.2-*` | ✅ | ❌ | 8 | ❌ | Sem qualquer controle de proporção ou resolução — incompatível com `formatos-canais.md` |
+| `google/gemini-3-pro-image` | ❌ | ✅ | 14 | ✅ | Sem seed |
+| `openai/gpt-image-*` (via roteador) | ❌ | ❌ | 16 | ❌ | Perde o `size` que hoje entrega `1024x1536` |
+| `krea/krea-2-*` | ✅ | ✅ | 1 | só 1K | Uma referência só |
+| `recraft/*` | ❌ | ❌ | 1 | ❌ | Só serve para peça vetorial |
+| `riverflow/*`, `grok`, `mai-image` | ❌ | — | — | — | Sem seed |
+
+**Conclusão:** `seedream-4.5` não é hipótese — é o único qualificado. O bake-off (Seção 6) valida a estética, não a escolha técnica, que já está determinada pelos requisitos.
+
+### Roster resultante
+
+| Registro visual | Modelo | Papel |
+|---|---|---|
+| `abstrato-material`, `fotografico-editorial` | `bytedance-seed/seedream-4.5` | Default de toda família |
+| `ilustracao-vetor` | `recraft/recraft-v4.1-vector` | Exceção: peça vetorial (ícone, moldura). Retrato e seed não se aplicam. US$ 0,08 |
+| `personagem-fotorreal` | `google/gemini-3-pro-image` | Exceção sob justificativa: quando consistência de rosto pesa mais que reprodutibilidade. **Sem seed** — registrar no perfil |
+| — | `openai/gpt-image-1.5` | **Suplente**, sempre pelo backend OpenAI direto (via roteador perderia o `size`) |
+
+### Honestidade sobre a calibração por marca
+
+A calibração por registro visual está certa como **arquitetura**, mas hoje ela resolve para o mesmo modelo em quase todo caso — o catálogo só oferece um qualificado. O valor presente do contrato é o ritual de bake-off, o suplente declarado e estar pronto quando mais modelos ganharem seed + proporção. A discriminação real por família aparece hoje apenas nas duas exceções (vetor e personagem).
+
+Registrar isso evita vender internamente uma capacidade que ainda não discrimina.
 
 ### A unidade é a família, não a marca
 
@@ -82,7 +108,7 @@ A hipótese inicial era mapear segmento → modelo (clínica → X, tecnologia �
 
 ### Prateleira curada
 
-O roster ativo tem **3 modelos** (mais o de exceção), não os 40 do catálogo. Habilitar tudo multiplica modos de falha, depreciação e superfície de suporte sem ganho. Modelo fora do roster exige alteração explícita do contrato — nunca acontece por roteamento automático.
+O roster ativo tem **1 default e 2 exceções**, não os 40 do catálogo. Habilitar tudo multiplica modos de falha, depreciação e superfície de suporte sem ganho. Modelo fora do roster exige alteração explícita do contrato — nunca acontece por roteamento automático.
 
 ---
 
@@ -95,13 +121,13 @@ Camada nova, declarativa, com um lugar só de verdade. Convive com `tokens.json`
   "_base": {
     "provider": "openrouter",
     "roster": [
-      "black-forest-labs/flux.2-pro",
       "bytedance-seed/seedream-4.5",
-      "recraft/recraft-v4.1-vector"
+      "recraft/recraft-v4.1-vector",
+      "google/gemini-3-pro-image"
     ],
     "tiers": {
-      "rascunho": { "resolution": "1K", "quality": "low" },
-      "final":    { "resolution": "2K", "quality": "high" }
+      "rascunho": { "resolution": "1K" },
+      "final":    { "resolution": "4K" }
     },
     "acervo": { "ativo": false, "max_refs": 20, "dir": null }
   },
@@ -110,7 +136,7 @@ Camada nova, declarativa, com um lugar só de verdade. Convive com `tokens.json`
       "marcas": ["smark", "provider-max", "elever-ai"],
       "registro": "abstrato-material",
       "modelo": null,
-      "suplente": "openai/gpt-image-1.5",
+      "suplente": { "modelo": "gpt-image-1.5", "provider": "openai" },
       "calibrado_em": null,
       "seed_base": "smark",
       "acervo": { "ativo": false, "dir": "design-system/acervo/smark" }
@@ -151,13 +177,22 @@ Consequências:
 - Variar vira ato explícito (`--reroll 1`), não acidente.
 - Rascunho aprovado → final é a **mesma imagem** com mais resolução.
 
+### O tier não é alavanca de custo — e isso é deliberado
+
+`seedream-4.5` cobra **US$ 0,04 por imagem, plano**, em 1K ou 4K. Rascunho não economiza dinheiro; economiza **tempo de iteração** (1K gera bem mais rápido) e entrega **previsão fiel** do enquadramento. O tier é mantido por esses dois motivos, não por custo.
+
+Toda a economia vem da troca de modelo, não do escalonamento.
+
+**Ganho colateral:** o final pode sair em **4K pelo mesmo preço**. Hoje o fundo é gerado em 1024×1536; passar a gerar em 4K e reduzir na composição dá nitidez extra sem custo.
+
 ### Custo projetado
 
-Base: 180 gerações/mês (135 rascunhos + 45 finais), perfil `flux.2-pro`.
+Base: 180 gerações/mês, perfil `seedream-4.5` a US$ 0,04 plano, + ~5% de taxa de crédito da OpenRouter.
 
 | | Hoje | Proposto |
 |---|---|---|
-| Custo/mês | US$ 36,00 | **≈ US$ 7,50** |
+| Custo/mês | US$ 36,00 | **≈ US$ 7,60** |
+| Resolução do fundo final | 1024×1536 | **4K** |
 | Rascunho prevê o final | ❌ | ✅ |
 | Regerar reproduz a arte | ❌ | ✅ |
 | Custo por peça visível | ❌ | ✅ |
@@ -173,8 +208,8 @@ A OpenRouter devolve `usage.cost` em dólar a cada chamada. Dois destinos:
 
 ```json
 {"data":"2026-07-24T14:03:11","familia":"smark","marca":"smark","slug":"...",
- "tipo":"manifesto","tier":"final","modelo":"black-forest-labs/flux.2-pro",
- "seed":183472911,"resolucao":"2K","custo_usd":0.044,"ok":true,
+ "tipo":"manifesto","tier":"final","modelo":"bytedance-seed/seedream-4.5",
+ "seed":183472911,"resolucao":"4K","custo_usd":0.04,"ok":true,
  "suplente_usado":false,"nao_calibrado":false}
 ```
 
@@ -315,5 +350,7 @@ slash command / editor_server
 ## Pendências
 
 - **`OPENROUTER_API_KEY`** — ausente. Bloqueia o bake-off (critério 7) e o teste de integração no provider novo. Os demais critérios são testáveis sem ela graças à degradação graciosa.
-- **Modelo final da família smark** — indefinido por decisão de projeto. Hipótese de partida `flux.2-pro` (registro `abstrato-material`); confirmado ou refutado pelo bake-off.
-- **Preço por resolução do `flux.2-pro`** — cobrado por megapixel; a projeção de US$ 7,50/mês assume 1 MP no rascunho e ~2 MP no final. Conferir na primeira fatura real.
+- **Estética do `seedream-4.5` com a direção da smark** — a escolha técnica está determinada pelos requisitos duros (Seção 2), mas ninguém viu ainda uma peça desse modelo com o prompt do `_direcao.py` e a paleta ativa. O bake-off decide se ele entra como default ou se a família precisa de exceção. Custo do teste: ~US$ 0,36.
+- **Proporção exata do retrato** — `seedream-4.5` oferece `4:5` e `3:4` via `aspect_ratio`, não pixels literais. Conferir se o recorte resultante alimenta o `compositor.py` sem ajuste; se não, o `_provedor.py` normaliza no pós-processo.
+- **`gpt-image` como suplente** — precisa ficar no backend OpenAI direto. Via OpenRouter o parâmetro de tamanho não é exposto e o suplente perderia o retrato, justamente no momento de falha. Validar no critério 6.
+- **Modelos avaliados e descartados** — `flux.2-*` (sem controle de proporção), `riverflow`, `grok`, `mai-image`, `krea` (sem seed ou uma referência só). Registrado para não serem reavaliados sem motivo novo.
