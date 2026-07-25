@@ -8,3 +8,5 @@
 # Artes geradas: AGORA versionadas (decisão 2026-07-05 — backup real, não perder o que foi aprovado).
 # As artes aplicadas ficam em arte/<slug>/_regen/ e são referenciadas pelo editor.json,
 # então versionamos toda a árvore arte/. Só os PNG entram; nada de segredo aqui.
+__pycache__/
+*.pyc
