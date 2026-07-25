@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Trocar o motor de fundo de IA por um roteador governado — modelo calibrado por família de marca, seed determinística, tiers, telemetria de custo e acervo de referências que realimenta as gerações seguintes.
+**Goal:** Trocar o motor de fundo de IA por um roteador governado — modelo calibrado por família de marca, telemetria de custo por geração e acervo de referências que realimenta as gerações seguintes.
 
-**Architecture:** Três módulos novos e pequenos entram entre o orquestrador e a rede: `_perfil.py` (lê o contrato e resolve modelo/tier/seed), `_provedor.py` (única peça que fala HTTP, com backends OpenRouter e OpenAI) e `_ledger.py` (append-only de custo). `openai_image.py` vira orquestrador fino e mantém a CLI atual intacta. A fase 2 acrescenta `_acervo.py`, que injeta peças aprovadas como `input_references`.
+**Architecture:** Três módulos novos e pequenos entram entre o orquestrador e a rede: `_perfil.py` (lê o contrato e resolve modelo/resolução/seed), `_provedor.py` (única peça que fala HTTP, com backends OpenRouter e OpenAI, e que normaliza qualquer saída para PNG) e `_ledger.py` (append-only de custo). `openai_image.py` vira orquestrador fino e mantém a CLI atual intacta. A fase 2 acrescenta `_acervo.py`, que injeta peças aprovadas como `input_references` — **é ele, e não a seed, que garante a consistência visual.**
 
 **Tech Stack:** Python 3 stdlib apenas (`urllib`, `json`, `hashlib`, `base64`) — o vault não usa dependências externas. Testes em pytest 9.0.3 (já instalado).
 
@@ -14,8 +14,11 @@
 - **CLI preservada.** Todo comando documentado em `shared/direcao-de-arte.md`, `.claude/commands/` e `editor_server.py:974` continua funcionando sem argumento novo.
 - **Chave nunca em linha de comando.** Só via `.env` na raiz ou variável de ambiente.
 - **Nada quebra sem crédito.** Falha de saldo (402), auth (401) ou rede na OpenRouter cai para o suplente OpenAI, com aviso em stderr.
-- **Modelo default:** `bytedance-seed/seedream-4.5`. Suplente: `gpt-image-1.5` no backend `openai` direto.
-- **Tiers:** `rascunho` = 1K, `final` = 4K. Preço plano — o tier é latência e fidelidade, não economia.
+- **Modelo default:** `google/gemini-3-pro-image` (backend `openrouter`, US$ 0,135/imagem medido). Suplente: `gpt-image-1.5` no backend `openai` direto.
+- **`bytedance-seed/seedream-4.5` está BANIDO do roster.** Reprovado no bake-off de 2026-07-24: com o prompt real do `_direcao` ele tipografa o próprio prompt na arte (renderizou `#9A4DFF`, `#F4F2FB`, `85mm`, 時裝, "BAZATUR" e corpo de texto falso) mesmo com `NEGATIVE: no text, no letters, no words` explícito. Não reintroduzir sem novo bake-off aprovado.
+- **Resolução única: `4K`.** Medido: 1K, 2K e 4K custam exatamente o mesmo (US$ 0,135) no modelo default. **Não existe tier de rascunho barato** — tier de resolução não economiza nada, e trocar de modelo para baratear destrói a fidelidade de enquadramento que o compositor precisa. O plano não implementa tiers.
+- **Seed é consultiva, não garantia.** O modelo default não suporta `seed` (aceita e ignora — duas chamadas idênticas devolveram composições diferentes). A seed determinística continua sendo calculada, gravada nos metadados e usada pelo `--reroll`, mas só é ENVIADA ao provedor quando o roster marca `suporta_seed: true` para aquele modelo. Quem garante consistência é o acervo (`input_references`), validado empiricamente.
+- **Formato de saída é imprevisível.** A mesma chamada devolveu `image/jpeg` numa execução e `image/png` na outra. `_provedor` normaliza tudo para PNG antes de devolver — a convenção `![[arte/<slug>.png]]` (regra 6 do CLAUDE.md) depende disso.
 - **Arquivos que NÃO podem ser modificados:** `scripts/compositor.py`, `scripts/_direcao.py`, `scripts/_paleta.py`, `scripts/estudio.py`.
 - **pt-BR** em mensagens de usuário, docstrings e commits.
 
