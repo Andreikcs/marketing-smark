@@ -21,6 +21,7 @@ VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _sidecar import meta_block  # noqa: E402
 from _paleta import aplicar_guard  # noqa: E402
+import _ledger  # noqa: E402
 DEFAULT_MODEL = "gpt-image-1.5"
 ENDPOINT = "https://api.openai.com/v1/images/edits"
 BOUNDARY = "----SmarkFormBoundary7MA4YWxkTrZu0gW29"
@@ -101,9 +102,31 @@ def main():
         sys.exit(f"ERRO: resposta sem imagem. {json.dumps(payload)[:600]}")
 
     out = args.out if os.path.isabs(args.out) else os.path.join(VAULT, args.out)
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    with open(out, "wb") as f:
-        f.write(base64.b64decode(b64))
+    evento = {
+        "familia": "", "marca": getattr(args, "marca", ""), "slug": "",
+        "tipo": "edit", "modelo": model, "provider": "openai",
+        "seed": None, "resolucao": args.size, "custo_usd": None,
+        "suplente_usado": False, "nao_calibrado": False,
+        "arquivo": os.path.basename(out),
+    }
+
+    # A edição já foi cobrada neste ponto. Se a gravação em disco falhar
+    # daqui pra frente, o ledger tem que registrar o gasto mesmo assim — é
+    # o único registro desse dinheiro (mesma lição do gerador de fundos).
+    try:
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        with open(out, "wb") as f:
+            f.write(base64.b64decode(b64))
+    except OSError as e:
+        evento["ok"] = False
+        evento["erro"] = str(e)
+        _ledger.registrar(evento)
+        sys.exit(f"ERRO: a edição foi paga mas a imagem não pôde ser salva em "
+                 f"'{out}' ({e}). O gasto foi registrado no ledger; a arte não foi entregue.")
+
+    evento["ok"] = True
+    _ledger.registrar(evento)
+
     print(f"OK: {out}  ({model}, edit de {os.path.basename(img)})")
     print(meta_block(out, {"modelo": model, "qualidade": args.quality,
                            "tamanho": args.size, "paleta": args.paleta}))
