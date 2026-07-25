@@ -133,18 +133,34 @@ def main():
         sys.exit(f"ERRO: {e}")
 
     out = args.out if os.path.isabs(args.out) else os.path.join(VAULT, args.out)
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    with open(out, "wb") as f:
-        f.write(r["png"])
-
-    _ledger.registrar({
+    evento = {
         "familia": perfil["familia"], "marca": args.marca, "slug": slug,
         "tipo": args.tipo, "modelo": r["modelo"],
         "provider": r["provider"], "seed": perfil["seed"],
         "resolucao": perfil["resolution"], "custo_usd": r["custo_usd"],
-        "ok": True, "suplente_usado": r["suplente_usado"],
+        "suplente_usado": r["suplente_usado"],
         "nao_calibrado": perfil["nao_calibrado"], "arquivo": os.path.basename(out),
-    })
+    }
+
+    # A geração já foi cobrada neste ponto (custo_usd é conhecido). Se a
+    # gravação em disco falhar daqui pra frente, o ledger tem que registrar o
+    # gasto mesmo assim — é o único registro desse dinheiro. A ordem continua
+    # PNG-antes-do-ledger: se o processo morrer no meio, perder o registro de
+    # custo (recuperável) é preferível a perder a arte já paga.
+    try:
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        with open(out, "wb") as f:
+            f.write(r["png"])
+    except OSError as e:
+        evento["ok"] = False
+        evento["erro"] = str(e)
+        _ledger.registrar(evento)
+        sys.exit(f"ERRO: a geração foi paga (custo=${r['custo_usd']}) mas a imagem "
+                 f"não pôde ser salva em '{out}' ({e}). O gasto foi registrado no "
+                 f"ledger; a arte não foi entregue.")
+
+    evento["ok"] = True
+    _ledger.registrar(evento)
 
     print(f"OK: {out}  ({r['modelo']} via {r['provider']}, "
           f"seed={perfil['seed']}, custo=${r['custo_usd'] if r['custo_usd'] is not None else '?'})")
