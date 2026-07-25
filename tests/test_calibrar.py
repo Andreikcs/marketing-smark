@@ -57,6 +57,33 @@ def test_fixar_preserva_o_resto_do_contrato(tmp_path):
     assert gravado["_base"]["roster"] == original["_base"]["roster"]
 
 
+def test_fixar_nao_corrompe_contrato_se_escrita_falhar_no_meio(tmp_path, monkeypatch):
+    """Se json.dump() explodir no meio da escrita, o contrato no destino tem que
+    continuar sendo o original íntegro — nunca truncado ou com JSON inválido.
+    E nenhum arquivo temporário pode sobrar no diretório."""
+    origem = _perfil.CONTRATO
+    alvo = str(tmp_path / "perfis-imagem.json")
+    shutil.copy(origem, alvo)
+    original = json.load(open(alvo, encoding="utf-8"))
+
+    def dump_quebrado(*a, **kw):
+        raise RuntimeError("falha simulada no meio da escrita")
+
+    monkeypatch.setattr(json, "dump", dump_quebrado)
+
+    with pytest.raises(RuntimeError):
+        calibrar.fixar("smark", "gpt-image-1.5", "2026-07-24", path=alvo)
+
+    gravado = json.load(open(alvo, encoding="utf-8"))
+    assert gravado == original
+    assert gravado["_base"]["roster"] == original["_base"]["roster"]
+    assert gravado["_base"]["banidos"] == original["_base"]["banidos"]
+    assert gravado["familias"] == original["familias"]
+
+    sobras = [p for p in os.listdir(tmp_path) if p != "perfis-imagem.json"]
+    assert sobras == [], f"arquivo(s) temporário(s) deixados para trás: {sobras}"
+
+
 def _args(**over):
     base = dict(familia="smark", marca="smark", tema="claro", paleta="roxo")
     base.update(over)

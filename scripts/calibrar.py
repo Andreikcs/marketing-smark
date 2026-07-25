@@ -24,6 +24,7 @@ import datetime
 import json
 import os
 import sys
+import tempfile
 
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -61,9 +62,24 @@ def fixar(familia, modelo, data, path=None):
     fam = cfg.setdefault("familias", {}).setdefault(familia, {})
     fam["modelo"] = modelo
     fam["calibrado_em"] = data
-    with open(alvo, "w", encoding="utf-8") as f:
-        json.dump(cfg, f, ensure_ascii=False, indent=2)
-        f.write("\n")
+
+    # Escrita atômica: grava num temporário no MESMO diretório do destino (mesmo
+    # sistema de arquivos, senão os.replace não é atômico) e só então substitui o
+    # contrato por cima com os.replace, que é atômico no POSIX. Assim só existem
+    # dois estados possíveis — o contrato antigo íntegro ou o novo íntegro — e
+    # nunca um meio-termo truncado, mesmo se o processo morrer no meio da escrita.
+    diretorio = os.path.dirname(os.path.abspath(alvo)) or "."
+    tmp_fd, tmp_path = tempfile.mkstemp(
+        dir=diretorio, prefix=".perfis-imagem-", suffix=".tmp")
+    try:
+        with os.fdopen(tmp_fd, "w", encoding="utf-8") as f:
+            json.dump(cfg, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+        os.replace(tmp_path, alvo)
+    except BaseException:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        raise
     return cfg
 
 
