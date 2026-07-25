@@ -25,6 +25,8 @@ VAULT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import compositor  # noqa: E402
 import estudio  # noqa: E402  (cérebro do chat: copy + conceito visual)
+import _acervo  # noqa: E402
+import _perfil  # noqa: E402
 
 PORT = 8765
 PAINEL = os.path.join(VAULT, "painel.html")
@@ -945,6 +947,24 @@ class H(http.server.BaseHTTPRequestHandler):
                 full = os.path.join(dd, name)
                 open(full, "wb").write(raw)
                 return self._send(200, {"ok": True, "path": os.path.relpath(full, VAULT)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/acervo-add":
+            try:
+                marca = safe_marca(req.get("marca", "smark"))
+                rel = str(req.get("path", "")).lstrip("/")
+                origem = os.path.join(VAULT, rel)
+                if not os.path.isfile(origem):
+                    return self._send(400, {"ok": False, "erro": "arquivo não encontrado"})
+                perfil = _perfil.resolver(marca)
+                if not perfil["acervo_dir"]:
+                    return self._send(400, {"ok": False, "erro": "família sem acervo no contrato"})
+                _acervo.adicionar(origem, perfil["acervo_dir"])
+                total = len(_acervo.listar(perfil["acervo_dir"], 10 ** 6))
+                return self._send(200, {"ok": True, "total": total,
+                                        "teto": perfil["acervo_max"],
+                                        "familia": perfil["familia"]})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 

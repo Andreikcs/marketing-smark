@@ -26,7 +26,7 @@ Regra de qualidade pra **todo fundo gerado por IA** (gpt-image via `scripts/open
 
 ## Como usar
 
-- **Fundo dirigido:** `python3 scripts/openai_image.py --out <bg.png> --direcao --marca <marca> --tipo <tipo> --tema <claro|escuro> --headline "..." [--conceito "override p/ tema especial"]` — **claro é o default**; só passe `--tema escuro` sob pedido.
+- **Fundo dirigido:** `python3 scripts/openai_image.py --out <bg.png> --direcao --marca <marca> --tipo <tipo> --tema <claro|escuro> --headline "..." [--reroll N] [--conceito "override p/ tema especial"]` — **claro é o default**; só passe `--tema escuro` sob pedido. O modelo sai do contrato (`design-system/tokens/perfis-imagem.json`), sempre em 4K (US$ 0,244; 2K sairia por 0,135 mas amolece o fundo). Não gostou do resultado? `--reroll 1`, `--reroll 2` — cada um é uma tentativa nova, ~US$ 0,244.
 - **Compor (grade automática):** `python3 scripts/compositor.py --marca <marca> --out <arte.png> --bg <bg.png> --tema <...> --headline "..." --sub "..."`
 - **Lançamento:** o `lancamento_server.py` (Gerar oficiais) já usa essa direção por tipo/tema de cada quadro.
 

@@ -25,6 +25,7 @@ from _paleta import aplicar_guard  # noqa: E402
 import _perfil  # noqa: E402
 import _provedor  # noqa: E402
 import _ledger  # noqa: E402
+import _acervo  # noqa: E402
 
 
 def load_env(path):
@@ -82,6 +83,8 @@ def main():
     ap.add_argument("--model", default=None, help="sobrescreve o modelo do perfil")
     ap.add_argument("--provider", default="auto", help="auto | openrouter | openai")
     ap.add_argument("--reroll", type=int, default=0, help="varia a seed de propósito")
+    ap.add_argument("--sem-acervo", action="store_true",
+                    help="não injeta as peças-referência da família")
     ap.add_argument("--slug", default="", help="slug do post — entra na seed determinística")
     ap.add_argument("--marca", default="")
     ap.add_argument("--canal", default="")
@@ -127,8 +130,16 @@ def main():
         print(f"AVISO: família '{perfil['familia']}' sem calibração — usando suplente "
               f"{perfil['modelo']}. Rode scripts/calibrar.py.", file=sys.stderr)
 
+    refs = []
+    if perfil.get("acervo_ativo") and not args.sem_acervo:
+        caminhos = _acervo.listar(perfil.get("acervo_dir"), perfil.get("acervo_max") or 20)
+        refs = _acervo.como_data_urls(caminhos)
+        if refs:
+            print(f"acervo: {len(refs)} peça(s) de referência da família "
+                  f"'{perfil['familia']}'", file=sys.stderr)
+
     try:
-        r = gerar_com_suplente(prompt, perfil, chaves, args.size, args.quality)
+        r = gerar_com_suplente(prompt, perfil, chaves, args.size, args.quality, refs=refs)
     except _provedor.ErroProvedor as e:
         sys.exit(f"ERRO: {e}")
 
@@ -138,6 +149,7 @@ def main():
         "tipo": args.tipo, "modelo": r["modelo"],
         "provider": r["provider"], "seed": perfil["seed"],
         "resolucao": perfil["resolution"], "custo_usd": r["custo_usd"],
+        "refs": len(refs),
         "suplente_usado": r["suplente_usado"],
         "nao_calibrado": perfil["nao_calibrado"], "arquivo": os.path.basename(out),
     }

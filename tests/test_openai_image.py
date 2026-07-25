@@ -19,6 +19,9 @@ PERFIL_FAKE = {
     "suplente_modelo": "gpt-image-1.5",
     "suplente_provider": "openai",
     "nao_calibrado": False,
+    "acervo_ativo": False,
+    "acervo_dir": None,
+    "acervo_max": 14,
 }
 
 

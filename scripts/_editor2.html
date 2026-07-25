@@ -327,6 +327,7 @@ input[type=range]{accent-color:var(--accent)}
         <button id=bsim><svg class=igicon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Instagram</button>
         <button id=blegenda>📝 Legenda</button>
         <button id=bfull>⛶ Tela cheia</button>
+        <button id=bref title="marcar esta arte como peça-referência da marca">★ Referência</button>
         <button class=del id=bdelc>🗑 Excluir</button>
       </div>
       <div class=strip id=strip></div>
@@ -930,7 +931,19 @@ async function openFull(){
   const s=Math.min((window.innerWidth-40)/1080,(window.innerHeight-40)/1350);
   document.getElementById('fsif').style.transform='scale('+s+')';
 }
-$('#bfull').onclick=openFull;$('#fsx').onclick=()=>document.getElementById('fsmodal').style.display='none';
+async function marcarReferencia(){
+  const p=post(), fr=frame();
+  const art=(fr&&fr.bg)||'';
+  if(!art){alert('Este card ainda não tem arte de fundo gerada.');return}
+  if(!confirm('Adicionar esta arte ao acervo de referência da marca?\n\nEla vai influenciar todas as próximas gerações desta família. Só adicione peças aprovadas.'))return;
+  try{
+    const r=await(await fetch('/acervo-add',{method:'POST',headers:HJSON,
+      body:JSON.stringify({marca:p.marca||'smark',path:art})})).json();
+    if(r.ok){toast('★ No acervo de "'+r.familia+'" ('+r.total+'/'+r.teto+')')}
+    else{alert('Erro: '+(r.erro||'desconhecido'))}
+  }catch(e){alert('Erro: '+e.message)}
+}
+$('#bfull').onclick=openFull;$('#bref').onclick=marcarReferencia;$('#fsx').onclick=()=>document.getElementById('fsmodal').style.display='none';
 document.getElementById('fsmodal').onclick=e=>{if(e.target.id==='fsmodal')e.currentTarget.style.display='none'};
 
 // ===== Desfazer / Refazer (histórico) =====
