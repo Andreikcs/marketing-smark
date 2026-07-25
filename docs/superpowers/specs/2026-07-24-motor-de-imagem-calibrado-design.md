@@ -2,15 +2,51 @@
 tipo: design
 tema: motor de imagem calibrado por família de marca (OpenRouter + perfis + acervo)
 data: 2026-07-24
-status: design aprovado — aguardando revisão do spec
+status: design aprovado — corrigido pelo bake-off de 2026-07-24
 autor: Andreik + Claude
 origem: avaliação da OpenRouter como camada de roteamento de modelos de imagem
 camada: sistema (motor de geração de arte)
 depende-de: docs/superpowers/specs/2026-07-21-distribuicao-plataforma-agencias-design.md
-bloqueio-conhecido: OPENROUTER_API_KEY ausente no .env
 ---
 
 # Motor de imagem calibrado por família de marca
+
+> ## ⚠️ ERRATA — bake-off executado em 2026-07-24
+>
+> O spec abaixo foi escrito **antes** de gerar uma única imagem. O bake-off com
+> chave paga (US$ 0,57 gastos) derrubou quatro premissas. **Onde este bloco e o
+> corpo do spec divergirem, vale este bloco** — e o plano
+> (`docs/superpowers/plans/2026-07-24-motor-de-imagem-calibrado.md`) já está corrigido.
+>
+> **1. `bytedance-seed/seedream-4.5` está reprovado e banido.** A Seção 3 o elegia
+> "o único qualificado" com base na tabela de capacidades. Com o prompt real do
+> `_direcao`, ele **tipografa o próprio prompt na arte**: renderizou `#9A4DFF`,
+> `#F4F2FB`, `85mm`, caracteres chineses (時裝), "BAZATUR", "Brandia" e corpo de
+> texto falso — mesmo com `NEGATIVE: no text, no letters, no words, no numbers`
+> explícito, e também com prompt curto. Falha dura no critério 3 da Seção 6.
+>
+> **2. O default é `google/gemini-3-pro-image`.** Quatro gerações, zero texto
+> espúrio, paleta exata, terço inferior limpo, robusto ao prompt atual (não exige
+> reescrever `_direcao`). US$ 0,135/imagem medido.
+>
+> **3. Seed não é reprodutibilidade — o acervo é a consistência.** A Seção 4
+> inteira parte de "mesma seed, mesma imagem". O modelo default **não suporta
+> `seed`**: aceita o parâmetro e ignora. Duas chamadas idênticas devolveram
+> composições diferentes. A seed continua sendo calculada, gravada nos metadados e
+> usada pelo `--reroll`, mas só é **enviada** quando o roster marca
+> `suporta_seed: true`. O que de fato trava o registro visual é o **acervo**
+> (`input_references`), e isso foi **validado**: gerar com uma peça aprovada como
+> referência produziu composição nova com o mesmo material, mesma luz e mesma
+> paleta. O fosso da Seção 6 se confirma; a promessa de determinismo da Seção 4, não.
+>
+> **4. Tiers morreram.** A Seção 4 mantinha `rascunho`/`final` por latência e
+> fidelidade. Medido: **1K, 2K e 4K custam exatamente o mesmo** (US$ 0,135). Não há
+> rascunho barato sem trocar de modelo, e trocar de modelo destrói a fidelidade de
+> enquadramento que o compositor precisa. Resolução passa a ser única (`4K`).
+>
+> **5. Achado operacional:** o formato de saída é imprevisível — a **mesma** chamada
+> devolveu `image/jpeg` numa execução e `image/png` na outra. `_provedor` normaliza
+> tudo para PNG (via `sips`), porque a regra 6 do `CLAUDE.md` depende do `.png`.
 
 ## Contexto e origem
 
@@ -83,7 +119,7 @@ Varredura dos 40 modelos com saída de imagem da OpenRouter (2026-07-24):
 | `recraft/*` | ❌ | ❌ | 1 | ❌ | Só serve para peça vetorial |
 | `riverflow/*`, `grok`, `mai-image` | ❌ | — | — | — | Sem seed |
 
-**Conclusão:** `seedream-4.5` não é hipótese — é o único qualificado. O bake-off (Seção 6) valida a estética, não a escolha técnica, que já está determinada pelos requisitos.
+**Conclusão (INVALIDADA pelo bake-off — ver ERRATA):** `seedream-4.5` parecia o único qualificado *na tabela de capacidades*. O bake-off o reprovou na estética. A lição a guardar: **capacidade declarada não é qualificação** — nenhum modelo entra no roster sem gerar imagem com o prompt real.
 
 ### Roster resultante
 
@@ -154,7 +190,8 @@ Camada nova, declarativa, com um lugar só de verdade. Convive com `tokens.json`
 
 ---
 
-## Seção 4 — Tiers e seed determinística
+## Seção 4 — Tiers e seed determinística  
+> **SUPERSEDIDA pela ERRATA no topo.** Não existem tiers e a seed não é garantia. Mantida como registro do raciocínio original.
 
 ### Por que rascunho só funciona no mesmo modelo
 

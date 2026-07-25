@@ -38,7 +38,8 @@
   - `familia_de(marca, cfg) -> str` — nome da família que contém a marca; `"smark"` se não achar.
   - `calcular_seed(familia, slug, tipo, reroll=0) -> int` — determinística, faixa `[0, 2**31)`.
   - `aspect_de_size(size) -> str` — `"1024x1536"` → `"2:3"`.
-  - `resolver(marca, tier="final", slug="", tipo="", reroll=0, size="1024x1536", cfg=None) -> dict` com as chaves exatas: `familia`, `modelo`, `provider`, `resolution`, `aspect_ratio`, `seed`, `suplente_modelo`, `suplente_provider`, `nao_calibrado`, `acervo_ativo`, `acervo_dir`, `acervo_max`.
+  - `capacidades(modelo, cfg) -> dict` — entrada do roster para o modelo; `{}` se fora do roster.
+  - `resolver(marca, slug="", tipo="", reroll=0, size="1024x1536", cfg=None) -> dict` com as chaves exatas: `familia`, `modelo`, `provider`, `resolution`, `aspect_ratio`, `seed`, `enviar_seed`, `suplente_modelo`, `suplente_provider`, `nao_calibrado`, `acervo_ativo`, `acervo_dir`, `acervo_max`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -84,7 +85,9 @@ def test_aspect_de_size():
 
 
 def test_resolver_familia_nao_calibrada_usa_suplente():
-    r = _perfil.resolver("smark", tier="final", slug="x", tipo="manifesto")
+    cfg = _perfil.carregar()
+    cfg["familias"]["smark"]["modelo"] = None
+    r = _perfil.resolver("smark", slug="x", tipo="manifesto", cfg=cfg)
     assert r["nao_calibrado"] is True
     assert r["modelo"] == "gpt-image-1.5"
     assert r["provider"] == "openai"
@@ -92,25 +95,46 @@ def test_resolver_familia_nao_calibrada_usa_suplente():
 
 def test_resolver_usa_modelo_calibrado_quando_existe():
     cfg = _perfil.carregar()
-    cfg["familias"]["smark"]["modelo"] = "bytedance-seed/seedream-4.5"
-    cfg["familias"]["smark"]["calibrado_em"] = "2026-07-24"
-    r = _perfil.resolver("smark", tier="rascunho", slug="x", tipo="dor", cfg=cfg)
-    assert r["modelo"] == "bytedance-seed/seedream-4.5"
+    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
+    assert r["modelo"] == "google/gemini-3-pro-image"
     assert r["provider"] == "openrouter"
-    assert r["resolution"] == "1K"
+    assert r["resolution"] == "4K"
     assert r["nao_calibrado"] is False
 
 
-def test_resolver_tier_final_usa_4k():
+def test_seed_nao_e_enviada_para_modelo_sem_suporte():
+    """gemini-3-pro-image aceita `seed` e ignora. Não mentir no corpo da requisição."""
     cfg = _perfil.carregar()
-    cfg["familias"]["smark"]["modelo"] = "bytedance-seed/seedream-4.5"
-    r = _perfil.resolver("smark", tier="final", slug="x", tipo="dor", cfg=cfg)
-    assert r["resolution"] == "4K"
+    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
+    assert r["seed"] > 0            # continua calculada, vai pros metadados
+    assert r["enviar_seed"] is False
+
+
+def test_seed_e_enviada_para_modelo_com_suporte():
+    cfg = _perfil.carregar()
+    cfg["_base"]["roster"]["modelo-ficticio"] = {
+        "provider": "openrouter", "suporta_seed": True, "max_refs": 4}
+    cfg["familias"]["smark"]["modelo"] = "modelo-ficticio"
+    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
+    assert r["enviar_seed"] is True
+
+
+def test_acervo_max_respeita_o_teto_do_modelo():
+    """O contrato pede 20 refs, mas o gemini aceita no máximo 14. Vence o menor."""
+    cfg = _perfil.carregar()
+    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
+    assert r["acervo_max"] == 14
+
+
+def test_seedream_esta_banido_do_roster():
+    """Reprovado no bake-off: tipografa o prompt na arte. Ver Global Constraints."""
+    cfg = _perfil.carregar()
+    assert "bytedance-seed/seedream-4.5" not in cfg["_base"]["roster"]
 
 
 def test_contrato_tem_roster_e_acervo():
     cfg = _perfil.carregar()
-    assert "bytedance-seed/seedream-4.5" in cfg["_base"]["roster"]
+    assert "google/gemini-3-pro-image" in cfg["_base"]["roster"]
     assert cfg["_base"]["acervo"]["max_refs"] == 20
 ```
 
@@ -125,14 +149,33 @@ Expected: FAIL com `ModuleNotFoundError: No module named '_perfil'`
 {
   "_base": {
     "provider": "openrouter",
-    "roster": [
-      "bytedance-seed/seedream-4.5",
-      "recraft/recraft-v4.1-vector",
-      "google/gemini-3-pro-image"
-    ],
-    "tiers": {
-      "rascunho": { "resolution": "1K" },
-      "final": { "resolution": "4K" }
+    "resolution": "4K",
+    "roster": {
+      "google/gemini-3-pro-image": {
+        "provider": "openrouter",
+        "suporta_seed": false,
+        "max_refs": 14,
+        "custo_medido_usd": 0.135,
+        "nota": "default. 1K/2K/4K custam o mesmo. Robusto ao prompt do _direcao."
+      },
+      "google/gemini-2.5-flash-image": {
+        "provider": "openrouter",
+        "suporta_seed": false,
+        "max_refs": 3,
+        "custo_medido_usd": null,
+        "nota": "candidato barato, ainda sem bake-off aprovado."
+      },
+      "gpt-image-1.5": {
+        "provider": "openai",
+        "suporta_seed": false,
+        "max_refs": 0,
+        "custo_medido_usd": null,
+        "nota": "suplente. Sem resolution/aspect_ratio — usa size/quality."
+      }
+    },
+    "banidos": {
+      "bytedance-seed/seedream-4.5":
+        "bake-off 2026-07-24: tipografa o prompt na arte (hex, 85mm, 時裝, texto falso) mesmo com NEGATIVE explícito."
     },
     "suplente": { "modelo": "gpt-image-1.5", "provider": "openai" },
     "acervo": { "ativo": false, "max_refs": 20, "dir": null }
@@ -141,8 +184,8 @@ Expected: FAIL com `ModuleNotFoundError: No module named '_perfil'`
     "smark": {
       "marcas": ["smark", "provider-max", "elever-ai"],
       "registro": "abstrato-material",
-      "modelo": null,
-      "calibrado_em": null,
+      "modelo": "google/gemini-3-pro-image",
+      "calibrado_em": "2026-07-24",
       "acervo": { "ativo": false, "dir": "design-system/acervo/smark" }
     }
   },
@@ -154,7 +197,7 @@ Expected: FAIL com `ModuleNotFoundError: No module named '_perfil'`
 
 ```python
 #!/usr/bin/env python3
-"""Resolve o perfil de imagem de uma marca: família, modelo, tier, seed e acervo.
+"""Resolve o perfil de imagem de uma marca: família, modelo, seed e acervo.
 
 Fonte única: design-system/tokens/perfis-imagem.json. Nenhuma decisão estética
 mora em código — só no contrato. Ver docs/superpowers/specs/2026-07-24-motor-de-imagem-calibrado-design.md
@@ -201,8 +244,17 @@ def aspect_de_size(size):
         return ""
 
 
-def resolver(marca, tier="final", slug="", tipo="", reroll=0, size="1024x1536", cfg=None):
-    """Devolve tudo que o orquestrador precisa pra chamar o provedor."""
+def capacidades(modelo, cfg):
+    """Entrada do roster pro modelo (suporta_seed, max_refs, provider). {} se fora do roster."""
+    return ((cfg.get("_base", {}).get("roster") or {}).get(modelo)) or {}
+
+
+def resolver(marca, slug="", tipo="", reroll=0, size="1024x1536", cfg=None):
+    """Devolve tudo que o orquestrador precisa pra chamar o provedor.
+
+    Não existe tier: 1K/2K/4K custam o mesmo no modelo default, então a
+    resolução é única e vem de `_base.resolution`.
+    """
     cfg = cfg or carregar()
     base = cfg.get("_base", {})
     familia = familia_de(marca, cfg)
@@ -211,45 +263,47 @@ def resolver(marca, tier="final", slug="", tipo="", reroll=0, size="1024x1536", 
     modelo = fam.get("modelo")
     nao_calibrado = not modelo
     suplente = fam.get("suplente") or base.get("suplente") or {}
-    provider = fam.get("provider") or base.get("provider", "openrouter")
 
     if nao_calibrado:
         modelo = suplente.get("modelo", "gpt-image-1.5")
-        provider = suplente.get("provider", "openai")
 
-    tiers = base.get("tiers", {})
-    resolution = (tiers.get(tier) or tiers.get("final") or {}).get("resolution", "2K")
+    cap = capacidades(modelo, cfg)
+    provider = cap.get("provider") or fam.get("provider") or base.get("provider", "openrouter")
 
     acervo_base = base.get("acervo", {})
     acervo_fam = fam.get("acervo", {})
     acervo_dir = acervo_fam.get("dir") or acervo_base.get("dir")
+    # O teto do contrato nunca pode passar do que o modelo aceita.
+    teto = int(cap.get("max_refs", 0) or 0)
+    acervo_max = min(int(acervo_base.get("max_refs", 20)), teto) if teto else 0
 
     return {
         "familia": familia,
         "modelo": modelo,
         "provider": provider,
-        "resolution": resolution,
+        "resolution": base.get("resolution", "4K"),
         "aspect_ratio": aspect_de_size(size),
         "seed": calcular_seed(familia, slug, tipo, reroll),
+        "enviar_seed": bool(cap.get("suporta_seed", False)),
         "suplente_modelo": suplente.get("modelo", "gpt-image-1.5"),
         "suplente_provider": suplente.get("provider", "openai"),
         "nao_calibrado": nao_calibrado,
         "acervo_ativo": bool(acervo_fam.get("ativo", acervo_base.get("ativo", False))),
         "acervo_dir": os.path.join(VAULT, acervo_dir) if acervo_dir else "",
-        "acervo_max": int(acervo_base.get("max_refs", 20)),
+        "acervo_max": acervo_max,
     }
 ```
 
 - [ ] **Step 5: Run test to verify it passes**
 
 Run: `cd /Users/andreik/smark && python3 -m pytest tests/test_perfil.py -v`
-Expected: PASS — 9 passed
+Expected: PASS — 12 passed
 
 - [ ] **Step 6: Commit**
 
 ```bash
 git add design-system/tokens/perfis-imagem.json scripts/_perfil.py tests/test_perfil.py
-git commit -m "feat: contrato de perfis de imagem e resolver (família, modelo, tier, seed)"
+git commit -m "feat: contrato de perfis de imagem e resolver (família, modelo, capacidades)"
 ```
 
 ---
@@ -364,7 +418,8 @@ git commit -m "feat: ledger append-only de custo por geração"
 - Consumes: nada.
 - Produces:
   - `class ErroProvedor(Exception)` com atributo `.codigo` (int ou `None`).
-  - `gerar(prompt, modelo, provider, chaves, *, resolution=None, aspect_ratio=None, seed=None, size=None, quality=None, refs=None, timeout=180) -> dict` com chaves `png` (bytes), `custo_usd` (float ou `None`), `modelo`, `provider`.
+  - `para_png(raw: bytes) -> bytes` — devolve PNG. Passa direto se já for PNG; converte se for JPEG; devolve intacto com aviso em stderr se não reconhecer.
+  - `gerar(prompt, modelo, provider, chaves, *, resolution=None, aspect_ratio=None, seed=None, size=None, quality=None, refs=None, timeout=180) -> dict` com chaves `png` (bytes, **sempre PNG**), `custo_usd` (float ou `None`), `modelo`, `provider`.
   - `chaves` é `{"openrouter": str|None, "openai": str|None}`.
   - `refs` é lista de data-URLs (`str`), só usada no backend `openrouter`.
 
@@ -411,17 +466,23 @@ def _captura(monkeypatch, payload):
     return vistos
 
 
-def test_openrouter_envia_seed_e_resolution_e_devolve_custo(monkeypatch):
-    vistos = _captura(monkeypatch, {"data": [{"b64_json": PNG}], "usage": {"cost": 0.04}})
-    r = _provedor.gerar("um prompt", "bytedance-seed/seedream-4.5", "openrouter",
-                        {"openrouter": "k1"}, resolution="4K", aspect_ratio="2:3", seed=99)
+def test_openrouter_envia_resolution_e_devolve_custo(monkeypatch):
+    vistos = _captura(monkeypatch, {"data": [{"b64_json": PNG}], "usage": {"cost": 0.135}})
+    r = _provedor.gerar("um prompt", "google/gemini-3-pro-image", "openrouter",
+                        {"openrouter": "k1"}, resolution="4K", aspect_ratio="4:5")
     assert r["png"] == b"fake-png-bytes"
-    assert r["custo_usd"] == 0.04
+    assert r["custo_usd"] == 0.135
     corpo = json.loads(vistos[0].data.decode())
-    assert corpo["seed"] == 99
     assert corpo["resolution"] == "4K"
-    assert corpo["aspect_ratio"] == "2:3"
+    assert corpo["aspect_ratio"] == "4:5"
+    assert "seed" not in corpo          # não foi pedida — não vai no corpo
     assert "openrouter.ai" in vistos[0].full_url
+
+
+def test_openrouter_envia_seed_quando_pedida(monkeypatch):
+    vistos = _captura(monkeypatch, {"data": [{"b64_json": PNG}], "usage": {"cost": 0.04}})
+    _provedor.gerar("p", "m", "openrouter", {"openrouter": "k1"}, seed=99)
+    assert json.loads(vistos[0].data.decode())["seed"] == 99
 
 
 def test_openai_envia_size_e_quality_e_nao_manda_seed(monkeypatch):
@@ -473,6 +534,31 @@ def test_resposta_sem_imagem_vira_erro_provedor(monkeypatch):
         assert False, "deveria ter levantado"
     except _provedor.ErroProvedor as e:
         assert "sem imagem" in str(e)
+
+
+def test_png_passa_intacto():
+    raw = b"\x89PNG\r\n\x1a\n" + b"resto"
+    assert _provedor.para_png(raw) == raw
+
+
+def test_jpeg_vira_png():
+    """A MESMA chamada devolveu jpeg numa execução e png na outra. Normalizar sempre."""
+    jpeg = _JPEG_1PX
+    saida = _provedor.para_png(jpeg)
+    assert saida.startswith(b"\x89PNG\r\n\x1a\n")
+
+
+def test_bytes_irreconheciveis_passam_intactos():
+    assert _provedor.para_png(b"fake-png-bytes") == b"fake-png-bytes"
+```
+
+Acrescente esta constante logo abaixo de `PNG = ...` no topo do arquivo de teste — é um JPEG real de 1x1 pixel:
+
+```python
+_JPEG_1PX = base64.b64decode(
+    "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a"
+    "HBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAA"
+    "AAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q==")
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -490,14 +576,53 @@ Dois backends atrás da mesma interface:
   - openrouter → POST /api/v1/images  (seed, resolution, aspect_ratio, input_references, custo)
   - openai     → POST /v1/images/generations (size, quality; sem seed, sem custo na resposta)
 
+Também normaliza a saída pra PNG: a MESMA chamada ao gemini-3-pro-image devolveu
+image/jpeg numa execução e image/png na outra, e a regra 6 do CLAUDE.md exige .png.
+
 Nenhuma decisão de modelo ou estética mora aqui — isso é do _perfil.py."""
 import base64
 import json
+import os
+import subprocess
+import sys
+import tempfile
 import urllib.error
 import urllib.request
 
 URL_OPENROUTER = "https://openrouter.ai/api/v1/images"
 URL_OPENAI = "https://api.openai.com/v1/images/generations"
+MAGIC_PNG = b"\x89PNG\r\n\x1a\n"
+MAGIC_JPEG = b"\xff\xd8\xff"
+
+
+def para_png(raw):
+    """Garante PNG na saída. Passa direto se já for; converte se for JPEG.
+
+    Sem dependência nova: usa `sips`, que vem no macOS. Se não der pra converter,
+    devolve os bytes originais e avisa — melhor uma arte com extensão errada do
+    que nenhuma arte.
+    """
+    if not raw or raw.startswith(MAGIC_PNG):
+        return raw
+    if not raw.startswith(MAGIC_JPEG):
+        print("AVISO: formato de imagem não reconhecido; gravando como veio",
+              file=sys.stderr)
+        return raw
+    try:
+        d = tempfile.mkdtemp(prefix="smark-img-")
+        src, dst = os.path.join(d, "i.jpg"), os.path.join(d, "o.png")
+        with open(src, "wb") as f:
+            f.write(raw)
+        r = subprocess.run(["/usr/bin/sips", "-s", "format", "png", src, "--out", dst],
+                           capture_output=True)
+        if r.returncode == 0 and os.path.exists(dst):
+            with open(dst, "rb") as f:
+                return f.read()
+        raise RuntimeError(r.stderr.decode("utf-8", "ignore")[:200])
+    except Exception as e:
+        print(f"AVISO: falha ao converter JPEG->PNG ({e}); gravando o JPEG original",
+              file=sys.stderr)
+        return raw
 
 
 class ErroProvedor(Exception):
@@ -567,14 +692,14 @@ def gerar(prompt, modelo, provider, chaves, *, resolution=None, aspect_ratio=Non
     except (KeyError, TypeError, ValueError):
         pass
 
-    return {"png": base64.b64decode(b64), "custo_usd": custo,
+    return {"png": para_png(base64.b64decode(b64)), "custo_usd": custo,
             "modelo": modelo, "provider": provider}
 ```
 
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `cd /Users/andreik/smark && python3 -m pytest tests/test_provedor.py -v`
-Expected: PASS — 6 passed
+Expected: PASS — 10 passed
 
 - [ ] **Step 5: Commit**
 
@@ -585,7 +710,7 @@ git commit -m "feat: provedor de imagem com backends OpenRouter e OpenAI"
 
 ---
 
-### Task 4: Metadados da arte com modelo, seed, tier e custo
+### Task 4: Metadados da arte com modelo, seed e custo
 
 **Files:**
 - Modify: `scripts/_sidecar.py:19-34`
@@ -593,7 +718,7 @@ git commit -m "feat: provedor de imagem com backends OpenRouter e OpenAI"
 
 **Interfaces:**
 - Consumes: nada.
-- Produces: `meta_block(out_png, meta)` passa a reconhecer as chaves `seed`, `tier`, `custo_usd`, `provider`, `suplente_usado` além das atuais (`modelo`, `qualidade`, `tamanho`, `paleta`). Campos vazios continuam saindo como linha vazia — o formato existente não muda.
+- Produces: `meta_block(out_png, meta)` passa a reconhecer as chaves `seed`, `custo_usd`, `provider`, `suplente_usado` além das atuais (`modelo`, `qualidade`, `tamanho`, `paleta`). Campos vazios continuam saindo como linha vazia — o formato existente não muda.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -619,12 +744,11 @@ def test_mantem_campos_existentes():
 
 def test_inclui_campos_novos():
     bloco = _sidecar.meta_block("/x/arte/01.png", {
-        "modelo": "bytedance-seed/seedream-4.5", "tamanho": "1024x1536",
-        "seed": 12345, "tier": "final", "custo_usd": 0.04,
+        "modelo": "google/gemini-3-pro-image", "tamanho": "1024x1536",
+        "seed": 12345, "custo_usd": 0.135,
         "provider": "openrouter", "suplente_usado": False})
     assert "arte-seed: 12345" in bloco
-    assert "arte-tier: final" in bloco
-    assert "arte-custo-usd: 0.04" in bloco
+    assert "arte-custo-usd: 0.135" in bloco
     assert "arte-provider: openrouter" in bloco
     assert "arte-suplente: false" in bloco
 
@@ -657,7 +781,6 @@ def meta_block(out_png, meta):
         f"arte-modelo: {meta.get('modelo', '')}",
         f"arte-provider: {meta.get('provider', '')}",
         f"arte-qualidade: {meta.get('qualidade', '')}",
-        f"arte-tier: {meta.get('tier', '')}",
         f"arte-tamanho: {size}",
         f"arte-proporcao: {_aspect(size)}",
         f"arte-seed: {meta.get('seed', '')}",
@@ -678,7 +801,7 @@ Expected: PASS — 3 passed
 
 ```bash
 git add scripts/_sidecar.py tests/test_sidecar.py
-git commit -m "feat: metadados da arte com provider, tier, seed e custo"
+git commit -m "feat: metadados da arte com provider, seed e custo"
 ```
 
 ---
@@ -694,7 +817,7 @@ git commit -m "feat: metadados da arte com provider, tier, seed e custo"
 - Produces:
   - `carregar_chaves(env) -> dict` — `{"openrouter": ..., "openai": ...}` a partir de `.env` + ambiente.
   - `gerar_com_suplente(prompt, perfil, chaves, size, quality, refs=None) -> dict` — tenta o modelo do perfil; em `ErroProvedor` tenta o suplente uma vez. Devolve o dict do provedor acrescido de `suplente_usado: bool`.
-  - Novos flags de CLI: `--tier {rascunho,final}` (default `final`), `--reroll N` (default 0), `--provider {auto,openrouter,openai}` (default `auto`), `--slug TEXTO`.
+  - Novos flags de CLI: `--reroll N` (default 0), `--provider {auto,openrouter,openai}` (default `auto`), `--slug TEXTO`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -723,11 +846,11 @@ def test_usa_o_modelo_do_perfil_quando_da_certo(monkeypatch):
         return {"png": b"x", "custo_usd": 0.04, "modelo": modelo, "provider": provider}
 
     monkeypatch.setattr(_provedor, "gerar", fake)
-    perfil = {"modelo": "bytedance-seed/seedream-4.5", "provider": "openrouter",
+    perfil = {"modelo": "google/gemini-3-pro-image", "provider": "openrouter",
               "resolution": "4K", "aspect_ratio": "2:3", "seed": 7,
               "suplente_modelo": "gpt-image-1.5", "suplente_provider": "openai"}
     r = openai_image.gerar_com_suplente("p", perfil, {"openrouter": "k"}, "1024x1536", "high")
-    assert chamadas == ["bytedance-seed/seedream-4.5"]
+    assert chamadas == ["google/gemini-3-pro-image"]
     assert r["suplente_usado"] is False
 
 
@@ -736,16 +859,16 @@ def test_cai_no_suplente_quando_o_principal_falha(monkeypatch):
 
     def fake(prompt, modelo, provider, chaves, **kw):
         chamadas.append(modelo)
-        if modelo == "bytedance-seed/seedream-4.5":
+        if modelo == "google/gemini-3-pro-image":
             raise _provedor.ErroProvedor("sem credito", codigo=402)
         return {"png": b"y", "custo_usd": None, "modelo": modelo, "provider": provider}
 
     monkeypatch.setattr(_provedor, "gerar", fake)
-    perfil = {"modelo": "bytedance-seed/seedream-4.5", "provider": "openrouter",
+    perfil = {"modelo": "google/gemini-3-pro-image", "provider": "openrouter",
               "resolution": "4K", "aspect_ratio": "2:3", "seed": 7,
               "suplente_modelo": "gpt-image-1.5", "suplente_provider": "openai"}
     r = openai_image.gerar_com_suplente("p", perfil, {"openai": "k"}, "1024x1536", "high")
-    assert chamadas == ["bytedance-seed/seedream-4.5", "gpt-image-1.5"]
+    assert chamadas == ["google/gemini-3-pro-image", "gpt-image-1.5"]
     assert r["suplente_usado"] is True
     assert r["png"] == b"y"
 
@@ -754,7 +877,7 @@ def test_valida_modelo_contra_o_roster():
     cfg = __import__("_perfil").carregar()
     roster = cfg["_base"]["roster"]
     assert openai_image.fora_do_roster("modelo/inventado", roster, "gpt-image-1.5") is True
-    assert openai_image.fora_do_roster("bytedance-seed/seedream-4.5", roster, "gpt-image-1.5") is False
+    assert openai_image.fora_do_roster("google/gemini-3-pro-image", roster, "gpt-image-1.5") is False
     assert openai_image.fora_do_roster("gpt-image-1.5", roster, "gpt-image-1.5") is False
 
 
@@ -816,8 +939,10 @@ def carregar_chaves(env):
 
 
 def fora_do_roster(modelo, roster, suplente):
-    """True se o modelo não está no roster do contrato nem é o suplente declarado."""
-    return modelo not in (roster or []) and modelo != suplente
+    """True se o modelo não está no roster do contrato nem é o suplente declarado.
+
+    `roster` é o dict de capacidades (`_base.roster`); basta testar as chaves."""
+    return modelo not in (roster or {}) and modelo != suplente
 
 
 def gerar_com_suplente(prompt, perfil, chaves, size, quality, refs=None):
@@ -826,14 +951,15 @@ def gerar_com_suplente(prompt, perfil, chaves, size, quality, refs=None):
         r = _provedor.gerar(prompt, perfil["modelo"], perfil["provider"], chaves,
                             resolution=perfil.get("resolution"),
                             aspect_ratio=perfil.get("aspect_ratio"),
-                            seed=perfil.get("seed"), size=size, quality=quality, refs=refs)
+                            seed=perfil.get("seed") if perfil.get("enviar_seed") else None,
+                            size=size, quality=quality, refs=refs)
         r["suplente_usado"] = False
         return r
     except _provedor.ErroProvedor as e:
         print(f"AVISO: {perfil['modelo']} falhou ({e}). Tentando suplente "
               f"{perfil['suplente_modelo']}.", file=sys.stderr)
         r = _provedor.gerar(prompt, perfil["suplente_modelo"], perfil["suplente_provider"],
-                            chaves, seed=perfil.get("seed"), size=size, quality=quality)
+                            chaves, size=size, quality=quality)
         r["suplente_usado"] = True
         return r
 
@@ -847,7 +973,6 @@ def main():
     ap.add_argument("--quality", default="high", help="low | medium | high | auto")
     ap.add_argument("--model", default=None, help="sobrescreve o modelo do perfil")
     ap.add_argument("--provider", default="auto", help="auto | openrouter | openai")
-    ap.add_argument("--tier", default="final", help="rascunho | final")
     ap.add_argument("--reroll", type=int, default=0, help="varia a seed de propósito")
     ap.add_argument("--slug", default="", help="slug do post — entra na seed determinística")
     ap.add_argument("--marca", default="")
@@ -879,10 +1004,10 @@ def main():
     chaves = carregar_chaves(env)
 
     slug = args.slug or os.path.splitext(os.path.basename(args.out))[0]
-    perfil = _perfil.resolver(args.marca or "smark", tier=args.tier, slug=slug,
+    perfil = _perfil.resolver(args.marca or "smark", slug=slug,
                               tipo=args.tipo, reroll=args.reroll, size=args.size)
     if args.model:
-        roster = _perfil.carregar().get("_base", {}).get("roster", [])
+        roster = _perfil.carregar().get("_base", {}).get("roster", {})
         if fora_do_roster(args.model, roster, perfil["suplente_modelo"]):
             sys.exit(f"ERRO: '{args.model}' não está no roster do contrato "
                      f"(design-system/tokens/perfis-imagem.json).\n"
@@ -906,17 +1031,17 @@ def main():
 
     _ledger.registrar({
         "familia": perfil["familia"], "marca": args.marca, "slug": slug,
-        "tipo": args.tipo, "tier": args.tier, "modelo": r["modelo"],
+        "tipo": args.tipo, "modelo": r["modelo"],
         "provider": r["provider"], "seed": perfil["seed"],
         "resolucao": perfil["resolution"], "custo_usd": r["custo_usd"],
         "ok": True, "suplente_usado": r["suplente_usado"],
         "nao_calibrado": perfil["nao_calibrado"], "arquivo": os.path.basename(out),
     })
 
-    print(f"OK: {out}  ({r['modelo']} via {r['provider']}, tier={args.tier}, "
+    print(f"OK: {out}  ({r['modelo']} via {r['provider']}, "
           f"seed={perfil['seed']}, custo=${r['custo_usd'] if r['custo_usd'] is not None else '?'})")
     print(meta_block(out, {"modelo": r["modelo"], "provider": r["provider"],
-                           "qualidade": args.quality, "tier": args.tier,
+                           "qualidade": args.quality,
                            "tamanho": args.size, "paleta": args.paleta,
                            "seed": perfil["seed"], "custo_usd": r["custo_usd"],
                            "suplente_usado": r["suplente_usado"]}))
@@ -937,16 +1062,16 @@ Expected: sai com `ERRO: 'modelo/inventado' não está no roster do contrato` e 
 - [ ] **Step 5: Verificar que a CLI antiga não quebrou**
 
 Run: `cd /Users/andreik/smark && python3 scripts/openai_image.py --help`
-Expected: a ajuda lista `--out --prompt --prompt-file --size --quality --model --provider --tier --reroll --slug --marca ... --direcao --tipo --tema --conceito` sem erro.
+Expected: a ajuda lista `--out --prompt --prompt-file --size --quality --model --provider --reroll --slug --marca ... --direcao --tipo --tema --conceito` sem erro.
 
 Run: `cd /Users/andreik/smark && python3 scripts/openai_image.py --out /tmp/regressao.png --direcao --marca smark --tipo manifesto --tema claro`
-Expected: gera o PNG usando o suplente OpenAI (a família ainda não está calibrada) e imprime o aviso de não-calibrado. Confirmar com `ls -la /tmp/regressao.png` e `tail -1 design-system/custos/geracoes.jsonl`.
+Expected: gera o PNG via `google/gemini-3-pro-image` na OpenRouter (a família já vem calibrada no contrato), custo ~US$ 0,135 impresso na linha OK. Confirmar com `ls -la /tmp/regressao.png`, `file /tmp/regressao.png` (tem que dizer **PNG**, mesmo se a API devolver JPEG) e `tail -1 design-system/custos/geracoes.jsonl`.
 
 - [ ] **Step 6: Commit**
 
 ```bash
 git add scripts/openai_image.py tests/test_openai_image.py
-git commit -m "feat: openai_image usa perfil, provedor e ledger; tiers, seed e suplente"
+git commit -m "feat: openai_image usa perfil, provedor e ledger; seed e suplente"
 ```
 
 ---
@@ -997,7 +1122,7 @@ E, logo depois da linha que grava o PNG de saída (antes do `print("OK: ...")`),
 ```python
     _ledger.registrar({
         "familia": "", "marca": getattr(args, "marca", ""), "slug": "",
-        "tipo": "edit", "tier": "final", "modelo": model, "provider": "openai",
+        "tipo": "edit", "modelo": model, "provider": "openai",
         "seed": None, "resolucao": args.size, "custo_usd": None,
         "ok": True, "suplente_usado": False, "nao_calibrado": False,
         "arquivo": os.path.basename(out),
@@ -1050,18 +1175,18 @@ import calibrar  # noqa: E402
 
 def test_candidatos_vem_do_roster():
     cfg = _perfil.carregar()
-    assert "bytedance-seed/seedream-4.5" in calibrar.candidatos(cfg)
+    assert "google/gemini-3-pro-image" in calibrar.candidatos(cfg)
 
 
 def test_fixar_grava_modelo_e_data(tmp_path):
     origem = _perfil.CONTRATO
     alvo = str(tmp_path / "perfis-imagem.json")
     shutil.copy(origem, alvo)
-    cfg = calibrar.fixar("smark", "bytedance-seed/seedream-4.5", "2026-07-24", path=alvo)
-    assert cfg["familias"]["smark"]["modelo"] == "bytedance-seed/seedream-4.5"
+    cfg = calibrar.fixar("smark", "google/gemini-3-pro-image", "2026-07-24", path=alvo)
+    assert cfg["familias"]["smark"]["modelo"] == "google/gemini-3-pro-image"
     assert cfg["familias"]["smark"]["calibrado_em"] == "2026-07-24"
     gravado = json.load(open(alvo, encoding="utf-8"))
-    assert gravado["familias"]["smark"]["modelo"] == "bytedance-seed/seedream-4.5"
+    assert gravado["familias"]["smark"]["modelo"] == "google/gemini-3-pro-image"
 
 
 def test_fixar_recusa_modelo_fora_do_roster(tmp_path):
@@ -1086,11 +1211,14 @@ Expected: FAIL com `ModuleNotFoundError: No module named 'calibrar'`
 #!/usr/bin/env python3
 """Bake-off de calibração: gera a MESMA direção nos modelos do roster e fixa a escolha.
 
-Ritual de entrada de família. Mesma seed, mesma paleta, mesma resolução em todos
+Ritual de entrada de família. Mesma direção, mesma paleta, mesma resolução em todos
 os candidatos — a comparação é estética, não técnica.
 
+Atenção ao critério 3: foi ele que reprovou o seedream-4.5 no bake-off de 2026-07-24
+(o modelo tipografava o próprio prompt na arte). Olhe a imagem, não só o custo.
+
   python3 scripts/calibrar.py --familia smark --marca smark
-  python3 scripts/calibrar.py --familia smark --fixar bytedance-seed/seedream-4.5
+  python3 scripts/calibrar.py --familia smark --fixar google/gemini-3-pro-image
 
 Critérios de avaliação (Seção 6 do spec):
   1. Aderência à paleta ativa
@@ -1121,8 +1249,9 @@ CRITERIOS = [
 
 
 def candidatos(cfg):
-    """Modelos elegíveis para o bake-off."""
-    return list(cfg.get("_base", {}).get("roster", []))
+    """Modelos elegíveis para o bake-off — as chaves do roster, sem os banidos."""
+    banidos = set((cfg.get("_base", {}).get("banidos") or {}).keys())
+    return [m for m in (cfg.get("_base", {}).get("roster") or {}) if m not in banidos]
 
 
 def fixar(familia, modelo, data, path=None):
@@ -1171,12 +1300,16 @@ def main():
     for modelo in candidatos(cfg):
         for tipo in tipos:
             seed = _perfil.calcular_seed(args.familia, "calibracao", tipo)
+            cap = _perfil.capacidades(modelo, cfg)
             prompt = aplicar_guard(
                 _direcao.construir(args.marca, tipo, args.tema, "", ""), args.paleta, True)
             out = os.path.join(destino, f"{_sanitizar(modelo)}-{tipo}.png")
             try:
-                r = _provedor.gerar(prompt, modelo, "openrouter", chaves,
-                                    resolution="2K", aspect_ratio="2:3", seed=seed)
+                r = _provedor.gerar(
+                    prompt, modelo, cap.get("provider", "openrouter"), chaves,
+                    resolution="2K", aspect_ratio="4:5",
+                    seed=seed if cap.get("suporta_seed") else None,
+                    size="1024x1536", quality="high")
             except _provedor.ErroProvedor as e:
                 print(f"FALHOU {modelo} / {tipo}: {e}", file=sys.stderr)
                 falhas += 1
@@ -1184,8 +1317,9 @@ def main():
             with open(out, "wb") as f:
                 f.write(r["png"])
             _ledger.registrar({"familia": args.familia, "marca": args.marca,
-                               "slug": "calibracao", "tipo": tipo, "tier": "calibracao",
-                               "modelo": modelo, "provider": "openrouter", "seed": seed,
+                               "slug": "calibracao", "tipo": tipo,
+                               "modelo": modelo, "provider": cap.get("provider", "openrouter"),
+                               "seed": seed,
                                "resolucao": "2K", "custo_usd": r["custo_usd"], "ok": True,
                                "suplente_usado": False, "nao_calibrado": True,
                                "arquivo": os.path.basename(out)})
@@ -1636,7 +1770,7 @@ git commit -m "feat: marcar peça-referência pelo Super Editor"
 Substituir a regra 7 por:
 
 ```markdown
-7. **Imagem via script.** A arte é **pipeline de 2 camadas**: o FUNDO (sem texto) por `scripts/openai_image.py` e o TEXTO/moldura por `scripts/compositor.py` (HTML/CSS nítido a 2x). Tamanho por canal em `shared/formatos-canais.md`. Cor/estilo por `marcas/<marca>/branding/identidade-visual.md` (paleta ativa). **O modelo do fundo é do contrato, não do comando:** `design-system/tokens/perfis-imagem.json` define modelo, suplente e tiers por família de marca. Nunca crave `--model` sem motivo — o contrato existe pra manter a consistência. Calibração por `scripts/calibrar.py`.
+7. **Imagem via script.** A arte é **pipeline de 2 camadas**: o FUNDO (sem texto) por `scripts/openai_image.py` e o TEXTO/moldura por `scripts/compositor.py` (HTML/CSS nítido a 2x). Tamanho por canal em `shared/formatos-canais.md`. Cor/estilo por `marcas/<marca>/branding/identidade-visual.md` (paleta ativa). **O modelo do fundo é do contrato, não do comando:** `design-system/tokens/perfis-imagem.json` define modelo, suplente e capacidades por família de marca. Nunca crave `--model` sem motivo — o contrato existe pra manter a consistência. Calibração por `scripts/calibrar.py`.
 ```
 
 - [ ] **Step 2: Acrescentar a regra 11 ao `CLAUDE.md`**
@@ -1644,7 +1778,7 @@ Substituir a regra 7 por:
 Logo após a regra 10:
 
 ```markdown
-11. **Seed, tier e acervo.** Toda geração de fundo é **reprodutível**: a seed vem de `família + slug + tipo`, então o mesmo post sempre gera a mesma imagem. Pra variar de propósito, use `--reroll N`. `--tier rascunho` (1K, rápido) serve pra validar enquadramento; `--tier final` (4K) é a peça. O **acervo** (`scripts/acervo.py`) guarda as peças aprovadas de cada família e as injeta como referência nas gerações seguintes — só entra peça que passou no `revisar.py` e foi marcada à mão. Custo de cada geração fica em `design-system/custos/geracoes.jsonl`.
+11. **Acervo, seed e custo.** Quem garante a consistência visual é o **acervo** (`scripts/acervo.py`): ele guarda as peças aprovadas de cada família e as injeta como `input_references` nas gerações seguintes — só entra peça que passou no `revisar.py` e foi marcada à mão. Cada arte aprovada deixa a próxima mais parecida com a marca; é o único ativo do sistema que não dá pra copiar. A **seed** (`família + slug + tipo`) é gravada nos metadados e serve de rótulo e de `--reroll N`, mas **não é garantia de reprodutibilidade**: o modelo default aceita `seed` e ignora. Não prometa "mesma seed, mesma imagem". Custo de cada geração fica em `design-system/custos/geracoes.jsonl`.
 ```
 
 - [ ] **Step 3: Atualizar `shared/direcao-de-arte.md`**
@@ -1652,7 +1786,7 @@ Logo após a regra 10:
 Substituir a linha 29 (o comando de fundo dirigido) por:
 
 ```markdown
-- **Fundo dirigido:** `python3 scripts/openai_image.py --out <bg.png> --direcao --marca <marca> --tipo <tipo> --tema <claro|escuro> --headline "..." [--tier rascunho|final] [--reroll N] [--conceito "override p/ tema especial"]` — **claro é o default**; só passe `--tema escuro` sob pedido. O modelo sai do contrato (`design-system/tokens/perfis-imagem.json`); `--tier rascunho` gera em 1K pra validar enquadramento antes da peça final em 4K, com a mesma seed.
+- **Fundo dirigido:** `python3 scripts/openai_image.py --out <bg.png> --direcao --marca <marca> --tipo <tipo> --tema <claro|escuro> --headline "..." [--reroll N] [--conceito "override p/ tema especial"]` — **claro é o default**; só passe `--tema escuro` sob pedido. O modelo sai do contrato (`design-system/tokens/perfis-imagem.json`), sempre em 4K (1K/2K/4K custam o mesmo). Não gostou do resultado? `--reroll 1`, `--reroll 2` — cada um é uma tentativa nova, ~US$ 0,135.
 ```
 
 - [ ] **Step 4: Criar `design-system/custos/README.md`**
@@ -1662,7 +1796,7 @@ Substituir a linha 29 (o comando de fundo dirigido) por:
 
 `geracoes.jsonl` — ledger append-only, uma linha por geração de imagem.
 
-Campos: `data`, `familia`, `marca`, `slug`, `tipo`, `tier`, `modelo`, `provider`,
+Campos: `data`, `familia`, `marca`, `slug`, `tipo`, `modelo`, `provider`,
 `seed`, `resolucao`, `custo_usd`, `refs`, `ok`, `suplente_usado`, `nao_calibrado`, `arquivo`.
 
 `custo_usd` só vem preenchido no provider `openrouter` — a OpenAI não devolve
@@ -1697,18 +1831,20 @@ Expected: PASS — suíte inteira verde.
 
 ```bash
 git add CLAUDE.md shared/direcao-de-arte.md design-system/custos/README.md
-git commit -m "docs: contrato de perfis, seed, tiers e acervo nas regras do vault"
+git commit -m "docs: contrato de perfis, acervo e telemetria de custo nas regras do vault"
 ```
 
 ---
 
 ## Aceite final
 
-Depois da Task 10, com crédito na OpenRouter:
+Depois da Task 10, com crédito na OpenRouter (~US$ 1,20 no total):
 
-- [ ] `python3 scripts/calibrar.py --familia smark --marca smark` gera as variantes e imprime os critérios
-- [ ] Escolher o vencedor e rodar `python3 scripts/calibrar.py --familia smark --fixar <modelo>`
-- [ ] `python3 scripts/openai_image.py --out /tmp/a.png --direcao --marca smark --tipo manifesto --tema claro` usa o modelo calibrado, sem aviso de não-calibrado
-- [ ] Rodar o mesmo comando de novo e confirmar a **mesma seed** no ledger
-- [ ] `--reroll 1` produz seed diferente
+- [ ] `python3 scripts/openai_image.py --out /tmp/a.png --direcao --marca smark --tipo manifesto --tema claro` usa `google/gemini-3-pro-image` sem aviso de não-calibrado
+- [ ] `file /tmp/a.png` diz **PNG** (a API pode ter devolvido JPEG — a normalização é obrigatória)
+- [ ] `tail -1 design-system/custos/geracoes.jsonl` traz `custo_usd` ≈ 0.135 e o modelo correto
+- [ ] `--reroll 1` grava seed diferente no ledger
+- [ ] Derrubar a rede (ou apagar `OPENROUTER_API_KEY` do ambiente) e confirmar que cai no suplente `gpt-image-1.5` com aviso em stderr, sem quebrar
 - [ ] Ativar o acervo (`"ativo": true` na família), adicionar 2 peças com `acervo.py add` e confirmar a linha `acervo: 2 peça(s)` na geração seguinte
+- [ ] **Teste do fosso:** gerar duas peças com o acervo ativo e confirmar a olho que compartilham material, luz e paleta com as referências — é este o mecanismo de consistência, não a seed
+- [ ] `python3 scripts/calibrar.py --familia smark --marca smark` roda sem erro (bake-off segue disponível para famílias novas)
