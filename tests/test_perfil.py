@@ -31,6 +31,14 @@ def test_seed_muda_por_slug_e_por_reroll():
     assert _perfil.calcular_seed("smark", "post-a", "dor", reroll=1) == base + 1
 
 
+def test_seed_sempre_cabe_na_faixa_documentada():
+    """Contrato: seed sempre em [0, 2**31), mesmo com reroll grande estourando a base."""
+    for slug in ("post-a", "churn-invisivel", "x", "outro-slug-qualquer"):
+        for reroll in (0, 1, 2 ** 31 - 1, 2 ** 32):
+            seed = _perfil.calcular_seed("smark", slug, "dor", reroll=reroll)
+            assert 0 <= seed < 2 ** 31
+
+
 def test_aspect_de_size():
     assert _perfil.aspect_de_size("1024x1536") == "2:3"
     assert _perfil.aspect_de_size("1024x1024") == "1:1"
@@ -89,3 +97,18 @@ def test_contrato_tem_roster_e_acervo():
     cfg = _perfil.carregar()
     assert "google/gemini-3-pro-image" in cfg["_base"]["roster"]
     assert cfg["_base"]["acervo"]["max_refs"] == 20
+
+
+def test_acervo_ativo_e_acervo_dir_com_contrato_atual():
+    cfg = _perfil.carregar()
+    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
+    assert r["acervo_ativo"] is False
+    assert r["acervo_dir"].endswith(os.path.join("design-system", "acervo", "smark"))
+    assert os.path.isabs(r["acervo_dir"])
+
+
+def test_acervo_ativo_liga_quando_familia_ativa():
+    cfg = _perfil.carregar()
+    cfg["familias"]["smark"]["acervo"]["ativo"] = True
+    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
+    assert r["acervo_ativo"] is True

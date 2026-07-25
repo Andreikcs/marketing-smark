@@ -32,7 +32,7 @@ def calcular_seed(familia, slug, tipo, reroll=0):
     """Seed determinística: mesma entrada, mesma imagem. `reroll` varia de propósito."""
     chave = f"{familia}:{slug}:{tipo}".encode("utf-8")
     base = int(hashlib.sha256(chave).hexdigest()[:8], 16) % (2 ** 31)
-    return base + int(reroll or 0)
+    return (base + int(reroll or 0)) % (2 ** 31)
 
 
 def aspect_de_size(size):
