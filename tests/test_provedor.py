@@ -126,3 +126,66 @@ def test_jpeg_vira_png():
 
 def test_bytes_irreconheciveis_passam_intactos():
     assert _provedor.para_png(b"fake-png-bytes") == b"fake-png-bytes"
+
+
+def test_provider_desconhecido_levanta_erro_provedor():
+    try:
+        _provedor.gerar("p", "m", "provider-fantasma", {"openrouter": "k"})
+        assert False, "deveria ter levantado"
+    except _provedor.ErroProvedor as e:
+        assert "provider-fantasma" in str(e)
+
+
+def test_openai_sem_chave_levanta_erro_provedor():
+    try:
+        _provedor.gerar("p", "m", "openai", {"openai": None})
+        assert False, "deveria ter levantado"
+    except _provedor.ErroProvedor as e:
+        assert "OPENAI_API_KEY" in str(e)
+
+
+def test_falha_de_rede_nao_http_vira_erro_provedor(monkeypatch):
+    def fake(req, timeout=None):
+        raise urllib.error.URLError("nome não resolvido")
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake)
+    try:
+        _provedor.gerar("p", "m", "openrouter", {"openrouter": "k"})
+        assert False, "deveria ter levantado"
+    except _provedor.ErroProvedor:
+        pass
+
+
+def test_corpo_nao_json_vira_erro_provedor(monkeypatch):
+    class _RespTexto:
+        def __init__(self, texto):
+            self._b = texto.encode("utf-8")
+
+        def read(self):
+            return self._b
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    def fake(req, timeout=None):
+        return _RespTexto("<html>502 Bad Gateway</html>")
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake)
+    try:
+        _provedor.gerar("p", "m", "openrouter", {"openrouter": "k"})
+        assert False, "deveria ter levantado"
+    except _provedor.ErroProvedor as e:
+        assert e.codigo is None
+        assert "502 Bad Gateway" in str(e)
+
+
+def test_b64_json_corrompido_vira_erro_provedor(monkeypatch):
+    _captura(monkeypatch, {"data": [{"b64_json": "!!!nao-e-base64-valido!!!"}]})
+    try:
+        _provedor.gerar("p", "m", "openrouter", {"openrouter": "k"})
+        assert False, "deveria ter levantado"
+    except _provedor.ErroProvedor:
+        pass

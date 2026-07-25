@@ -10,6 +10,7 @@ image/jpeg numa execução e image/png na outra, e a regra 6 do CLAUDE.md exige 
 
 Nenhuma decisão de modelo ou estética mora aqui — isso é do _perfil.py."""
 import base64
+import binascii
 import json
 import os
 import subprocess
@@ -75,7 +76,12 @@ def _postar(url, corpo, chave, timeout):
         raise ErroProvedor(f"HTTP {e.code}: {detalhe}", codigo=e.code)
     except Exception as e:
         raise ErroProvedor(f"falha de rede: {e}")
-    return json.loads(bruto.decode("utf-8"))
+    try:
+        texto = bruto.decode("utf-8")
+        return json.loads(texto)
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        trecho = bruto[:200].decode("utf-8", "ignore")
+        raise ErroProvedor(f"resposta ilegível do provedor: {e} — corpo: {trecho!r}")
 
 
 def gerar(prompt, modelo, provider, chaves, *, resolution=None, aspect_ratio=None,
@@ -121,5 +127,10 @@ def gerar(prompt, modelo, provider, chaves, *, resolution=None, aspect_ratio=Non
     except (KeyError, TypeError, ValueError):
         pass
 
-    return {"png": para_png(base64.b64decode(b64)), "custo_usd": custo,
+    try:
+        imagem = base64.b64decode(b64, validate=True)
+    except (binascii.Error, ValueError) as e:
+        raise ErroProvedor(f"b64_json corrompido na resposta do provedor: {e}")
+
+    return {"png": para_png(imagem), "custo_usd": custo,
             "modelo": modelo, "provider": provider}
