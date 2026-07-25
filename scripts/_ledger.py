@@ -18,7 +18,9 @@ def registrar(evento, path=None):
     ev = dict(evento)
     ev.setdefault("data", datetime.datetime.now().isoformat(timespec="seconds"))
     try:
-        os.makedirs(os.path.dirname(alvo), exist_ok=True)
+        dirname = os.path.dirname(alvo)
+        if dirname:
+            os.makedirs(dirname, exist_ok=True)
         with open(alvo, "a", encoding="utf-8") as f:
             f.write(json.dumps(ev, ensure_ascii=False) + "\n")
     except Exception as e:
