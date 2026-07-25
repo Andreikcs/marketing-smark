@@ -1,0 +1,45 @@
+{
+  "_base": {
+    "provider": "openrouter",
+    "resolution": "4K",
+    "roster": {
+      "google/gemini-3-pro-image": {
+        "provider": "openrouter",
+        "suporta_seed": false,
+        "max_refs": 14,
+        "custo_medido_usd": 0.135,
+        "nota": "default. 1K/2K/4K custam o mesmo. Robusto ao prompt do _direcao."
+      },
+      "google/gemini-2.5-flash-image": {
+        "provider": "openrouter",
+        "suporta_seed": false,
+        "max_refs": 3,
+        "custo_medido_usd": null,
+        "nota": "candidato barato, ainda sem bake-off aprovado."
+      },
+      "gpt-image-1.5": {
+        "provider": "openai",
+        "suporta_seed": false,
+        "max_refs": 0,
+        "custo_medido_usd": null,
+        "nota": "suplente. Sem resolution/aspect_ratio — usa size/quality."
+      }
+    },
+    "banidos": {
+      "bytedance-seed/seedream-4.5":
+        "bake-off 2026-07-24: tipografa o prompt na arte (hex, 85mm, 時裝, texto falso) mesmo com NEGATIVE explícito."
+    },
+    "suplente": { "modelo": "gpt-image-1.5", "provider": "openai" },
+    "acervo": { "ativo": false, "max_refs": 20, "dir": null }
+  },
+  "familias": {
+    "smark": {
+      "marcas": ["smark", "provider-max", "elever-ai"],
+      "registro": "abstrato-material",
+      "modelo": "google/gemini-3-pro-image",
+      "calibrado_em": "2026-07-24",
+      "acervo": { "ativo": false, "dir": "design-system/acervo/smark" }
+    }
+  },
+  "familia_padrao": "smark"
+}
