@@ -128,7 +128,11 @@ def gerar(prompt, modelo, provider, chaves, *, resolution=None, aspect_ratio=Non
         pass
 
     try:
-        imagem = base64.b64decode(b64, validate=True)
+        # Sem validate=True de propósito: provedores reais às vezes devolvem base64
+        # com quebra de linha ou na variante URL-safe, e o modo estrito transformaria
+        # resposta boa em falha — acionando o suplente pago à toa. O try/except abaixo
+        # já pega a corrupção que importa (padding quebrado).
+        imagem = base64.b64decode(b64)
     except (binascii.Error, ValueError) as e:
         raise ErroProvedor(f"b64_json corrompido na resposta do provedor: {e}")
 

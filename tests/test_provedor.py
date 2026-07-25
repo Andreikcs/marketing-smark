@@ -183,7 +183,9 @@ def test_corpo_nao_json_vira_erro_provedor(monkeypatch):
 
 
 def test_b64_json_corrompido_vira_erro_provedor(monkeypatch):
-    _captura(monkeypatch, {"data": [{"b64_json": "!!!nao-e-base64-valido!!!"}]})
+    # Base64 truncado (5 chars = múltiplo de 4 + 1). É a corrupção que acontece de
+    # verdade — resposta cortada no meio — e a única que o decode permissivo rejeita.
+    _captura(monkeypatch, {"data": [{"b64_json": "QUJDR"}]})
     try:
         _provedor.gerar("p", "m", "openrouter", {"openrouter": "k"})
         assert False, "deveria ter levantado"
