@@ -2073,7 +2073,18 @@
       "caption": "Ninguém aguenta ficar esperando a tela carregar. Com a provider-max, a conexão fica firme o dia inteiro — pra trabalhar, estudar e relaxar sem interrupção. Quer saber onde sua rede pode melhorar? Comece pelo diagnóstico gratuito.\n\n#provedor #internetfibra #conexao #provedordeinternet",
       "canais": [
         "instagram"
-      ]
+      ],
+      "roi": {
+        "active": {
+          "started_at": "2026-07-26T19:24:49",
+          "copy_calls": 0,
+          "image_gens": 0
+        },
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     }
   ]
 }
