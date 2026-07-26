@@ -1827,7 +1827,7 @@
           "n": 1,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c8913-cem3o/01.png",
           "_v": 4,
-          "overlay": "branco",
+          "overlay": "none",
           "overlay_op": 1,
           "ov_pos": 0,
           "bg_custo_usd": 0.242964,
