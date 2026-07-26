@@ -99,7 +99,15 @@ def gerar(prompt, modelo, provider, chaves, *, resolution=None, aspect_ratio=Non
         if seed is not None:
             corpo["seed"] = int(seed)
         if refs:
-            corpo["input_references"] = list(refs)
+            # API unificada OpenRouter exige objetos {type, image_url:{url}},
+            # não strings soltas (ZodError: expected object, received string).
+            norm = []
+            for r in refs:
+                if isinstance(r, str):
+                    norm.append({"type": "image_url", "image_url": {"url": r}})
+                elif isinstance(r, dict):
+                    norm.append(r)
+            corpo["input_references"] = norm
         url = URL_OPENROUTER
     elif provider == "openai":
         chave = (chaves or {}).get("openai")

@@ -1,0 +1,586 @@
+<title>smark Studio — o motor de mídia da sua agência</title>
+<style>
+  :root{
+    --paper:#F4F1FA; --card:#FFFFFF; --ink:#17111F; --soft:#5A5268; --faint:#8B8399;
+    --line:#E5DFF0; --line-2:#EEE9F6;
+    --violet:#7A2FE0; --violet-2:#8B3CF7; --violet-deep:#5B1FB0;
+    --lime:#3E8E00; --lime-bg:#EAF6D6; --lime-ink:#2C6600;
+    --good:#2E8B4F; --warn:#B8860B; --bad:#C0455E;
+    --hero-band:#1B1230; --hero-ink:#F5F1FF; --hero-soft:#C6B8E6;
+    --shadow:0 1px 2px rgba(23,17,31,.04),0 8px 30px rgba(90,50,160,.07);
+    --shadow-lg:0 2px 8px rgba(23,17,31,.06),0 24px 60px rgba(90,50,160,.13);
+    --radius:14px;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#120D1C; --card:#1B1428; --ink:#F3EFFA; --soft:#ABA1C0; --faint:#7A7091;
+      --line:#2A2140; --line-2:#231A36;
+      --violet:#A877FF; --violet-2:#B98CFF; --violet-deep:#8B3CF7;
+      --lime:#C6F24E; --lime-bg:#26310F; --lime-ink:#D6F87A;
+      --good:#66D08A; --warn:#E0B341; --bad:#F07A93;
+      --hero-band:#0C0716; --hero-ink:#F5F1FF; --hero-soft:#B6A6DB;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 30px rgba(0,0,0,.35);
+      --shadow-lg:0 2px 8px rgba(0,0,0,.4),0 24px 60px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#F4F1FA; --card:#FFFFFF; --ink:#17111F; --soft:#5A5268; --faint:#8B8399;
+    --line:#E5DFF0; --line-2:#EEE9F6;
+    --violet:#7A2FE0; --violet-2:#8B3CF7; --violet-deep:#5B1FB0;
+    --lime:#3E8E00; --lime-bg:#EAF6D6; --lime-ink:#2C6600;
+    --good:#2E8B4F; --warn:#B8860B; --bad:#C0455E;
+    --hero-band:#1B1230; --hero-ink:#F5F1FF; --hero-soft:#C6B8E6;
+    --shadow:0 1px 2px rgba(23,17,31,.04),0 8px 30px rgba(90,50,160,.07);
+    --shadow-lg:0 2px 8px rgba(23,17,31,.06),0 24px 60px rgba(90,50,160,.13);
+  }
+  :root[data-theme="dark"]{
+    --paper:#120D1C; --card:#1B1428; --ink:#F3EFFA; --soft:#ABA1C0; --faint:#7A7091;
+    --line:#2A2140; --line-2:#231A36;
+    --violet:#A877FF; --violet-2:#B98CFF; --violet-deep:#8B3CF7;
+    --lime:#C6F24E; --lime-bg:#26310F; --lime-ink:#D6F87A;
+    --good:#66D08A; --warn:#E0B341; --bad:#F07A93;
+    --hero-band:#0C0716; --hero-ink:#F5F1FF; --hero-soft:#B6A6DB;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 30px rgba(0,0,0,.35);
+    --shadow-lg:0 2px 8px rgba(0,0,0,.4),0 24px 60px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  section{padding:76px 0;border-top:1px solid var(--line)}
+  @media(max-width:640px){section{padding:52px 0}body{font-size:16px}}
+
+  h1,h2,h3{margin:0;text-wrap:balance;line-height:1.02;letter-spacing:-.02em}
+  .display{font-weight:850;text-transform:uppercase;letter-spacing:-.025em}
+  a{color:inherit}
+  .mono{font-family:var(--mono)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--violet-2);font-weight:600;display:inline-flex;align-items:center;gap:9px}
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--violet-2);display:inline-block}
+  .lead{font-size:19px;color:var(--soft);max-width:60ch}
+  .hl{color:var(--violet-2)}
+  .lime{color:var(--lime)}
+
+  /* ---------- HERO ---------- */
+  .hero{background:var(--hero-band);color:var(--hero-ink);border-top:none;position:relative;
+    overflow:hidden;padding:0}
+  .hero .glow{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(60% 55% at 78% 8%,rgba(139,60,247,.45),transparent 60%),
+               radial-gradient(45% 40% at 12% 100%,rgba(90,31,176,.35),transparent 65%)}
+  .hero .wrap{position:relative;padding-top:34px;padding-bottom:88px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:6px 0 60px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:18px;letter-spacing:-.01em}
+  .brand .mk{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;
+    background:linear-gradient(150deg,#9A4DFF,#5B1FB0);color:#fff;font-weight:900;font-size:17px;
+    box-shadow:0 4px 14px rgba(139,60,247,.5)}
+  .brand small{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;
+    color:var(--hero-soft);text-transform:uppercase}
+  .topbar .tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--hero-soft);border:1px solid rgba(255,255,255,.16);padding:6px 12px;border-radius:999px}
+  .hero h1{font-weight:860;text-transform:uppercase;letter-spacing:-.03em;
+    font-size:clamp(38px,7.4vw,80px);line-height:.96;max-width:15ch}
+  .hero h1 .b{color:var(--hero-soft)}
+  .hero h1 .u{color:#C6F24E}
+  .hero .sub{margin-top:26px;font-size:clamp(17px,2.2vw,21px);color:var(--hero-soft);max-width:52ch;line-height:1.5}
+  .hero .stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:40px}
+  .stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;
+    padding:16px 20px;min-width:150px}
+  .stat b{display:block;font-size:30px;font-weight:850;letter-spacing:-.02em;line-height:1}
+  .stat span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--hero-soft);margin-top:7px;display:block}
+  .hero .cta{margin-top:40px;display:flex;gap:14px;flex-wrap:wrap}
+
+  .btn{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:15px;
+    padding:14px 24px;border-radius:11px;text-decoration:none;border:1px solid transparent;cursor:pointer;
+    transition:transform .12s ease,box-shadow .12s ease,background .12s}
+  .btn:focus-visible{outline:3px solid var(--violet-2);outline-offset:2px}
+  .btn-primary{background:linear-gradient(140deg,#9A4DFF,#6B21D6);color:#fff;
+    box-shadow:0 10px 28px rgba(139,60,247,.4)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(139,60,247,.5)}
+  .btn-ghost{background:rgba(255,255,255,.06);color:var(--hero-ink);border-color:rgba(255,255,255,.2)}
+  .btn-ghost:hover{background:rgba(255,255,255,.12)}
+
+  /* ---------- generic section head ---------- */
+  .shead{max-width:64ch;margin-bottom:44px}
+  .shead h2{font-size:clamp(28px,4.4vw,46px);font-weight:840;text-transform:uppercase;
+    letter-spacing:-.025em;margin-top:16px}
+  .shead p{color:var(--soft);font-size:18px;margin-top:16px}
+
+  /* ---------- pain grid ---------- */
+  .grid{display:grid;gap:18px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:800px){.g3{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.g3,.g2{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px;box-shadow:var(--shadow)}
+  .card .n{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.1em}
+  .card h3{font-size:20px;font-weight:800;margin:14px 0 8px;letter-spacing:-.01em;text-transform:none}
+  .card p{margin:0;color:var(--soft);font-size:15.5px}
+
+  /* ---------- how / craft ---------- */
+  .craft{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+  @media(max-width:820px){.craft{grid-template-columns:1fr;gap:32px}}
+  .layers{display:flex;flex-direction:column;gap:14px}
+  .layer{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:18px 20px}
+  .layer .lc{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;
+    color:#fff;background:var(--violet-deep);border-radius:7px;padding:6px 9px;white-space:nowrap;margin-top:2px}
+  .layer h4{margin:0 0 5px;font-size:16px;font-weight:750}
+  .layer p{margin:0;font-size:14.5px;color:var(--soft)}
+  .shot{border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-lg);
+    background:var(--card)}
+  .shot img{display:block;width:100%}
+  .shot .cap{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--faint);
+    padding:12px 16px;border-top:1px solid var(--line);text-transform:uppercase}
+
+  /* ---------- gallery ---------- */
+  .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:760px){.gal{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+  .piece{border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-lg);
+    background:var(--card);transition:transform .18s ease}
+  .piece:hover{transform:translateY(-4px)}
+  .piece img{display:block;width:100%}
+  .piece .meta{padding:13px 15px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--faint);text-transform:uppercase}
+  .piece .meta b{color:var(--violet-2);font-weight:700}
+
+  /* ---------- ROI calculator ---------- */
+  .calc{background:var(--card);border:1px solid var(--line);border-radius:20px;
+    box-shadow:var(--shadow-lg);overflow:hidden}
+  .calc-top{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  @media(max-width:820px){.calc-top{grid-template-columns:1fr}}
+  .calc-in{padding:30px 30px 34px;border-right:1px solid var(--line)}
+  @media(max-width:820px){.calc-in{border-right:none;border-bottom:1px solid var(--line)}}
+  .calc-in h3{font-size:14px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;
+    color:var(--faint);margin-bottom:22px;font-weight:600}
+  .field{margin-bottom:22px}
+  .field .flab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+  .field .flab label{font-size:14.5px;font-weight:650}
+  .field .flab .fval{font-family:var(--mono);font-weight:700;font-size:16px;color:var(--violet-2);
+    font-variant-numeric:tabular-nums}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;
+    background:var(--line);outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+    background:var(--violet);border:3px solid var(--card);box-shadow:0 2px 8px rgba(122,47,224,.5);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--violet);
+    border:3px solid var(--card);box-shadow:0 2px 8px rgba(122,47,224,.5);cursor:pointer}
+  input[type=range]:focus-visible{outline:3px solid var(--violet-2);outline-offset:4px}
+  .seg{display:flex;gap:6px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:5px}
+  .seg button{flex:1;font-family:var(--sans);font-size:13.5px;font-weight:650;padding:9px 8px;border-radius:7px;
+    border:none;background:transparent;color:var(--soft);cursor:pointer;transition:.12s}
+  .seg button[aria-pressed=true]{background:var(--violet);color:#fff;box-shadow:0 2px 8px rgba(122,47,224,.4)}
+  .subnote{font-size:12.5px;color:var(--faint);margin-top:-8px}
+
+  .calc-out{padding:30px;background:linear-gradient(180deg,transparent,rgba(122,47,224,.03));display:flex;
+    flex-direction:column;gap:18px}
+  .bignum{}
+  .bignum .k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .bignum b{display:block;font-size:clamp(36px,6vw,52px);font-weight:860;letter-spacing:-.03em;
+    color:var(--lime-ink);line-height:1;margin-top:6px;font-variant-numeric:tabular-nums}
+  .bars{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+  .bar .bl{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px}
+  .bar .bl .bn{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+  .bar .track{height:26px;border-radius:8px;background:var(--paper);overflow:hidden;position:relative;border:1px solid var(--line)}
+  .bar .fill{height:100%;border-radius:7px;transition:width .35s cubic-bezier(.4,0,.2,1)}
+  .fill-human{background:repeating-linear-gradient(45deg,var(--bad),var(--bad) 9px,color-mix(in srgb,var(--bad) 78%,#000) 9px,color-mix(in srgb,var(--bad) 78%,#000) 18px)}
+  .fill-plat{background:linear-gradient(90deg,var(--violet),var(--violet-2))}
+  .payoff{display:flex;flex-wrap:wrap;gap:10px;margin-top:2px}
+  .chip{font-family:var(--mono);font-size:12.5px;font-weight:650;padding:9px 13px;border-radius:9px;
+    background:var(--lime-bg);color:var(--lime-ink);display:inline-flex;gap:7px;align-items:center}
+  .chip.alt{background:color-mix(in srgb,var(--violet) 12%,transparent);color:var(--violet-2)}
+  .calc-foot{padding:16px 30px;border-top:1px solid var(--line);font-size:12.5px;color:var(--faint);
+    font-family:var(--mono);letter-spacing:.02em}
+
+  /* ---------- comparison table ---------- */
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;min-width:720px;background:var(--card)}
+  th,td{padding:15px 16px;text-align:left;border-bottom:1px solid var(--line-2);font-size:14.5px;vertical-align:middle}
+  thead th{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--faint);font-weight:600;background:var(--paper);position:sticky;top:0}
+  thead th.us{color:var(--violet-2);background:color-mix(in srgb,var(--violet) 10%,var(--card))}
+  tbody td:first-child{font-weight:650;color:var(--ink)}
+  td.us{background:color-mix(in srgb,var(--violet) 6%,transparent)}
+  .mk-y{color:var(--good);font-weight:700}
+  .mk-n{color:var(--bad);font-weight:700}
+  .mk-p{color:var(--warn);font-weight:700}
+  td .cell{display:flex;gap:8px;align-items:center;font-size:13.5px}
+  td small{color:var(--faint);font-size:12.5px;display:block;font-family:var(--mono)}
+
+  /* ---------- pricing ---------- */
+  .price{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:760px){.price{grid-template-columns:1fr}}
+  .pc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:var(--shadow);
+    position:relative}
+  .pc.feat{border-color:var(--violet);box-shadow:0 0 0 1px var(--violet),var(--shadow-lg)}
+  .pc .pk{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .pc .amt{font-size:40px;font-weight:860;letter-spacing:-.03em;margin:12px 0 2px;font-variant-numeric:tabular-nums}
+  .pc .amt small{font-size:15px;font-weight:600;color:var(--soft);letter-spacing:0}
+  .pc .desc{font-size:14.5px;color:var(--soft);margin:8px 0 0}
+  .pc ul{list-style:none;padding:0;margin:18px 0 0;display:flex;flex-direction:column;gap:9px}
+  .pc li{font-size:14px;display:flex;gap:9px;align-items:flex-start;color:var(--soft)}
+  .pc li::before{content:"→";color:var(--violet-2);font-weight:800}
+  .badge{position:absolute;top:-11px;right:20px;background:var(--lime);color:#17280A;font-family:var(--mono);
+    font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:99px}
+  .launch{margin-top:22px;font-size:14px;color:var(--soft);background:var(--lime-bg);color:var(--lime-ink);
+    border-radius:12px;padding:14px 18px;display:flex;gap:10px;align-items:center;font-weight:600}
+
+  /* ---------- discourse / close ---------- */
+  .close{background:var(--hero-band);color:var(--hero-ink);border-top:none;position:relative;overflow:hidden}
+  .close .glow{position:absolute;inset:0;background:radial-gradient(50% 60% at 50% 0%,rgba(139,60,247,.4),transparent 60%);pointer-events:none}
+  .close .wrap{position:relative}
+  .pitch{max-width:60ch}
+  .pitch .eyebrow{color:#C6F24E}
+  .pitch .eyebrow::before{background:#C6F24E}
+  .pitch blockquote{margin:22px 0 0;font-size:clamp(21px,3vw,30px);font-weight:750;line-height:1.32;
+    letter-spacing:-.015em;text-wrap:balance}
+  .pitch blockquote .u{color:#C6F24E}
+  .pitch blockquote .b{color:var(--hero-soft)}
+  .pitch .src{margin-top:26px;color:var(--hero-soft);font-size:16px;line-height:1.55}
+  .close .cta{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap}
+
+  footer{padding:30px 0 60px;color:var(--faint);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand"><span class="mk">S</span><div>smark Studio<br><small>motor de mídia · para agências</small></div></div>
+      <span class="tag">proposta · v1</span>
+    </div>
+    <h1 class="display">Criar arte virou <span class="b">commodity.</span><br>Distribuir, <span class="u">não.</span></h1>
+    <p class="sub">Hoje qualquer um gera imagem com IA. O que ainda é escasso — e o que a sua agência vende — é chegar no cliente com peça pronta, no padrão da marca, no prazo. O smark Studio é a linha de produção invisível por trás disso.</p>
+    <div class="stats">
+      <div class="stat"><b>minutos</b><span>do briefing à arte final</span></div>
+      <div class="stat"><b>+5 marcas</b><span>rodando sem inchar a equipe</span></div>
+      <div class="stat"><b>&lt; ½ designer</b><span>o custo mensal</span></div>
+    </div>
+    <div class="cta">
+      <a class="btn btn-primary" href="#calc">Calcular meu retorno →</a>
+      <a class="btn btn-ghost" href="#precos">Ver como funciona</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAIN ================= -->
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">A realidade da sua operação</span>
+      <h2 class="display">Sua agência vende horas.<br>O gargalo é a arte.</h2>
+      <p>Cada cliente novo é mais peça pra produzir — e a produção está presa ao tamanho do seu time. É por isso que crescer sempre vem junto com contratar, atrasar ou baixar o padrão.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><div class="n">01</div><h3>Horas que não voltam</h3><p>Designer sênior montando o mesmo formato de post, ajustando margem de texto, exportando por canal. Trabalho caro em tarefa repetível.</p></div>
+      <div class="card"><div class="n">02</div><h3>Não escala sem contratar</h3><p>Pegou 3 clientes novos? Ou contrata, ou o prazo estoura, ou a qualidade cai. O crescimento esbarra na folha.</p></div>
+      <div class="card"><div class="n">03</div><h3>Consistência frágil</h3><p>A marca fica boa quando o sênior faz. Some quando ele sai de férias — ou sai da empresa e leva o padrão junto.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CRAFT / HOW ================= -->
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">O que torna isso difícil de copiar</span>
+      <h2 class="display">Não é "gerar imagem".<br>É a linha de produção.</h2>
+      <p>Qualquer ferramenta cospe uma imagem. O que entrega peça vendável é o que vem em volta — e é aqui que o Studio é outro nível.</p>
+    </div>
+    <div class="craft">
+      <div class="layers">
+        <div class="layer"><span class="lc">CAMADA 1</span><div><h4>Fundo com direção de arte</h4><p>Não é prompt de uma linha. É conceito por tipo de peça, composição guiada pelo layout e cor estrita da marca — o gosto de uma agência, codificado.</p></div></div>
+        <div class="layer"><span class="lc">CAMADA 2</span><div><h4>Texto nítido de verdade</h4><p>O título vai por cima em tipografia real, não "queimado" na imagem. Zero texto borrado — o problema nº 1 da arte por IA, resolvido.</p></div></div>
+        <div class="layer"><span class="lc">TRAVA</span><div><h4>Padrão de marca automático</h4><p>Cada peça passa por um filtro de voz e identidade antes de sair. Consistência que não depende de quem está no plantão.</p></div></div>
+        <div class="layer"><span class="lc">SEMPRE</span><div><h4>Motor sempre atualizado</h4><p>Modelo de imagem muda a cada trimestre. A gente absorve isso por baixo — a qualidade sobe sozinha, você não mexe em nada.</p></div></div>
+      </div>
+      <div class="shot">
+        <img src="{{IMG1}}" alt="Peça produzida no smark Studio: título nítido sobre fundo de IA">
+        <div class="cap">peça real · fundo de IA + título tipográfico nítido</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Saída real do motor</span>
+      <h2 class="display">Do briefing à arte final,<br>em minutos.</h2>
+      <p>Peças produzidas no Studio — claras, escuras, minimalistas. Mesma marca, ritmo de feed, sem um designer parado horas em cada uma.</p>
+    </div>
+    <div class="gal">
+      <div class="piece"><img src="{{IMG2}}" alt="Peça clara com fundo de IA arejado"><div class="meta"><span>tema claro</span><b>~2 min</b></div></div>
+      <div class="piece"><img src="{{IMG1}}" alt="Peça escura dramática com fundo de IA"><div class="meta"><span>tema escuro</span><b>~2 min</b></div></div>
+      <div class="piece"><img src="{{IMG3}}" alt="Peça clara minimalista"><div class="meta"><span>minimal</span><b>~1 min</b></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ROI CALCULATOR ================= -->
+<section id="calc">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Calculadora de retorno</span>
+      <h2 class="display">Faça a conta com os seus números.</h2>
+      <p>Compare o que você gasta hoje produzindo arte — com designer ou freelancer — contra rodar tudo no Studio. Ajuste e veja o retorno na hora.</p>
+    </div>
+
+    <div class="calc">
+      <div class="calc-top">
+        <div class="calc-in">
+          <h3>Seus números</h3>
+          <div class="field">
+            <div class="flab"><label for="cli">Clientes atendidos</label><span class="fval" id="cliV">5</span></div>
+            <input type="range" id="cli" min="1" max="20" step="1" value="5">
+          </div>
+          <div class="field">
+            <div class="flab"><label for="pec">Peças por cliente / mês</label><span class="fval" id="pecV">20</span></div>
+            <input type="range" id="pec" min="4" max="60" step="2" value="20">
+          </div>
+          <div class="field">
+            <div class="flab"><label>Como você produz hoje</label></div>
+            <div class="seg" role="group" aria-label="modo de produção atual">
+              <button id="mFree" aria-pressed="true">Freelancer por peça</button>
+              <button id="mDes" aria-pressed="false">Designer contratado</button>
+            </div>
+          </div>
+          <div class="field" id="fFree">
+            <div class="flab"><label for="ppp">Custo por peça (freelancer)</label><span class="fval" id="pppV">R$ 70</span></div>
+            <input type="range" id="ppp" min="20" max="200" step="5" value="70">
+          </div>
+          <div class="field" id="fDes" hidden>
+            <div class="flab"><label for="sal">Salário do designer (carregado)</label><span class="fval" id="salV">R$ 4.500</span></div>
+            <input type="range" id="sal" min="2500" max="9000" step="100" value="4500">
+            <p class="subnote">Salário + encargos de um designer que dá conta dessa carga.</p>
+          </div>
+        </div>
+
+        <div class="calc-out">
+          <div class="bignum"><span class="k">Você economiza por ano</span><b id="yr">R$ 0</b></div>
+          <div class="bars">
+            <div class="bar">
+              <div class="bl"><span>Hoje (produção humana)</span><span class="bn" id="hM">R$ 0</span></div>
+              <div class="track"><div class="fill fill-human" id="hBar" style="width:100%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bl"><span>Com o smark Studio</span><span class="bn" id="pM">R$ 0</span></div>
+              <div class="track"><div class="fill fill-plat" id="pBar" style="width:30%"></div></div>
+            </div>
+          </div>
+          <div class="payoff">
+            <span class="chip" id="chSave">↓ 0% mais barato</span>
+            <span class="chip alt" id="chPay">Setup pago em 0 meses</span>
+            <span class="chip alt" id="chBreak">Se paga com 2 clientes</span>
+          </div>
+        </div>
+      </div>
+      <div class="calc-foot" id="footNote">Studio: setup R$ 2.997 (único) + base R$ 1.197/mês (até 3 marcas) + R$ 297/mês por marca extra. Custo variável de IA já incluso.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COMPARISON ================= -->
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Por que não é Canva, nem freelancer, nem contratar</span>
+      <h2 class="display">O Canva te dá uma tela em branco.<br>A gente te dá a peça pronta.</h2>
+      <p>Ferramenta você ainda opera na mão, hora a hora. O Studio é a produção acontecendo — com o padrão que uma agência precisa entregar.</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th class="us">smark Studio</th>
+            <th>Canva</th>
+            <th>Freelancer</th>
+            <th>Contratar designer</th>
+            <th>IA genérica</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Entrega a peça pronta</td>
+            <td class="us"><span class="cell mk-y">Sim</span><small>no padrão da marca</small></td>
+            <td><span class="cell mk-n">Não</span><small>você monta tudo</small></td>
+            <td><span class="cell mk-p">Depende</span><small>e no ritmo dele</small></td>
+            <td><span class="cell mk-y">Sim</span><small>1 pessoa por vez</small></td>
+            <td><span class="cell mk-n">Não</span><small>imagem crua</small></td>
+          </tr>
+          <tr>
+            <td>Texto nítido na arte</td>
+            <td class="us"><span class="cell mk-y">Sim</span><small>tipografia real</small></td>
+            <td><span class="cell mk-y">Sim</span></td>
+            <td><span class="cell mk-y">Sim</span></td>
+            <td><span class="cell mk-y">Sim</span></td>
+            <td><span class="cell mk-n">Borrado</span></td>
+          </tr>
+          <tr>
+            <td>Direção de arte embutida</td>
+            <td class="us"><span class="cell mk-y">Sim</span><small>nível agência</small></td>
+            <td><span class="cell mk-n">Não</span><small>template genérico</small></td>
+            <td><span class="cell mk-p">Varia</span></td>
+            <td><span class="cell mk-y">Sim</span></td>
+            <td><span class="cell mk-n">Não</span></td>
+          </tr>
+          <tr>
+            <td>Escala sem contratar</td>
+            <td class="us"><span class="cell mk-y">Sim</span><small>+1 marca = +R$297</small></td>
+            <td><span class="cell mk-n">Não</span><small>mais horas do time</small></td>
+            <td><span class="cell mk-n">Não</span><small>custo linear</small></td>
+            <td><span class="cell mk-n">Não</span><small>+ folha</small></td>
+            <td><span class="cell mk-p">Meio</span></td>
+          </tr>
+          <tr>
+            <td>Consistência de marca</td>
+            <td class="us"><span class="cell mk-y">Automática</span></td>
+            <td><span class="cell mk-p">Manual</span></td>
+            <td><span class="cell mk-n">Frágil</span></td>
+            <td><span class="cell mk-p">Depende dele</span></td>
+            <td><span class="cell mk-n">Nenhuma</span></td>
+          </tr>
+          <tr>
+            <td>White-label (marca é sua)</td>
+            <td class="us"><span class="cell mk-y">Sim</span><small>motor invisível</small></td>
+            <td><span class="cell mk-p">Parcial</span></td>
+            <td><span class="cell mk-y">Sim</span></td>
+            <td><span class="cell mk-y">Sim</span></td>
+            <td><span class="cell mk-p">Parcial</span></td>
+          </tr>
+          <tr>
+            <td>Custo mensal típico</td>
+            <td class="us"><span class="cell mk-y">R$ 1.197+</span><small>até 3 marcas</small></td>
+            <td><span class="cell mk-p">R$ 100–300</span><small>+ suas horas</small></td>
+            <td><span class="cell mk-n">R$ 60–200/peça</span></td>
+            <td><span class="cell mk-n">R$ 3.500–5.000</span></td>
+            <td><span class="cell mk-p">R$ 100–500</span><small>+ montagem</small></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--soft);font-size:14.5px;margin-top:18px;max-width:64ch">
+      A conta honesta: o Canva é barato porque o trabalho continua sendo seu. O designer entrega padrão, mas custa uma folha e some com a pessoa. O Studio fica no meio certo — <b style="color:var(--ink)">mais barato que um designer, mais completo que o Canva, e o trabalho pesado é nosso.</b></p>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section id="precos">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Modelo simples, sem letra miúda</span>
+      <h2 class="display">Você paga por marca-cliente.<br>Cresce quando você cresce.</h2>
+      <p>Sem cobrança por peça — usar à vontade é o ponto. A partir do 2º cliente, a base já se pagou.</p>
+    </div>
+    <div class="price">
+      <div class="pc">
+        <div class="pk">Início (único)</div>
+        <div class="amt">R$ 2.997</div>
+        <p class="desc">Liberação da plataforma, treinamento da sua equipe e onboarding das 3 primeiras marcas.</p>
+        <ul><li>Acesso completo ao Studio</li><li>Treino da equipe</li><li>Voz, paleta e formatos configurados</li></ul>
+      </div>
+      <div class="pc feat">
+        <span class="badge">o motor</span>
+        <div class="pk">Base mensal</div>
+        <div class="amt">R$ 1.197<small>/mês</small></div>
+        <p class="desc">Até 3 marcas-cliente ativas, com uso à vontade e o motor sempre atualizado.</p>
+        <ul><li>3 marcas-cliente incluídas</li><li>Peças sem limite de contagem</li><li>Atualização de modelo contínua</li><li>Suporte</li></ul>
+      </div>
+      <div class="pc">
+        <div class="pk">Marca extra</div>
+        <div class="amt">R$ 297<small>/mês</small></div>
+        <p class="desc">Cada cliente novo além dos 3. A alavanca que faz sua conta crescer sem contratar.</p>
+        <ul><li>+1 marca-cliente ativa</li><li>Mesmo motor, mesmo padrão</li><li>Cancelável a qualquer momento</li></ul>
+      </div>
+    </div>
+    <div class="launch">🚀 Preço de lançamento — as primeiras agências entram com o Início por conta da casa. Fica só a base + marcas.</div>
+  </div>
+</section>
+
+<!-- ================= CLOSE / DISCOURSE ================= -->
+<section class="close">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div class="pitch">
+      <span class="eyebrow">Pra fechar</span>
+      <blockquote>Criar arte virou commodity. Só que seu cliente não paga por "imagem de IA" — paga por <span class="u">peça que vende, no padrão, no prazo.</span> A gente não te vende um gerador. Te entrega a <span class="u">linha de produção</span> — e você entrega como sua.</blockquote>
+      <p class="src">A conta é simples: a partir do 2º cliente, a plataforma já se pagou. Do 3º em diante, cada cliente novo custa R$ 297 — e a receita daquele cliente é sua, inteira. Você escala sem contratar ninguém.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#calc">Rodar minha simulação →</a>
+        <a class="btn btn-ghost" href="#precos">Começar como piloto</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap"><span>smark Studio · uma plataforma smark</span><span>proposta comercial · 2026</span></div></footer>
+
+<script>
+(function(){
+  var cli=document.getElementById('cli'),pec=document.getElementById('pec'),
+      ppp=document.getElementById('ppp'),sal=document.getElementById('sal'),
+      mFree=document.getElementById('mFree'),mDes=document.getElementById('mDes'),
+      fFree=document.getElementById('fFree'),fDes=document.getElementById('fDes');
+  var mode='free';
+  var SETUP=2997, BASE=1197, ADD=297, INCL=3;
+  function brl(n){return 'R$ '+Math.round(n).toLocaleString('pt-BR');}
+  function setMode(m){
+    mode=m;
+    mFree.setAttribute('aria-pressed', m==='free');
+    mDes.setAttribute('aria-pressed', m==='des');
+    fFree.hidden = m!=='free'; fDes.hidden = m!=='des';
+    calc();
+  }
+  mFree.onclick=function(){setMode('free')};
+  mDes.onclick=function(){setMode('des')};
+
+  function calc(){
+    var C=+cli.value, P=+pec.value, PP=+ppp.value, SAL=+sal.value;
+    document.getElementById('cliV').textContent=C;
+    document.getElementById('pecV').textContent=P;
+    document.getElementById('pppV').textContent=brl(PP);
+    document.getElementById('salV').textContent=brl(SAL);
+
+    var human, breakClients, humanPerClient;
+    if(mode==='free'){
+      humanPerClient = P*PP;
+      human = C*humanPerClient;
+    } else {
+      // designer contratado: salário fixo cobre a carga atual
+      human = SAL;
+      humanPerClient = SAL/Math.max(C,1);
+    }
+    var plat = BASE + Math.max(0, C-INCL)*ADD;
+    var saveM = human - plat;
+    var saveY = saveM*12;
+    var pct = human>0 ? Math.max(0,Math.round((1-plat/human)*100)) : 0;
+    var payback = saveM>0 ? Math.ceil(SETUP/saveM) : null;
+    var breakN = humanPerClient>0 ? Math.max(1,Math.ceil(BASE/humanPerClient)) : null;
+
+    document.getElementById('yr').textContent = saveY>0? brl(saveY) : brl(0);
+    document.getElementById('hM').textContent = brl(human);
+    document.getElementById('pM').textContent = brl(plat);
+    var mx=Math.max(human,plat,1);
+    document.getElementById('hBar').style.width=(human/mx*100)+'%';
+    document.getElementById('pBar').style.width=(plat/mx*100)+'%';
+
+    var chSave=document.getElementById('chSave'), chPay=document.getElementById('chPay'), chBreak=document.getElementById('chBreak');
+    if(saveM>0){ chSave.textContent='↓ '+pct+'% mais barato'; chSave.style.opacity=1; }
+    else { chSave.textContent='mais clientes = mais economia'; chSave.style.opacity=.85; }
+    chPay.textContent = payback? ('Setup pago em '+payback+(payback===1?' mês':' meses')) : 'Ajuste os números';
+    chBreak.textContent = breakN? ('Se paga com '+breakN+(breakN===1?' cliente':' clientes')) : '—';
+  }
+  [cli,pec,ppp,sal].forEach(function(el){el.addEventListener('input',calc)});
+  calc();
+})();
+</script>

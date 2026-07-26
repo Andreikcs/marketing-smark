@@ -1072,6 +1072,8 @@ carregar().then(()=>snapshot());
   function pollJob(id,onTick){return new Promise(res=>{let t=0;const t0=Date.now();const iv=setInterval(async()=>{t++;let j;try{j=await(await fetch('/job?id='+id)).json()}catch(e){return}
     if(onTick)onTick(Math.round((Date.now()-t0)/1000),(j||{}).status);
     if(j.status==='done'||j.status==='erro'){clearInterval(iv);res(j)}else if(t>180){clearInterval(iv);res({status:'timeout',erro:'ainda gerando — aparece ao recarregar a página'})}},2000)})}
+  // Último pedido do chat — alimenta o prompt de EDIÇÃO e a detecção de “quer imagem”.
+  let lastPedido='';
   // Pedido fala de imagem/cena? → gera fundo mesmo se o checkbox estiver desmarcado.
   function pedidoQuerImagem(t){
     t=(t||'').toLowerCase();
@@ -1138,8 +1140,6 @@ carregar().then(()=>snapshot());
     if(typeof applyTom==='function')applyTom(fr,fr.tema);
     return fr;
   }
-  // Último pedido do chat — vai pro prompt de EDIÇÃO (não só o conceito_visual em inglês).
-  let lastPedido='';
   // Anexo ＋ OU fundo já no card ativo (é isso que faz "a partir desse fundo" funcionar).
   function refBase(){
     if(attPath)return attPath;

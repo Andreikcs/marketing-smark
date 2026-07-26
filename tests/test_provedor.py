@@ -79,7 +79,10 @@ def test_refs_viram_input_references_no_openrouter(monkeypatch):
     _provedor.gerar("p", "m", "openrouter", {"openrouter": "k"},
                     refs=["data:image/png;base64,AAA", "data:image/png;base64,BBB"])
     corpo = json.loads(vistos[0].data.decode())
-    assert corpo["input_references"] == ["data:image/png;base64,AAA", "data:image/png;base64,BBB"]
+    assert corpo["input_references"] == [
+        {"type": "image_url", "image_url": {"url": "data:image/png;base64,AAA"}},
+        {"type": "image_url", "image_url": {"url": "data:image/png;base64,BBB"}},
+    ]
 
 
 def test_sem_chave_levanta_erro_provedor():
