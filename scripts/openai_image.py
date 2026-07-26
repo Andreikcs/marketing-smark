@@ -97,8 +97,8 @@ def main():
     ap.add_argument("--quality", default="high", help="low | medium | high | auto")
     ap.add_argument("--model", default=None, help="sobrescreve o modelo do perfil")
     ap.add_argument("--provider", default="auto", help="auto | openrouter | openai")
-    ap.add_argument("--tier", default="final", choices=["final", "rascunho"],
-                    help="final=Gemini 4K publicável | rascunho=Seedream barato + gate")
+    ap.add_argument("--tier", default="rascunho", choices=["final", "rascunho"],
+                    help="padrão rascunho=Seedream ~US$0,04 | final=Gemini 4K publicável")
     ap.add_argument("--reroll", type=int, default=0, help="varia a seed de propósito")
     ap.add_argument("--sem-acervo", action="store_true",
                     help="não injeta as peças-referência da família")

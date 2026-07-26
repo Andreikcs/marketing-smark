@@ -243,9 +243,12 @@ input[type=range]{accent-color:var(--accent)}
 .esmsg .apply button.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 .esempty{color:var(--muted);font-size:12.5px;line-height:1.5}
 .esfoot{border-top:1px solid var(--line);padding:11px 13px;display:flex;flex-direction:column;gap:8px}
-.esopts{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--sub)}
-.esopts select{background:var(--field);border:1px solid var(--field-line);color:var(--text);border-radius:8px;padding:5px 7px;font-size:12px}
-.esopts label{display:flex;align-items:center;gap:5px;cursor:pointer;margin:0}
+.esopts{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;font-size:12px;color:var(--sub)}
+.esopts select{background:var(--field);border:1px solid var(--field-line);color:var(--text);border-radius:8px;padding:5px 7px;font-size:12px;max-width:42%}
+.esopts label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;margin:0;white-space:nowrap}
+.esopts .esrow1,.esopts .esrow2{display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:100%}
+.esbadge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 9px;background:var(--inset);white-space:nowrap}
+.esbadge b{color:var(--accent);font-weight:700}
 .esattach{display:none;align-items:center;gap:9px;margin-bottom:8px;background:var(--inset);border:1px solid var(--line);border-radius:10px;padding:6px 9px}
 .esattach.on{display:flex}
 .esattach img{width:42px;height:42px;object-fit:cover;border-radius:7px;flex:0 0 auto}
@@ -1099,15 +1102,16 @@ carregar().then(()=>snapshot());
   <div class=eslog id=eslog><div class=esempty>Descreva o post que você quer — eu gero a copy (headline, sub, CTA, legenda, hashtags) já no markup do editor, e um conceito visual pro fundo.<br><br>Ex: <i>"carrossel de 3 sobre parar de perder tempo com tarefa repetitiva, tom leve"</i></div></div>
   <div class=esfoot>
     <div class=esopts>
-      <span>Marca</span>
-      <select id=esmarca><option value=smark>smark</option><option value=provider-max>provider-max</option><option value=elever-ai>elever-ai</option></select>
-      <span>Frames</span>
-      <select id=esn><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
-      <label title="Marcado: gera a arte de fundo (pago). Desmarcado: só a copy."><input type=checkbox id=esfundo> gerar arte <span style="color:var(--warn)">(pago)</span></label>
-      <select id=estier title="rascunho=Seedream ~US$0,04 (não publicável) · final=Gemini ~US$0,24">
-        <option value=final selected>final · Gemini 4K</option>
-        <option value=rascunho>rascunho · Seedream barato</option>
-      </select>
+      <div class=esrow1>
+        <span>Marca</span>
+        <select id=esmarca><option value=smark>smark</option><option value=provider-max>provider-max</option><option value=elever-ai>elever-ai</option></select>
+        <span>Frames</span>
+        <select id=esn><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+      </div>
+      <div class=esrow2>
+        <label title="Gera fundo com Seedream (~US$0,04). Edição com referência usa Gemini."><input type=checkbox id=esfundo> gerar arte <span style="color:var(--warn)">(pago)</span></label>
+        <span class=esbadge title="Padrão do sistema — sem escolha no UI. Export final com Gemini só via edição com ref ou CLI --tier final.">fundo: <b>Seedream</b> · ~US$0,04</span>
+      </div>
     </div>
     <div class=esattach id=esattach></div>
     <div class=esrow>
@@ -1122,8 +1126,9 @@ carregar().then(()=>snapshot());
   const panel=document.getElementById('estudio'),logEl=document.getElementById('eslog'),
     txt=document.getElementById('estxt'),send=document.getElementById('essend'),
     optMarca=document.getElementById('esmarca'),optN=document.getElementById('esn'),
-    optFundo=document.getElementById('esfundo'),optTier=document.getElementById('estier'),provEl=document.getElementById('esprov');
-  function tierAtual(){return (optTier&&optTier.value)==='rascunho'?'rascunho':'final'}
+    optFundo=document.getElementById('esfundo'),provEl=document.getElementById('esprov');
+  // Padrão fixo: Seedream (rascunho). Edição com referência continua em final (Gemini).
+  function tierAtual(){return 'rascunho'}
   const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const CLAUDELOGO='<svg viewBox="0 0 24 24" width=12 height=12 style="flex:0 0 auto"><path fill="#D97757" d="M12 2.5c.3 0 .5.2.6.5l.9 4.3 3.1-3.1c.3-.3.7-.2.8.2l.5 2.9 2.9.5c.4.1.5.5.2.8l-3.1 3.1 4.3.9c.5.1.5.9 0 1l-4.3.9 3.1 3.1c.3.3.2.7-.2.8l-2.9.5-.5 2.9c-.1.4-.5.5-.8.2l-3.1-3.1-.9 4.3c-.1.5-.9.5-1 0l-.9-4.3-3.1 3.1c-.3.3-.7.2-.8-.2l-.5-2.9-2.9-.5c-.4-.1-.5-.5-.2-.8l3.1-3.1-4.3-.9c-.5-.1-.5-.9 0-1l4.3-.9-3.1-3.1c-.3-.3-.2-.7.2-.8l2.9-.5.5-2.9c.1-.4.5-.5.8-.2l3.1 3.1.9-4.3c.1-.3.3-.5.6-.5z"/></svg>';
   function setProv(name){provEl.innerHTML=(name==='Claude'?CLAUDELOGO:'')+'<span>'+name+'</span>';}

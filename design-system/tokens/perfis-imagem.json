@@ -2,7 +2,7 @@
   "_base": {
     "provider": "openrouter",
     "resolution": "4K",
-    "tier_padrao": "final",
+    "tier_padrao": "rascunho",
     "tiers": {
       "rascunho": {
         "modelo": "bytedance-seed/seedream-4.5",

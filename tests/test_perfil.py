@@ -48,7 +48,7 @@ def test_aspect_de_size():
 def test_resolver_familia_nao_calibrada_usa_suplente():
     cfg = _perfil.carregar()
     cfg["familias"]["smark"]["modelo"] = None
-    r = _perfil.resolver("smark", slug="x", tipo="manifesto", cfg=cfg)
+    r = _perfil.resolver("smark", slug="x", tipo="manifesto", cfg=cfg, tier="final")
     assert r["nao_calibrado"] is True
     assert r["modelo"] == "gpt-image-1.5"
     assert r["provider"] == "openai"
@@ -56,7 +56,7 @@ def test_resolver_familia_nao_calibrada_usa_suplente():
 
 def test_resolver_usa_modelo_calibrado_quando_existe():
     cfg = _perfil.carregar()
-    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
+    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg, tier="final")
     assert r["modelo"] == "google/gemini-3-pro-image"
     assert r["provider"] == "openrouter"
     assert r["resolution"] == "4K"
@@ -66,7 +66,7 @@ def test_resolver_usa_modelo_calibrado_quando_existe():
 def test_seed_nao_e_enviada_para_modelo_sem_suporte():
     """gemini-3-pro-image aceita `seed` e ignora. Não mentir no corpo da requisição."""
     cfg = _perfil.carregar()
-    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
+    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg, tier="final")
     assert r["seed"] > 0            # continua calculada, vai pros metadados
     assert r["enviar_seed"] is False
 
@@ -76,7 +76,7 @@ def test_seed_e_enviada_para_modelo_com_suporte():
     cfg["_base"]["roster"]["modelo-ficticio"] = {
         "provider": "openrouter", "suporta_seed": True, "max_refs": 4}
     cfg["familias"]["smark"]["modelo"] = "modelo-ficticio"
-    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
+    r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg, tier="final")
     assert r["enviar_seed"] is True
 
 
@@ -124,11 +124,12 @@ def test_tier_final_usa_gemini():
     assert r["prompt_modo"] == "direcao"
 
 
-def test_tier_rascunho_usa_seedream():
-    r = _perfil.resolver("smark", slug="x", tipo="dor", tier="rascunho")
+def test_tier_padrao_e_rascunho_seedream():
+    """Padrão do contrato: rascunho/Seedream (sem o usuário configurar)."""
+    r = _perfil.resolver("smark", slug="x", tipo="dor")  # sem tier → padrao
     assert r["tier"] == "rascunho"
     assert r["modelo"] == "bytedance-seed/seedream-4.5"
-    assert r["resolution"] == "4K"  # Seedream exige ≥~3.7M px; 2K é rejeitado pela API
+    assert r["resolution"] == "4K"
     assert r["publicavel"] is False
     assert r["gate_texto"] is True
     assert r["prompt_modo"] == "curto"

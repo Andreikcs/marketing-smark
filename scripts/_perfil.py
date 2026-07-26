@@ -54,19 +54,20 @@ def capacidades(modelo, cfg):
 
 
 def normalizar_tier(tier, cfg=None):
-    """'rascunho' | 'final'. Default vem do contrato."""
+    """'rascunho' | 'final'. Default vem do contrato (`tier_padrao`)."""
     cfg = cfg or carregar()
-    t = (tier or "").strip().lower()
+    t = (tier or "").strip().lower() if tier is not None else ""
     if t in TIERS_VALIDOS:
         return t
-    return (cfg.get("_base") or {}).get("tier_padrao", "final")
+    return (cfg.get("_base") or {}).get("tier_padrao", "rascunho")
 
 
-def resolver(marca, slug="", tipo="", reroll=0, size="1024x1536", cfg=None, tier="final"):
+def resolver(marca, slug="", tipo="", reroll=0, size="1024x1536", cfg=None, tier=None):
     """Devolve tudo que o orquestrador precisa pra chamar o provedor.
 
-    `tier=rascunho` → modelo barato (Seedream), resolução de rascunho, prompt curto, não publicável.
+    `tier=rascunho` → modelo barato (Seedream), prompt curto, não publicável (padrão do contrato).
     `tier=final`    → modelo calibrado da família (Gemini), 4K, publicável.
+    `tier=None`     → usa `_base.tier_padrao` do contrato.
     """
     cfg = cfg or carregar()
     base = cfg.get("_base", {})

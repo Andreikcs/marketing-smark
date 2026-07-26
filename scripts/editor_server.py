@@ -1130,11 +1130,11 @@ class H(http.server.BaseHTTPRequestHandler):
                            "--prompt", full, "--size", "1024x1536", "--quality", "high",
                            "--input-fidelity", "high"]
                 else:  # direção de arte (padrão claro, rule #9)
-                    # tier: final (Gemini 4K) | rascunho (Seedream barato + gate)
-                    tier = (req.get("tier") or "final").strip().lower()
+                    # padrão do sistema: Seedream (rascunho). UI não expõe escolha.
+                    # edição com ref nunca cai aqui (ramo openai_edit acima).
+                    tier = (req.get("tier") or "rascunho").strip().lower()
                     if tier not in ("final", "rascunho"):
-                        tier = "final"
-                    # edição fotográfica / com ref nunca usa rascunho Seedream
+                        tier = "rascunho"
                     cmd = ["python3", os.path.join(HERE, "openai_image.py"), "--out", out, "--direcao",
                            "--marca", marca, "--tipo", req.get("tipo", "manifesto"),
                            "--tema", req.get("tema", "claro"),
