@@ -296,16 +296,17 @@
   },
   "gaps": [
     "Ledger de copy Claude ainda vazio (n=0) — medições de tokens só após uso pós-deploy",
-    "Sem analytics de uso (tempo real por post, taxa de aprovação) — horas economizadas são estimadas",
+    "ROI humano instrumentado (2026-07-26: _roi.py + painel ⏱) mas sample de ciclos exportados ainda insuficiente para measured — meta: 20 posts",
     "Sem baseline formal pré-sistema de taxa de erro/retrabalho",
     "Volume histórico de ~357 PNGs não está no ledger (pré-OpenRouter)",
     "OpenAI com hard limit de billing — dependência forte de crédito OpenRouter",
-    "Sem URL pública de produção (local-only); screenshots de Estúdio com custo UI podem ser recapturados após hard refresh",
-    "company_size e horas economizadas sem pesquisa formal de time"
+    "Sem URL pública de produção (local-only)",
+    "company_size sem pesquisa formal de time"
   ],
   "quality_score": {
-    "completeness_0_to_100": 78,
-    "evidence_strength_0_to_100": 72,
-    "notes": "Forte em evidência técnica e custos de imagem medidos; fraco em ROI humano medido e ledger de copy histórico. Screenshots capturados do hub local. Adequado para case de imersão com ressalvas explícitas."
+    "completeness_0_to_100": 82,
+    "evidence_strength_0_to_100": 74,
+    "notes": "ROI humano passou de 'não existe' para 'instrumentado, aguardando amostra'. Custos de imagem measured. Copy ledger ainda vazio. Após 20 exports com ROI, promover time_saved para measured."
   }
 }
+

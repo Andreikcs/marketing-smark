@@ -270,6 +270,19 @@ input[type=range]{accent-color:var(--accent)}
 .genprog .barw{width:240px;max-width:72%;height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
 .genprog .bar{height:100%;width:4%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:99px;transition:width .5s ease}
 .genprog .gent{font-size:11px;color:var(--muted)}
+/* ROI humano */
+.roipanel{position:fixed;top:56px;right:16px;width:min(420px,92vw);max-height:min(78vh,640px);z-index:40;display:none;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);overflow:hidden}
+.roipanel.on{display:flex}
+.roihead{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px}
+.roibody{overflow:auto;padding:10px 12px 14px;font-size:12px;line-height:1.45}
+.roistat{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.roistat .c{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.roistat .c b{display:block;font-size:15px;color:var(--accent);margin-top:2px}
+.roilist{display:flex;flex-direction:column;gap:6px}
+.roirow{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
+.roirow .t{font-weight:600;font-size:12px;margin-bottom:2px}
+.roirow .m{color:var(--muted);font-size:11px}
+.roihint{color:var(--muted);font-size:11px;margin:8px 0 4px}
 </style></head>
 <body>
 <div class=app>
@@ -284,11 +297,16 @@ input[type=range]{accent-color:var(--accent)}
     <a href="/editor" class="hnav on">Editor</a>
     <span class=sp></span>
     <span id=autosave class=autosave><span class="stdot ok"></span> salvo</span>
+    <button class=hicon id=broi title="ROI humano — tempo e custo dos posts"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><circle cx=12 cy=12 r=9/><path d="M12 7v5l3 2"/></svg></button>
     <button class=hicon id=bhist title="Histórico de versões deste post"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg></button>
     <button class=hicon id=bexport title="exportar PNG (este frame ou o carrossel)"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></button>
     <button class="sk-btn sk-btn--studio" style="width:auto" id=bestudio><svg viewBox="0 0 24 24" width=15 height=15 fill=currentColor style="margin-right:5px;vertical-align:-2px"><path d="M12 2l1.7 5.5L19 9l-5.3 1.5L12 16l-1.7-5.5L5 9l5.3-1.5z"/><path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>Estúdio IA</button>
     <button class="btn" style="width:auto" id=bsave>💾 Salvar</button>
   </header>
+  <div id=roipanel class=roipanel>
+    <div class=roihead><span>⏱ ROI humano</span><button class=hicon id=roiclose title=fechar>✕</button></div>
+    <div class=roibody id=roibody><div class=roihint>Carregando…</div></div>
+  </div>
 
   <div id=histpanel class=histpanel hidden>
     <div class=histhead><span>📜 Histórico de versões</span><button class=hicon id=histclose title=fechar>✕</button></div>
@@ -467,7 +485,55 @@ async function reorderFrame(from,to){
   if(from===to||isNaN(from))return;const fr=post().frames;const[m]=fr.splice(from,1);fr.splice(to,0,m);
   await salvar(true);await reload(PI,to);toast('Reordenado');
 }
-function sel(pi,fi){hideWelcome();PI=pi;FI=fi;renderPosts();renderStrip();renderCtrl();preview()}
+function sel(pi,fi){hideWelcome();PI=pi;FI=fi;renderPosts();renderStrip();renderCtrl();preview();roiStartQuiet()}
+async function roiStartQuiet(){
+  try{
+    if(!D||!D.posts[PI])return;
+    const r=await(await fetch('/roi-start',{method:'POST',headers:HJSON,body:JSON.stringify({post:PI,force:false})})).json();
+    if(r.ok&&r.roi&&D.posts[PI])D.posts[PI].roi=r.roi;
+  }catch(e){}
+}
+async function openRoi(){
+  const pan=document.getElementById('roipanel');
+  pan.classList.add('on');
+  const body=document.getElementById('roibody');
+  body.innerHTML='<div class=roihint>Carregando resumo…</div>';
+  try{
+    const r=await(await fetch('/roi-resumo',{method:'POST',headers:HJSON,body:JSON.stringify({limit:20})})).json();
+    if(!r.ok){body.innerHTML='⚠️ '+(r.erro||'falhou');return}
+    const s=r.stats||{};
+    const am=(s.avg_minutes_per_post||{}).mean;
+    const lm=(s.last_cycle_minutes||{}).mean;
+    const cu=(s.cogs_usd||{}).mean;
+    const cb=(s.cogs_brl||{}).mean;
+    let h='<div class=roistat>'
+      +'<div class=c>Min. médios (ciclos)<b>'+(am!=null?am+' min':'—')+'</b></div>'
+      +'<div class=c>Último ciclo (média)<b>'+(lm!=null?lm+' min':'—')+'</b></div>'
+      +'<div class=c>COGS médio US$<b>'+(cu!=null?('US$ '+Number(cu).toFixed(3)):'—')+'</b></div>'
+      +'<div class=c>COGS médio R$<b>'+(cb!=null?('R$ '+Number(cb).toFixed(2)):'—')+'</b></div>'
+      +'</div>';
+    if(r.estimated_hours_saved!=null){
+      h+='<div class=roihint>Proxy vs baseline '+(r.baseline_minutes||45)+' min: <b>~'+r.estimated_hours_saved+' h</b> economizadas nos ciclos com tempo registrado (ainda amostra pequena até ter 20 posts).</div>';
+    }else{
+      h+='<div class=roihint>Exporte posts (⬇) para fechar ciclos de tempo. Copy e imagem abrem o ciclo automaticamente.</div>';
+    }
+    h+='<div class=roilist>';
+    (r.posts||[]).forEach(p=>{
+      h+='<div class=roirow><div class=t>'+esc(p.titulo)+'</div><div class=m>'
+        +esc(p.marca||'')+' · '+(p.cycles_n||0)+' ciclo(s)'
+        +(p.last_minutes!=null?(' · último '+p.last_minutes+' min'):'')
+        +(p.avg_minutes!=null?(' · média '+p.avg_minutes+' min'):'')
+        +'<br>copy×'+(p.copy_calls_total||0)+' · img×'+(p.image_gens_total||0)+' · export×'+(p.exports_total||0)
+        +(p.total_usd!=null?('<br>COGS US$ '+Number(p.total_usd).toFixed(3)+(p.total_brl!=null?(' · R$ '+Number(p.total_brl).toFixed(2)):'')):'')
+        +(p.active?' · <span style=color:var(--accent)>ciclo ativo</span>':'')
+        +'</div></div>';
+    });
+    h+='</div>';
+    body.innerHTML=h;
+  }catch(e){body.innerHTML='⚠️ '+esc(e.message)}
+}
+document.getElementById('broi').onclick=openRoi;
+document.getElementById('roiclose').onclick=()=>document.getElementById('roipanel').classList.remove('on');
 
 function fmtSize(s){return ({'1080x1350':'Feed 4:5','1080x1080':'Quadrado 1:1','1080x1920':'Story 9:16'})[s]||'Feed 4:5'}
 function fld(label,val,onin,ph,rows,key){
@@ -726,6 +792,8 @@ setInterval(()=>{if(dirty){salvar(true);toast('Auto-salvo (rascunho)')}},30000);
 async function exportar(btn,scope){
   btn.disabled=true;btn.style.opacity='.5';  // ícone SVG — NÃO mexer em textContent (apaga o ícone)
   await salvar(true);
+  // garante ciclo ROI aberto antes do export
+  await roiStartQuiet();
   const r=await(await fetch('/exportar',{method:'POST',headers:HJSON,
     body:JSON.stringify({post:PI,frame:scope})})).json();
   btn.disabled=false;btn.style.opacity='';
@@ -747,8 +815,14 @@ async function exportar(btn,scope){
       document.body.appendChild(a);a.click();a.remove();
     },k*500));
   }
+  if(r.roi_cycle&&post()){
+    if(!post().roi)post().roi={};
+    post().roi.last_cycle=r.roi_cycle;
+    post().roi.active=null;
+  }
+  const minRoi=r.roi_cycle&&r.roi_cycle.minutes!=null?(' · ciclo '+r.roi_cycle.minutes+' min'):'';
   if(faltaram.length)toast('⚠️ Baixei '+feitas.length+'/'+(r.esperado||feitas.length)+' — card(s) '+faltaram.join(', ')+' não renderizaram. Tente de novo.');
-  else toast('⬇ '+feitas.length+' PNG salvos em Downloads · carrossel completo');
+  else toast('⬇ '+feitas.length+' PNG salvos em Downloads'+minRoi);
 }
 
 async function upload(file){
@@ -1109,7 +1183,8 @@ carregar().then(()=>snapshot());
     let d=0;const anim=setInterval(()=>{d=(d+1)%4;const el=wait.querySelector('.dots');if(el)el.textContent='.'.repeat(d)},380);
     try{
       const pSlug=(typeof post==='function'&&post())?(post().slug||''):'';
-      const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:pedido,marca:optMarca.value,n:+optN.value,contexto:ctxAtual(),historico:hist.slice(-6),imagem:attB64,imagem_mime:attMime,slug:pSlug})})).json();
+      await roiStartQuiet();
+      const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:pedido,marca:optMarca.value,n:+optN.value,contexto:ctxAtual(),historico:hist.slice(-6),imagem:attB64,imagem_mime:attMime,slug:pSlug,post:PI})})).json();
       if(!st.ok){clearInterval(anim);wait.innerHTML='⚠️ '+esc(st.erro||'falhou');send.disabled=false;return}
       const j=await pollJob(st.job);clearInterval(anim);
       if(j.status!=='done'){wait.innerHTML='⚠️ '+esc(j.erro||'falhou');send.disabled=false;return}

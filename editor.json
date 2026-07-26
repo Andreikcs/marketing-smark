@@ -97,7 +97,18 @@
       "status": "rascunho",
       "canais": [
         "instagram"
-      ]
+      ],
+      "roi": {
+        "active": {
+          "started_at": "2026-07-26T19:11:54",
+          "copy_calls": 0,
+          "image_gens": 0
+        },
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "selecao-nina-teo-clara",

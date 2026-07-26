@@ -27,6 +27,7 @@ import compositor  # noqa: E402
 import estudio  # noqa: E402  (cérebro do chat: copy + conceito visual)
 import _acervo  # noqa: E402
 import _perfil  # noqa: E402
+import _roi  # noqa: E402
 
 PORT = 8765
 PAINEL = os.path.join(VAULT, "painel.html")
@@ -606,6 +607,11 @@ def _run_gen(job_id, cmd, out, pi, fi):
                             f["bg_seed"] = meta["seed"]
                         if "suplente" in meta:
                             f["bg_suplente"] = meta["suplente"]
+                        # ROI humano: +1 imagem no ciclo ativo
+                        try:
+                            _roi.touch_image(d["posts"][pi])
+                        except Exception:
+                            pass
                         save(d)
             except Exception:
                 pass
@@ -632,7 +638,7 @@ def _run_gen(job_id, cmd, out, pi, fi):
 
 
 def _run_estudio(job_id, pedido, marca, n, tipo, contexto="", historico=None,
-                 imagem_b64=None, imagem_mime="image/jpeg", slug=""):
+                 imagem_b64=None, imagem_mime="image/jpeg", slug="", post_idx=None):
     """Roda o cérebro do chat em background (chat é rápido, mas não trava a UI)."""
     with GEN_SEM:
         try:
@@ -644,6 +650,16 @@ def _run_estudio(job_id, pedido, marca, n, tipo, contexto="", historico=None,
             else:
                 res, prov = out[0], out[1]
                 meta = {}
+            # ROI humano: +1 copy no post ativo
+            if post_idx is not None:
+                try:
+                    with IO_LOCK:
+                        d = load()
+                        if 0 <= int(post_idx) < len(d["posts"]):
+                            _roi.touch_copy(d["posts"][int(post_idx)])
+                            save(d)
+                except Exception:
+                    pass
             JOBS[job_id] = {
                 "status": "done", "resultado": res, "provider": prov,
                 "custo": res.get("_custo") or {
@@ -1021,9 +1037,21 @@ class H(http.server.BaseHTTPRequestHandler):
                         feitas.append(os.path.relpath(out, VAULT) if os.path.isabs(out) else out)
                     else:
                         faltaram.append(i + 1)
-                # esperado = quantos frames pedimos; se faltou algum, o cliente avisa em vez de baixar a menos
+                # ROI humano: fecha ciclo ativo no export bem-sucedido
+                cycle = None
+                if feitas:
+                    try:
+                        with IO_LOCK:
+                            d2 = load()
+                            pi = int(req["post"])
+                            if 0 <= pi < len(d2["posts"]):
+                                cycle = _roi.close_export(d2["posts"][pi])
+                                save(d2)
+                    except Exception:
+                        cycle = None
                 return self._send(200, {"ok": True, "feitas": feitas,
-                                        "faltaram": faltaram, "esperado": len(idxs)})
+                                        "faltaram": faltaram, "esperado": len(idxs),
+                                        "roi_cycle": cycle})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 
@@ -1136,12 +1164,46 @@ class H(http.server.BaseHTTPRequestHandler):
                 img_b64 = req.get("imagem") or None
                 img_mime = req.get("imagem_mime", "image/jpeg")
                 slug = safe_slug(req.get("slug", "") or "")
+                post_idx = req.get("post")
+                try:
+                    post_idx = int(post_idx) if post_idx is not None and post_idx != "" else None
+                except (TypeError, ValueError):
+                    post_idx = None
                 job_id = secrets.token_hex(6)
                 JOBS[job_id] = {"status": "running"}
                 threading.Thread(target=_run_estudio,
                                  args=(job_id, pedido, marca, n, tipo, contexto, historico,
-                                       img_b64, img_mime, slug), daemon=True).start()
+                                       img_b64, img_mime, slug, post_idx), daemon=True).start()
                 return self._send(200, {"ok": True, "job": job_id})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/roi-start":
+            # Abre ciclo de tempo no post (manual ou ao focar o post)
+            try:
+                with IO_LOCK:
+                    d = load()
+                    pi = int(req.get("post", -1))
+                    if not (0 <= pi < len(d["posts"])):
+                        return self._send(400, {"ok": False, "erro": "post inválido"})
+                    force = bool(req.get("force"))
+                    act = _roi.start(d["posts"][pi], force=force)
+                    save(d)
+                return self._send(200, {"ok": True, "active": act, "roi": d["posts"][pi].get("roi")})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/roi-resumo":
+            try:
+                import _ledger  # noqa: E402
+                limit = max(1, min(50, int(req.get("limit", 20) or 20)))
+                d = load()
+                resumo = _roi.resumo_posts(
+                    d.get("posts") or [],
+                    limit=limit,
+                    totais_fn=_ledger.totais_por_post,
+                )
+                return self._send(200, {"ok": True, **resumo})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 

@@ -122,9 +122,9 @@ Sistema **local** (Python + vault Obsidian + Super Editor web) que produz **copy
 
 ## 8. Gaps (para virar case “measured”)
 
-1. Ligar analytics simples: tempo por post, nº de regenerações, taxa de aprovação  
+1. ~~Ligar analytics de tempo por post~~ → **implementado 2026-07-26** (`_roi.py`, painel ⏱ no Editor, export fecha ciclo). Precisa de **20 posts exportados** para sample measured.  
 2. Encher ledger de copy com uso real do Estúdio  
-3. Stopwatch de 10 posts (antes/depois) com o mesmo operador  
+3. Rodar 2 semanas com ROI ligado e atualizar `resultado.json` (`time_saved` → measured)  
 4. Opcional: deploy demo read-only (Vercel/static) só vitrine  
 
 ---
