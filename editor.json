@@ -1813,26 +1813,30 @@
       "frames": [
         {
           "headline": "Quantas motos você deixa|de *atender* sem ver?",
-          "sub": "Enquanto você cuida do salão, um funcionário de IA responde cada pessoa.",
-          "cta": "Diagnóstico gratuito — link na bio",
+          "sub": "",
+          "cta": "Diagnóstico gratuito • link na bio",
           "page": "",
           "chip": true,
           "tema": "claro",
           "bgmode": "imagem",
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/_regen/01-7fb9d9.png",
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c8913-cem3o/_regen/01-e215a9.png",
           "cor": "#F4F2FB",
           "accent": "",
           "hsize": 0,
           "grade": true,
           "n": 1,
           "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c8913-cem3o/01.png",
-          "_v": 3,
+          "_v": 4,
           "overlay": "branco",
           "overlay_op": 1,
-          "ov_pos": 0
+          "ov_pos": 0,
+          "bg_custo_usd": 0.242964,
+          "bg_modelo": "google/gemini-3-pro-image",
+          "bg_provider": "openrouter",
+          "bg_suplente": false
         }
       ],
-      "caption": "Toda pessoa que manda mensagem e não recebe resposta é uma moto que ficou parada no salão. Um funcionário de IA atende na hora, tira dúvida e organiza quem quer visitar a loja. Você cuida do fechamento; ele cuida da fila.\n\n#concessionaria #motos #atendimento #inteligenciaartificial",
+      "caption": "Toda moto parada na loja é um cliente que ligou e ninguém respondeu a tempo. Um funcionário de IA atende cada contato na hora, organiza as visitas e não deixa ninguém esperando. Você cuida das motos; ele cuida das conversas.\n\n#motos #concessionaria #atendimento #inteligenciaartificial",
       "canais": [
         "instagram"
       ]
