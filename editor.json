@@ -2055,7 +2055,8 @@
           "bg_provider": "openrouter",
           "bg_suplente": false,
           "bg_tier": "final",
-          "bg_publicavel": true
+          "bg_publicavel": true,
+          "overlay": "branco"
         }
       ],
       "caption": "Ninguém aguenta ficar esperando a tela carregar. Com a provider-max, a conexão fica firme o dia inteiro — pra trabalhar, estudar e relaxar sem interrupção. Quer saber onde sua rede pode melhorar? Comece pelo diagnóstico gratuito.\n\n#provedor #internetfibra #conexao #provedordeinternet",
