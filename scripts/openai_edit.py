@@ -218,10 +218,17 @@ def main():
         sys.exit(f"ERRO: edição falhou em todos os provedores. {resumo}")
 
     out = args.out if os.path.isabs(args.out) else os.path.join(VAULT, args.out)
+    from _cambio import enriquecer  # noqa: E402
+    pack = enriquecer(result.get("custo_usd"))
     evento = {
         "familia": "", "marca": getattr(args, "marca", ""), "slug": "",
         "tipo": "edit", "modelo": result["modelo"], "provider": result["provider"],
-        "seed": None, "resolucao": args.size, "custo_usd": result.get("custo_usd"),
+        "seed": None, "resolucao": args.size,
+        "custo_usd": pack.get("custo_usd"),
+        "custo_brl": pack.get("custo_brl"),
+        "usd_brl": pack.get("usd_brl"),
+        "cambio_fonte": pack.get("cambio_fonte"),
+        "cambio_em": pack.get("cambio_em"),
         "refs": 1, "suplente_usado": False, "nao_calibrado": False,
         "arquivo": os.path.basename(out),
     }
@@ -233,17 +240,19 @@ def main():
     except OSError as e:
         evento["ok"] = False
         evento["erro"] = str(e)
-        _ledger.registrar(evento)
+        _ledger.registrar_imagem(evento)
         sys.exit(f"ERRO: a edição foi paga mas a imagem não pôde ser salva em "
                  f"'{out}' ({e}). O gasto foi registrado no ledger; a arte não foi entregue.")
 
     evento["ok"] = True
-    _ledger.registrar(evento)
+    _ledger.registrar_imagem(evento)
 
-    custo = result.get("custo_usd")
+    custo = pack.get("custo_usd")
     custo_s = f"{custo}" if custo is not None else "?"
+    brl = pack.get("custo_brl")
+    brl_s = f" · R${brl:.2f}" if brl is not None else ""
     print(f"OK: {out}  ({result['modelo']} via {result['provider']}, "
-          f"edit de {os.path.basename(img)}, custo=${custo_s})")
+          f"edit de {os.path.basename(img)}, custo=${custo_s}{brl_s})")
     print(meta_block(out, {"modelo": result["modelo"], "provider": result["provider"],
                            "qualidade": args.quality,
                            "tamanho": args.size, "paleta": args.paleta,

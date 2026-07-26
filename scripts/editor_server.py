@@ -612,6 +612,16 @@ def _run_gen(job_id, cmd, out, pi, fi):
             job = {"status": "done", "path": rel}
             job.update({k: meta[k] for k in ("custo_usd", "modelo", "provider", "seed", "suplente")
                         if k in meta})
+            # BRL ao vivo (mesmo se o stdout da CLI não trouxe)
+            try:
+                from _cambio import enriquecer  # noqa: E402
+                if job.get("custo_usd") is not None:
+                    pack = enriquecer(job["custo_usd"])
+                    job["custo_brl"] = pack["custo_brl"]
+                    job["usd_brl"] = pack["usd_brl"]
+                    job["cambio_fonte"] = pack["cambio_fonte"]
+            except Exception:
+                pass
             # exit 3 = gate de texto falhou (rascunho poluído); arquivo existe
             if r.returncode == 3 or "GATE_FALHOU" in (r.stdout or ""):
                 job["gate_falhou"] = True
@@ -622,13 +632,31 @@ def _run_gen(job_id, cmd, out, pi, fi):
 
 
 def _run_estudio(job_id, pedido, marca, n, tipo, contexto="", historico=None,
-                 imagem_b64=None, imagem_mime="image/jpeg"):
+                 imagem_b64=None, imagem_mime="image/jpeg", slug=""):
     """Roda o cérebro do chat em background (chat é rápido, mas não trava a UI)."""
     with GEN_SEM:
         try:
-            res, prov = estudio.gerar(pedido, marca, n, tipo, contexto, historico,
-                                      imagem_b64, imagem_mime)
-            JOBS[job_id] = {"status": "done", "resultado": res, "provider": prov}
+            out = estudio.gerar(pedido, marca, n, tipo, contexto, historico,
+                                imagem_b64, imagem_mime, slug=slug or "")
+            # compat: gerar devolve 2 ou 3 valores
+            if len(out) == 3:
+                res, prov, meta = out
+            else:
+                res, prov = out[0], out[1]
+                meta = {}
+            JOBS[job_id] = {
+                "status": "done", "resultado": res, "provider": prov,
+                "custo": res.get("_custo") or {
+                    "tipo": "copy",
+                    "custo_usd": meta.get("custo_usd"),
+                    "custo_brl": meta.get("custo_brl"),
+                    "usd_brl": meta.get("usd_brl"),
+                    "modelo": meta.get("modelo"),
+                    "provider": meta.get("provider") or prov,
+                    "input_tokens": meta.get("input_tokens"),
+                    "output_tokens": meta.get("output_tokens"),
+                },
+            }
         except Exception as e:
             JOBS[job_id] = {"status": "erro", "erro": str(e)}
 
@@ -1107,12 +1135,35 @@ class H(http.server.BaseHTTPRequestHandler):
                 historico = req.get("historico") if isinstance(req.get("historico"), list) else None
                 img_b64 = req.get("imagem") or None
                 img_mime = req.get("imagem_mime", "image/jpeg")
+                slug = safe_slug(req.get("slug", "") or "")
                 job_id = secrets.token_hex(6)
                 JOBS[job_id] = {"status": "running"}
                 threading.Thread(target=_run_estudio,
                                  args=(job_id, pedido, marca, n, tipo, contexto, historico,
-                                       img_b64, img_mime), daemon=True).start()
+                                       img_b64, img_mime, slug), daemon=True).start()
                 return self._send(200, {"ok": True, "job": job_id})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/custos-post":
+            # GET-like via POST body: {slug, marca} → totais copy+imagem em USD/BRL
+            try:
+                import _ledger  # noqa: E402
+                slug = safe_slug(req.get("slug", ""))
+                marca = safe_marca(req.get("marca", "smark"))
+                t = _ledger.totais_por_post(slug, marca)
+                # não devolve listas enormes na UI
+                t.pop("imagens", None)
+                t.pop("copys", None)
+                return self._send(200, {"ok": True, **t})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/custos-resumo":
+            try:
+                import _ledger  # noqa: E402
+                periodo = str(req.get("periodo", "") or "")
+                return self._send(200, {"ok": True, **_ledger.resumo_periodo(periodo)})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 

@@ -573,11 +573,14 @@ function renderCtrl(){
         :'<div style="color:var(--muted)">✓ final publicável</div>';
       info.innerHTML=
         '<div style="font-weight:700;margin-bottom:4px;color:var(--text)">ℹ Geração desta imagem</div>'
-        +'<div><span style="color:var(--muted)">Custo</span> · <b style="color:var(--accent)">'+custo+'</b></div>'
+        +'<div><span style="color:var(--muted)">Custo imagem</span> · <b style="color:var(--accent)">'+custo+'</b>'
+        +(f.bg_custo_brl!=null?(' · <b>R$ '+Number(f.bg_custo_brl).toFixed(2)+'</b>'):'')
+        +'</div>'
         +'<div><span style="color:var(--muted)">Tier</span> · '+esc(tier)+'</div>'
         +(f.bg_modelo?('<div><span style="color:var(--muted)">Modelo</span> · '+esc(String(f.bg_modelo))+'</div>'):'')
         +(f.bg_provider?('<div><span style="color:var(--muted)">Provider</span> · '+esc(String(f.bg_provider))+'</div>'):'')
         +(f.bg_seed!=null?('<div><span style="color:var(--muted)">Seed</span> · '+esc(String(f.bg_seed))+'</div>'):'')
+        +(f.bg_usd_brl!=null?('<div style="color:var(--muted);font-size:11px">cotação USD/BRL '+Number(f.bg_usd_brl).toFixed(4)+'</div>'):'')
         +pub
         +(f.bg_suplente?('<div style="color:#c47">⚠ gerado no suplente (principal falhou)</div>'):'');
     }else if(f.bg){
@@ -1105,21 +1108,36 @@ carregar().then(()=>snapshot());
     send.disabled=true;const wait=addMsg('a','✍️ Claude está escrevendo a copy<span class=dots></span>');
     let d=0;const anim=setInterval(()=>{d=(d+1)%4;const el=wait.querySelector('.dots');if(el)el.textContent='.'.repeat(d)},380);
     try{
-      const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:pedido,marca:optMarca.value,n:+optN.value,contexto:ctxAtual(),historico:hist.slice(-6),imagem:attB64,imagem_mime:attMime})})).json();
+      const pSlug=(typeof post==='function'&&post())?(post().slug||''):'';
+      const st=await(await fetch('/estudio',{method:'POST',headers:HJSON,body:JSON.stringify({prompt:pedido,marca:optMarca.value,n:+optN.value,contexto:ctxAtual(),historico:hist.slice(-6),imagem:attB64,imagem_mime:attMime,slug:pSlug})})).json();
       if(!st.ok){clearInterval(anim);wait.innerHTML='⚠️ '+esc(st.erro||'falhou');send.disabled=false;return}
       const j=await pollJob(st.job);clearInterval(anim);
       if(j.status!=='done'){wait.innerHTML='⚠️ '+esc(j.erro||'falhou');send.disabled=false;return}
-      wait.remove();renderResult(j.resultado,j.provider);
+      wait.remove();renderResult(j.resultado,j.provider,j.custo);
     }catch(e){clearInterval(anim);wait.innerHTML='⚠️ '+esc(e.message)}
     send.disabled=false;
   }
-  function renderResult(r,prov){
+  function fmtCusto(c){
+    if(!c||c.custo_usd==null&&c.custo_brl==null)return '';
+    const u=c.custo_usd!=null?('US$ '+Number(c.custo_usd).toFixed(4)):'';
+    const b=c.custo_brl!=null?('R$ '+Number(c.custo_brl).toFixed(2)):'';
+    const fx=c.usd_brl!=null?(' · cotação '+Number(c.usd_brl).toFixed(4)):'';
+    return (u&&b)?(u+' · '+b+fx):(u||b)+fx;
+  }
+  function renderResult(r,prov,custoCopy){
     setProv(prov==='claude'?'Claude':'OpenAI');
     hist.push({role:'assistant',content:(r.resumo||r.titulo||'')});
     const vaiFundo=querFundoAgora();
     if(vaiFundo&&optFundo)optFundo.checked=true;
+    const cc=custoCopy||(r&&r._custo)||null;
     let h='<b>'+esc(r.titulo||'Post')+'</b> <span style="font-size:11px;color:var(--muted)">· tema '+(r.tema==='escuro'?'escuro':'claro'+(r.forcado_claro?' (padrão)':''))+'</span>';
     if(r.resumo)h+='<br>'+esc(r.resumo);
+    if(cc&&(cc.custo_usd!=null||cc.custo_brl!=null)){
+      h+='<div style="margin-top:6px;font-size:11px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface)">'
+        +'<b>📝 Copy (Claude/chat)</b><br>'+fmtCusto(cc)
+        +(cc.modelo?('<br><span style="color:var(--muted)">'+esc(String(cc.modelo))+' · '+(cc.input_tokens||'?')+'→'+(cc.output_tokens||'?')+' tok</span>'):'')
+        +'</div>';
+    }
     (r.frames||[]).forEach((f,i)=>{h+='<div style="margin-top:6px;font-size:12px;opacity:.85">'+(i+1)+'. '+esc((f.headline||'').replace(/\|/g,' / '))+(f.cta?(' — <i>'+esc(f.cta)+'</i>'):'')+'</div>'});
     if(r.conceito_visual)h+='<div style="margin-top:6px;font-size:11px;color:var(--muted)">🎨 '+esc(r.conceito_visual)+'</div>';
     if(r.alertas&&r.alertas.length)h+='<div class=alert>⚠️ revisar: '+esc(r.alertas.join(', '))+'</div>';
@@ -1232,6 +1250,8 @@ carregar().then(()=>snapshot());
       if(j.status==='done'){const tf=D.posts[pi]&&D.posts[pi].frames[fi];if(tf){
           tf.bg=j.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(typeof applyTom==='function')applyTom(tf,tema);
           if(j.custo_usd!=null)tf.bg_custo_usd=j.custo_usd;
+          if(j.custo_brl!=null)tf.bg_custo_brl=j.custo_brl;
+          if(j.usd_brl!=null)tf.bg_usd_brl=j.usd_brl;
           if(j.modelo)tf.bg_modelo=j.modelo;
           if(j.provider)tf.bg_provider=j.provider;
           if(j.seed!=null)tf.bg_seed=j.seed;
@@ -1240,13 +1260,28 @@ carregar().then(()=>snapshot());
           tf.bg_publicavel=j.gate_falhou?false:(tier==='final');
           if(j.gate_falhou)tf.bg_gate_falhou=true;
         }
-        const cst=j.custo_usd!=null?(' · <b>US$ '+Number(j.custo_usd).toFixed(3)+'</b>'):'';
+        const cstU=j.custo_usd!=null?('US$ '+Number(j.custo_usd).toFixed(3)):'';
+        const cstB=j.custo_brl!=null?('R$ '+Number(j.custo_brl).toFixed(2)):'';
+        const cst=(cstU||cstB)?(' · <b>'+[cstU,cstB].filter(Boolean).join(' · ')+'</b>'):'';
         if(j.gate_falhou){
           prog.innerHTML='⚠️ Fundo <b>'+(fi+1)+'</b> gerado mas <b>gate de texto falhou</b> (possível poluição Seedream). Não publique — mude para <b>final</b> ou tente de novo.'+cst;
         }else{
           const modo=withRef?' (edição)':(tier==='rascunho'?' (rascunho)':' (final)');
           prog.innerHTML='✨ Fundo <b>'+(fi+1)+'/'+total+'</b> pronto'+modo+cst+(j.modelo?(' · '+esc(j.modelo)):'');
         }
+        // totais do post (copy + imagens) em USD e BRL
+        try{
+          const p=D.posts[pi]||{};
+          const tot=await(await fetch('/custos-post',{method:'POST',headers:HJSON,body:JSON.stringify({slug:p.slug||'',marca:p.marca||'smark'})})).json();
+          if(tot.ok){
+            addMsg('a','<div style="font-size:12px;line-height:1.45"><b>💰 Custo acumulado deste post</b><br>'
+              +'🖼 Imagem: <b>US$ '+(Number(tot.imagem_usd||0).toFixed(4))+'</b> · <b>R$ '+(Number(tot.imagem_brl||0).toFixed(2))+'</b> ('+(tot.n_imagens||0)+' ger.)<br>'
+              +'📝 Copy: <b>US$ '+(Number(tot.copy_usd||0).toFixed(4))+'</b> · <b>R$ '+(Number(tot.copy_brl||0).toFixed(2))+'</b> ('+(tot.n_copys||0)+' cham.)<br>'
+              +'Σ Total: <b style="color:var(--accent)">US$ '+(Number(tot.total_usd||0).toFixed(4))+' · R$ '+(Number(tot.total_brl||0).toFixed(2))+'</b>'
+              +(tot.usd_brl?('<br><span style="color:var(--muted);font-size:11px">cotação USD/BRL '+Number(tot.usd_brl).toFixed(4)+(tot.cambio_fonte?(' · '+esc(String(tot.cambio_fonte))):'')+'</span>'):'')
+              +'</div>');
+          }
+        }catch(e){}
         if(pi===PI){if(typeof genStop==='function')genStop(true);renderStrip();if(fi===FI){renderCtrl();preview()}}setDirty(true)}
       else{prog.innerHTML=(j.status==='timeout'?'⏳ Fundo '+(fi+1)+' ainda gerando — recarregue a página em 1 min pra ver.':'⚠️ Fundo '+(fi+1)+' falhou'+(j.erro?': '+esc(String(j.erro).slice(0,120)):''));if(pi===PI&&typeof genStop==='function')genStop(false)}
     }catch(e){prog.innerHTML='⚠️ Erro no fundo '+(fi+1)+': '+esc(e.message);if(pi===PI&&typeof genStop==='function')genStop(false)}

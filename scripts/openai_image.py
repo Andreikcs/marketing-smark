@@ -185,11 +185,18 @@ def main():
         sys.exit(f"ERRO: {e}")
 
     out = args.out if os.path.isabs(args.out) else os.path.join(VAULT, args.out)
+    from _cambio import enriquecer  # noqa: E402
+    pack_fx = enriquecer(r.get("custo_usd"))
     evento = {
         "familia": perfil["familia"], "marca": args.marca, "slug": slug,
         "tipo": args.tipo, "tier": perfil["tier"], "modelo": r["modelo"],
         "provider": r["provider"], "seed": perfil["seed"],
-        "resolucao": perfil["resolution"], "custo_usd": r["custo_usd"],
+        "resolucao": perfil["resolution"],
+        "custo_usd": pack_fx.get("custo_usd"),
+        "custo_brl": pack_fx.get("custo_brl"),
+        "usd_brl": pack_fx.get("usd_brl"),
+        "cambio_fonte": pack_fx.get("cambio_fonte"),
+        "cambio_em": pack_fx.get("cambio_em"),
         "refs": len(refs),
         "suplente_usado": r["suplente_usado"],
         "nao_calibrado": perfil["nao_calibrado"],
@@ -204,7 +211,7 @@ def main():
     except OSError as e:
         evento["ok"] = False
         evento["erro"] = str(e)
-        _ledger.registrar(evento)
+        _ledger.registrar_imagem(evento)
         sys.exit(f"ERRO: a geração foi paga (custo=${r['custo_usd']}) mas a imagem "
                  f"não pôde ser salva em '{out}' ({e}). O gasto foi registrado no "
                  f"ledger; a arte não foi entregue.")
@@ -218,34 +225,38 @@ def main():
         if gate.get("aviso"):
             print(f"AVISO gate: {gate['aviso']}", file=sys.stderr)
         if gate.get("poluido"):
-            # mantém o arquivo para inspeção, mas marca não-ok no sentido de publicável
-            evento["ok"] = True  # geração técnica ok
+            evento["ok"] = True
             evento["publicavel"] = False
             evento["gate_falhou"] = True
-            _ledger.registrar(evento)
+            _ledger.registrar_imagem(evento)
+            brl = evento.get("custo_brl")
+            brl_s = f" R${brl:.2f}" if brl is not None else ""
             print(f"OK: {out}  (tier={perfil['tier']}, {r['modelo']} via {r['provider']}, "
-                  f"seed={perfil['seed']}, custo=${r['custo_usd'] if r['custo_usd'] is not None else '?'}, "
+                  f"seed={perfil['seed']}, custo=${evento.get('custo_usd') or '?'}{brl_s}, "
                   f"GATE_FALHOU poluído)")
             print(meta_block(out, {"modelo": r["modelo"], "provider": r["provider"],
                                    "qualidade": args.quality,
                                    "tamanho": args.size, "paleta": args.paleta,
-                                   "seed": perfil["seed"], "custo_usd": r["custo_usd"],
+                                   "seed": perfil["seed"], "custo_usd": evento.get("custo_usd"),
                                    "suplente_usado": r["suplente_usado"]}))
-            # exit 3 = poluído (CLI pode decidir retry)
             sys.exit(3)
 
     evento["ok"] = True
     evento["gate_metodo"] = gate.get("metodo")
     evento["gate_poluido"] = False
-    _ledger.registrar(evento)
+    _ledger.registrar_imagem(evento)
 
     pub = "publicável" if evento.get("publicavel") else "rascunho NÃO publicável"
+    brl = evento.get("custo_brl")
+    brl_s = f" · R${brl:.2f}" if brl is not None else ""
+    fx = evento.get("usd_brl")
+    fx_s = f" · USD/BRL {fx:.4f}" if fx else ""
     print(f"OK: {out}  (tier={perfil['tier']}, {pub}, {r['modelo']} via {r['provider']}, "
-          f"seed={perfil['seed']}, custo=${r['custo_usd'] if r['custo_usd'] is not None else '?'})")
+          f"seed={perfil['seed']}, custo=${evento.get('custo_usd') or '?'}{brl_s}{fx_s})")
     print(meta_block(out, {"modelo": r["modelo"], "provider": r["provider"],
                            "qualidade": args.quality,
                            "tamanho": args.size, "paleta": args.paleta,
-                           "seed": perfil["seed"], "custo_usd": r["custo_usd"],
+                           "seed": perfil["seed"], "custo_usd": evento.get("custo_usd"),
                            "suplente_usado": r["suplente_usado"]}))
 
 

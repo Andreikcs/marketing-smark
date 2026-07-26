@@ -320,11 +320,12 @@ def main():
     ap.add_argument("--tipo", default="")
     a = ap.parse_args()
     try:
-        res, prov = gerar(a.pedido, a.marca, a.n, a.tipo)
+        res, prov, meta = gerar(a.pedido, a.marca, a.n, a.tipo)
     except Exception as e:
         print(json.dumps({"erro": str(e)}, ensure_ascii=False))
         sys.exit(1)
-    print(json.dumps({"provider": prov, **res}, ensure_ascii=False, indent=2))
+    res.pop("_custo", None)
+    print(json.dumps({"provider": prov, "custo": meta, **res}, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
