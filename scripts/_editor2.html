@@ -1072,9 +1072,21 @@ carregar().then(()=>snapshot());
   function pollJob(id,onTick){return new Promise(res=>{let t=0;const t0=Date.now();const iv=setInterval(async()=>{t++;let j;try{j=await(await fetch('/job?id='+id)).json()}catch(e){return}
     if(onTick)onTick(Math.round((Date.now()-t0)/1000),(j||{}).status);
     if(j.status==='done'||j.status==='erro'){clearInterval(iv);res(j)}else if(t>180){clearInterval(iv);res({status:'timeout',erro:'ainda gerando — aparece ao recarregar a página'})}},2000)})}
+  // Pedido fala de imagem/cena? → gera fundo mesmo se o checkbox estiver desmarcado.
+  function pedidoQuerImagem(t){
+    t=(t||'').toLowerCase();
+    return /\b(gere|gerar|gera|imagem|fundo|foto|edite|editar|troque|trocar|refaça|refaca|refazer|a partir|em vez|ao inv[eé]s|mesma cena|mesma composi|mesmo homem|mesma pessoa|nova arte|arte de fundo|motos?|carros?|refer[eê]ncia)\b/.test(t);
+  }
+  function querFundoAgora(){
+    if(optFundo&&optFundo.checked)return true;
+    if(pedidoQuerImagem(lastPedido))return true;
+    return false;
+  }
   async function gerar(){
     const pedido=txt.value.trim();if(!pedido)return;
     lastPedido=pedido;
+    // "gere uma nova imagem…" → marca o checkbox sozinho (era a armadilha do print)
+    if(pedidoQuerImagem(pedido)&&optFundo){optFundo.checked=true}
     const emp=logEl.querySelector('.esempty');if(emp)emp.remove();
     addMsg('u',esc(pedido));txt.value='';txt.style.height='auto';hist.push({role:'user',content:pedido});
     send.disabled=true;const wait=addMsg('a','✍️ Claude está escrevendo a copy<span class=dots></span>');
@@ -1084,30 +1096,40 @@ carregar().then(()=>snapshot());
       if(!st.ok){clearInterval(anim);wait.innerHTML='⚠️ '+esc(st.erro||'falhou');send.disabled=false;return}
       const j=await pollJob(st.job);clearInterval(anim);
       if(j.status!=='done'){wait.innerHTML='⚠️ '+esc(j.erro||'falhou');send.disabled=false;return}
-      wait.remove();renderResult(j.resultado,j.provider,optFundo.checked);
+      wait.remove();renderResult(j.resultado,j.provider);
     }catch(e){clearInterval(anim);wait.innerHTML='⚠️ '+esc(e.message)}
     send.disabled=false;
   }
-  function renderResult(r,prov,fundo){
+  function renderResult(r,prov){
     setProv(prov==='claude'?'Claude':'OpenAI');
     hist.push({role:'assistant',content:(r.resumo||r.titulo||'')});
+    const vaiFundo=querFundoAgora();
+    if(vaiFundo&&optFundo)optFundo.checked=true;
     let h='<b>'+esc(r.titulo||'Post')+'</b> <span style="font-size:11px;color:var(--muted)">· tema '+(r.tema==='escuro'?'escuro':'claro'+(r.forcado_claro?' (padrão)':''))+'</span>';
     if(r.resumo)h+='<br>'+esc(r.resumo);
     (r.frames||[]).forEach((f,i)=>{h+='<div style="margin-top:6px;font-size:12px;opacity:.85">'+(i+1)+'. '+esc((f.headline||'').replace(/\|/g,' / '))+(f.cta?(' — <i>'+esc(f.cta)+'</i>'):'')+'</div>'});
     if(r.conceito_visual)h+='<div style="margin-top:6px;font-size:11px;color:var(--muted)">🎨 '+esc(r.conceito_visual)+'</div>';
     if(r.alertas&&r.alertas.length)h+='<div class=alert>⚠️ revisar: '+esc(r.alertas.join(', '))+'</div>';
+    if(vaiFundo){
+      const temRef=!!refBase();
+      h+='<div style="margin-top:8px;font-size:11px;color:var(--accent)">⚡ Ao aplicar: '+(temRef?'edita a imagem atual (pago, 1–3 min)':'gera fundo do zero (pago)')+'</div>';
+    }else{
+      h+='<div style="margin-top:8px;font-size:11px;color:var(--muted)">Só copy — marque “gerar arte de fundo” se quiser imagem</div>';
+    }
     // Escopo: se o post já tem vários cards, PROTEGE — o principal vira "só o card atual".
     const M=(post()&&post().frames&&post().frames.length)||0;
+    const lblFundo=vaiFundo?' + gerar imagem':'';
     if(M>1){
-      h+='<div class=apply><button class=go data-a=card>✓ Só no card atual ('+(FI+1)+'/'+M+')</button>'
-       +'<button data-a=todos>Substituir os '+M+' cards</button>'
+      h+='<div class=apply><button class=go data-a=card>✓ Card atual'+lblFundo+'</button>'
+       +'<button data-a=todos>Substituir os '+M+' cards'+lblFundo+'</button>'
        +'<button data-a=novo>＋ Novo post</button></div>';
     } else {
-      h+='<div class=apply><button class=go data-a=todos>✓ Aplicar neste post</button>'
+      h+='<div class=apply><button class=go data-a=todos>✓ Aplicar neste post'+lblFundo+'</button>'
        +'<button data-a=novo>＋ Novo post</button></div>';
     }
     const m=addMsg('a',h);
-    const bind=(a,scope)=>{const el=m.querySelector('[data-a='+a+']');if(el)el.onclick=()=>aplicar(r,scope,fundo)};
+    // fundo é reavaliado no clique (não congela o estado do checkbox)
+    const bind=(a,scope)=>{const el=m.querySelector('[data-a='+a+']');if(el)el.onclick=()=>aplicar(r,scope)};
     bind('card','card');bind('todos','todos');bind('novo','novo');
   }
   // monta um frame novo herdando o que já existia (bg, sliders, chip) e sobrescrevendo só copy/tema
@@ -1129,9 +1151,11 @@ carregar().then(()=>snapshot());
     const ped=pedido||lastPedido||'';
     (async()=>{for(const i of idxs){await gerarFundo(pi,i,r.conceito_visual||'',r.tipo,(D.posts[pi].frames[i]||{}).tema,ped,refFallback)}})();
   }
-  // scope: 'card' (só o card atual, NÃO toca nos outros) · 'todos' (substitui tudo, com confirmação) · 'novo'
-  function aplicar(r,scope,fundo){
+  // scope: 'card' | 'todos' | 'novo' — fundo é decidido no clique (checkbox + texto do pedido)
+  function aplicar(r,scope){
     if(typeof D==='undefined'||!D){toast('Editor ainda carregando');return}
+    const fundo=querFundoAgora();
+    if(fundo&&optFundo)optFundo.checked=true;
     // captura a ref ANTES de trocar de post/card (novo post ainda não tem bg)
     const rf=refBase();
     if(scope==='novo'){
@@ -1139,30 +1163,41 @@ carregar().then(()=>snapshot());
       D.posts.push(p);PI=D.posts.length-1;FI=0;
       p.frames=(r.frames||[]).map(f=>mkFrame(f,{},r,fundo));
       if(typeof syncPages==='function')syncPages(p);
-      sel(PI,0);setDirty(true);toast('Novo post criado ✓');
+      sel(PI,0);setDirty(true);
+      toast(fundo?('Novo post ✓ — gerando imagem'+(rf?' a partir da anterior…':'…')):'Novo post criado ✓');
       if(fundo)genFundos(PI,p.frames.map((_,i)=>i),r,lastPedido,rf);
       return;
     }
     const p=post();if(!p){toast('Sem post ativo');return}
-    if(scope==='card'){                        // ← SÓ O CARD ATUAL. Os outros ficam intactos.
+    if(scope==='card'){
       const nf=r.frames&&r.frames[0];
       if(!nf){toast('Resultado sem card pra aplicar');return}
       const fi=Math.min(FI,(p.frames||[]).length-1);if(fi<0){toast('Sem card ativo');return}
-      p.frames[fi]=mkFrame(nf,p.frames[fi]||{},r,fundo);   // herda bg antigo → vira base da edição
+      p.frames[fi]=mkFrame(nf,p.frames[fi]||{},r,fundo);   // herda bg antigo → base da edição
       if(typeof syncPages==='function')syncPages(p);
-      sel(PI,fi);setDirty(true);toast('✓ Card '+(fi+1)+' atualizado — os outros ficaram intactos');
-      if(fundo)genFundos(PI,[fi],r,lastPedido,rf);
+      sel(PI,fi);setDirty(true);
+      if(fundo){
+        toast('✓ Card '+(fi+1)+' — '+(rf||(p.frames[fi]&&p.frames[fi].bg)?'editando imagem…':'gerando fundo…'));
+        genFundos(PI,[fi],r,lastPedido,rf);
+      }else{
+        toast('✓ Card '+(fi+1)+' atualizado (só copy — sem gerar imagem)');
+      }
       return;
     }
-    // scope==='todos' → substitui o post inteiro (destrutivo) — confirma se há trabalho a perder
-    if((p.frames||[]).length>1 && !confirm('Isto substitui TODOS os '+p.frames.length+' cards deste post pelos '+((r.frames||[]).length)+' gerados. Os atuais serão perdidos. Continuar?'))return;
+    if((p.frames||[]).length>1 && !confirm('OK = aplica copy'+(fundo?' + gera imagem':'')+' em TODOS os '+p.frames.length+' cards. Continuar?'))return;
     p.titulo=r.titulo||p.titulo;
     p.caption=(r.caption||'')+(r.hashtags?('\n\n'+r.hashtags):'');
     const old=p.frames||[];
     p.frames=(r.frames||[]).map((f,i)=>mkFrame(f,old[i]||{},r,fundo));
     if(typeof syncPages==='function')syncPages(p);
-    sel(PI,0);setDirty(true);toast('Post inteiro atualizado ✓');
-    if(fundo)genFundos(PI,p.frames.map((_,i)=>i),r,lastPedido,rf);
+    sel(PI,0);setDirty(true);
+    if(fundo){
+      const tem=rf||(p.frames[0]&&p.frames[0].bg);
+      toast('Post atualizado ✓ — '+(tem?'editando imagem a partir do fundo atual…':'gerando fundo do zero…'));
+      genFundos(PI,p.frames.map((_,i)=>i),r,lastPedido,rf);
+    }else{
+      toast('Post atualizado ✓ (só copy). Marque “gerar arte de fundo” ou peça a imagem no chat.');
+    }
   }
   async function gerarFundo(pi,fi,conceito,tipo,tema,pedido,refFallback){
     const total=(D.posts[pi]&&D.posts[pi].frames.length)||1;
