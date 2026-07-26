@@ -567,12 +567,18 @@ function renderCtrl(){
       const custo=f.bg_custo_usd!=null
         ?('US$ '+Number(f.bg_custo_usd).toFixed(3))
         :'— (sem telemetria)';
+      const tier=f.bg_tier||(String(f.bg_modelo||'').includes('seedream')?'rascunho':'final');
+      const pub=f.bg_publicavel===false||f.bg_gate_falhou
+        ?'<div style="color:#c47;font-weight:700">⚠ rascunho — NÃO publicável'+(f.bg_gate_falhou?' (gate texto falhou)':'')+'</div>'
+        :'<div style="color:var(--muted)">✓ final publicável</div>';
       info.innerHTML=
         '<div style="font-weight:700;margin-bottom:4px;color:var(--text)">ℹ Geração desta imagem</div>'
         +'<div><span style="color:var(--muted)">Custo</span> · <b style="color:var(--accent)">'+custo+'</b></div>'
+        +'<div><span style="color:var(--muted)">Tier</span> · '+esc(tier)+'</div>'
         +(f.bg_modelo?('<div><span style="color:var(--muted)">Modelo</span> · '+esc(String(f.bg_modelo))+'</div>'):'')
         +(f.bg_provider?('<div><span style="color:var(--muted)">Provider</span> · '+esc(String(f.bg_provider))+'</div>'):'')
         +(f.bg_seed!=null?('<div><span style="color:var(--muted)">Seed</span> · '+esc(String(f.bg_seed))+'</div>'):'')
+        +pub
         +(f.bg_suplente?('<div style="color:#c47">⚠ gerado no suplente (principal falhou)</div>'):'');
     }else if(f.bg){
       info.innerHTML='<div style="color:var(--muted)">Sem custo registrado nesta arte (upload ou geração anterior ao ledger). Regere o fundo pra ver o valor.</div>';
@@ -1020,7 +1026,11 @@ carregar().then(()=>snapshot());
       <select id=esmarca><option value=smark>smark</option><option value=provider-max>provider-max</option><option value=elever-ai>elever-ai</option></select>
       <span>Frames</span>
       <select id=esn><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
-      <label title="Marcado: Claude escreve a copy E gera a arte de fundo (OpenAI, pago ~40s/frame). Desmarcado: só a copy (grátis) — o fundo fica no preset atual."><input type=checkbox id=esfundo> gerar arte de fundo <span style="color:var(--warn)">(IA paga)</span></label>
+      <label title="Marcado: gera a arte de fundo (pago). Desmarcado: só a copy."><input type=checkbox id=esfundo> gerar arte <span style="color:var(--warn)">(pago)</span></label>
+      <select id=estier title="rascunho=Seedream ~US$0,04 (não publicável) · final=Gemini ~US$0,24">
+        <option value=final selected>final · Gemini 4K</option>
+        <option value=rascunho>rascunho · Seedream barato</option>
+      </select>
     </div>
     <div class=esattach id=esattach></div>
     <div class=esrow>
@@ -1035,7 +1045,8 @@ carregar().then(()=>snapshot());
   const panel=document.getElementById('estudio'),logEl=document.getElementById('eslog'),
     txt=document.getElementById('estxt'),send=document.getElementById('essend'),
     optMarca=document.getElementById('esmarca'),optN=document.getElementById('esn'),
-    optFundo=document.getElementById('esfundo'),provEl=document.getElementById('esprov');
+    optFundo=document.getElementById('esfundo'),optTier=document.getElementById('estier'),provEl=document.getElementById('esprov');
+  function tierAtual(){return (optTier&&optTier.value)==='rascunho'?'rascunho':'final'}
   const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const CLAUDELOGO='<svg viewBox="0 0 24 24" width=12 height=12 style="flex:0 0 auto"><path fill="#D97757" d="M12 2.5c.3 0 .5.2.6.5l.9 4.3 3.1-3.1c.3-.3.7-.2.8.2l.5 2.9 2.9.5c.4.1.5.5.2.8l-3.1 3.1 4.3.9c.5.1.5.9 0 1l-4.3.9 3.1 3.1c.3.3.2.7-.2.8l-2.9.5-.5 2.9c-.1.4-.5.5-.8.2l-3.1-3.1-.9 4.3c-.1.5-.9.5-1 0l-.9-4.3-3.1 3.1c-.3.3-.7.2-.8-.2l-.5-2.9-2.9-.5c-.4-.1-.5-.5-.2-.8l3.1-3.1-4.3-.9c-.5-.1-.5-.9 0-1l4.3-.9-3.1-3.1c-.3-.3-.2-.7.2-.8l2.9-.5.5-2.9c.1-.4.5-.5.8-.2l3.1 3.1.9-4.3c.1-.3.3-.5.6-.5z"/></svg>';
   function setProv(name){provEl.innerHTML=(name==='Claude'?CLAUDELOGO:'')+'<span>'+name+'</span>';}
@@ -1203,18 +1214,21 @@ carregar().then(()=>snapshot());
     const total=(D.posts[pi]&&D.posts[pi].frames.length)||1;
     const fr=D.posts[pi]&&D.posts[pi].frames[fi];
     // Prioridade: anexo ＋ → fundo do próprio frame → ref capturada no Aplicar
+    // Edição com ref SEMPRE final (Gemini) — Seedream não é bom em edit fotográfico
     const ref=attPath||(fr&&fr.bg)||refFallback||'';
     const withRef=!!ref;
+    const tier=withRef?'final':tierAtual();
     const ped=(pedido||lastPedido||'').trim();
-    const prog=addMsg('a','🎨 Gerando arte de fundo <b>'+(fi+1)+'/'+total+'</b>… <span class=dots></span>'+(withRef?'<div style="font-size:11px;color:var(--muted);margin-top:3px">editando a partir da imagem atual — 1 a 3 min</div>':'<div style="font-size:11px;color:var(--muted);margin-top:3px">geração do zero (sem imagem-base)</div>'));
+    const lblTier=tier==='rascunho'?'rascunho Seedream ~US$0,04':'final Gemini ~US$0,24';
+    const prog=addMsg('a','🎨 Gerando arte <b>'+(fi+1)+'/'+total+'</b> · '+lblTier+'… <span class=dots></span>'+(withRef?'<div style="font-size:11px;color:var(--muted);margin-top:3px">editando a partir da imagem atual — 1 a 3 min</div>':(tier==='rascunho'?'<div style="font-size:11px;color:var(--muted);margin-top:3px">rascunho barato — NÃO publicável até promover a final</div>':'<div style="font-size:11px;color:var(--muted);margin-top:3px">geração final publicável</div>')));
     try{
-      if(pi===PI){FI=fi;renderPosts();renderStrip();renderCtrl();preview();if(typeof genStart==='function')genStart(withRef?('Editando fundo '+(fi+1)+'/'+total+'…'):('Gerando fundo '+(fi+1)+'/'+total+'…'))}
+      if(pi===PI){FI=fi;renderPosts();renderStrip();renderCtrl();preview();if(typeof genStart==='function')genStart(withRef?('Editando fundo '+(fi+1)+'/'+total+'…'):('Gerando '+tier+' '+(fi+1)+'/'+total+'…'))}
       const st=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,body:JSON.stringify({
         post:pi,frame:fi,conceito:conceito||'',tipo:tipo||'manifesto',tema:tema||'claro',
-        ref:ref,prompt:withRef?ped:'',pedido:ped
+        ref:ref,prompt:withRef?ped:'',pedido:ped,tier:tier
       })})).json();
       if(!st.ok||!st.job){prog.innerHTML='⚠️ Falha ao iniciar o fundo '+(fi+1)+(st.erro?': '+esc(st.erro):'');if(pi===PI&&typeof genStop==='function')genStop(false);return}
-      const j=await pollJob(st.job,(sec)=>{prog.innerHTML='🎨 '+(withRef?'Editando':'Gerando')+' fundo <b>'+(fi+1)+'/'+total+'</b> · '+sec+'s'+(withRef?' · a partir da imagem':'')});
+      const j=await pollJob(st.job,(sec)=>{prog.innerHTML='🎨 '+(withRef?'Editando':'Gerando '+tier)+' <b>'+(fi+1)+'/'+total+'</b> · '+sec+'s'});
       if(j.status==='done'){const tf=D.posts[pi]&&D.posts[pi].frames[fi];if(tf){
           tf.bg=j.path;tf.bgmode='imagem';tf._v=(tf._v||0)+1;if(typeof applyTom==='function')applyTom(tf,tema);
           if(j.custo_usd!=null)tf.bg_custo_usd=j.custo_usd;
@@ -1222,10 +1236,17 @@ carregar().then(()=>snapshot());
           if(j.provider)tf.bg_provider=j.provider;
           if(j.seed!=null)tf.bg_seed=j.seed;
           if(j.suplente!=null)tf.bg_suplente=!!j.suplente;
+          tf.bg_tier=tier;
+          tf.bg_publicavel=j.gate_falhou?false:(tier==='final');
+          if(j.gate_falhou)tf.bg_gate_falhou=true;
         }
         const cst=j.custo_usd!=null?(' · <b>US$ '+Number(j.custo_usd).toFixed(3)+'</b>'):'';
-        const modo=withRef?' (edição)':' (do zero)';
-        prog.innerHTML='✨ Fundo <b>'+(fi+1)+'/'+total+'</b> pronto'+modo+cst+(j.modelo?(' · '+esc(j.modelo)):'');
+        if(j.gate_falhou){
+          prog.innerHTML='⚠️ Fundo <b>'+(fi+1)+'</b> gerado mas <b>gate de texto falhou</b> (possível poluição Seedream). Não publique — mude para <b>final</b> ou tente de novo.'+cst;
+        }else{
+          const modo=withRef?' (edição)':(tier==='rascunho'?' (rascunho)':' (final)');
+          prog.innerHTML='✨ Fundo <b>'+(fi+1)+'/'+total+'</b> pronto'+modo+cst+(j.modelo?(' · '+esc(j.modelo)):'');
+        }
         if(pi===PI){if(typeof genStop==='function')genStop(true);renderStrip();if(fi===FI){renderCtrl();preview()}}setDirty(true)}
       else{prog.innerHTML=(j.status==='timeout'?'⏳ Fundo '+(fi+1)+' ainda gerando — recarregue a página em 1 min pra ver.':'⚠️ Fundo '+(fi+1)+' falhou'+(j.erro?': '+esc(String(j.erro).slice(0,120)):''));if(pi===PI&&typeof genStop==='function')genStop(false)}
     }catch(e){prog.innerHTML='⚠️ Erro no fundo '+(fi+1)+': '+esc(e.message);if(pi===PI&&typeof genStop==='function')genStop(false)}

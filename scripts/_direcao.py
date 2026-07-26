@@ -61,7 +61,10 @@ def _material(tema):
 
 
 def construir(marca, tipo="", tema="escuro", headline="", conceito=""):
-    """Retorna o prompt completo (inglês) do fundo. `conceito` sobrescreve a metáfora do tipo (temas especiais)."""
+    """Retorna o prompt completo (inglês) do fundo. `conceito` sobrescreve a metáfora do tipo (temas especiais).
+
+    Usar no tier=final (Gemini). NÃO usar no Seedream — ele tipografa hex/85mm.
+    """
     tema = "claro" if tema == "claro" else "escuro"
     conc = conceito.strip() or CONCEITOS.get((tipo or "").lower(), CONCEITO_PADRAO)
     mood = MARCA_MOOD.get(marca, MARCA_MOOD["smark"])
@@ -81,10 +84,38 @@ def construir(marca, tipo="", tema="escuro", headline="", conceito=""):
         "no UI, no charts, no clutter, no busy patterns, no rainbow colors.")
 
 
+def construir_rascunho(marca, tipo="", tema="escuro", headline="", conceito=""):
+    """Prompt CURTO pro tier=rascunho (Seedream).
+
+    Sem hex, sem 85mm, sem listas técnicas — o Seedream imprime isso na arte
+    (bake-off 2026-07-24). Só conceito + composição + proibição de texto em
+    linguagem natural.
+    """
+    tema = "claro" if tema == "claro" else "escuro"
+    conc = conceito.strip() or CONCEITOS.get((tipo or "").lower(), CONCEITO_PADRAO)
+    # encurta conceito longo (Estúdio às vezes manda frase de edição)
+    if len(conc) > 220:
+        conc = conc[:220].rsplit(" ", 1)[0]
+    if tema == "claro":
+        base = "bright airy background soft lavender and white soft violet light"
+    else:
+        base = "dark premium background deep violet glow soft haze"
+    return (
+        f"Premium brand background, {base}, clean empty lower third for headline, "
+        f"visual interest in upper two thirds, abstract editorial, sophisticated, "
+        f"photorealistic materials, no text, no letters, no words, no numbers, "
+        f"no logos, no watermark, no UI. Concept: {conc}."
+    )
+
+
 if __name__ == "__main__":
     import sys
     a = sys.argv[1:]
     marca = a[0] if a else "smark"
     tipo = a[1] if len(a) > 1 else "nucleo"
     tema = a[2] if len(a) > 2 else "escuro"
-    print(construir(marca, tipo, tema))
+    modo = a[3] if len(a) > 3 else "final"
+    if modo == "rascunho":
+        print(construir_rascunho(marca, tipo, tema))
+    else:
+        print(construir(marca, tipo, tema))

@@ -612,6 +612,10 @@ def _run_gen(job_id, cmd, out, pi, fi):
             job = {"status": "done", "path": rel}
             job.update({k: meta[k] for k in ("custo_usd", "modelo", "provider", "seed", "suplente")
                         if k in meta})
+            # exit 3 = gate de texto falhou (rascunho poluído); arquivo existe
+            if r.returncode == 3 or "GATE_FALHOU" in (r.stdout or ""):
+                job["gate_falhou"] = True
+                job["publicavel"] = False
             JOBS[job_id] = job
         else:
             JOBS[job_id] = {"status": "erro", "erro": (r.stderr or r.stdout or "falhou")[-400:]}
@@ -1070,11 +1074,17 @@ class H(http.server.BaseHTTPRequestHandler):
                            "--prompt", full, "--size", "1024x1536", "--quality", "high",
                            "--input-fidelity", "high"]
                 else:  # direção de arte (padrão claro, rule #9)
+                    # tier: final (Gemini 4K) | rascunho (Seedream barato + gate)
+                    tier = (req.get("tier") or "final").strip().lower()
+                    if tier not in ("final", "rascunho"):
+                        tier = "final"
+                    # edição fotográfica / com ref nunca usa rascunho Seedream
                     cmd = ["python3", os.path.join(HERE, "openai_image.py"), "--out", out, "--direcao",
                            "--marca", marca, "--tipo", req.get("tipo", "manifesto"),
                            "--tema", req.get("tema", "claro"),
                            "--headline", (fr.get("headline", "") or "").replace("|", " "),
-                           "--size", "1024x1536", "--quality", "high"]
+                           "--size", "1024x1536", "--quality", "high",
+                           "--tier", tier]
                     if req.get("conceito"):  # metáfora visual vinda do Estúdio IA
                         cmd += ["--conceito", str(req["conceito"])[:400]]
                 job_id = secrets.token_hex(6)

@@ -87,10 +87,10 @@ def test_acervo_max_respeita_o_teto_do_modelo():
     assert r["acervo_max"] == 14
 
 
-def test_seedream_esta_banido_do_roster():
-    """Reprovado no bake-off: tipografa o prompt na arte. Ver Global Constraints."""
-    cfg = _perfil.carregar()
-    assert "bytedance-seed/seedream-4.5" not in cfg["_base"]["roster"]
+def test_seedream_nao_e_default_de_final():
+    """Seedream não pode ser o modelo do tier final (só rascunho)."""
+    r = _perfil.resolver("smark", slug="x", tipo="dor", tier="final")
+    assert r["modelo"] != "bytedance-seed/seedream-4.5"
 
 
 def test_contrato_tem_roster_e_acervo():
@@ -112,3 +112,32 @@ def test_acervo_ativo_liga_quando_familia_ativa():
     cfg["familias"]["smark"]["acervo"]["ativo"] = True
     r = _perfil.resolver("smark", slug="x", tipo="dor", cfg=cfg)
     assert r["acervo_ativo"] is True
+
+
+def test_tier_final_usa_gemini():
+    r = _perfil.resolver("smark", slug="x", tipo="dor", tier="final")
+    assert r["tier"] == "final"
+    assert r["modelo"] == "google/gemini-3-pro-image"
+    assert r["resolution"] == "4K"
+    assert r["publicavel"] is True
+    assert r["gate_texto"] is False
+    assert r["prompt_modo"] == "direcao"
+
+
+def test_tier_rascunho_usa_seedream():
+    r = _perfil.resolver("smark", slug="x", tipo="dor", tier="rascunho")
+    assert r["tier"] == "rascunho"
+    assert r["modelo"] == "bytedance-seed/seedream-4.5"
+    assert r["resolution"] == "4K"  # Seedream exige ≥~3.7M px; 2K é rejeitado pela API
+    assert r["publicavel"] is False
+    assert r["gate_texto"] is True
+    assert r["prompt_modo"] == "curto"
+    assert r["enviar_seed"] is True
+
+
+def test_seedream_no_roster_so_como_rascunho():
+    """Seedream voltou ao roster, mas só com papel rascunho — nunca final."""
+    cfg = _perfil.carregar()
+    assert "bytedance-seed/seedream-4.5" in cfg["_base"]["roster"]
+    assert "rascunho" in cfg["_base"]["roster"]["bytedance-seed/seedream-4.5"]["papel"]
+    assert "final" not in cfg["_base"]["roster"]["bytedance-seed/seedream-4.5"]["papel"]

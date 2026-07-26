@@ -2,32 +2,62 @@
   "_base": {
     "provider": "openrouter",
     "resolution": "4K",
+    "tier_padrao": "final",
+    "tiers": {
+      "rascunho": {
+        "modelo": "bytedance-seed/seedream-4.5",
+        "resolution": "4K",
+        "prompt": "curto",
+        "publicavel": false,
+        "gate_texto": true,
+        "nota": "Exploração barata (~US$0,04). Seedream exige ≥~3.7M px → 4K (não 2K). Prompt SEM hex/85mm. Nunca publicar sem gate + promoção a final."
+      },
+      "final": {
+        "modelo": null,
+        "resolution": "4K",
+        "prompt": "direcao",
+        "publicavel": true,
+        "gate_texto": false,
+        "nota": "Publicável. modelo null = usa o calibrado da família (Gemini)."
+      }
+    },
     "roster": {
       "google/gemini-3-pro-image": {
         "provider": "openrouter",
         "suporta_seed": false,
         "max_refs": 14,
+        "papel": ["final"],
         "custo_medido_usd": 0.244,
-        "nota": "default. Medido: 1K e 2K custam US$ 0,135; 4K custa US$ 0,244. Usamos 4K porque o compositor renderiza a 2x (2160x2700 no feed, 2160x3840 no story) e ainda aplica zoom/crop — abaixo disso o fundo amolece. Robusto ao prompt do _direcao."
+        "nota": "default final. 4K. Robusto ao prompt do _direcao."
+      },
+      "bytedance-seed/seedream-4.5": {
+        "provider": "openrouter",
+        "suporta_seed": true,
+        "max_refs": 14,
+        "papel": ["rascunho"],
+        "custo_medido_usd": 0.04,
+        "nota": "SÓ rascunho. Bake-off 2026-07-24: com _direcao longo tipografa o prompt. Usar construir_rascunho() + gate_texto."
       },
       "google/gemini-2.5-flash-image": {
         "provider": "openrouter",
         "suporta_seed": false,
         "max_refs": 3,
+        "papel": ["rascunho"],
         "custo_medido_usd": null,
-        "nota": "candidato barato, ainda sem bake-off aprovado."
+        "nota": "candidato barato alternativo; ainda sem bake-off aprovado como default de rascunho."
       },
       "gpt-image-1.5": {
         "provider": "openai",
         "suporta_seed": false,
         "max_refs": 0,
+        "papel": ["final", "suplente"],
         "custo_medido_usd": null,
         "nota": "suplente. Sem resolution/aspect_ratio — usa size/quality."
       }
     },
     "banidos": {
-      "bytedance-seed/seedream-4.5":
-        "bake-off 2026-07-24: tipografa o prompt na arte (hex, 85mm, 時裝, texto falso) mesmo com NEGATIVE explícito."
+      "bytedance-seed/seedream-4.5@final":
+        "bake-off 2026-07-24: tipografa o prompt na arte com _direcao longo. Liberado só como tier=rascunho + prompt curto + gate."
     },
     "suplente": { "modelo": "gpt-image-1.5", "provider": "openai" },
     "acervo": { "ativo": false, "max_refs": 20, "dir": null }
@@ -37,6 +67,7 @@
       "marcas": ["smark", "provider-max", "elever-ai"],
       "registro": "abstrato-material",
       "modelo": "google/gemini-3-pro-image",
+      "modelo_rascunho": "bytedance-seed/seedream-4.5",
       "calibrado_em": "2026-07-24",
       "acervo": { "ativo": false, "dir": "design-system/acervo/smark" }
     }

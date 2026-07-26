@@ -2,8 +2,12 @@
 
 `geracoes.jsonl` — ledger append-only, uma linha por geração de imagem.
 
-Campos: `data`, `familia`, `marca`, `slug`, `tipo`, `modelo`, `provider`,
-`seed`, `resolucao`, `custo_usd`, `refs`, `ok`, `suplente_usado`, `nao_calibrado`, `arquivo`.
+Campos: `data`, `familia`, `marca`, `slug`, `tipo`, `tier` (`final`|`rascunho`),
+`modelo`, `provider`, `seed`, `resolucao`, `custo_usd`, `refs`, `ok`,
+`publicavel`, `gate_poluido`, `suplente_usado`, `nao_calibrado`, `arquivo`.
+
+- **final** — Gemini 4K (~US$ 0,24), publicável
+- **rascunho** — Seedream (~US$ 0,04), NÃO publicável; use para explorar e depois `--tier final`
 
 `custo_usd` só vem preenchido no provider `openrouter` — a OpenAI não devolve
 custo na resposta.

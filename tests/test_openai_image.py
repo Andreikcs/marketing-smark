@@ -22,6 +22,10 @@ PERFIL_FAKE = {
     "acervo_ativo": False,
     "acervo_dir": None,
     "acervo_max": 14,
+    "tier": "final",
+    "publicavel": True,
+    "gate_texto": False,
+    "prompt_modo": "direcao",
 }
 
 

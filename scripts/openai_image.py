@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
 Gera UMA imagem de fundo (sem texto) e salva como PNG. Orquestrador: resolve o
-perfil da marca via `_perfil.py` (modelo, provider, seed), chama `_provedor.py`
-(OpenRouter ou OpenAI atrás da mesma interface) e cai no suplente uma vez se o
-modelo principal falhar. Registra custo/uso em `_ledger.py`.
+perfil da marca via `_perfil.py` (modelo, provider, seed, tier), chama `_provedor.py`
+e cai no suplente uma vez se o modelo principal falhar. Registra custo em `_ledger.py`.
+
+Tiers:
+  final     — Gemini 4K, publicável (default)
+  rascunho  — Seedream barato, prompt curto, gate anti-texto, NÃO publicável
 
 Exemplos:
-  python3 scripts/openai_image.py --out arte/01.png --prompt-file /tmp/frame01.txt
   python3 scripts/openai_image.py --out arte/01.png --direcao --marca smark --tipo manifesto --tema claro
+  python3 scripts/openai_image.py --out /tmp/r.png --direcao --marca smark --tipo dor --tema claro --tier rascunho
 
-Chaves: OPENROUTER_API_KEY / OPENAI_API_KEY no .env da raiz do vault (ou variável
-de ambiente). Nunca passadas por linha de comando.
-Sizes válidos: 1024x1024, 1024x1536 (retrato), 1536x1024 (paisagem), auto.
-Quality: low | medium | high | auto.
+Chaves: OPENROUTER_API_KEY / OPENAI_API_KEY no .env (nunca em CLI).
 """
 import argparse
 import os
@@ -26,6 +26,7 @@ import _perfil  # noqa: E402
 import _provedor  # noqa: E402
 import _ledger  # noqa: E402
 import _acervo  # noqa: E402
+import _gate_texto  # noqa: E402
 
 
 def load_env(path):
@@ -48,14 +49,16 @@ def carregar_chaves(env):
 
 
 def fora_do_roster(modelo, roster, suplente):
-    """True se o modelo não está no roster do contrato nem é o suplente declarado.
-
-    `roster` é o dict de capacidades (`_base.roster`); basta testar as chaves."""
+    """True se o modelo não está no roster do contrato nem é o suplente declarado."""
     return modelo not in (roster or {}) and modelo != suplente
 
 
 def gerar_com_suplente(prompt, perfil, chaves, size, quality, refs=None):
-    """Tenta o modelo do perfil; em falha, uma tentativa no suplente."""
+    """Tenta o modelo do perfil; em falha, uma tentativa no suplente.
+
+    No tier=rascunho o suplente é Gemini final (OpenRouter), não gpt-image —
+    a OpenAI com hard limit de billing não pode derrubar o rascunho barato.
+    """
     try:
         r = _provedor.gerar(prompt, perfil["modelo"], perfil["provider"], chaves,
                             resolution=perfil.get("resolution"),
@@ -65,6 +68,18 @@ def gerar_com_suplente(prompt, perfil, chaves, size, quality, refs=None):
         r["suplente_usado"] = False
         return r
     except _provedor.ErroProvedor as e:
+        if perfil.get("tier") == "rascunho":
+            # sobe pro Gemini 4K (pago, mas funciona) em vez da OpenAI sem crédito
+            alt_modelo = "google/gemini-3-pro-image"
+            alt_provider = "openrouter"
+            print(f"AVISO: rascunho {perfil['modelo']} falhou ({e}). "
+                  f"Caindo no Gemini final ({alt_modelo}).", file=sys.stderr)
+            r = _provedor.gerar(prompt, alt_modelo, alt_provider, chaves,
+                                resolution="4K",
+                                aspect_ratio=perfil.get("aspect_ratio"),
+                                size=size, quality=quality, refs=refs)
+            r["suplente_usado"] = True
+            return r
         print(f"AVISO: {perfil['modelo']} falhou ({e}). Tentando suplente "
               f"{perfil['suplente_modelo']}.", file=sys.stderr)
         r = _provedor.gerar(prompt, perfil["suplente_modelo"], perfil["suplente_provider"],
@@ -82,9 +97,13 @@ def main():
     ap.add_argument("--quality", default="high", help="low | medium | high | auto")
     ap.add_argument("--model", default=None, help="sobrescreve o modelo do perfil")
     ap.add_argument("--provider", default="auto", help="auto | openrouter | openai")
+    ap.add_argument("--tier", default="final", choices=["final", "rascunho"],
+                    help="final=Gemini 4K publicável | rascunho=Seedream barato + gate")
     ap.add_argument("--reroll", type=int, default=0, help="varia a seed de propósito")
     ap.add_argument("--sem-acervo", action="store_true",
                     help="não injeta as peças-referência da família")
+    ap.add_argument("--sem-gate", action="store_true",
+                    help="não roda gate de texto (só use em debug)")
     ap.add_argument("--slug", default="", help="slug do post — entra na seed determinística")
     ap.add_argument("--marca", default="")
     ap.add_argument("--canal", default="")
@@ -94,7 +113,7 @@ def main():
     ap.add_argument("--post", default="")
     ap.add_argument("--legenda-file", default="")
     ap.add_argument("--no-guard", action="store_true", help="desliga a trava de paleta (cor on-brand)")
-    ap.add_argument("--direcao", action="store_true", help="monta o prompt do fundo via _direcao (nível agência)")
+    ap.add_argument("--direcao", action="store_true", help="monta o prompt do fundo via _direcao")
     ap.add_argument("--tipo", default="", help="tipo do post (manifesto/dor/prova/cta...)")
     ap.add_argument("--tema", default="escuro", help="escuro | claro")
     ap.add_argument("--conceito", default="", help="sobrescreve a metáfora visual")
@@ -102,9 +121,22 @@ def main():
 
     if not args.prompt and not args.prompt_file and not args.direcao:
         sys.exit("ERRO: informe --prompt, --prompt-file ou --direcao")
+
+    slug = args.slug or os.path.splitext(os.path.basename(args.out))[0]
+    perfil = _perfil.resolver(args.marca or "smark", slug=slug,
+                              tipo=args.tipo, reroll=args.reroll, size=args.size,
+                              tier=args.tier)
+
     if args.direcao and not args.prompt and not args.prompt_file:
         import _direcao
-        prompt = _direcao.construir(args.marca, args.tipo, args.tema, args.headline, args.conceito)
+        if perfil.get("prompt_modo") == "curto" or perfil.get("tier") == "rascunho":
+            prompt = _direcao.construir_rascunho(
+                args.marca, args.tipo, args.tema, args.headline, args.conceito)
+            print("AVISO: tier=rascunho — prompt curto (Seedream não recebe _direcao longo).",
+                  file=sys.stderr)
+        else:
+            prompt = _direcao.construir(
+                args.marca, args.tipo, args.tema, args.headline, args.conceito)
     else:
         prompt = args.prompt
         if args.prompt_file:
@@ -114,15 +146,19 @@ def main():
     env = load_env(os.path.join(VAULT, ".env"))
     chaves = carregar_chaves(env)
 
-    slug = args.slug or os.path.splitext(os.path.basename(args.out))[0]
-    perfil = _perfil.resolver(args.marca or "smark", slug=slug,
-                              tipo=args.tipo, reroll=args.reroll, size=args.size)
     if args.model:
         roster = _perfil.carregar().get("_base", {}).get("roster", {})
         if fora_do_roster(args.model, roster, perfil["suplente_modelo"]):
             sys.exit(f"ERRO: '{args.model}' não está no roster do contrato "
                      f"(design-system/tokens/perfis-imagem.json).\n"
                      f"Roster: {', '.join(roster)} | suplente: {perfil['suplente_modelo']}")
+        # bloquear Seedream forçado em final via --model
+        if perfil["tier"] == "final":
+            cap = roster.get(args.model) or {}
+            papeis = cap.get("papel") or []
+            if papeis and "final" not in papeis and "suplente" not in papeis:
+                sys.exit(f"ERRO: '{args.model}' só pode ser usado com --tier rascunho "
+                         f"(papel={papeis}). Final publicável exige Gemini.")
         perfil["modelo"] = args.model
     if args.provider != "auto":
         perfil["provider"] = args.provider
@@ -130,8 +166,13 @@ def main():
         print(f"AVISO: família '{perfil['familia']}' sem calibração — usando suplente "
               f"{perfil['modelo']}. Rode scripts/calibrar.py.", file=sys.stderr)
 
+    if perfil["tier"] == "rascunho":
+        print(f"tier=rascunho · modelo={perfil['modelo']} · res={perfil['resolution']} "
+              f"· NÃO publicável (promova a --tier final)", file=sys.stderr)
+
     refs = []
-    if perfil.get("acervo_ativo") and not args.sem_acervo:
+    # acervo só no final (rascunho deve ser exploração livre e barata)
+    if perfil.get("acervo_ativo") and not args.sem_acervo and perfil["tier"] == "final":
         caminhos = _acervo.listar(perfil.get("acervo_dir"), perfil.get("acervo_max") or 20)
         refs = _acervo.como_data_urls(caminhos)
         if refs:
@@ -146,21 +187,18 @@ def main():
     out = args.out if os.path.isabs(args.out) else os.path.join(VAULT, args.out)
     evento = {
         "familia": perfil["familia"], "marca": args.marca, "slug": slug,
-        "tipo": args.tipo, "modelo": r["modelo"],
+        "tipo": args.tipo, "tier": perfil["tier"], "modelo": r["modelo"],
         "provider": r["provider"], "seed": perfil["seed"],
         "resolucao": perfil["resolution"], "custo_usd": r["custo_usd"],
         "refs": len(refs),
         "suplente_usado": r["suplente_usado"],
-        "nao_calibrado": perfil["nao_calibrado"], "arquivo": os.path.basename(out),
+        "nao_calibrado": perfil["nao_calibrado"],
+        "publicavel": perfil.get("publicavel", perfil["tier"] == "final"),
+        "arquivo": os.path.basename(out),
     }
 
-    # A geração já foi cobrada neste ponto (custo_usd é conhecido). Se a
-    # gravação em disco falhar daqui pra frente, o ledger tem que registrar o
-    # gasto mesmo assim — é o único registro desse dinheiro. A ordem continua
-    # PNG-antes-do-ledger: se o processo morrer no meio, perder o registro de
-    # custo (recuperável) é preferível a perder a arte já paga.
     try:
-        os.makedirs(os.path.dirname(out), exist_ok=True)
+        os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
         with open(out, "wb") as f:
             f.write(r["png"])
     except OSError as e:
@@ -171,10 +209,38 @@ def main():
                  f"não pôde ser salva em '{out}' ({e}). O gasto foi registrado no "
                  f"ledger; a arte não foi entregue.")
 
+    # Gate de texto (rascunho Seedream)
+    gate = {"ok": True, "poluido": False, "metodo": "n/a", "aviso": "", "trechos": []}
+    if perfil.get("gate_texto") and not args.sem_gate:
+        gate = _gate_texto.avaliar(out)
+        evento["gate_metodo"] = gate.get("metodo")
+        evento["gate_poluido"] = bool(gate.get("poluido"))
+        if gate.get("aviso"):
+            print(f"AVISO gate: {gate['aviso']}", file=sys.stderr)
+        if gate.get("poluido"):
+            # mantém o arquivo para inspeção, mas marca não-ok no sentido de publicável
+            evento["ok"] = True  # geração técnica ok
+            evento["publicavel"] = False
+            evento["gate_falhou"] = True
+            _ledger.registrar(evento)
+            print(f"OK: {out}  (tier={perfil['tier']}, {r['modelo']} via {r['provider']}, "
+                  f"seed={perfil['seed']}, custo=${r['custo_usd'] if r['custo_usd'] is not None else '?'}, "
+                  f"GATE_FALHOU poluído)")
+            print(meta_block(out, {"modelo": r["modelo"], "provider": r["provider"],
+                                   "qualidade": args.quality,
+                                   "tamanho": args.size, "paleta": args.paleta,
+                                   "seed": perfil["seed"], "custo_usd": r["custo_usd"],
+                                   "suplente_usado": r["suplente_usado"]}))
+            # exit 3 = poluído (CLI pode decidir retry)
+            sys.exit(3)
+
     evento["ok"] = True
+    evento["gate_metodo"] = gate.get("metodo")
+    evento["gate_poluido"] = False
     _ledger.registrar(evento)
 
-    print(f"OK: {out}  ({r['modelo']} via {r['provider']}, "
+    pub = "publicável" if evento.get("publicavel") else "rascunho NÃO publicável"
+    print(f"OK: {out}  (tier={perfil['tier']}, {pub}, {r['modelo']} via {r['provider']}, "
           f"seed={perfil['seed']}, custo=${r['custo_usd'] if r['custo_usd'] is not None else '?'})")
     print(meta_block(out, {"modelo": r["modelo"], "provider": r["provider"],
                            "qualidade": args.quality,

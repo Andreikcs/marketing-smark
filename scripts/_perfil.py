@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Resolve o perfil de imagem de uma marca: família, modelo, seed e acervo.
+"""Resolve o perfil de imagem de uma marca: família, modelo, seed, acervo e tier.
 
-Fonte única: design-system/tokens/perfis-imagem.json. Nenhuma decisão estética
-mora em código — só no contrato. Ver docs/superpowers/specs/2026-07-24-motor-de-imagem-calibrado-design.md
+Fonte única: design-system/tokens/perfis-imagem.json.
+Tiers: `rascunho` (Seedream barato, não publicável) e `final` (Gemini 4K, publicável).
 """
 import hashlib
 import json
@@ -11,6 +11,8 @@ from math import gcd
 
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONTRATO = os.path.join(VAULT, "design-system", "tokens", "perfis-imagem.json")
+
+TIERS_VALIDOS = ("rascunho", "final")
 
 
 def carregar(path=None):
@@ -51,45 +53,80 @@ def capacidades(modelo, cfg):
     return ((cfg.get("_base", {}).get("roster") or {}).get(modelo)) or {}
 
 
-def resolver(marca, slug="", tipo="", reroll=0, size="1024x1536", cfg=None):
+def normalizar_tier(tier, cfg=None):
+    """'rascunho' | 'final'. Default vem do contrato."""
+    cfg = cfg or carregar()
+    t = (tier or "").strip().lower()
+    if t in TIERS_VALIDOS:
+        return t
+    return (cfg.get("_base") or {}).get("tier_padrao", "final")
+
+
+def resolver(marca, slug="", tipo="", reroll=0, size="1024x1536", cfg=None, tier="final"):
     """Devolve tudo que o orquestrador precisa pra chamar o provedor.
 
-    Não existe tier: 1K/2K/4K custam o mesmo no modelo default, então a
-    resolução é única e vem de `_base.resolution`.
+    `tier=rascunho` → modelo barato (Seedream), resolução de rascunho, prompt curto, não publicável.
+    `tier=final`    → modelo calibrado da família (Gemini), 4K, publicável.
     """
     cfg = cfg or carregar()
     base = cfg.get("_base", {})
+    tier = normalizar_tier(tier, cfg)
+    tier_cfg = (base.get("tiers") or {}).get(tier) or {}
     familia = familia_de(marca, cfg)
     fam = (cfg.get("familias") or {}).get(familia, {})
 
-    modelo = fam.get("modelo")
-    nao_calibrado = not modelo
     suplente = fam.get("suplente") or base.get("suplente") or {}
 
-    if nao_calibrado:
-        modelo = suplente.get("modelo", "gpt-image-1.5")
+    if tier == "rascunho":
+        modelo = fam.get("modelo_rascunho") or tier_cfg.get("modelo")
+        if not modelo:
+            # sem rascunho configurado → cai pro final da família
+            modelo = fam.get("modelo")
+            tier = "final"
+            tier_cfg = (base.get("tiers") or {}).get("final") or {}
+        nao_calibrado = False
+    else:
+        modelo = fam.get("modelo")
+        nao_calibrado = not modelo
+        if nao_calibrado:
+            modelo = suplente.get("modelo", "gpt-image-1.5")
 
+    # Safety: Seedream nunca como final (mesmo se alguém cravar no JSON da família)
     cap = capacidades(modelo, cfg)
+    papeis = cap.get("papel") or []
+    if tier == "final" and papeis and "final" not in papeis and "suplente" not in papeis:
+        # modelo só de rascunho forçado em final → sobe pro calibrado
+        modelo = fam.get("modelo") or suplente.get("modelo", "gpt-image-1.5")
+        cap = capacidades(modelo, cfg)
+        nao_calibrado = not fam.get("modelo")
+
     provider = cap.get("provider") or fam.get("provider") or base.get("provider", "openrouter")
+    resolution = tier_cfg.get("resolution") or base.get("resolution", "4K")
+    # final sem resolution no tier → base
+    if tier == "final" and not tier_cfg.get("resolution"):
+        resolution = base.get("resolution", "4K")
 
     acervo_base = base.get("acervo", {})
     acervo_fam = fam.get("acervo", {})
     acervo_dir = acervo_fam.get("dir") or acervo_base.get("dir")
-    # O teto do contrato nunca pode passar do que o modelo aceita.
     teto = int(cap.get("max_refs", 0) or 0)
     acervo_max = min(int(acervo_base.get("max_refs", 20)), teto) if teto else 0
 
     return {
         "familia": familia,
+        "tier": tier,
         "modelo": modelo,
         "provider": provider,
-        "resolution": base.get("resolution", "4K"),
+        "resolution": resolution,
         "aspect_ratio": aspect_de_size(size),
         "seed": calcular_seed(familia, slug, tipo, reroll),
         "enviar_seed": bool(cap.get("suporta_seed", False)),
         "suplente_modelo": suplente.get("modelo", "gpt-image-1.5"),
         "suplente_provider": suplente.get("provider", "openai"),
         "nao_calibrado": nao_calibrado,
+        "publicavel": bool(tier_cfg.get("publicavel", tier == "final")),
+        "gate_texto": bool(tier_cfg.get("gate_texto", tier == "rascunho")),
+        "prompt_modo": tier_cfg.get("prompt") or ("curto" if tier == "rascunho" else "direcao"),
         "acervo_ativo": bool(acervo_fam.get("ativo", acervo_base.get("ativo", False))),
         "acervo_dir": os.path.join(VAULT, acervo_dir) if acervo_dir else "",
         "acervo_max": acervo_max,
