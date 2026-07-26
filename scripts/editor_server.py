@@ -1040,17 +1040,35 @@ class H(http.server.BaseHTTPRequestHandler):
                                   "arte", slug, "_regen")
                 os.makedirs(dd, exist_ok=True)
                 out = os.path.join(dd, f"{req['frame']+1:02d}-{secrets.token_hex(3)}.png")
-                ref = req.get("ref", "")
-                if ref:  # referência → openai_edit (contexto do usuário como prompt)
-                    ctx = (req.get("prompt", "") or "").strip()
-                    full = ((ctx + ". ") if ctx else "") + (
-                        "Keep the SAME lighting, color palette, mood, materials and overall composition "
-                        "style as the reference image, so it matches the other slides of the carousel. "
-                        "Brand key visual, abstract, premium, violet/roxo palette, editorial, "
-                        "lower third kept clean for headline text, 4k, no text, no logos.")
+                # ref: anexo do Estúdio OU fundo atual do card. Com ref = EDIÇÃO (gpt-image).
+                # Sem ref = geração do zero (Gemini + direção de arte).
+                ref = (req.get("ref") or "").strip().lstrip("/")
+                if ref and not os.path.isfile(os.path.join(VAULT, ref)):
+                    # path inválido → cai pro caminho sem ref (não quebra o job)
+                    ref = ""
+                if ref:
+                    # Pedido do usuário manda; conceito_visual do Claude é só reforço.
+                    pedido = (req.get("pedido") or req.get("prompt") or "").strip()
+                    conceito = (req.get("conceito") or "").strip()
+                    partes = []
+                    if pedido:
+                        partes.append("USER REQUEST (follow closely):\n" + pedido[:1200])
+                    if conceito and conceito.lower() not in pedido.lower():
+                        partes.append("Visual hint: " + conceito[:400])
+                    partes.append(
+                        "This is an IMAGE EDIT of the provided reference photo — NOT a new scene. "
+                        "Preserve the same person(s), face(s), body, pose, camera angle, framing, "
+                        "lighting, time of day, environment and photographic realism unless the user "
+                        "explicitly asks to change them. Apply ONLY the changes in the USER REQUEST. "
+                        "Do not invent a studio, mannequins, abstract glass, or a different location. "
+                        "Keep the lower third relatively clean for headline overlay when possible. "
+                        "No text, letters, logos or watermarks in the image. Photorealistic, high detail, 4k."
+                    )
+                    full = "\n\n".join(partes)
                     cmd = ["python3", os.path.join(HERE, "openai_edit.py"),
                            "--image", os.path.join(VAULT, ref), "--out", out,
-                           "--prompt", full, "--size", "1024x1536", "--quality", "high"]
+                           "--prompt", full, "--size", "1024x1536", "--quality", "high",
+                           "--input-fidelity", "high"]
                 else:  # direção de arte (padrão claro, rule #9)
                     cmd = ["python3", os.path.join(HERE, "openai_image.py"), "--out", out, "--direcao",
                            "--marca", marca, "--tipo", req.get("tipo", "manifesto"),

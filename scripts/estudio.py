@@ -53,9 +53,13 @@ MARKUP DA HEADLINE (obrigatório):
 - Headline curta e caixa-alta natural (o render já faz uppercase). 2 a 5 palavras por linha.
 
 CONCEITO VISUAL:
-- "conceito_visual" é uma metáfora visual CURTA em INGLÊS pro fundo de IA (SEM texto,
-  sem logo, abstrato/editorial, premium). Ex pra Copa: "abstract stadium light trails,
-  trophy silhouette in violet mist". O gerador aplica a paleta roxa e a moldura sozinho.
+- "conceito_visual" é uma linha CURTA em INGLÊS pro gerador de fundo (SEM texto na arte, sem logo).
+- Se o usuário pede pra MUDAR/EDITAR uma imagem existente (ex.: "a partir desse fundo",
+  "troque o carro por motos", "mesma cena mas…"): descreva a MUDANÇA e o que PRESERVAR,
+  em tom fotográfico — NÃO invente cena abstrata nova. Ex: "same man and dusk parking lot,
+  replace white car with luxury sport motorcycles, keep pose and lighting".
+- Se é arte do zero (sem imagem-base): metáfora abstrata/editorial premium. Ex: "abstract
+  stadium light trails, trophy silhouette in violet mist".
 
 REGRA DE COR (CRÍTICA): o tema padrão é SEMPRE **claro** (fundo branco/lavanda, texto escuro,
 acento roxo na palavra-chave). Só use "escuro" se o PEDIDO DO USUÁRIO disser explicitamente
@@ -181,10 +185,11 @@ def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=Non
     oai = os.environ.get("OPENAI_API_KEY") or env.get("OPENAI_API_KEY")
     instr = _instrucao(pedido, marca, n_frames, tipo, contexto, historico)
     if imagem_b64:
-        instr += ("\n\nO usuário ANEXOU UMA IMAGEM DE EXEMPLO. Analise o estilo, composição, "
-                  "enquadramento, luz e mood dela e escreva o 'conceito_visual' refletindo esse "
-                  "exemplo — porém SEMPRE adaptado à identidade da marca (paleta roxa, editorial premium). "
-                  "Descreva no 'resumo' o que você entendeu da imagem.")
+        instr += ("\n\nO usuário ANEXOU UMA IMAGEM. O gerador vai EDITAR essa foto (não inventar outra). "
+                  "No 'conceito_visual', diga em inglês o que PRESERVAR e o que MUDAR conforme o pedido "
+                  "(ex.: same person and dusk scene, replace car with luxury motorcycles). "
+                  "NÃO proponha cena abstrata, manequim ou estúdio novo se a foto é fotorealista. "
+                  "Descreva no 'resumo' o que você entendeu e o que vai mudar.")
     if ant:
         res, prov = _via_claude(ant, instr, imagem_b64, imagem_mime), "claude"
     elif oai:

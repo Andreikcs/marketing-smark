@@ -127,9 +127,11 @@ def main():
     evento["ok"] = True
     _ledger.registrar(evento)
 
-    print(f"OK: {out}  ({model}, edit de {os.path.basename(img)})")
-    print(meta_block(out, {"modelo": model, "qualidade": args.quality,
-                           "tamanho": args.size, "paleta": args.paleta}))
+    print(f"OK: {out}  ({model} via openai, edit de {os.path.basename(img)}, custo=$?)")
+    print(meta_block(out, {"modelo": model, "provider": "openai",
+                           "qualidade": args.quality,
+                           "tamanho": args.size, "paleta": args.paleta,
+                           "custo_usd": None, "suplente_usado": False}))
 
 
 if __name__ == "__main__":
