@@ -141,25 +141,44 @@ def _extrai_json(txt):
 
 
 def _via_claude(api_key, instrucao, imagem_b64=None, imagem_mime="image/jpeg"):
+    """Devolve (resultado_json, meta_custo)."""
     content = []
     if imagem_b64:  # visão: Claude analisa a imagem de exemplo anexada
         content.append({"type": "image", "source": {"type": "base64",
                         "media_type": imagem_mime, "data": imagem_b64}})
     content.append({"type": "text", "text": instrucao})
+    model = os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-8")
     data = _post_json(
         "https://api.anthropic.com/v1/messages",
         {"x-api-key": api_key, "anthropic-version": "2023-06-01",
          "content-type": "application/json"},
-        {"model": os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-8"),
+        {"model": model,
          "max_tokens": 6000, "system": SISTEMA,
          "thinking": {"type": "adaptive"},          # + inteligência: raciocina antes
          "output_config": {"effort": "high"},        # esforço alto (trabalho sensível)
          "messages": [{"role": "user", "content": content}]})
     parts = [b.get("text", "") for b in data.get("content", []) if b.get("type") == "text"]
-    return _extrai_json("".join(parts))
+    usage = data.get("usage") or {}
+    # Claude: input_tokens / output_tokens (+ cache opcional)
+    inp = int(usage.get("input_tokens") or 0)
+    # tokens de thinking às vezes vêm em output
+    out = int(usage.get("output_tokens") or 0)
+    cache_r = int(usage.get("cache_read_input_tokens") or 0)
+    cache_c = int(usage.get("cache_creation_input_tokens") or 0)
+    # soma cache no input para estimativa conservadora
+    inp_total = inp + cache_r + cache_c
+    import _custo_llm  # noqa: E402
+    custo = _custo_llm.custo_tokens(model, inp_total, out)
+    meta = {
+        "modelo": model, "provider": "anthropic",
+        "input_tokens": inp_total, "output_tokens": out,
+        "custo_usd": custo, "ok": True,
+    }
+    return _extrai_json("".join(parts)), meta
 
 
 def _via_openai(api_key, instrucao, imagem_b64=None, imagem_mime="image/jpeg"):
+    """Devolve (resultado_json, meta_custo)."""
     model = os.environ.get("OPENAI_CHAT_MODEL", "gpt-4o")
     content = [{"type": "text", "text": instrucao}]
     if imagem_b64:
@@ -172,12 +191,22 @@ def _via_openai(api_key, instrucao, imagem_b64=None, imagem_mime="image/jpeg"):
          "response_format": {"type": "json_object"},
          "messages": [{"role": "system", "content": SISTEMA},
                       {"role": "user", "content": content}]})
-    return _extrai_json(data["choices"][0]["message"]["content"])
+    usage = data.get("usage") or {}
+    inp = int(usage.get("prompt_tokens") or 0)
+    out = int(usage.get("completion_tokens") or 0)
+    import _custo_llm  # noqa: E402
+    custo = _custo_llm.custo_tokens(model, inp, out)
+    meta = {
+        "modelo": model, "provider": "openai",
+        "input_tokens": inp, "output_tokens": out,
+        "custo_usd": custo, "ok": True,
+    }
+    return _extrai_json(data["choices"][0]["message"]["content"]), meta
 
 
 def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=None,
-          imagem_b64=None, imagem_mime="image/jpeg"):
-    """Devolve (resultado_dict, provider_usado). Levanta RuntimeError em falha."""
+          imagem_b64=None, imagem_mime="image/jpeg", slug=""):
+    """Devolve (resultado_dict, provider_usado, meta_custo). Levanta RuntimeError em falha."""
     marca = marca if marca in MARCAS else "smark"
     n_frames = max(1, min(10, int(n_frames or 3)))
     env = load_env(os.path.join(VAULT, ".env"))
@@ -190,10 +219,13 @@ def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=Non
                   "(ex.: same person and dusk scene, replace car with luxury motorcycles). "
                   "NÃO proponha cena abstrata, manequim ou estúdio novo se a foto é fotorealista. "
                   "Descreva no 'resumo' o que você entendeu e o que vai mudar.")
+    meta = {"custo_usd": None, "ok": False}
     if ant:
-        res, prov = _via_claude(ant, instr, imagem_b64, imagem_mime), "claude"
+        res, meta = _via_claude(ant, instr, imagem_b64, imagem_mime)
+        prov = "claude"
     elif oai:
-        res, prov = _via_openai(oai, instr, imagem_b64, imagem_mime), "openai"
+        res, meta = _via_openai(oai, instr, imagem_b64, imagem_mime)
+        prov = "openai"
     else:
         raise RuntimeError("Sem chave: coloque OPENAI_API_KEY (ou ANTHROPIC_API_KEY) no .env")
     res = _sanea(res, marca, n_frames)
@@ -207,7 +239,45 @@ def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=Non
         for fr in res["frames"]:
             fr["tema"] = "claro"
     res["forcado_claro"] = forcar
-    return res, prov
+
+    # Ledger de copy (separado da imagem) + BRL via cotação
+    try:
+        import _ledger  # noqa: E402
+        from _cambio import enriquecer  # noqa: E402
+        pack = enriquecer(meta.get("custo_usd"))
+        evento = {
+            "marca": marca,
+            "slug": slug or (res.get("titulo") or "")[:60],
+            "pedido": (pedido or "")[:200],
+            "n_frames": n_frames,
+            "modelo": meta.get("modelo"),
+            "provider": meta.get("provider") or prov,
+            "input_tokens": meta.get("input_tokens"),
+            "output_tokens": meta.get("output_tokens"),
+            "custo_usd": pack.get("custo_usd"),
+            "custo_brl": pack.get("custo_brl"),
+            "usd_brl": pack.get("usd_brl"),
+            "cambio_fonte": pack.get("cambio_fonte"),
+            "cambio_em": pack.get("cambio_em"),
+            "ok": True,
+        }
+        _ledger.registrar_copy(evento)
+        meta.update(pack)
+        meta["ok"] = True
+        res["_custo"] = {
+            "tipo": "copy",
+            "custo_usd": pack.get("custo_usd"),
+            "custo_brl": pack.get("custo_brl"),
+            "usd_brl": pack.get("usd_brl"),
+            "modelo": meta.get("modelo"),
+            "provider": meta.get("provider") or prov,
+            "input_tokens": meta.get("input_tokens"),
+            "output_tokens": meta.get("output_tokens"),
+        }
+    except Exception as e:
+        print(f"AVISO: ledger de copy não gravou ({e})", file=sys.stderr)
+
+    return res, prov, meta
 
 
 def _sanea(res, marca, n_frames):
