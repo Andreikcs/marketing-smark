@@ -389,7 +389,33 @@ input[type=range]{accent-color:var(--accent)}
   <label>Título</label><input id=nptitle placeholder="ex.: Chegada do funcionário de IA">
   <label>Marca</label>
   <div class=npbrands><button data-m=smark class=on>smark</button><button data-m=provider-max>Provider Max</button><button data-m=elever-ai>Elever AI</button></div>
+  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+    <button type=button id=npnewmarca class=btn style="width:auto;padding:8px 12px;font-size:12px">＋ Nova marca</button>
+    <a href="/config" class=btn style="width:auto;padding:8px 12px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center">⚙ Gerenciar marcas</a>
+  </div>
   <div class=npbtns><button id=npcancel>Cancelar</button><button id=npok class=go>Criar post</button></div>
+</div></div>
+<div id=mbmodal class=npmodal style="display:none"><div class=npbox style="max-width:440px">
+  <h3 id=mbtitle>Nova marca</h3>
+  <label>Slug (único)</label><input id=mb_slug placeholder="ex: netsul-fibra">
+  <label>Nome</label><input id=mb_nome placeholder="NetSul Fibra">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div><label>Acento</label><input id=mb_acento type=color value="#E0562D" style="width:100%;height:40px;padding:2px"></div>
+    <div><label>Acento claro</label><input id=mb_acento_claro type=color value="#FF7A4D" style="width:100%;height:40px;padding:2px"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div><label>Handle</label><input id=mb_handle placeholder="@marca"></div>
+    <div><label>Glyph</label><input id=mb_glyph placeholder="N" maxlength=2></div>
+  </div>
+  <label>Wordmark</label><input id=mb_wordmark placeholder="NetSul">
+  <label>Mood (inglês, p/ fundo IA)</label><textarea id=mb_mood rows=2 placeholder="warm regional ISP brand — clean, reliable"></textarea>
+  <label>Logo (opcional)</label>
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+    <div id=mb_logoprev style="width:48px;height:48px;border-radius:12px;border:1px dashed var(--line);display:grid;place-items:center;font-size:10px;color:var(--muted);overflow:hidden">—</div>
+    <input type=file id=mb_logo accept="image/*" style="font-size:12px;color:var(--sub)">
+  </div>
+  <div id=mb_msg class=mini style="min-height:16px;margin:4px 0"></div>
+  <div class=npbtns><button id=mbcancel>Cancelar</button><button id=mbok class=go>Criar marca</button></div>
 </div></div>
 <div id=toast></div>
 
@@ -418,6 +444,8 @@ function syncPages(p){const n=(p.frames||[]).length;(p.frames||[]).forEach((fr,i
 function syncAllPages(){((D&&D.posts)||[]).forEach(syncPages)}
 
 let MARCAS_LIST=[{slug:'smark',nome:'smark'},{slug:'provider-max',nome:'Provider Max'},{slug:'elever-ai',nome:'Elever AI'}];
+let MB_LOGO=null;
+function marcaMeta(slug){return MARCAS_LIST.find(m=>m.slug===slug)||{slug:slug||'smark',nome:slug||'smark'}}
 async function carregarMarcas(){
   try{
     const r=await(await fetch('/marcas')).json();
@@ -427,26 +455,80 @@ async function carregarMarcas(){
   const sel=document.getElementById('esmarca');
   if(sel){
     const cur=sel.value;
-    sel.innerHTML=MARCAS_LIST.map(m=>'<option value="'+m.slug+'">'+esc(m.nome||m.slug)+(m.pronta===false?' · setup':'')+'</option>').join('');
-    if(cur&&[...sel.options].some(o=>o.value===cur))sel.value=cur;
+    sel.innerHTML=MARCAS_LIST.map(m=>'<option value="'+m.slug+'">'+esc(m.nome||m.slug)+(m.pronta===false?' · setup':'')+'</option>').join('')
+      +'<option value="__nova__">＋ Nova marca…</option>';
+    if(cur&&cur!=='__nova__'&&[...sel.options].some(o=>o.value===cur))sel.value=cur;
+    sel.onchange=()=>{if(sel.value==='__nova__'){sel.value=cur&&cur!=='__nova__'?cur:(MARCAS_LIST[0]&&MARCAS_LIST[0].slug)||'smark';abrirModalMarca()}};
   }
   // Modal novo post — botões de marca
   const nb=document.querySelector('#npmodal .npbrands');
   if(nb){
-    nb.innerHTML=MARCAS_LIST.map((m,i)=>'<button data-m="'+m.slug+'"'+(i===0?' class=on':'')+'>'+esc(m.nome||m.slug)+'</button>').join('');
+    const cur=NPBRAND;
+    nb.innerHTML=MARCAS_LIST.map(m=>'<button data-m="'+m.slug+'"'+(m.slug===cur?' class=on':'')+'>'+esc(m.nome||m.slug)+'</button>').join('');
+    if(!nb.querySelector('button.on')&&nb.querySelector('button'))nb.querySelector('button').classList.add('on');
     nb.querySelectorAll('button').forEach(b=>b.onclick=()=>{
       NPBRAND=b.dataset.m;
       nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
     });
   }
+  // select de marca no post aberto
+  const ps=document.getElementById('postmarca');
+  if(ps&&typeof post==='function'&&post()){
+    const cur=post().marca||'smark';
+    ps.innerHTML=MARCAS_LIST.map(m=>'<option value="'+m.slug+'">'+esc(m.nome||m.slug)+'</option>').join('');
+    if([...ps.options].some(o=>o.value===cur))ps.value=cur;
+  }
+}
+function abrirModalMarca(){
+  MB_LOGO=null;
+  document.getElementById('mb_slug').value='';
+  document.getElementById('mb_nome').value='';
+  document.getElementById('mb_acento').value='#E0562D';
+  document.getElementById('mb_acento_claro').value='#FF7A4D';
+  document.getElementById('mb_handle').value='';
+  document.getElementById('mb_glyph').value='';
+  document.getElementById('mb_wordmark').value='';
+  document.getElementById('mb_mood').value='';
+  document.getElementById('mb_logoprev').textContent='—';
+  document.getElementById('mb_logo').value='';
+  document.getElementById('mb_msg').textContent='';
+  document.getElementById('mbmodal').style.display='flex';
+}
+async function salvarModalMarca(){
+  const msg=document.getElementById('mb_msg');
+  const body={
+    slug:document.getElementById('mb_slug').value.trim().toLowerCase(),
+    nome:document.getElementById('mb_nome').value.trim(),
+    acento:document.getElementById('mb_acento').value,
+    acento_claro:document.getElementById('mb_acento_claro').value,
+    handle:document.getElementById('mb_handle').value.trim(),
+    glyph:document.getElementById('mb_glyph').value.trim(),
+    wordmark:document.getElementById('mb_wordmark').value.trim(),
+    mood:document.getElementById('mb_mood').value.trim(),
+  };
+  if(MB_LOGO)body.logo_dataurl=MB_LOGO;
+  if(!body.slug||!body.nome){msg.textContent='Preencha slug e nome';msg.style.color='var(--warn)';return}
+  msg.textContent='Criando…';msg.style.color='var(--muted)';
+  const r=await(await fetch('/nova-marca',{method:'POST',headers:HJSON,body:JSON.stringify(body)})).json();
+  if(!r.ok){msg.textContent=r.erro||'erro';msg.style.color='var(--warn)';return}
+  msg.textContent='Marca criada ✓';msg.style.color='var(--good)';
+  await carregarMarcas();
+  NPBRAND=r.slug;
+  const nb=document.querySelector('#npmodal .npbrands');
+  if(nb)nb.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===r.slug));
+  const sel=document.getElementById('esmarca');
+  if(sel&&[...sel.options].some(o=>o.value===r.slug))sel.value=r.slug;
+  setTimeout(()=>{document.getElementById('mbmodal').style.display='none';toast('Marca '+r.slug+' pronta')},500);
 }
 async function carregar(){
   await carregarMarcas();
   D=await(await fetch('/dados')).json();syncAllPages();renderPosts();
   const q=new URLSearchParams(location.search);let pi=parseInt(q.get('post'));
+  if(q.get('marca')&&MARCAS_LIST.some(m=>m.slug===q.get('marca')))NPBRAND=q.get('marca');
   if(!isNaN(pi)&&pi>=0&&pi<D.posts.length){hideWelcome();sel(pi,0)}else{showWelcome()}
   if(q.get('novo'))setTimeout(novoPost,60);
   else if(q.get('estudio'))setTimeout(()=>{const b=document.getElementById('bestudio');if(b)b.click()},60);
+  else if(q.get('nova-marca'))setTimeout(abrirModalMarca,80);
 }
 function showWelcome(){$('.app').classList.add('welcome');PI=-1;renderPosts()}
 function hideWelcome(){$('.app').classList.remove('welcome')}
@@ -609,6 +691,33 @@ function richField(label,val,onin,key){
 function renderCtrl(){
   if(!D||!D.posts[PI]){const c=$('#ctrl');if(c)c.innerHTML='';return}
   const f=frame(),c=$('#ctrl');c.innerHTML='';
+  // MARCA do post
+  const gm=document.createElement('div');gm.className='grp';
+  const mm=marcaMeta(post().marca||'smark');
+  gm.innerHTML='<h5>Marca</h5>';
+  const mrow=document.createElement('div');mrow.className='row';mrow.style.gap='8px';mrow.style.alignItems='center';
+  const msel=document.createElement('select');msel.id='postmarca';
+  msel.style.cssText='flex:1;background:var(--surface);border:1px solid var(--field-line);border-radius:9px;color:var(--txt);padding:9px 10px;font-size:13px';
+  MARCAS_LIST.forEach(m=>{const o=document.createElement('option');o.value=m.slug;o.textContent=m.nome+(m.pronta===false?' · setup':'');msel.appendChild(o)});
+  msel.value=post().marca||'smark';
+  msel.onchange=()=>{
+    const nova=msel.value;
+    if(nova===(post().marca||'smark'))return;
+    post().marca=nova;
+    // paths de arte seguem a marca (normaliza no save)
+    setDirty(true);renderPosts();change();toast('Marca: '+(marcaMeta(nova).nome||nova));
+  };
+  mrow.appendChild(msel);
+  const bedit=document.createElement('button');bedit.className='btn';bedit.style.cssText='width:auto;padding:8px 10px;font-size:12px';bedit.textContent='✎';
+  bedit.title='Editar marca em Config';bedit.onclick=()=>location.href='/config?editar='+encodeURIComponent(post().marca||'smark');
+  mrow.appendChild(bedit);
+  const bnew=document.createElement('button');bnew.className='btn';bnew.style.cssText='width:auto;padding:8px 10px;font-size:12px';bnew.textContent='＋';
+  bnew.title='Nova marca';bnew.onclick=abrirModalMarca;mrow.appendChild(bnew);
+  gm.appendChild(mrow);
+  const mhint=document.createElement('div');mhint.className='mini';mhint.style.marginTop='6px';
+  mhint.innerHTML='<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+esc(mm.acento||'#8B3CF7')+';margin-right:6px;vertical-align:middle"></span>'
+    +esc(mm.handle||'')+(mm.logo_url?' · logo ok':'')+(mm.pronta===false?' · <b style="color:var(--warn)">setup incompleto</b>':'');
+  gm.appendChild(mhint);c.appendChild(gm);
   // PUBLICAÇÃO (canais)
   const gp=document.createElement('div');gp.className='grp';gp.innerHTML='<h5>Publicação — canais</h5>';
   const cseg=document.createElement('div');cseg.className='seg';

@@ -186,80 +186,238 @@ def config_html():
     tp = tok.get("tema_padrao") or "claro"
     defsize = tok.get("editor_defaults", {}).get("size", "1080x1350")
     sw = lambda c: f"<span style='display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:6px;background:{c};border:1px solid #333'></span>"
-    rows_m = "".join(
-        f"<tr><td><b>{m.get('nome', s)}</b></td><td>{sw(m.get('acento','#000'))}{m.get('acento','')}</td>"
-        f"<td>{sw(m.get('acento_claro', m.get('acento','#000')))}{m.get('acento_claro','—')}</td>"
-        f"<td style='font-size:11px;max-width:260px;word-break:break-all'>{m.get('gradiente','—')}</td>"
-        f"<td><input class=\"sk-input\" style=\"padding:7px 10px;font-size:13px\" id='cf_h_{s}' value='{m.get('handle','')}'></td></tr>" for s, m in marcas.items())
     rows_p = "".join(
         f"<tr><td>{i+1}</td><td>{p.get('titulo','')}</td><td>{p.get('slug','')}</td>"
-        f"<td>{len(p.get('frames',[]))}</td></tr>" for i, p in enumerate(ed.get("posts", [])))
+        f"<td>{p.get('marca','')}</td><td>{len(p.get('frames',[]))}</td></tr>"
+        for i, p in enumerate(ed.get("posts", [])))
     chips = " ".join(f"<span class='sk-pill'>{c}</span>" for c in conceitos)
     return f"""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Configurações · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
 body.sk{{padding:0}}
-.wrap{{padding:24px 30px 60px;max-width:1000px;margin:0 auto}}
+.wrap{{padding:24px 30px 60px;max-width:1080px;margin:0 auto}}
 .sk-pagehead h1{{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:32px;margin:6px 0 4px}}h1 span{{color:var(--accent)}} .sub{{color:var(--muted);font-size:13px}}
-.gh{{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:12px}}
-.sk-card{{margin-bottom:16px;max-width:880px}}
+.gh{{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px}}
+.sk-card{{margin-bottom:16px;max-width:1000px}}
 table{{width:100%;border-collapse:collapse;font-size:13px}}td,th{{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}}th{{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em}}
 tr:last-child td{{border-bottom:0}}
 .kv{{display:flex;flex-wrap:wrap;gap:10px;align-items:center}}.kv .cell{{background:var(--inset);border:1px solid var(--line);border-radius:var(--radius-md);padding:8px 12px;font-size:13px}}.kv b{{color:var(--accent-2)}}
-.ok{{color:var(--good);font-weight:600}}
+.ok{{color:var(--good);font-weight:600}}.err{{color:#e07070;font-weight:600}}
 .sk-input.mini,.sk-select.mini{{padding:7px 10px;font-size:13px;width:auto}}
+.mgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}}
+.mcard{{background:var(--inset);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}}
+.mcard .top{{display:flex;gap:12px;align-items:center}}
+.mlogo{{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:20px;color:#fff;flex:0 0 auto;overflow:hidden;background:var(--accent)}}
+.mlogo img{{width:100%;height:100%;object-fit:cover}}
+.mcard h3{{font-size:15px;margin:0}} .mcard .slug{{color:var(--muted);font-size:12px}}
+.mmeta{{font-size:12px;color:var(--muted);line-height:1.45}}
+.macts{{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}}
+.sw{{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:4px;border:1px solid #333}}
+.pill{{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;border:1px solid var(--line);color:var(--muted)}}
+.pill.ok{{border-color:var(--good);color:var(--good)}}
+.pill.warn{{border-color:#c90;color:#c90}}
+.modal{{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}}
+.modal.on{{display:flex}}
+.mbox{{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(520px,100%);max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.45)}}
+.mbox h2{{font-size:18px;margin:0 0 14px}}
+.fld{{margin-bottom:12px}} .fld label{{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}}
+.fld input,.fld textarea{{width:100%;background:var(--inset);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit}}
+.fld textarea{{min-height:70px;resize:vertical}}
+.row2{{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
+.mbtns{{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}}
+.logoprev{{width:64px;height:64px;border-radius:14px;border:1px dashed var(--line);display:grid;place-items:center;overflow:hidden;background:var(--inset);font-size:11px;color:var(--muted)}}
+.logoprev img{{width:100%;height:100%;object-fit:cover}}
 </style></head><body class="sk">
 {topbar("config")}
 <div class=wrap>
 <div class="sk-pagehead"><div>
 <div class=sk-kicker>painel local · tokens.json</div>
 <h1>Configurações do <span>Sistema</span></h1>
-<div class=sub>Edite os padrões e os handles das marcas — salva no tokens.json.</div></div></div>
+<div class=sub>Padrões do studio + gestão de marcas (criar, editar, logo) — tudo pela interface.</div></div></div>
 
 <div class="sk-card"><div class=gh>Padrões editáveis</div><div class=kv>
 <div class=cell>Tema-padrão: <select class="sk-select mini" id=cf_tema><option value=claro>claro</option><option value=escuro>escuro</option></select></div>
 <div class=cell>Template padrão (tamanho): <select class="sk-select mini" id=cf_size><option value=1080x1350>Feed 4:5</option><option value=1080x1080>Quadrado 1:1</option><option value=1080x1920>Story 9:16</option></select></div>
 <div class=cell>Assinatura padrão (rodapé direito): <input class="sk-input mini" id=cf_rodape value="{fund.get('rodape','')}" style="width:180px"></div>
 </div>
-<div style="margin-top:12px;color:var(--muted);font-size:12px">Regra #9: imagens geradas saem <b style="color:var(--accent-2)">claras</b> por padrão · Base clara {tok.get('tema_claro',{}).get('base','#F4F2FB')} · Base escura {fund.get('base','#0B0B0B')} · Rodapé {fund.get('rodape','—')}</div>
-<div style="margin-top:14px"><button class="sk-btn" id=cf_save>💾 Salvar configurações</button> <span id=cf_msg class=ok></span></div>
+<div style="margin-top:12px;color:var(--muted);font-size:12px">Regra #9: imagens geradas saem <b style="color:var(--accent-2)">claras</b> por padrão · Base clara {tok.get('tema_claro',{}).get('base','#F4F2FB')} · Base escura {fund.get('base','#0B0B0B')}</div>
+<div style="margin-top:14px"><button class="sk-btn" id=cf_save>💾 Salvar padrões</button> <span id=cf_msg class=ok></span></div>
 </div>
 
-<div class="sk-card"><div class=gh>Estilo padrão (automático)</div>
-<div style="color:var(--muted);font-size:13px;line-height:1.7">
-Saíram do editor pra cá — o editor fica limpo e tudo automático. Ajuste aqui só se precisar:
-<div class=kv style="margin-top:10px">
-<div class=cell><b>Acento</b> (palavra em *): cor da marca (edite na tabela de marcas abaixo)</div>
-<div class=cell><b>Tamanho do título</b>: automático</div>
-<div class=cell><b>Grade de acabamento</b> (duotone+grão): ligada</div>
-<div class=cell><b>Assinatura</b> (rodapé/handle): padrão da marca/sistema</div>
-</div></div></div>
-
-<div class="sk-card"><div class=gh>Marcas (cores / degradê / handle editável)</div>
-<table><tr><th>Marca</th><th>Acento</th><th>Acento claro</th><th>Degradê</th><th>Handle</th></tr>{rows_m}</table></div>
+<div class="sk-card">
+  <div class=gh><span>Marcas</span><button class="sk-btn sk-btn--sm" id=bm_new>+ Nova marca</button></div>
+  <div id=mgrid class=mgrid><div style="color:var(--muted);font-size:13px">Carregando marcas…</div></div>
+  <div style="margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5">
+    Cliente novo: crie a marca → revise cores/logo → no <a href="/editor">Editor</a> escolha a marca no post ou Estúdio.
+    Entrega final = <code>tier=final</code> (Gemini) após 3 pilotos aprovados.
+  </div>
+</div>
 
 <div class="sk-card"><div class=gh>Conceitos de direção de arte ({len(conceitos)})</div>{chips}</div>
 
 <div class="sk-card"><div class=gh>Posts no editor ({len(ed.get('posts',[]))})</div>
-<table><tr><th>#</th><th>Título</th><th>Slug</th><th>Frames</th></tr>{rows_p}</table></div>
+<table><tr><th>#</th><th>Título</th><th>Slug</th><th>Marca</th><th>Frames</th></tr>{rows_p}</table></div>
 
 <div class="sk-card"><div class=gh>Servidor & segurança</div><div class=kv>
 <div class=cell>Porta: <b>{PORT}</b></div>
-<div class=cell>Hosts permitidos: <b>localhost:8765 / 127.0.0.1:8765</b></div>
-<div class=cell>Proteção CSRF/DNS: <b class=ok>ativa</b> (Host+Origin+token)</div>
+<div class=cell>Hosts permitidos: <b>localhost:{PORT} / 127.0.0.1:{PORT}</b></div>
+<div class=cell>Proteção CSRF/DNS: <b class=ok>ativa</b></div>
 <div class=cell>Dados do editor: <b>editor.json</b></div>
 </div></div>
 </div>
+
+<div class=modal id=mmodal>
+  <div class=mbox>
+    <h2 id=mtitle>Nova marca</h2>
+    <div class=fld id=fld_slug><label>Slug (kebab-case, único)</label><input id=mf_slug placeholder="ex: netsul-fibra"></div>
+    <div class=fld><label>Nome</label><input id=mf_nome placeholder="NetSul Fibra"></div>
+    <div class=row2>
+      <div class=fld><label>Acento</label><input id=mf_acento type=color value="#E0562D" style="height:42px;padding:4px"></div>
+      <div class=fld><label>Acento claro</label><input id=mf_acento_claro type=color value="#FF7A4D" style="height:42px;padding:4px"></div>
+    </div>
+    <div class=row2>
+      <div class=fld><label>Handle</label><input id=mf_handle placeholder="@marca"></div>
+      <div class=fld><label>Glyph (1–2 letras)</label><input id=mf_glyph placeholder="N" maxlength=2></div>
+    </div>
+    <div class=fld><label>Wordmark (chip)</label><input id=mf_wordmark placeholder="NetSul"></div>
+    <div class=fld><label>Mood (inglês, direção de arte)</label><textarea id=mf_mood placeholder="regional ISP fiber brand — warm, reliable, clean"></textarea></div>
+    <div class=fld><label>Logo (PNG/SVG)</label>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class=logoprev id=mf_logoprev>sem logo</div>
+        <input type=file id=mf_logo accept="image/*" style="font-size:12px;color:var(--muted)">
+      </div>
+    </div>
+    <div id=mf_msg style="font-size:13px;min-height:18px;margin:4px 0"></div>
+    <div class=mbtns>
+      <button class="sk-btn sk-btn--secondary" id=mf_cancel>Cancelar</button>
+      <button class="sk-btn" id=mf_save>Salvar marca</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const T="__EDITOR_TOKEN__";
+const H={{'Content-Type':'application/json','X-Editor-Token':T}};
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"']/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}}[c]));
 document.getElementById('cf_tema').value="{tp}";
 document.getElementById('cf_size').value="{defsize}";
 document.getElementById('cf_save').onclick=async()=>{{
-  const handles={{}};document.querySelectorAll('[id^=\\"cf_h_\\"]').forEach(i=>handles[i.id.slice(5)]=i.value.trim());
-  const r=await(await fetch('/config-save',{{method:'POST',headers:{{'Content-Type':'application/json','X-Editor-Token':T}},
-    body:JSON.stringify({{tema_padrao:document.getElementById('cf_tema').value,size:document.getElementById('cf_size').value,rodape:document.getElementById('cf_rodape').value,handles:handles}})}})).json();
+  const r=await(await fetch('/config-save',{{method:'POST',headers:H,
+    body:JSON.stringify({{tema_padrao:document.getElementById('cf_tema').value,size:document.getElementById('cf_size').value,rodape:document.getElementById('cf_rodape').value}})}})).json();
   document.getElementById('cf_msg').textContent=r.ok?'Salvo ✓':('Erro: '+(r.erro||''));
 }};
+
+let MARCAS=[], EDIT=null, LOGO_DATA=null;
+async function loadMarcas(){{
+  const r=await(await fetch('/marcas')).json();
+  MARCAS=(r.ok&&r.marcas)?r.marcas:[];
+  const g=document.getElementById('mgrid');
+  if(!MARCAS.length){{g.innerHTML='<div style="color:var(--muted)">Nenhuma marca.</div>';return}}
+  g.innerHTML=MARCAS.map(m=>`
+    <div class=mcard>
+      <div class=top>
+        <div class=mlogo style="background:${{m.gradiente||m.acento}}">${{
+          m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" alt="">`:esc(m.glyph||'?')
+        }}</div>
+        <div>
+          <h3>${{esc(m.nome)}}</h3>
+          <div class=slug>${{esc(m.slug)}} · ${{esc(m.handle||'')}}</div>
+        </div>
+      </div>
+      <div class=mmeta>
+        <span class=sw style="background:${{esc(m.acento)}}"></span>${{esc(m.acento)}}
+        · <span class=sw style="background:${{esc(m.acento_claro)}}"></span>${{esc(m.acento_claro)}}
+        <br>
+        <span class="pill ${{m.pronta?'ok':'warn'}}">${{m.pronta?'pronta':'setup'}}</span>
+        ${{m.canonica?'<span class=pill>canônica</span>':''}}
+        ${{m.mood?('<div style="margin-top:6px">'+esc(m.mood.slice(0,90))+(m.mood.length>90?'…':'')+'</div>'):''}}
+      </div>
+      <div class=macts>
+        <button class="sk-btn sk-btn--secondary sk-btn--sm" data-edit="${{esc(m.slug)}}">Editar</button>
+        <a class="sk-btn sk-btn--sm" href="/editor?novo=1&marca=${{encodeURIComponent(m.slug)}}">Novo post</a>
+      </div>
+    </div>`).join('');
+  g.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
+}}
+
+function openNew(){{
+  EDIT=null; LOGO_DATA=null;
+  document.getElementById('mtitle').textContent='Nova marca';
+  document.getElementById('fld_slug').style.display='';
+  document.getElementById('mf_slug').value='';
+  document.getElementById('mf_slug').disabled=false;
+  document.getElementById('mf_nome').value='';
+  document.getElementById('mf_acento').value='#E0562D';
+  document.getElementById('mf_acento_claro').value='#FF7A4D';
+  document.getElementById('mf_handle').value='';
+  document.getElementById('mf_glyph').value='';
+  document.getElementById('mf_wordmark').value='';
+  document.getElementById('mf_mood').value='';
+  document.getElementById('mf_logoprev').innerHTML='sem logo';
+  document.getElementById('mf_logo').value='';
+  document.getElementById('mf_msg').textContent='';
+  document.getElementById('mmodal').classList.add('on');
+}}
+function openEdit(slug){{
+  const m=MARCAS.find(x=>x.slug===slug); if(!m)return;
+  EDIT=slug; LOGO_DATA=null;
+  document.getElementById('mtitle').textContent='Editar · '+m.nome;
+  document.getElementById('fld_slug').style.display='';
+  document.getElementById('mf_slug').value=m.slug;
+  document.getElementById('mf_slug').disabled=true;
+  document.getElementById('mf_nome').value=m.nome||'';
+  document.getElementById('mf_acento').value=m.acento||'#8B3CF7';
+  document.getElementById('mf_acento_claro').value=m.acento_claro||m.acento||'#A472FF';
+  document.getElementById('mf_handle').value=m.handle||'';
+  document.getElementById('mf_glyph').value=m.glyph||'';
+  document.getElementById('mf_wordmark').value=m.wordmark||'';
+  document.getElementById('mf_mood').value=m.mood||'';
+  document.getElementById('mf_logoprev').innerHTML=m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}">`:'sem logo';
+  document.getElementById('mf_logo').value='';
+  document.getElementById('mf_msg').textContent='';
+  document.getElementById('mmodal').classList.add('on');
+}}
+document.getElementById('bm_new').onclick=openNew;
+document.getElementById('mf_cancel').onclick=()=>document.getElementById('mmodal').classList.remove('on');
+document.getElementById('mmodal').onclick=e=>{{if(e.target.id==='mmodal')e.currentTarget.classList.remove('on')}};
+document.getElementById('mf_logo').onchange=e=>{{
+  const f=e.target.files&&e.target.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{{LOGO_DATA=rd.result;document.getElementById('mf_logoprev').innerHTML=`<img src="${{rd.result}}">`}};
+  rd.readAsDataURL(f);
+}};
+document.getElementById('mf_save').onclick=async()=>{{
+  const msg=document.getElementById('mf_msg');
+  msg.className=''; msg.textContent='Salvando…';
+  const body={{
+    nome:document.getElementById('mf_nome').value.trim(),
+    acento:document.getElementById('mf_acento').value,
+    acento_claro:document.getElementById('mf_acento_claro').value,
+    handle:document.getElementById('mf_handle').value.trim(),
+    glyph:document.getElementById('mf_glyph').value.trim(),
+    wordmark:document.getElementById('mf_wordmark').value.trim(),
+    mood:document.getElementById('mf_mood').value.trim(),
+  }};
+  if(LOGO_DATA) body.logo_dataurl=LOGO_DATA;
+  let r;
+  if(EDIT){{
+    body.slug=EDIT;
+    r=await(await fetch('/editar-marca',{{method:'POST',headers:H,body:JSON.stringify(body)}})).json();
+  }}else{{
+    body.slug=document.getElementById('mf_slug').value.trim().toLowerCase();
+    if(!body.slug||!body.nome){{msg.className='err';msg.textContent='Preencha slug e nome';return}}
+    r=await(await fetch('/nova-marca',{{method:'POST',headers:H,body:JSON.stringify(body)}})).json();
+  }}
+  if(!r.ok){{msg.className='err';msg.textContent=r.erro||'erro';return}}
+  msg.className='ok';msg.textContent='Salvo ✓'+(r.aviso_logo?(' (logo: '+r.aviso_logo+')'):'');
+  await loadMarcas();
+  setTimeout(()=>document.getElementById('mmodal').classList.remove('on'),600);
+}};
+loadMarcas();
+// deep-link: /config?nova=1 ou /config?editar=slug
+const qs=new URLSearchParams(location.search);
+if(qs.get('nova')) setTimeout(openNew,80);
+else if(qs.get('editar')) setTimeout(()=>openEdit(qs.get('editar')),120);
 </script>
 </body></html>"""
 
@@ -729,6 +887,26 @@ def require_marca(m):
     if not m:
         return "smark"
     return _marcas.require(m)
+
+
+def _logo_from_dataurl(slug, dataurl):
+    """Decodifica data:image/...;base64,... e grava via _marcas.salvar_logo_bytes."""
+    dataurl = (dataurl or "").strip()
+    if not dataurl:
+        raise ValueError("logo_dataurl vazio")
+    if "," in dataurl:
+        head, b64 = dataurl.split(",", 1)
+    else:
+        head, b64 = "data:image/png;base64", dataurl
+    ext = ".png"
+    if "image/jpeg" in head or "image/jpg" in head:
+        ext = ".jpg"
+    elif "image/webp" in head:
+        ext = ".webp"
+    elif "image/svg" in head:
+        ext = ".svg"
+    raw = base64.b64decode(b64)
+    return _marcas.salvar_logo_bytes(slug, raw, ext=ext)
 
 
 def safe_slug(s):
@@ -1241,8 +1419,60 @@ class H(http.server.BaseHTTPRequestHandler):
                     wordmark=str(req.get("wordmark") or "") or None,
                     mood=str(req.get("mood") or ""),
                 )
+                # logo opcional em dataurl
+                if req.get("logo_dataurl"):
+                    try:
+                        _logo_from_dataurl(r["slug"], req["logo_dataurl"])
+                        r = {"slug": r["slug"], "pronta": _marcas.pronta(r["slug"]),
+                             "dir": r["dir"], "meta": _marcas.get(r["slug"])}
+                    except Exception as le:
+                        return self._send(200, {"ok": True, **{k: r[k] for k in ("slug", "pronta", "dir")},
+                                                "meta": r["meta"], "aviso_logo": str(le)})
                 return self._send(200, {"ok": True, **{k: r[k] for k in ("slug", "pronta", "dir")},
-                                        "meta": r["meta"]})
+                                        "meta": r.get("meta") or _marcas.get(r["slug"]),
+                                        "detalhe": next((d for d in _marcas.listar_detalhes()
+                                                         if d["slug"] == r["slug"]), None)})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/editar-marca":
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                campos = {}
+                for k in ("nome", "acento", "acento_claro", "handle", "glyph",
+                          "wordmark", "mood", "gradiente"):
+                    if k in req and req[k] is not None:
+                        campos[k] = req[k]
+                if "endossa" in req:
+                    campos["endossa"] = bool(req["endossa"])
+                r = _marcas.atualizar(slug, **campos)
+                if req.get("logo_dataurl"):
+                    try:
+                        _logo_from_dataurl(slug, req["logo_dataurl"])
+                        r["meta"] = _marcas.get(slug)
+                        r["pronta"] = _marcas.pronta(slug)
+                    except Exception as le:
+                        return self._send(200, {"ok": True, **r, "aviso_logo": str(le),
+                                                "detalhe": next((d for d in _marcas.listar_detalhes()
+                                                                 if d["slug"] == slug), None)})
+                return self._send(200, {"ok": True, **r,
+                                        "detalhe": next((d for d in _marcas.listar_detalhes()
+                                                         if d["slug"] == slug), None)})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-logo":
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                dest = _logo_from_dataurl(slug, req.get("logo_dataurl") or req.get("dataurl") or "")
+                return self._send(200, {"ok": True, "slug": slug,
+                                        "path": os.path.relpath(dest, VAULT).replace("\\", "/"),
+                                        "detalhe": next((d for d in _marcas.listar_detalhes()
+                                                         if d["slug"] == slug), None)})
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:

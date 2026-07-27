@@ -118,19 +118,117 @@ def pronta(slug):
 
 
 def listar_detalhes():
-    """Lista dicts para UI: slug, nome, handle, pronta, canonica."""
+    """Lista dicts ricos para UI de gestão de marcas."""
     out = []
     for s in list_slugs():
         m = get(s)
+        brasao = m.get("brasao") or {}
+        logo = brasao.get("principal") or m.get("logo_file") or ""
         out.append({
             "slug": s,
             "nome": m.get("nome") or s,
             "handle": m.get("handle") or ("@" + s.replace("-", "")),
             "acento": m.get("acento") or "#8B3CF7",
+            "acento_claro": m.get("acento_claro") or m.get("acento") or "#8B3CF7",
+            "wordmark": m.get("wordmark") or m.get("nome") or s,
+            "glyph": m.get("logo_glyph") or (m.get("nome") or s)[:1].upper(),
+            "mood": m.get("mood") or "",
+            "gradiente": m.get("gradiente") or "",
+            "papel": m.get("papel") or ("canonica" if s in CANONICAS else "cliente"),
+            "logo": logo,
+            "logo_url": ("/" + logo.lstrip("/")) if logo else "",
             "pronta": pronta(s),
             "canonica": s in CANONICAS,
         })
     return out
+
+
+def _hex_ok(h):
+    return bool(h and re.match(r"^#[0-9A-Fa-f]{6}$", h.strip()))
+
+
+def atualizar(slug, *, nome=None, acento=None, acento_claro=None, handle=None,
+              glyph=None, wordmark=None, mood=None, gradiente=None, endossa=None):
+    """Atualiza campos editáveis de uma marca no tokens.json.
+
+    Canônicas podem editar handle/mood/cores (cuidado), mas o slug não muda.
+    Raises ValueError se slug desconhecido ou hex inválido.
+    """
+    slug = require(slug)
+    t = _load_tokens()
+    m = dict(t["marcas"][slug])
+
+    if nome is not None:
+        nome = str(nome).strip()
+        if not nome:
+            raise ValueError("nome não pode ser vazio")
+        m["nome"] = nome
+    if acento is not None:
+        acento = str(acento).strip()
+        if not _hex_ok(acento):
+            raise ValueError(f"acento deve ser hex #RRGGBB: {acento!r}")
+        m["acento"] = acento.upper()
+        if gradiente is None and not m.get("gradiente"):
+            m["gradiente"] = f"linear-gradient(155deg,{m['acento']} 0%,#2A1CA8 100%)"
+        elif gradiente is None:
+            # recompõe gradiente a partir do novo acento
+            m["gradiente"] = f"linear-gradient(155deg,{m['acento']} 0%,#2A1CA8 100%)"
+    if acento_claro is not None:
+        acento_claro = str(acento_claro).strip()
+        if not _hex_ok(acento_claro):
+            raise ValueError(f"acento_claro deve ser hex #RRGGBB: {acento_claro!r}")
+        m["acento_claro"] = acento_claro.upper()
+    if handle is not None:
+        handle = re.sub(r"[^@A-Za-z0-9_.]", "", str(handle))[:40].strip()
+        if handle and not handle.startswith("@"):
+            handle = "@" + handle
+        if handle:
+            m["handle"] = handle
+    if glyph is not None:
+        g = str(glyph).strip()[:2] or m.get("logo_glyph") or "M"
+        m["logo_glyph"] = g
+    if wordmark is not None:
+        wm = str(wordmark).strip()[:60]
+        if wm:
+            m["wordmark"] = wm
+    if mood is not None:
+        m["mood"] = str(mood).strip()[:400]
+    if gradiente is not None:
+        g = str(gradiente).strip()[:200]
+        if g:
+            m["gradiente"] = g
+    if endossa is not None:
+        m["endossa"] = bool(endossa)
+
+    t["marcas"][slug] = m
+    _save_tokens(t)
+    return {"slug": slug, "meta": m, "pronta": pronta(slug)}
+
+
+def salvar_logo_bytes(slug, raw, *, ext=".png"):
+    """Grava logo binário em branding/assets e anota brasao.principal no tokens."""
+    require(slug)
+    if not raw:
+        raise ValueError("logo vazio")
+    if len(raw) > 8 * 1024 * 1024:
+        raise ValueError("logo maior que 8 MB")
+    ext = (ext or ".png").lower()
+    if not ext.startswith("."):
+        ext = "." + ext
+    if ext not in (".png", ".jpg", ".jpeg", ".webp", ".svg"):
+        raise ValueError(f"extensão de logo não suportada: {ext}")
+    dest_dir = os.path.join(MARCAS_DIR, slug, "branding", "assets")
+    os.makedirs(dest_dir, exist_ok=True)
+    dest = os.path.join(dest_dir, "logo" + ext)
+    with open(dest, "wb") as f:
+        f.write(raw)
+    rel = os.path.relpath(dest, VAULT).replace("\\", "/")
+    t = _load_tokens()
+    m = t["marcas"][slug]
+    m.setdefault("brasao", {})["principal"] = rel
+    t["marcas"][slug] = m
+    _save_tokens(t)
+    return dest
 
 
 def _sync_perfis(slug):
