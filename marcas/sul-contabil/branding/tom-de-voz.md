@@ -5,6 +5,8 @@ tipo: tom-de-voz
 
 # Tom de voz — Sul Contábil
 
-- Frases curtas.
-- Explicar como para alguém inteligente, sem jargão.
-- CTA simples (diagnóstico, link na bio, fale conosco).
+- Frases curtas; uma ideia por card.
+- Traduzir lei → impacto no caixa / operação.
+- Números e datas concretas (quando reais e checadas).
+- Pergunta no título quando for dor; afirmação quando for autoridade.
+- CTA simples e humano.

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sul Contábil · piloto multi-marca</title>
+<style>
+  :root {
+    --bg: #000a14;
+    --pan: #001a34;
+    --line: rgba(28,165,178,.25);
+    --txt: #f4f8fa;
+    --muted: #8aa0b0;
+    --acc: #1CA5B2;
+    --acc2: #3DC4D0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: radial-gradient(100% 70% at 80% 0%, #0a3a45 0%, var(--bg) 50%);
+    color: var(--txt);
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+  }
+  header {
+    max-width: 1100px; margin: 0 auto 32px;
+    display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+  }
+  .logo {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: linear-gradient(155deg, #1CA5B2, #001A34);
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 26px; color: #fff;
+    box-shadow: 0 10px 30px rgba(28,165,178,.3);
+  }
+  h1 { font-size: 26px; }
+  h1 span { color: var(--acc2); }
+  .meta { color: var(--muted); font-size: 14px; max-width: 520px; line-height: 1.5; }
+  .badge {
+    margin-left: auto; border: 1px solid var(--line); background: var(--pan);
+    padding: 8px 14px; border-radius: 999px; font-size: 12px; color: var(--muted);
+  }
+  .badge b { color: var(--acc2); }
+  .grid {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; max-width: 420px; } }
+  .card {
+    background: var(--pan); border: 1px solid var(--line); border-radius: 16px;
+    overflow: hidden; box-shadow: 0 18px 50px rgba(0,0,0,.4);
+  }
+  .card img { width: 100%; display: block; aspect-ratio: 1080/1350; object-fit: cover; background: #000; }
+  .cap { padding: 14px 16px 16px; }
+  .cap b { font-size: 14px; display: block; margin-bottom: 4px; }
+  .cap span { font-size: 12px; color: var(--muted); }
+  .note {
+    max-width: 1100px; margin: 28px auto 0; padding: 16px 18px;
+    border-radius: 14px; border: 1px dashed rgba(28,165,178,.45);
+    background: rgba(28,165,178,.08); color: var(--muted); font-size: 13px; line-height: 1.55;
+  }
+  .note strong { color: var(--acc2); }
+  a { color: var(--acc2); }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; margin-right: 4px; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">S</div>
+    <div>
+      <h1>Sul <span>Contábil</span></h1>
+      <p class="meta">
+        Absorvido do padrão Revoe (navy + teal).
+        <span class="sw" style="background:#001A34;border:1px solid #333"></span>#001A34
+        <span class="sw" style="background:#1CA5B2"></span>#1CA5B2
+        · 3 refs de feed no acervo
+      </p>
+    </div>
+    <div class="badge">slug <b>sul-contabil</b> · porta <b>8794</b></div>
+  </header>
+
+  <div class="grid">
+    <article class="card">
+      <img src="01.png" alt="Sul Contábil 01">
+      <div class="cap"><b>01 · Dor</b><span>Sua empresa fatura mas não cresce?</span></div>
+    </article>
+    <article class="card">
+      <img src="02.png" alt="Sul Contábil 02">
+      <div class="cap"><b>02 · Educativo</b><span>5 erros que aumentam riscos fiscais</span></div>
+    </article>
+    <article class="card">
+      <img src="03.png" alt="Sul Contábil 03">
+      <div class="cap"><b>03 · CTA</b><span>Contabilidade que ajuda a decidir</span></div>
+    </article>
+  </div>
+
+  <p class="note">
+    <strong>Rascunhos</strong> (Seedream + compositor tema escuro + paleta da marca).
+    Referências em <code>marcas/sul-contabil/referencias/</code>.
+    No Editor: marca <b>Sul Contábil</b> · tema escuro ·
+    <a href="http://127.0.0.1:8765/editor?novo=1&marca=sul-contabil">criar post</a> ·
+    <a href="http://127.0.0.1:8765/config?editar=sul-contabil">editar marca</a>.
+  </p>
+</body>
+</html>

@@ -6,11 +6,15 @@ tipo: do-and-dont
 # Do and don't — Sul Contábil
 
 ## Faça
-- Manter paleta e logo oficiais
-- Headline curta com 1 acento
-- Fundo limpo (terço inferior livre)
+- Manter navy `#001A34` + teal `#1CA5B2`
+- Uma palavra-chave em acento teal
+- Foto ou abstrato premium com terço inferior limpo
+- Logo / wordmark legível
+- Conteúdo fiscal checado antes de publicar
 
 ## Não faça
-- Texto na imagem de IA
-- Cores fora da marca
-- Promessa de venda/faturamento
+- Usar paleta smark (roxo) nesta marca
+- Inventar leis, alíquotas ou prazos
+- Poluir o fundo com texto da IA
+- Tom de “guru de imposto”
+- Prometer resultado financeiro

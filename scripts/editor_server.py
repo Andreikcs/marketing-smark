@@ -287,6 +287,12 @@ tr:last-child td{{border-bottom:0}}
         <input type=file id=mf_logo accept="image/*" style="font-size:12px;color:var(--muted)">
       </div>
     </div>
+    <div class=fld><label>Referências da marca (prints do feed / peças aprovadas)</label>
+      <input type=file id=mf_refs accept="image/*" multiple style="font-size:12px;color:var(--muted)">
+      <div id=mf_refs_prev style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Entra no acervo da marca e guia as próximas gerações de fundo.</div>
+    </div>
+    <div class=fld><label>Site (opcional)</label><input id=mf_site placeholder="https://cliente.com.br"></div>
     <div id=mf_msg style="font-size:13px;min-height:18px;margin:4px 0"></div>
     <div class=mbtns>
       <button class="sk-btn sk-btn--secondary" id=mf_cancel>Cancelar</button>
@@ -307,7 +313,7 @@ document.getElementById('cf_save').onclick=async()=>{{
   document.getElementById('cf_msg').textContent=r.ok?'Salvo ✓':('Erro: '+(r.erro||''));
 }};
 
-let MARCAS=[], EDIT=null, LOGO_DATA=null;
+let MARCAS=[], EDIT=null, LOGO_DATA=null, REFS_DATA=[];
 async function loadMarcas(){{
   const r=await(await fetch('/marcas')).json();
   MARCAS=(r.ok&&r.marcas)?r.marcas:[];
@@ -340,19 +346,25 @@ async function loadMarcas(){{
   g.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
 }}
 
+function clearRefsPrev(){{
+  REFS_DATA=[];
+  const el=document.getElementById('mf_refs_prev'); if(el) el.innerHTML='';
+  const inp=document.getElementById('mf_refs'); if(inp) inp.value='';
+}}
 function openNew(){{
-  EDIT=null; LOGO_DATA=null;
+  EDIT=null; LOGO_DATA=null; clearRefsPrev();
   document.getElementById('mtitle').textContent='Nova marca';
   document.getElementById('fld_slug').style.display='';
   document.getElementById('mf_slug').value='';
   document.getElementById('mf_slug').disabled=false;
   document.getElementById('mf_nome').value='';
-  document.getElementById('mf_acento').value='#E0562D';
-  document.getElementById('mf_acento_claro').value='#FF7A4D';
+  document.getElementById('mf_acento').value='#1CA5B2';
+  document.getElementById('mf_acento_claro').value='#3DC4D0';
   document.getElementById('mf_handle').value='';
   document.getElementById('mf_glyph').value='';
   document.getElementById('mf_wordmark').value='';
   document.getElementById('mf_mood').value='';
+  document.getElementById('mf_site').value='';
   document.getElementById('mf_logoprev').innerHTML='sem logo';
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
@@ -360,7 +372,7 @@ function openNew(){{
 }}
 function openEdit(slug){{
   const m=MARCAS.find(x=>x.slug===slug); if(!m)return;
-  EDIT=slug; LOGO_DATA=null;
+  EDIT=slug; LOGO_DATA=null; clearRefsPrev();
   document.getElementById('mtitle').textContent='Editar · '+m.nome;
   document.getElementById('fld_slug').style.display='';
   document.getElementById('mf_slug').value=m.slug;
@@ -372,6 +384,7 @@ function openEdit(slug){{
   document.getElementById('mf_glyph').value=m.glyph||'';
   document.getElementById('mf_wordmark').value=m.wordmark||'';
   document.getElementById('mf_mood').value=m.mood||'';
+  document.getElementById('mf_site').value='';
   document.getElementById('mf_logoprev').innerHTML=m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}">`:'sem logo';
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
@@ -386,6 +399,18 @@ document.getElementById('mf_logo').onchange=e=>{{
   rd.onload=()=>{{LOGO_DATA=rd.result;document.getElementById('mf_logoprev').innerHTML=`<img src="${{rd.result}}">`}};
   rd.readAsDataURL(f);
 }};
+document.getElementById('mf_refs').onchange=async e=>{{
+  const files=[...(e.target.files||[])].slice(0,12);
+  REFS_DATA=[];
+  const prev=document.getElementById('mf_refs_prev'); prev.innerHTML='';
+  for(const f of files){{
+    const dataurl=await new Promise(res=>{{const rd=new FileReader();rd.onload=()=>res(rd.result);rd.readAsDataURL(f)}});
+    REFS_DATA.push({{nome:f.name.replace(/\\.[^.]+$/,''), dataurl}});
+    const thumb=document.createElement('img');
+    thumb.src=dataurl; thumb.style.cssText='width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid var(--line)';
+    prev.appendChild(thumb);
+  }}
+}};
 document.getElementById('mf_save').onclick=async()=>{{
   const msg=document.getElementById('mf_msg');
   msg.className=''; msg.textContent='Salvando…';
@@ -397,8 +422,10 @@ document.getElementById('mf_save').onclick=async()=>{{
     glyph:document.getElementById('mf_glyph').value.trim(),
     wordmark:document.getElementById('mf_wordmark').value.trim(),
     mood:document.getElementById('mf_mood').value.trim(),
+    site:document.getElementById('mf_site').value.trim(),
   }};
   if(LOGO_DATA) body.logo_dataurl=LOGO_DATA;
+  if(REFS_DATA.length) body.referencias=REFS_DATA;
   let r;
   if(EDIT){{
     body.slug=EDIT;
@@ -409,9 +436,11 @@ document.getElementById('mf_save').onclick=async()=>{{
     r=await(await fetch('/nova-marca',{{method:'POST',headers:H,body:JSON.stringify(body)}})).json();
   }}
   if(!r.ok){{msg.className='err';msg.textContent=r.erro||'erro';return}}
-  msg.className='ok';msg.textContent='Salvo ✓'+(r.aviso_logo?(' (logo: '+r.aviso_logo+')'):'');
+  const nref=(r.referencias||[]).filter(x=>x&&x.feed).length;
+  msg.className='ok';
+  msg.textContent='Salvo ✓'+(nref?(' · '+nref+' ref(s)'):'')+(r.avisos&&r.avisos.length?(' · '+r.avisos.join('; ')): '');
   await loadMarcas();
-  setTimeout(()=>document.getElementById('mmodal').classList.remove('on'),600);
+  setTimeout(()=>document.getElementById('mmodal').classList.remove('on'),700);
 }};
 loadMarcas();
 // deep-link: /config?nova=1 ou /config?editar=slug
@@ -889,11 +918,11 @@ def require_marca(m):
     return _marcas.require(m)
 
 
-def _logo_from_dataurl(slug, dataurl):
-    """Decodifica data:image/...;base64,... e grava via _marcas.salvar_logo_bytes."""
+def _decode_dataurl(dataurl):
+    """Devolve (raw_bytes, ext) a partir de data URL ou base64 puro."""
     dataurl = (dataurl or "").strip()
     if not dataurl:
-        raise ValueError("logo_dataurl vazio")
+        raise ValueError("dataurl vazio")
     if "," in dataurl:
         head, b64 = dataurl.split(",", 1)
     else:
@@ -905,8 +934,32 @@ def _logo_from_dataurl(slug, dataurl):
         ext = ".webp"
     elif "image/svg" in head:
         ext = ".svg"
-    raw = base64.b64decode(b64)
+    return base64.b64decode(b64), ext
+
+
+def _logo_from_dataurl(slug, dataurl):
+    """Decodifica data:image/...;base64,... e grava via _marcas.salvar_logo_bytes."""
+    raw, ext = _decode_dataurl(dataurl)
     return _marcas.salvar_logo_bytes(slug, raw, ext=ext)
+
+
+def _refs_from_dataurls(slug, lista):
+    """Salva lista de dataurls como referências/acervo da marca."""
+    out = []
+    for i, item in enumerate(lista or []):
+        if not item:
+            continue
+        if isinstance(item, dict):
+            du = item.get("dataurl") or item.get("data") or ""
+            nome = item.get("nome") or f"ref-{i+1:02d}"
+        else:
+            du, nome = item, f"ref-{i+1:02d}"
+        try:
+            raw, ext = _decode_dataurl(du)
+            out.append(_marcas.salvar_referencia_bytes(slug, raw, nome=nome, ext=ext))
+        except Exception as e:
+            out.append({"erro": str(e), "nome": nome})
+    return out
 
 
 def safe_slug(s):
@@ -1406,7 +1459,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(500, {"ok": False, "erro": str(e)})
 
         if path == "/nova-marca":
-            # cria marca de cliente (Sprint multi-marca)
+            # cria marca de cliente (Sprint multi-marca) + refs opcionais
             try:
                 slug = str(req.get("slug", "")).strip().lower()
                 nome = str(req.get("nome", "")).strip()
@@ -1419,19 +1472,35 @@ class H(http.server.BaseHTTPRequestHandler):
                     wordmark=str(req.get("wordmark") or "") or None,
                     mood=str(req.get("mood") or ""),
                 )
-                # logo opcional em dataurl
+                avisos = []
                 if req.get("logo_dataurl"):
                     try:
                         _logo_from_dataurl(r["slug"], req["logo_dataurl"])
-                        r = {"slug": r["slug"], "pronta": _marcas.pronta(r["slug"]),
-                             "dir": r["dir"], "meta": _marcas.get(r["slug"])}
                     except Exception as le:
-                        return self._send(200, {"ok": True, **{k: r[k] for k in ("slug", "pronta", "dir")},
-                                                "meta": r["meta"], "aviso_logo": str(le)})
-                return self._send(200, {"ok": True, **{k: r[k] for k in ("slug", "pronta", "dir")},
-                                        "meta": r.get("meta") or _marcas.get(r["slug"]),
-                                        "detalhe": next((d for d in _marcas.listar_detalhes()
-                                                         if d["slug"] == r["slug"]), None)})
+                        avisos.append(f"logo: {le}")
+                refs_in = req.get("referencias") or req.get("refs") or []
+                refs_out = []
+                if refs_in:
+                    try:
+                        refs_out = _refs_from_dataurls(r["slug"], refs_in)
+                    except Exception as re_:
+                        avisos.append(f"refs: {re_}")
+                # site / nota opcional no tokens
+                if req.get("site"):
+                    t = _marcas._load_tokens()
+                    t["marcas"][r["slug"]]["site"] = str(req["site"])[:200]
+                    _marcas._save_tokens(t)
+                return self._send(200, {
+                    "ok": True,
+                    "slug": r["slug"],
+                    "pronta": _marcas.pronta(r["slug"]),
+                    "dir": r["dir"],
+                    "meta": _marcas.get(r["slug"]),
+                    "referencias": refs_out,
+                    "avisos": avisos,
+                    "detalhe": next((d for d in _marcas.listar_detalhes()
+                                     if d["slug"] == r["slug"]), None),
+                })
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:
@@ -1457,7 +1526,10 @@ class H(http.server.BaseHTTPRequestHandler):
                         return self._send(200, {"ok": True, **r, "aviso_logo": str(le),
                                                 "detalhe": next((d for d in _marcas.listar_detalhes()
                                                                  if d["slug"] == slug), None)})
-                return self._send(200, {"ok": True, **r,
+                refs_out = []
+                if req.get("referencias") or req.get("refs"):
+                    refs_out = _refs_from_dataurls(slug, req.get("referencias") or req.get("refs"))
+                return self._send(200, {"ok": True, **r, "referencias": refs_out,
                                         "detalhe": next((d for d in _marcas.listar_detalhes()
                                                          if d["slug"] == slug), None)})
             except ValueError as e:

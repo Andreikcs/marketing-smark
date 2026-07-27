@@ -113,6 +113,17 @@ def resolver(marca, slug="", tipo="", reroll=0, size="1024x1536", cfg=None, tier
     teto = int(cap.get("max_refs", 0) or 0)
     acervo_max = min(int(acervo_base.get("max_refs", 20)), teto) if teto else 0
 
+    # Acervo por marca (cliente) tem prioridade sobre o da família — isola refs
+    brand_acervo = os.path.join(VAULT, "marcas", marca or "", "referencias", "acervo")
+    if marca and os.path.isdir(brand_acervo) and any(
+        n.lower().endswith(".png") for n in os.listdir(brand_acervo)
+    ):
+        acervo_dir_abs = brand_acervo
+        acervo_ativo = True
+    else:
+        acervo_dir_abs = os.path.join(VAULT, acervo_dir) if acervo_dir else ""
+        acervo_ativo = bool(acervo_fam.get("ativo", acervo_base.get("ativo", False)))
+
     return {
         "familia": familia,
         "tier": tier,
@@ -128,7 +139,7 @@ def resolver(marca, slug="", tipo="", reroll=0, size="1024x1536", cfg=None, tier
         "publicavel": bool(tier_cfg.get("publicavel", tier == "final")),
         "gate_texto": bool(tier_cfg.get("gate_texto", tier == "rascunho")),
         "prompt_modo": tier_cfg.get("prompt") or ("curto" if tier == "rascunho" else "direcao"),
-        "acervo_ativo": bool(acervo_fam.get("ativo", acervo_base.get("ativo", False))),
-        "acervo_dir": os.path.join(VAULT, acervo_dir) if acervo_dir else "",
+        "acervo_ativo": acervo_ativo,
+        "acervo_dir": acervo_dir_abs,
         "acervo_max": acervo_max,
     }

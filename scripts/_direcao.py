@@ -118,10 +118,24 @@ def construir_rascunho(marca, tipo="", tema="escuro", headline="", conceito=""):
     acc = (meta.get("acento") or "#8B3CF7").upper()
     if acc in ("#C6F24E", "#D6FF5C", "#B8E62E"):
         tint = "soft lime green light"
+    elif acc in ("#1CA5B2", "#3DC4D0", "#17A2B8", "#0D9488", "#14B8A6"):
+        tint = "soft teal cyan brand light on deep navy"
     elif acc.startswith("#E") or acc.startswith("#C0") or acc.startswith("#D4"):
         tint = "soft warm brand-colored light"
-    elif acc.startswith("#0") or acc.startswith("#1") or acc.startswith("#2"):
-        tint = "soft blue brand-colored light"
+    elif len(acc) == 7:
+        # hue grosso por canais
+        try:
+            r, g, b = int(acc[1:3], 16), int(acc[3:5], 16), int(acc[5:7], 16)
+            if g > 100 and b > 100 and abs(g - b) < 40 and r < g:
+                tint = "soft teal cyan brand light"
+            elif r > g + 40 and r > b + 20:
+                tint = "soft warm brand-colored light"
+            elif b > r + 20 and b >= g:
+                tint = "soft blue brand-colored light"
+            else:
+                tint = "soft violet brand-colored light"
+        except ValueError:
+            tint = "soft violet brand-colored light"
     else:
         tint = "soft violet brand-colored light"
     if tema == "claro":

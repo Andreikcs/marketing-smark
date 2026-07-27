@@ -231,6 +231,53 @@ def salvar_logo_bytes(slug, raw, *, ext=".png"):
     return dest
 
 
+def salvar_referencia_bytes(slug, raw, *, nome=None, ext=".jpg"):
+    """Salva print/peça de referência em referencias/feed e PNG no acervo da marca.
+
+    O acervo (referencias/acervo/*.png) alimenta gerações via _perfil (prioridade
+    por marca). Devolve dict com paths.
+    """
+    require(slug)
+    if not raw:
+        raise ValueError("referência vazia")
+    if len(raw) > 12 * 1024 * 1024:
+        raise ValueError("referência maior que 12 MB")
+    ext = (ext or ".jpg").lower()
+    if not ext.startswith("."):
+        ext = "." + ext
+    if ext not in (".png", ".jpg", ".jpeg", ".webp"):
+        ext = ".jpg"
+    feed_dir = os.path.join(MARCAS_DIR, slug, "referencias", "feed")
+    acervo_dir = os.path.join(MARCAS_DIR, slug, "referencias", "acervo")
+    os.makedirs(feed_dir, exist_ok=True)
+    os.makedirs(acervo_dir, exist_ok=True)
+    base = nome or f"ref-{len(os.listdir(feed_dir))+1:02d}"
+    base = re.sub(r"[^a-z0-9._-]+", "-", base.lower()).strip("-") or "ref"
+    feed_path = os.path.join(feed_dir, base + ext)
+    with open(feed_path, "wb") as f:
+        f.write(raw)
+    # PNG no acervo (input_references)
+    acervo_path = os.path.join(acervo_dir, base + ".png")
+    try:
+        from PIL import Image
+        import io
+        im = Image.open(io.BytesIO(raw)).convert("RGB")
+        # limita lado maior p/ não estourar refs
+        im.thumbnail((1536, 1536))
+        im.save(acervo_path, "PNG", optimize=True)
+    except Exception:
+        # se não for imagem decodável, só copia se já for png
+        if ext == ".png":
+            with open(acervo_path, "wb") as f:
+                f.write(raw)
+        else:
+            acervo_path = ""
+    return {
+        "feed": os.path.relpath(feed_path, VAULT).replace("\\", "/"),
+        "acervo": (os.path.relpath(acervo_path, VAULT).replace("\\", "/") if acervo_path and os.path.isfile(acervo_path) else ""),
+    }
+
+
 def _sync_perfis(slug):
     """Inclui slug na família smark do contrato de imagem (mesmo motor)."""
     if not os.path.isfile(PERFIS):
