@@ -12,7 +12,18 @@ import re
 import sys
 
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MARCAS = {"smark", "provider-max", "elever-ai"}
+sys.path.insert(0, os.path.join(VAULT, "scripts"))
+try:
+    import _marcas  # noqa: E402
+    def _marcas_ok():
+        return set(_marcas.list_slugs())
+    def _endossa(m):
+        return bool((_marcas.get(m) or {}).get("endossa"))
+except Exception:
+    def _marcas_ok():
+        return {"smark", "provider-max", "elever-ai"}
+    def _endossa(m):
+        return m in {"provider-max", "elever-ai"}
 
 
 def frontmatter(txt):
@@ -69,10 +80,10 @@ def main():
             legenda = re.sub(r"^---.*?---", "", txt, flags=re.S)
         hashtags = secao(txt, "Hashtags")
         alt = fm.get("alt", "")
-        endossa = marca in {"provider-max", "elever-ai"}
+        endossa = _endossa(marca) if marca else False
     else:
         marca, legenda, hashtags, alt, fm = a.marca, a.texto, a.texto, "", {}
-        endossa = marca in {"provider-max", "elever-ai"}
+        endossa = _endossa(marca) if marca else False
 
     base = legenda + "\n" + hashtags
     low = base.lower()
@@ -83,10 +94,13 @@ def main():
 
     erros, avisos, oks = [], [], []
 
-    # marca válida
-    (oks if marca in MARCAS else erros).append(
-        f"marca '{marca or '—'}' " + ("válida" if marca in MARCAS else "INVÁLIDA (use smark/provider-max/elever-ai)"))
-
+    # marca válida (registry dinâmico)
+    conhecidas = _marcas_ok()
+    (oks if marca in conhecidas else erros).append(
+        f"marca '{marca or '—'}' " + (
+            "válida" if marca in conhecidas
+            else f"INVÁLIDA (registre com nova_marca.py; conhecidas: {', '.join(sorted(conhecidas))})"
+        ))
     # palavras-proibidas
     achou = sorted({w for w in proib if re.search(r"\b" + re.escape(w) + r"\b", low)})
     (erros.append(f"palavra-proibida: {', '.join(achou)}") if achou else oks.append("sem palavras-proibidas"))

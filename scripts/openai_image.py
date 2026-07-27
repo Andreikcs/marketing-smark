@@ -141,8 +141,7 @@ def main():
         prompt = args.prompt
         if args.prompt_file:
             prompt = open(args.prompt_file, "r", encoding="utf-8").read().strip()
-    prompt = aplicar_guard(prompt, args.paleta, not args.no_guard)
-
+    prompt = aplicar_guard(prompt, args.paleta, not args.no_guard, marca=args.marca or "")
     env = load_env(os.path.join(VAULT, ".env"))
     chaves = carregar_chaves(env)
 

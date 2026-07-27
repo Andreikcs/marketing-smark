@@ -30,7 +30,7 @@ CONCEITOS = {
 }
 CONCEITO_PADRAO = "an abstract premium technology key visual — a single restrained violet light gesture in open space"
 
-# Mundo visual por marca (nuance de mood; paleta sempre unificada em roxo)
+# Mundo visual por marca (canônicas). Clientes externos: tokens.mood ou genérico.
 MARCA_MOOD = {
     "smark": "senior B2B technology consultancy — restrained, trustworthy, architectural",
     "provider-max": "infrastructure operating at scale (telecom / ISP) — systems executing tirelessly, industrial-premium",
@@ -38,13 +38,27 @@ MARCA_MOOD = {
 }
 
 
-def _cor(tema):
+def _meta_marca(marca):
+    """Acento/mood da marca via tokens (multi-marca). Fallback smark."""
+    try:
+        import _marcas
+        m = _marcas.get(marca) or {}
+        if m:
+            return m
+    except Exception:
+        pass
+    return {}
+
+
+def _cor(tema, acento=None, acento_claro=None):
+    acc = (acento or HEX["roxo"]).upper()
+    acc2 = (acento_claro or HEX["violeta"]).upper()
     if tema == "claro":
-        return (f"strict palette only — airy off-white base {HEX['base_claro']} and soft lavender {HEX['lavanda']}, "
-                f"with violet {HEX['violeta']} to {HEX['roxo']} as the only accent; light and clean, lots of white space; "
-                "no other hues, no warm tones")
-    return (f"strict palette only — near-black base {HEX['base_escuro']}, deep indigo {HEX['indigo']} to vivid "
-            f"violet {HEX['violeta']} for light and gradients; mostly dark; no other hues, no warm tones")
+        return (f"strict palette only — airy off-white base {HEX['base_claro']} and soft tint of {acc2}, "
+                f"with {acc} to {acc2} as the only accent; light and clean, lots of white space; "
+                "no other hues unless in the brand accent family, no random warm casts")
+    return (f"strict palette only — near-black base {HEX['base_escuro']}, deep tones with "
+            f"{acc} to {acc2} for light and gradients; mostly dark; no other hues, no random warm casts")
 
 
 def _luz(tema):
@@ -67,7 +81,11 @@ def construir(marca, tipo="", tema="escuro", headline="", conceito=""):
     """
     tema = "claro" if tema == "claro" else "escuro"
     conc = conceito.strip() or CONCEITOS.get((tipo or "").lower(), CONCEITO_PADRAO)
-    mood = MARCA_MOOD.get(marca, MARCA_MOOD["smark"])
+    meta = _meta_marca(marca)
+    mood = meta.get("mood") or MARCA_MOOD.get(marca) or (
+        f"premium on-brand visual for {meta.get('nome') or marca} — clean, professional")
+    acc = meta.get("acento") or HEX["roxo"]
+    acc2 = meta.get("acento_claro") or HEX["violeta"]
     vazio = "light" if tema == "claro" else "near-black"
     return (
         f"Editorial brand key visual for a {mood}; fully abstract, minimalist. "
@@ -76,7 +94,7 @@ def construir(marca, tipo="", tema="escuro", headline="", conceito=""):
         "headline typography; all visual interest sits in the top two-thirds; asymmetric, generous breathing room. "
         f"LIGHT: {_luz(tema)}. "
         "CAMERA: 85mm, shallow depth of field, delicate bokeh, fine cinematic film grain. "
-        f"COLOR: {_cor(tema)}. "
+        f"COLOR: {_cor(tema, acc, acc2)}. "
         f"MATERIAL: {_material(tema)}. "
         "MOOD: restrained, sophisticated, expensive, confident, calm. "
         "FINISH: hyper-detailed where lit, sharp focus, color-graded like a magazine cover, 4k. "
@@ -89,17 +107,27 @@ def construir_rascunho(marca, tipo="", tema="escuro", headline="", conceito=""):
 
     Sem hex, sem 85mm, sem listas técnicas — o Seedream imprime isso na arte
     (bake-off 2026-07-24). Só conceito + composição + proibição de texto em
-    linguagem natural.
+    linguagem natural. Cor: nome de família (violet/teal/etc) sem hex.
     """
     tema = "claro" if tema == "claro" else "escuro"
     conc = conceito.strip() or CONCEITOS.get((tipo or "").lower(), CONCEITO_PADRAO)
-    # encurta conceito longo (Estúdio às vezes manda frase de edição)
     if len(conc) > 220:
         conc = conc[:220].rsplit(" ", 1)[0]
-    if tema == "claro":
-        base = "bright airy background soft lavender and white soft violet light"
+    meta = _meta_marca(marca)
+    # tom de cor sem hex (Seedream tipografa #RRGGBB)
+    acc = (meta.get("acento") or "#8B3CF7").upper()
+    if acc in ("#C6F24E", "#D6FF5C", "#B8E62E"):
+        tint = "soft lime green light"
+    elif acc.startswith("#E") or acc.startswith("#C0") or acc.startswith("#D4"):
+        tint = "soft warm brand-colored light"
+    elif acc.startswith("#0") or acc.startswith("#1") or acc.startswith("#2"):
+        tint = "soft blue brand-colored light"
     else:
-        base = "dark premium background deep violet glow soft haze"
+        tint = "soft violet brand-colored light"
+    if tema == "claro":
+        base = f"bright airy background soft white and pale tint, {tint}"
+    else:
+        base = f"dark premium background soft haze, {tint}"
     return (
         f"Premium brand background, {base}, clean empty lower third for headline, "
         f"visual interest in upper two thirds, abstract editorial, sophisticated, "

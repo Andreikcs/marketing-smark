@@ -417,11 +417,37 @@ function frame(){return post().frames[FI]}
 function syncPages(p){const n=(p.frames||[]).length;(p.frames||[]).forEach((fr,i)=>{fr.page=n>1?(String(i+1).padStart(2,'0')+'/'+String(n).padStart(2,'0')):''})}
 function syncAllPages(){((D&&D.posts)||[]).forEach(syncPages)}
 
-async function carregar(){D=await(await fetch('/dados')).json();syncAllPages();renderPosts();
+let MARCAS_LIST=[{slug:'smark',nome:'smark'},{slug:'provider-max',nome:'Provider Max'},{slug:'elever-ai',nome:'Elever AI'}];
+async function carregarMarcas(){
+  try{
+    const r=await(await fetch('/marcas')).json();
+    if(r.ok&&r.marcas&&r.marcas.length)MARCAS_LIST=r.marcas;
+  }catch(e){}
+  // Estúdio select
+  const sel=document.getElementById('esmarca');
+  if(sel){
+    const cur=sel.value;
+    sel.innerHTML=MARCAS_LIST.map(m=>'<option value="'+m.slug+'">'+esc(m.nome||m.slug)+(m.pronta===false?' · setup':'')+'</option>').join('');
+    if(cur&&[...sel.options].some(o=>o.value===cur))sel.value=cur;
+  }
+  // Modal novo post — botões de marca
+  const nb=document.querySelector('#npmodal .npbrands');
+  if(nb){
+    nb.innerHTML=MARCAS_LIST.map((m,i)=>'<button data-m="'+m.slug+'"'+(i===0?' class=on':'')+'>'+esc(m.nome||m.slug)+'</button>').join('');
+    nb.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+      NPBRAND=b.dataset.m;
+      nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+    });
+  }
+}
+async function carregar(){
+  await carregarMarcas();
+  D=await(await fetch('/dados')).json();syncAllPages();renderPosts();
   const q=new URLSearchParams(location.search);let pi=parseInt(q.get('post'));
   if(!isNaN(pi)&&pi>=0&&pi<D.posts.length){hideWelcome();sel(pi,0)}else{showWelcome()}
   if(q.get('novo'))setTimeout(novoPost,60);
-  else if(q.get('estudio'))setTimeout(()=>{const b=document.getElementById('bestudio');if(b)b.click()},60);}
+  else if(q.get('estudio'))setTimeout(()=>{const b=document.getElementById('bestudio');if(b)b.click()},60);
+}
 function showWelcome(){$('.app').classList.add('welcome');PI=-1;renderPosts()}
 function hideWelcome(){$('.app').classList.remove('welcome')}
 document.querySelectorAll('#welcome .wcard').forEach(c=>c.onclick=()=>{const a=c.dataset.a;

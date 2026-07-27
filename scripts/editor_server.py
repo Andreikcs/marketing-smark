@@ -28,6 +28,7 @@ import estudio  # noqa: E402  (cérebro do chat: copy + conceito visual)
 import _acervo  # noqa: E402
 import _perfil  # noqa: E402
 import _roi  # noqa: E402
+import _marcas  # noqa: E402
 
 PORT = 8765
 PAINEL = os.path.join(VAULT, "painel.html")
@@ -717,12 +718,9 @@ def frame_kwargs(fr, size, for_export, marca="smark"):
     return k
 
 
-BRANDS = ("smark", "provider-max", "elever-ai")
-
-
 def safe_marca(m):
-    """Bloqueia path traversal via marca — só marcas conhecidas."""
-    return m if m in BRANDS else "smark"
+    """Marca path-safe e registrada; desconhecida → smark (com lista dinâmica)."""
+    return _marcas.safe_marca(m, fallback="smark")
 
 
 def safe_slug(s):
@@ -814,6 +812,11 @@ class H(http.server.BaseHTTPRequestHandler):
             return self._send(200, JOBS.get(jid, {"status": "unknown"}))
         if path == "/dados":
             return self._send(200, load())
+        if path == "/marcas":
+            try:
+                return self._send(200, {"ok": True, "marcas": _marcas.listar_detalhes()})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
         if path == "/historico":
             # versões de UM post ao longo dos autosaves do git (dedupe: só quando o post mudou)
             try:
@@ -1204,6 +1207,27 @@ class H(http.server.BaseHTTPRequestHandler):
                     totais_fn=_ledger.totais_por_post,
                 )
                 return self._send(200, {"ok": True, **resumo})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/nova-marca":
+            # cria marca de cliente (Sprint multi-marca)
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                nome = str(req.get("nome", "")).strip()
+                acento = str(req.get("acento", "")).strip()
+                r = _marcas.criar(
+                    slug, nome, acento,
+                    acento_claro=str(req.get("acento_claro") or "") or None,
+                    handle=str(req.get("handle") or "") or None,
+                    glyph=str(req.get("glyph") or "") or None,
+                    wordmark=str(req.get("wordmark") or "") or None,
+                    mood=str(req.get("mood") or ""),
+                )
+                return self._send(200, {"ok": True, **{k: r[k] for k in ("slug", "pronta", "dir")},
+                                        "meta": r["meta"]})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 
