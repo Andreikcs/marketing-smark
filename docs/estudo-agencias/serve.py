@@ -19,6 +19,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent
+SPECS = (RAIZ.parent / "superpowers" / "specs").resolve()
 
 CSS = """
 :root{--paper:#F4F1FA;--card:#fff;--ink:#17111F;--soft:#5A5268;--faint:#8B8399;
@@ -199,17 +200,29 @@ class Handler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def guess_type(self, path):
+        # .md é servido renderizado como HTML (ver do_GET); o tipo acompanha
+        if str(path).endswith(".md"):
+            return "text/html; charset=utf-8"
         tipo = super().guess_type(path)
         base = tipo.split(";")[0].strip()
         if base.startswith("text/") or base in ("application/javascript", "application/json"):
             return f"{base}; charset=utf-8"
         return tipo
 
+    def _resolver_md(self, caminho):
+        """Mapeia a URL para um .md em disco. /specs/<x> aponta para os specs de design,
+        que vivem fora desta pasta — path traversal por `../` é bloqueado de propósito."""
+        if caminho.startswith("/specs/"):
+            alvo = (SPECS / caminho[len("/specs/"):]).resolve()
+            return alvo if SPECS in alvo.parents and alvo.is_file() else None
+        alvo = (RAIZ / caminho.lstrip("/")).resolve()
+        return alvo if RAIZ in alvo.parents and alvo.is_file() else None
+
     def do_GET(self):
         caminho = self.path.split("?")[0]
         if caminho.endswith(".md"):
-            alvo = (RAIZ / caminho.lstrip("/")).resolve()
-            if RAIZ in alvo.parents and alvo.is_file():
+            alvo = self._resolver_md(caminho)
+            if alvo:
                 md = alvo.read_text(encoding="utf-8")
                 # remove front matter YAML antes de renderizar
                 if md.startswith("---\n"):
