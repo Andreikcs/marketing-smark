@@ -1123,10 +1123,13 @@ async function delCard(){
   post().frames.splice(FI,1);await salvar(true);await reload(PI,Math.max(0,FI-1));toast('Card excluído');
 }
 let NPBRAND='smark';
-function novoPost(){NPBRAND='smark';const m=document.getElementById('npmodal');
+function novoPost(){
+  if(!NPBRAND||!MARCAS_LIST.some(m=>m.slug===NPBRAND))NPBRAND=(MARCAS_LIST[0]&&MARCAS_LIST[0].slug)||'smark';
+  const m=document.getElementById('npmodal');
   document.getElementById('nptitle').value='';
-  m.querySelectorAll('.npbrands button').forEach(b=>b.classList.toggle('on',b.dataset.m==='smark'));
-  m.style.display='flex';setTimeout(()=>document.getElementById('nptitle').focus(),50)}
+  m.querySelectorAll('.npbrands button').forEach(b=>b.classList.toggle('on',b.dataset.m===NPBRAND));
+  m.style.display='flex';setTimeout(()=>document.getElementById('nptitle').focus(),50);
+}
 document.querySelectorAll('#npmodal .npbrands button').forEach(b=>b.onclick=()=>{NPBRAND=b.dataset.m;
   document.querySelectorAll('#npmodal .npbrands button').forEach(x=>x.classList.toggle('on',x===b))});
 document.getElementById('npcancel').onclick=()=>document.getElementById('npmodal').style.display='none';
@@ -1134,8 +1137,19 @@ document.getElementById('npok').onclick=async()=>{
   const t=(document.getElementById('nptitle').value||'').trim()||'Novo post';
   document.getElementById('npmodal').style.display='none';
   const r=await(await fetch('/novo-post',{method:'POST',headers:HJSON,body:JSON.stringify({titulo:t,slug:t,marca:NPBRAND})})).json();
-  if(r.ok){await reload(r.index,0);toast('Post criado · '+NPBRAND)}else toast('Erro ao criar post');
+  if(r.ok){await reload(r.index,0);toast('Post criado · '+NPBRAND)}else toast(r.erro||'Erro ao criar post');
 };
+// modal + botão nova marca
+const _npnm=document.getElementById('npnewmarca');if(_npnm)_npnm.onclick=abrirModalMarca;
+const _mbc=document.getElementById('mbcancel');if(_mbc)_mbc.onclick=()=>document.getElementById('mbmodal').style.display='none';
+const _mbo=document.getElementById('mbok');if(_mbo)_mbo.onclick=salvarModalMarca;
+const _mbl=document.getElementById('mb_logo');if(_mbl)_mbl.onchange=e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{MB_LOGO=rd.result;const p=document.getElementById('mb_logoprev');p.innerHTML='<img src="'+rd.result+'" style="width:100%;height:100%;object-fit:cover">'};
+  rd.readAsDataURL(f);
+};
+const _mbm=document.getElementById('mbmodal');if(_mbm)_mbm.onclick=e=>{if(e.target.id==='mbmodal')e.currentTarget.style.display='none'};
 $('#bnew').onclick=novoPost;$('#baddc').onclick=addCard;$('#bdelc').onclick=delCard;
 // setas laterais = NAVEGAR entre cards (visualizar próximo/anterior)
 $('#bmvl').onclick=()=>{if(FI>0)sel(PI,FI-1)};$('#bmvr').onclick=()=>{if(FI<post().frames.length-1)sel(PI,FI+1)};

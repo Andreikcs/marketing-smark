@@ -83,6 +83,58 @@ def test_listar_detalhes_campos():
     assert any(x["slug"] == "smark" and x["canonica"] for x in d)
     for x in d:
         assert "acento" in x and "pronta" in x
+        assert "wordmark" in x and "glyph" in x
+
+
+def test_atualizar_marca(tmp_path, monkeypatch):
+    tok = {
+        "marcas": {
+            "smark": {"nome": "smark.", "acento": "#8B3CF7", "handle": "@smark"},
+            "cliente": {
+                "nome": "Cliente", "acento": "#112233", "acento_claro": "#445566",
+                "handle": "@cliente", "wordmark": "Cliente", "logo_glyph": "C",
+                "mood": "old",
+            },
+        },
+    }
+    tok_path = tmp_path / "tokens.json"
+    tok_path.write_text(json.dumps(tok), encoding="utf-8")
+    monkeypatch.setattr(_marcas, "TOKENS", str(tok_path))
+    monkeypatch.setattr(_marcas, "MARCAS_DIR", str(tmp_path / "marcas"))
+    (tmp_path / "marcas" / "cliente" / "branding").mkdir(parents=True)
+    (tmp_path / "marcas" / "cliente" / "branding" / "identidade-visual.md").write_text("x")
+    (tmp_path / "marcas" / "cliente" / "branding" / "brand-voice.md").write_text("x")
+
+    r = _marcas.atualizar(
+        "cliente",
+        nome="Cliente Novo",
+        acento="#E0562D",
+        handle="@clientenovo",
+        mood="warm fiber brand",
+    )
+    assert r["meta"]["nome"] == "Cliente Novo"
+    assert r["meta"]["acento"] == "#E0562D"
+    assert r["meta"]["handle"] == "@clientenovo"
+    assert r["pronta"] is True
+
+
+def test_salvar_logo_bytes(tmp_path, monkeypatch):
+    tok_path = tmp_path / "tokens.json"
+    tok_path.write_text(json.dumps({
+        "marcas": {"foo": {"nome": "Foo", "acento": "#AABBCC", "handle": "@foo"}},
+    }), encoding="utf-8")
+    monkeypatch.setattr(_marcas, "TOKENS", str(tok_path))
+    monkeypatch.setattr(_marcas, "MARCAS_DIR", str(tmp_path / "marcas"))
+    monkeypatch.setattr(_marcas, "VAULT", str(tmp_path))
+    # 1x1 png
+    import base64
+    raw = base64.b64decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    )
+    dest = _marcas.salvar_logo_bytes("foo", raw, ext=".png")
+    assert os.path.isfile(dest)
+    meta = json.loads(tok_path.read_text())["marcas"]["foo"]
+    assert meta["brasao"]["principal"].endswith("logo.png")
 
 
 def test_compositor_aceita_marca_do_tokens():
