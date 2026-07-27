@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>white studio — protótipo de produto</title>
+<style>
+:root{
+  --bg:#0F0B18;--side:#161022;--card:#1B1428;--elev:#221A32;
+  --ink:#F3EFFA;--soft:#ABA1C0;--muted:#7A7091;--line:#2A2140;
+  --accent:#9A4DFF;--accent2:#B98CFF;--lime:#C6F24E;--warn:#E0B341;--bad:#F07A93;
+  --good:#66D08A;--radius:14px;--font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.45}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.side{background:var(--side);border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.brand .mk{width:32px;height:32px;border-radius:9px;background:linear-gradient(150deg,#9A4DFF,#5B1FB0);display:grid;place-items:center;font-weight:900}
+.brand b{font-size:15px;font-weight:800;letter-spacing:-.02em}
+.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-family:var(--mono);margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.nav button{text-align:left;background:transparent;border:0;padding:10px 12px;border-radius:10px;color:var(--soft);cursor:pointer}
+.nav button:hover{background:var(--elev);color:var(--ink)}
+.nav button.on{background:rgba(154,77,255,.15);color:var(--accent2);font-weight:700}
+.nav .sec{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:14px 12px 6px}
+.side .foot{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:4px 9px;border-radius:999px;background:rgba(198,242,78,.1);color:var(--lime);border:1px solid rgba(198,242,78,.25);font-family:var(--mono)}
+.pill.v{background:rgba(154,77,255,.12);color:var(--accent2);border-color:rgba(154,77,255,.3)}
+.main{padding:22px 28px 48px;min-width:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.top h1{margin:0;font-size:24px;font-weight:850;letter-spacing:-.03em}
+.top p{margin:4px 0 0;color:var(--soft);font-size:13.5px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--elev);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:linear-gradient(140deg,#9A4DFF,#6B21D6);border-color:transparent;color:#fff}
+.btn.ghost{background:transparent}
+.btn.lime{background:rgba(198,242,78,.12);border-color:rgba(198,242,78,.35);color:var(--lime)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:980px){.app{grid-template-columns:1fr}.side{height:auto;position:relative}.g3,.g4{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:640px){.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.card h3{margin:0 0 6px;font-size:15px}
+.card .meta{color:var(--muted);font-size:12px}
+.stat b{display:block;font-size:26px;font-weight:850;letter-spacing:-.03em;margin-top:6px}
+.stat span{color:var(--muted);font-size:11px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th{text-align:left;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--line)}
+.table td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.table tr:hover td{background:rgba(255,255,255,.02)}
+.badge{font-size:10px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--soft)}
+.badge.in{background:rgba(102,208,138,.12);border-color:rgba(102,208,138,.3);color:var(--good)}
+.badge.ex{background:rgba(154,77,255,.12);border-color:rgba(154,77,255,.3);color:var(--accent2)}
+.badge.off{color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:12px;color:var(--soft);font-weight:600}
+.field input,.field select,.field textarea{background:var(--elev);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.field textarea{min-height:88px;resize:vertical}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row .field{flex:1;min-width:160px}
+.steps{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.step{padding:8px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px}
+.step.on{border-color:var(--accent);color:var(--accent2);background:rgba(154,77,255,.12)}
+.step.done{color:var(--good);border-color:rgba(102,208,138,.35)}
+.mock-canvas{aspect-ratio:4/5;max-width:280px;background:linear-gradient(160deg,#2A1B45,#100D1C 55%,#E7DCFF);border-radius:16px;border:1px solid var(--line);position:relative;overflow:hidden}
+.mock-canvas .tag{position:absolute;top:14px;left:14px;background:var(--accent);color:#fff;font-size:10px;padding:4px 8px;border-radius:6px;font-weight:700}
+.mock-canvas .txt{position:absolute;left:18px;right:18px;bottom:22%;font-size:22px;font-weight:850;line-height:1.1;letter-spacing:-.02em}
+.mock-canvas .cta{position:absolute;left:18px;bottom:14%;background:var(--accent);color:#fff;font-size:10px;padding:7px 12px;border-radius:999px;font-weight:700}
+.split{display:grid;grid-template-columns:1fr 300px;gap:16px}
+@media(max-width:900px){.split{grid-template-columns:1fr}}
+.note{background:rgba(224,179,65,.08);border:1px solid rgba(224,179,65,.25);color:var(--warn);border-radius:12px;padding:12px 14px;font-size:12.5px;margin-bottom:16px}
+.note b{color:var(--ink)}
+.login{min-height:100vh;display:grid;place-items:center;padding:24px}
+.login-box{width:min(420px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px}
+.login-box h1{font-size:26px;margin:0 0 8px}
+.hidden{display:none!important}
+.role-switch{display:flex;gap:6px;margin-bottom:8px}
+.role-switch button{flex:1;font-size:11px;padding:7px}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#9A4DFF,#2A1CA8);display:grid;place-items:center;font-size:11px;font-weight:800}
+.list-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:0}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
+.dot.warn{background:var(--warn)}
+.progress{height:8px;background:var(--elev);border-radius:99px;overflow:hidden}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:40%}
+.banner{display:flex;gap:12px;align-items:flex-start;background:rgba(154,77,255,.1);border:1px solid rgba(154,77,255,.3);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px}
+.banner .x{margin-left:auto;opacity:.6;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN (sem shell) ===== -->
+<div id="screen-login" class="login">
+  <div class="login-box">
+    <div class="brand" style="border:0;padding:0;margin:0 0 18px">
+      <span class="mk">W</span>
+      <div><b>white studio</b><small>protótipo · não é o app real</small></div>
+    </div>
+    <h1>Entrar no estúdio</h1>
+    <p style="color:var(--soft);margin:0 0 18px">Simula o login multi-tenant. Escolha o papel para ver as telas.</p>
+    <div class="role-switch">
+      <button class="btn on" data-role="agency" id="role-agency">Agência</button>
+      <button class="btn" data-role="smark" id="role-smark">Staff smark</button>
+    </div>
+    <div class="field"><label>E-mail</label><input value="ana@agenciaexemplo.com.br" readonly></div>
+    <div class="field"><label>Código mágico</label><input value="••••••" readonly></div>
+    <button class="btn primary" style="width:100%;margin-top:8px" onclick="enterApp()">Continuar →</button>
+    <p style="color:var(--muted);font-size:12px;margin:14px 0 0;text-align:center">Protótipo clicável · dados fictícios · sem backend</p>
+  </div>
+</div>
+
+<!-- ===== APP SHELL ===== -->
+<div id="app" class="app hidden">
+  <aside class="side">
+    <div class="brand">
+      <span class="mk" id="wl-mark">A</span>
+      <div>
+        <b id="wl-name">Agência Norte</b>
+        <small id="wl-sub">white studio</small>
+      </div>
+    </div>
+    <nav class="nav" id="nav-agency">
+      <div class="sec">Produção</div>
+      <button data-go="dashboard" class="on">Dashboard</button>
+      <button data-go="clients">Clientes-marca</button>
+      <button data-go="new-post">Novo post</button>
+      <button data-go="studio">Estúdio / Editor</button>
+      <button data-go="library">Biblioteca</button>
+      <button data-go="templates">Templates do nicho</button>
+      <div class="sec">Conta</div>
+      <button data-go="billing">Uso e fatura</button>
+      <button data-go="team">Equipe</button>
+      <button data-go="whitelabel">White-label</button>
+      <button data-go="help">Ajuda / playbook</button>
+    </nav>
+    <nav class="nav hidden" id="nav-smark">
+      <div class="sec">Plataforma smark</div>
+      <button data-go="admin-tenants" class="on">Tenants</button>
+      <button data-go="admin-billing">Billing ops</button>
+      <button data-go="admin-margin">Uso e margem</button>
+      <button data-go="admin-queue">Fila assistido</button>
+      <button data-go="admin-libs">Bibliotecas verticais</button>
+    </nav>
+    <div class="foot">
+      <span class="pill" id="plan-pill">plano · 2 inclusos + 1 extra</span>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;color:var(--soft);font-size:12px">
+        <span class="avatar">AN</span>
+        <div><div id="user-name">Ana Ops</div><div style="color:var(--muted);font-size:11px" id="user-role">owner · agência</div></div>
+      </div>
+      <button class="btn ghost" style="width:100%;margin-top:10px;font-size:12px" onclick="logout()">Sair do protótipo</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="banner"><div>🎨 <b>Protótipo de produto</b> — telas e fluxo do white studio (cliente único ou agência). Não grava dados. Compare com o vault atual em <code>:8765</code>.</div><span class="x" onclick="this.parentElement.classList.add('hidden')">✕</span></div>
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view">
+      <div class="top">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Visão do mês · clientes ativos · produção · custo</p>
+        </div>
+        <div class="actions">
+          <button class="btn" data-go="clients">+ Cliente</button>
+          <button class="btn primary" data-go="new-post">Novo post</button>
+        </div>
+      </div>
+      <div class="grid g4" style="margin-bottom:16px">
+        <div class="card stat"><span>Clientes ativos</span><b>3</b><div class="meta">2 inclusos · 1 extra</div></div>
+        <div class="card stat"><span>Posts no mês</span><b>47</b><div class="meta">meta livre · artes ilimitadas</div></div>
+        <div class="card stat"><span>COGS API (est.)</span><b>R$ 92</b><div class="meta">imagem + copy</div></div>
+        <div class="card stat"><span>Sua fatura</span><b>R$ 794</b><div class="meta">630 + 164,10</div></div>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <h3>Atividade recente</h3>
+          <div class="list-item"><span class="dot"></span><div><b>NetSul Fibra</b> · carrossel planos<div class="meta">exportado há 2h · 11 min de ciclo</div></div></div>
+          <div class="list-item"><span class="dot"></span><div><b>Contábil Horizonte</b> · post IRPF<div class="meta">rascunho · aguarda aprovação</div></div></div>
+          <div class="list-item"><span class="dot warn"></span><div><b>Unit 12 — Bella</b> · campanha nacional<div class="meta">3º brand · slot extra ativo</div></div></div>
+        </div>
+        <div class="card">
+          <h3>Plano e slots</h3>
+          <p class="meta" style="margin:0 0 10px">2 clientes inclusos na base de R$ 630. Do 3º em diante: R$ 164,10/mês.</p>
+          <div class="progress" style="margin-bottom:8px"><i style="width:100%"></i></div>
+          <div class="meta">3 / 3 marcas ativas (1 cobrada como extra)</div>
+          <button class="btn primary" style="margin-top:14px" data-go="clients">Gerenciar clientes</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLIENTS -->
+    <section id="view-clients" class="view hidden">
+      <div class="top">
+        <div>
+          <h1>Clientes-marca</h1>
+          <p>Cada marca é um “cliente” no billing · contexto e acervo moram aqui</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" data-go="client-setup">+ Novo cliente</button>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="table">
+          <thead><tr><th>Marca</th><th>Vertical</th><th>Slot</th><th>Posts/mês</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>NetSul Fibra</b><div class="meta">netsul</div></td>
+              <td>ISP</td>
+              <td><span class="badge in">incluso</span></td>
+              <td>18</td>
+              <td><span class="badge in">ativa</span></td>
+              <td><button class="btn ghost" data-go="client-setup">Abrir</button></td>
+            </tr>
+            <tr>
+              <td><b>Contábil Horizonte</b><div class="meta">horizonte</div></td>
+              <td>Contábil</td>
+              <td><span class="badge in">incluso</span></td>
+              <td>12</td>
+              <td><span class="badge in">ativa</span></td>
+              <td><button class="btn ghost" data-go="client-setup">Abrir</button></td>
+            </tr>
+            <tr>
+              <td><b>Unit 12 — Bella</b><div class="meta">bella-u12</div></td>
+              <td>Franquia</td>
+              <td><span class="badge ex">extra · R$164</span></td>
+              <td>9</td>
+              <td><span class="badge in">ativa</span></td>
+              <td><button class="btn ghost" data-go="client-setup">Abrir</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note" style="margin-top:14px"><b>Regra de negócio:</b> 2ª marca ainda cabe na base. A 3ª exige slot extra (R$ 164,10/mês sobre a régua de R$ 547). Sem auditoria do preço que a agência cobra do cliente final.</div>
+    </section>
+
+    <!-- CLIENT SETUP -->
+    <section id="view-client-setup" class="view hidden">
+      <div class="top">
+        <div>
+          <h1>Setup do cliente</h1>
+          <p>Onboarding de marca · origem do custo de troca</p>
+        </div>
+        <div class="actions">
+          <button class="btn" data-go="clients">← Voltar</button>
+          <button class="btn primary" data-go="studio">Salvar e produzir</button>
+        </div>
+      </div>
+      <div class="steps">
+        <span class="step done">1 · Identidade</span>
+        <span class="step on">2 · Voz</span>
+        <span class="step">3 · Canais</span>
+        <span class="step">4 · Exemplos</span>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <div class="field"><label>Nome da marca</label><input value="NetSul Fibra"></div>
+          <div class="row">
+            <div class="field"><label>Slug</label><input value="netsul"></div>
+            <div class="field"><label>Vertical</label>
+              <select><option>Provedor de internet</option><option>Contabilidade</option><option>Franquia / rede</option><option>Outro</option></select>
+            </div>
+          </div>
+          <div class="field"><label>Logo</label><input type="file"></div>
+          <div class="row">
+            <div class="field"><label>Cor primária</label><input type="color" value="#7A2FE0"></div>
+            <div class="field"><label>Cor secundária</label><input type="color" value="#1B1230"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="field"><label>Tom de voz (resumo)</label><textarea>Direto, regional, sem jargão. Fala de preço e cobertura. Nunca promete velocidade mentirosa.</textarea></div>
+          <div class="field"><label>Palavras proibidas</label><input value="melhor do Brasil, imbatível, #1"></div>
+          <div class="field"><label>Formatos</label>
+            <select><option>Instagram feed 4:5</option><option>Story 9:16</option><option>Feed + story</option></select>
+          </div>
+          <p class="meta">Depois: acervo ★ alimenta as próximas peças desta marca.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEW POST -->
+    <section id="view-new-post" class="view hidden">
+      <div class="top">
+        <div>
+          <h1>Novo post</h1>
+          <p>Briefing curto · o motor esconde modelo e prompt</p>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <div class="field"><label>Cliente-marca</label>
+            <select><option>NetSul Fibra</option><option>Contábil Horizonte</option><option>Unit 12 — Bella</option></select>
+          </div>
+          <div class="field"><label>Tipo de peça</label>
+            <select><option>Plano e preço</option><option>Cobertura / bairro</option><option>Promoção instalação</option><option>Institucional</option><option>Livre</option></select>
+          </div>
+          <div class="field"><label>Briefing</label><textarea>Post de 1 frame: plano 300 mega por R$ 99,90 na promoção de aniversário. Tom leve, CTA link na bio.</textarea></div>
+          <div class="field">
+            <label><input type="checkbox" checked> gerar arte (pago · Seedream padrão ~US$0,04)</label>
+          </div>
+          <button class="btn primary" data-go="studio">Gerar peça →</button>
+        </div>
+        <div class="card">
+          <h3>O que o parceiro <em>não</em> vê</h3>
+          <ul class="meta" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
+            <li>Nome do modelo (Seedream / Gemini)</li>
+            <li>Prompt de direção de arte</li>
+            <li>Scripts e contratos de perfil</li>
+            <li>Marca smark na peça exportada</li>
+          </ul>
+          <div class="note" style="margin-top:16px"><b>Regra:</b> smark não fala com o cliente final da agência. Aprovação final é do parceiro.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDIO / EDITOR -->
+    <section id="view-studio" class="view hidden">
+      <div class="top">
+        <div>
+          <h1>Estúdio / Editor</h1>
+          <p>Wireframe do fluxo atual do vault, multi-brand</p>
+        </div>
+        <div class="actions">
+          <button class="btn">Reroll fundo</button>
+          <button class="btn lime">★ Acervo</button>
+          <button class="btn primary">Exportar PNG</button>
+        </div>
+      </div>
+      <div class="split">
+        <div class="card">
+          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+            <div class="mock-canvas">
+              <span class="tag">ELEVER</span>
+              <div class="txt">300 MEGA<br>por <span style="color:#C6F24E">R$99,90</span></div>
+              <div class="cta">ASSINE · LINK NA BIO</div>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <div class="field"><label>Headline</label><input value="300 MEGA|por *R$99,90*"></div>
+              <div class="field"><label>Sub</label><input value="Promoção de aniversário · só este mês"></div>
+              <div class="field"><label>CTA</label><input value="Assine · link na bio"></div>
+              <div class="meta">Ciclo ROI: 8 min · copy US$ 0,41 · imagem US$ 0,04 · total ~R$ 2,30</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Chat Estúdio</h3>
+          <div class="meta" style="margin-bottom:10px">“Gere a partir desse fundo, mais claro”</div>
+          <div style="background:var(--elev);border-radius:10px;padding:10px;margin-bottom:8px;font-size:12.5px">Copy pronta · tema claro · 1 frame</div>
+          <div class="meta">fundo: <b style="color:var(--accent2)">Seedream</b> · ~US$0,04</div>
+          <button class="btn" style="width:100%;margin-top:12px" data-go="library">Ver na biblioteca</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="view-library" class="view hidden">
+      <div class="top">
+        <div>
+          <h1>Biblioteca</h1>
+          <p>Posts, exports e acervo por marca-cliente</p>
+        </div>
+      </div>
+      <div class="grid g3">
+        <div class="card"><div class="mock-canvas" style="max-width:100%;margin-bottom:10px"></div><b>Planos 300 mega</b><div class="meta">NetSul · exportado</div></div>
+        <div class="card"><div class="mock-canvas" style="max-width:100%;margin-bottom:10px;background:linear-gradient(160deg,#1a1030,#f4f2fb)"></div><b>IRPF prazo</b><div class="meta">Horizonte · rascunho</div></div>
+        <div class="card"><div class="mock-canvas" style="max-width:100%;margin-bottom:10px;background:linear-gradient(160deg,#2a1840,#e8f5d0)"></div><b>Campanha nacional</b><div class="meta">Bella U12 · ★ acervo</div></div>
+      </div>
+    </section>
+
+    <!-- TEMPLATES -->
+    <section id="view-templates" class="view hidden">
+      <div class="top">
+        <div>
+          <h1>Templates do nicho</h1>
+          <p>Biblioteca GTM — ISP (primeiro) · contábil · franquia</p>
+        </div>
+      </div>
+      <div class="note"><b>Ainda não existe no vault.</b> No modelo de negócio é o que transforma “IA genérica” em “sistema de produção do seu nicho”.</div>
+      <div class="grid g3">
+        <div class="card"><span class="badge v">ISP</span><h3 style="margin-top:10px">Plano e velocidade</h3><p class="meta">Preço + mega + CTA</p></div>
+        <div class="card"><span class="badge v">ISP</span><h3 style="margin-top:10px">Cobertura no bairro</h3><p class="meta">Cidade / região</p></div>
+        <div class="card"><span class="badge v">ISP</span><h3 style="margin-top:10px">Instalação grátis</h3><p class="meta">Promoção semanal</p></div>
+        <div class="card"><span class="badge">Contábil</span><h3 style="margin-top:10px">Prazo IRPF</h3><p class="meta">Calendário nacional</p></div>
+        <div class="card"><span class="badge">Contábil</span><h3 style="margin-top:10px">Obrigações do mês</h3><p class="meta">eSocial / DAS</p></div>
+        <div class="card"><span class="badge">Franquia</span><h3 style="margin-top:10px">Campanha nacional</h3><p class="meta">Unidade só troca endereço</p></div>
+      </div>
+    </section>
+
+    <!-- BILLING -->
+    <section id="view-billing" class="view hidden">
+      <div class="top">
+        <div>
+          <h1>Uso e fatura</h1>
+          <p>Base R$ 630 · extras R$ 164,10 · artes ilimitadas</p>
+        </div>
+      </div>
+      <div class="grid g3" style="margin-bottom:16px">
+        <div class="card stat"><span>Mensalidade base</span><b>R$ 630</b><div class="meta">2 clientes inclusos</div></div>
+        <div class="card stat"><span>Extras (1)</span><b>R$ 164</b><div class="meta">30% de R$ 547</div></div>
+        <div class="card stat"><span>Total do mês</span><b>R$ 794</b><div class="meta">sem limite de peças</div></div>
+      </div>
+      <div class="card">
+        <h3>Extrato</h3>
+        <table class="table">
+          <thead><tr><th>Item</th><th>Qtd</th><th>Valor</th></tr></thead>
+          <tbody>
+            <tr><td>Assinatura base</td><td>1</td><td>R$ 630,00</td></tr>
+            <tr><td>Cliente adicional (Unit 12 — Bella)</td><td>1</td><td>R$ 164,10</td></tr>
+            <tr><td>Artes geradas (informativo)</td><td>47</td><td>R$ 0,00</td></tr>
+          </tbody>
+        </table>
+        <div class="note" style="margin-top:12px"><b>Régua R$ 547:</b> os 30% incidem sempre sobre a referência, não sobre o que a agência cobra do cliente. Sem auditoria de faturamento do parceiro.</div>
+      </div>
+    </section>
+
+    <!-- TEAM -->
+    <section id="view-team" class="view hidden">
+      <div class="top">
+        <div><h1>Equipe</h1><p>Papéis: owner · editor · viewer</p></div>
+        <button class="btn primary">Convidar</button>
+      </div>
+      <div class="card" style="padding:0">
+        <table class="table">
+          <thead><tr><th>Pessoa</th><th>Papel</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Ana Ops</td><td>owner</td><td><span class="badge in">ativo</span></td></tr>
+            <tr><td>Bruno Designer</td><td>editor</td><td><span class="badge in">ativo</span></td></tr>
+            <tr><td>Carla Estagiária</td><td>viewer</td><td><span class="badge off">convite</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- WHITELABEL -->
+    <section id="view-whitelabel" class="view hidden">
+      <div class="top">
+        <div><h1>White-label</h1><p>A interface veste a marca da agência — smark fica no motor</p></div>
+        <button class="btn primary">Salvar aparência</button>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <div class="field"><label>Nome exibido</label><input id="wl-input-name" value="Agência Norte" oninput="document.getElementById('wl-name').textContent=this.value"></div>
+          <div class="field"><label>Cor de acento</label><input type="color" value="#9A4DFF"></div>
+          <div class="field"><label>Logo</label><input type="file"></div>
+          <div class="field"><label>Domínio custom (Fase 3)</label><input placeholder="studio.agencianorte.com.br" disabled></div>
+        </div>
+        <div class="card">
+          <h3>Preview da barra</h3>
+          <div class="brand" style="border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:8px">
+            <span class="mk">A</span>
+            <div><b id="wl-preview-name">Agência Norte</b><small>powered by motor invisível</small></div>
+          </div>
+          <p class="meta" style="margin-top:12px">Peças exportadas: zero menção smark. Moat = craft + contexto + update, não logo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP -->
+    <section id="view-help" class="view hidden">
+      <div class="top"><div><h1>Ajuda / playbook</h1><p>Incluso na entrada de R$ 2.000</p></div></div>
+      <div class="grid g2">
+        <div class="card"><h3>1. Ativar 2 clientes</h3><p class="meta">Workshop com smark · logos e voz</p></div>
+        <div class="card"><h3>2. Primeiro post em 10 min</h3><p class="meta">Briefing → gerar → exportar</p></div>
+        <div class="card"><h3>3. Quando usar template</h3><p class="meta">Preço, prazo, campanha</p></div>
+        <div class="card"><h3>4. Suporte assistido</h3><p class="meta">SKU pago · fila smark staff</p></div>
+      </div>
+    </section>
+
+    <!-- ===== SMARK ADMIN ===== -->
+    <section id="view-admin-tenants" class="view hidden">
+      <div class="top">
+        <div><h1>Tenants</h1><p>Staff smark · parceiros e workspace interno</p></div>
+        <button class="btn primary">+ Nova agência</button>
+      </div>
+      <div class="card" style="padding:0">
+        <table class="table">
+          <thead><tr><th>Tenant</th><th>Modo</th><th>Brands</th><th>MRR</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><b>smark-ops</b></td><td>cliente único</td><td>3</td><td>—</td><td><span class="badge in">interno</span></td></tr>
+            <tr><td><b>Agência Norte</b></td><td>white-label</td><td>3</td><td>R$ 794</td><td><span class="badge in">pago</span></td></tr>
+            <tr><td><b>Mkt Contábil Sul</b></td><td>white-label</td><td>2</td><td>R$ 630</td><td><span class="badge in">pago</span></td></tr>
+            <tr><td><b>ISP Mídia</b></td><td>white-label</td><td>0</td><td>—</td><td><span class="badge off">onboarding</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="view-admin-billing" class="view hidden">
+      <div class="top"><div><h1>Billing ops</h1><p>Entradas · mensalidades · extras</p></div></div>
+      <div class="grid g3" style="margin-bottom:14px">
+        <div class="card stat"><span>MRR</span><b>R$ 12,6k</b></div>
+        <div class="card stat"><span>Entradas no mês</span><b>R$ 4k</b></div>
+        <div class="card stat"><span>Inadimplência</span><b>0</b></div>
+      </div>
+      <div class="card"><p class="meta">Integração Asaas/Stripe — protótipo. Régua 547 e 30% sem auditoria de faturamento do parceiro.</p></div>
+    </section>
+
+    <section id="view-admin-margin" class="view hidden">
+      <div class="top"><div><h1>Uso e margem</h1><p>Receita vs COGS API real (ledger multi-tenant)</p></div></div>
+      <div class="grid g3">
+        <div class="card stat"><span>Receita do mês</span><b>R$ 36k</b><div class="meta">cenário doc 20×8</div></div>
+        <div class="card stat"><span>COGS IA</span><b>R$ 7,3k</b><div class="meta">img + copy</div></div>
+        <div class="card stat"><span>Margem contrib.</span><b>37%</b><div class="meta">P&L modelado</div></div>
+      </div>
+      <div class="note" style="margin-top:14px"><b>Hoje no vault:</b> ledger single-tenant local. Esta tela exige Fase 0 multi-tenant + events por tenant.</div>
+    </section>
+
+    <section id="view-admin-queue" class="view hidden">
+      <div class="top"><div><h1>Fila assistido / sob demanda</h1><p>SKU de serviço · smark não vira concorrente da agência</p></div></div>
+      <div class="card" style="padding:0">
+        <table class="table">
+          <thead><tr><th>Pedido</th><th>Tenant</th><th>Tipo</th><th>SLA</th></tr></thead>
+          <tbody>
+            <tr><td>Lote 12 posts abertura</td><td>ISP Mídia</td><td>assistido</td><td>48h</td></tr>
+            <tr><td>Campanha difícil (foto real)</td><td>Agência Norte</td><td>sob demanda</td><td>72h</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="view-admin-libs" class="view hidden">
+      <div class="top"><div><h1>Bibliotecas verticais</h1><p>GTM: ISP → contábil → franquia</p></div></div>
+      <div class="grid g3">
+        <div class="card"><h3>ISP · 12 templates</h3><p class="meta">Prioridade GTM 30 dias</p></div>
+        <div class="card"><h3>Contábil · 0</h3><p class="meta">Semana 3 do plano</p></div>
+        <div class="card"><h3>Franquia · 0</h3><p class="meta">Semeio mês 2</p></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+let role = 'agency';
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+
+function enterApp(){
+  $('#screen-login').classList.add('hidden');
+  $('#app').classList.remove('hidden');
+  applyRole();
+  go(role === 'agency' ? 'dashboard' : 'admin-tenants');
+}
+function logout(){
+  $('#app').classList.add('hidden');
+  $('#screen-login').classList.remove('hidden');
+}
+function applyRole(){
+  const ag = role === 'agency';
+  $('#nav-agency').classList.toggle('hidden', !ag);
+  $('#nav-smark').classList.toggle('hidden', ag);
+  $('#user-name').textContent = ag ? 'Ana Ops' : 'Andreik · smark';
+  $('#user-role').textContent = ag ? 'owner · agência' : 'staff · plataforma';
+  $('#wl-name').textContent = ag ? 'Agência Norte' : 'smark platform';
+  $('#wl-sub').textContent = ag ? 'white studio' : 'admin';
+  $('#wl-mark').textContent = ag ? 'A' : 'S';
+  $('#plan-pill').textContent = ag ? 'plano · 2 inclusos + 1 extra' : 'ops · multi-tenant';
+  $('#plan-pill').className = ag ? 'pill' : 'pill v';
+}
+$$('#role-agency, #role-smark').forEach(b=>{
+  b.onclick = ()=>{
+    role = b.dataset.role;
+    $$('#role-agency, #role-smark').forEach(x=>x.classList.toggle('on', x===b));
+  };
+});
+
+function go(id){
+  $$('.view').forEach(v=>v.classList.add('hidden'));
+  const view = document.getElementById('view-'+id);
+  if(view) view.classList.remove('hidden');
+  $$('.nav button').forEach(b=>b.classList.toggle('on', b.dataset.go===id));
+  window.scrollTo(0,0);
+}
+document.body.addEventListener('click', e=>{
+  const b = e.target.closest('[data-go]');
+  if(b){ e.preventDefault(); go(b.dataset.go); }
+});
+
+// deep link ?view=
+const q = new URLSearchParams(location.search).get('view');
+if(q){ enterApp(); go(q); }
+</script>
+</body>
+</html>
