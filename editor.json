@@ -2107,6 +2107,46 @@
         "image_gens_total": 0,
         "exports_total": 0
       }
+    },
+    {
+      "slug": "teste-ai",
+      "marca": "smark",
+      "status": "rascunho",
+      "titulo": "Teste AI",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-ai/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ],
+      "roi": {
+        "active": {
+          "started_at": "2026-07-27T14:04:03",
+          "copy_calls": 0,
+          "image_gens": 0
+        },
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     }
   ]
 }
