@@ -2220,6 +2220,46 @@
         "image_gens_total": 0,
         "exports_total": 0
       }
+    },
+    {
+      "slug": "sul-cont-bil",
+      "marca": "sul-contabil",
+      "status": "rascunho",
+      "titulo": "Sul Contábil",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/sul-contabil/publicacoes/social/instagram/arte/sul-cont-bil/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ],
+      "roi": {
+        "active": {
+          "started_at": "2026-07-27T20:32:27",
+          "copy_calls": 0,
+          "image_gens": 0
+        },
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     }
   ]
 }
