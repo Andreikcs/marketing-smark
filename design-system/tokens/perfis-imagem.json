@@ -83,7 +83,8 @@
         "smark",
         "provider-max",
         "elever-ai",
-        "netsul"
+        "netsul",
+        "sul-contabil"
       ],
       "registro": "abstrato-material",
       "modelo": "google/gemini-3-pro-image",
