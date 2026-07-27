@@ -26,7 +26,9 @@
         "provider": "openrouter",
         "suporta_seed": false,
         "max_refs": 14,
-        "papel": ["final"],
+        "papel": [
+          "final"
+        ],
         "custo_medido_usd": 0.244,
         "nota": "default final. 4K. Robusto ao prompt do _direcao."
       },
@@ -34,7 +36,9 @@
         "provider": "openrouter",
         "suporta_seed": true,
         "max_refs": 14,
-        "papel": ["rascunho"],
+        "papel": [
+          "rascunho"
+        ],
         "custo_medido_usd": 0.04,
         "nota": "SÓ rascunho. Bake-off 2026-07-24: com _direcao longo tipografa o prompt. Usar construir_rascunho() + gate_texto."
       },
@@ -42,7 +46,9 @@
         "provider": "openrouter",
         "suporta_seed": false,
         "max_refs": 3,
-        "papel": ["rascunho"],
+        "papel": [
+          "rascunho"
+        ],
         "custo_medido_usd": null,
         "nota": "candidato barato alternativo; ainda sem bake-off aprovado como default de rascunho."
       },
@@ -50,26 +56,43 @@
         "provider": "openai",
         "suporta_seed": false,
         "max_refs": 0,
-        "papel": ["final", "suplente"],
+        "papel": [
+          "final",
+          "suplente"
+        ],
         "custo_medido_usd": null,
         "nota": "suplente. Sem resolution/aspect_ratio — usa size/quality."
       }
     },
     "banidos": {
-      "bytedance-seed/seedream-4.5@final":
-        "bake-off 2026-07-24: tipografa o prompt na arte com _direcao longo. Liberado só como tier=rascunho + prompt curto + gate."
+      "bytedance-seed/seedream-4.5@final": "bake-off 2026-07-24: tipografa o prompt na arte com _direcao longo. Liberado só como tier=rascunho + prompt curto + gate."
     },
-    "suplente": { "modelo": "gpt-image-1.5", "provider": "openai" },
-    "acervo": { "ativo": false, "max_refs": 20, "dir": null }
+    "suplente": {
+      "modelo": "gpt-image-1.5",
+      "provider": "openai"
+    },
+    "acervo": {
+      "ativo": false,
+      "max_refs": 20,
+      "dir": null
+    }
   },
   "familias": {
     "smark": {
-      "marcas": ["smark", "provider-max", "elever-ai"],
+      "marcas": [
+        "smark",
+        "provider-max",
+        "elever-ai",
+        "netsul"
+      ],
       "registro": "abstrato-material",
       "modelo": "google/gemini-3-pro-image",
       "modelo_rascunho": "bytedance-seed/seedream-4.5",
       "calibrado_em": "2026-07-24",
-      "acervo": { "ativo": false, "dir": "design-system/acervo/smark" }
+      "acervo": {
+        "ativo": false,
+        "dir": "design-system/acervo/smark"
+      }
     }
   },
   "familia_padrao": "smark"

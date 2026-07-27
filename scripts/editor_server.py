@@ -719,8 +719,16 @@ def frame_kwargs(fr, size, for_export, marca="smark"):
 
 
 def safe_marca(m):
-    """Marca path-safe e registrada; desconhecida → smark (com lista dinâmica)."""
+    """Marca path-safe e registrada; desconhecida → smark (só paths/UI legada)."""
     return _marcas.safe_marca(m, fallback="smark")
+
+
+def require_marca(m):
+    """Marca registrada ou ValueError — usar em geração/copy (sem fallback silencioso)."""
+    m = (m or "").strip()
+    if not m:
+        return "smark"
+    return _marcas.require(m)
 
 
 def safe_slug(s):
@@ -998,7 +1006,10 @@ class H(http.server.BaseHTTPRequestHandler):
             slug = safe_slug(req.get("slug", "")) if req.get("slug") else ("novo-" + secrets.token_hex(3))
             if any(p["slug"] == slug for p in d["posts"]):
                 slug = slug + "-" + secrets.token_hex(2)
-            marca = safe_marca(req.get("marca", "smark"))
+            try:
+                marca = require_marca(req.get("marca", "smark"))
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
             try:
                 defs = json.load(open(os.path.join(VAULT, "design-system", "tokens", "tokens.json"), encoding="utf-8"))
             except Exception:
@@ -1098,7 +1109,10 @@ class H(http.server.BaseHTTPRequestHandler):
                 post = d["posts"][req["post"]]
                 fr = post["frames"][req["frame"]]
                 slug = safe_slug(post.get("slug", ""))
-                marca = safe_marca(post.get("marca", "smark"))
+                try:
+                    marca = require_marca(post.get("marca", "smark"))
+                except ValueError as e:
+                    return self._send(400, {"ok": False, "erro": str(e)})
                 dd = os.path.join(VAULT, "marcas", marca, "publicacoes", "social", "instagram",
                                   "arte", slug, "_regen")
                 os.makedirs(dd, exist_ok=True)
@@ -1159,7 +1173,10 @@ class H(http.server.BaseHTTPRequestHandler):
                 pedido = (req.get("prompt", "") or "").strip()
                 if not pedido:
                     return self._send(400, {"ok": False, "erro": "pedido vazio"})
-                marca = safe_marca(req.get("marca", "smark"))
+                try:
+                    marca = require_marca(req.get("marca", "smark"))
+                except ValueError as e:
+                    return self._send(400, {"ok": False, "erro": str(e)})
                 n = max(1, min(10, int(req.get("n", 3) or 3)))
                 tipo = req.get("tipo", "")
                 contexto = str(req.get("contexto", ""))[:1500]

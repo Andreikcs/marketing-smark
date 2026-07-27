@@ -75,11 +75,13 @@ def load_brands():
     fund["_claro"] = t.get("tema_claro", {})
     brands = {}
     for slug, m in t["marcas"].items():
+        brasao = m.get("brasao") or {}
         brands[slug] = {
             "name": m["nome"], "accent": m["acento"], "bright": m.get("acento_claro", m["acento"]),
             "glyph": m.get("logo_glyph", "•"), "handle": m.get("handle", "@" + slug),
             "endossa": m.get("endossa", False),
             "logo_path": m.get("logo_path", ""), "logo_svg": m.get("logo_svg", ""),
+            "logo_file": brasao.get("principal") or m.get("logo_file") or "",
             "wordmark": m.get("wordmark", ""), "gradiente": m.get("gradiente", ""),
             "tab": (m["wordmark"].split("*")[0].split()[0].upper() if m.get("wordmark")
                     else m["nome"].split()[0].replace(".", "").upper()),
@@ -91,14 +93,41 @@ def esc(s):
     return htmlmod.escape(s)
 
 
+def _resolve_logo_file(rel):
+    """Caminho absoluto do logo PNG/SVG: vault-root ou design-system/assets."""
+    if not rel:
+        return ""
+    if os.path.isabs(rel) and os.path.isfile(rel):
+        return rel
+    p1 = os.path.join(VAULT, rel)
+    if os.path.isfile(p1):
+        return p1
+    p2 = os.path.join(VAULT, "design-system", "assets", rel)
+    if os.path.isfile(p2):
+        return p2
+    return ""
+
+
 def glyph_html(b, color, px):
-    """Símbolo da marca: logo_svg (markup multi-elemento, usa currentColor) > logo_path (path único) > letra."""
+    """Símbolo: logo_svg > logo_path (SVG path) > logo_file (PNG cliente) > letra."""
     if b.get("logo_svg"):
         return (f'<svg viewBox="0 0 100 100" width="{px}" height="{px}" style="color:{color}">'
                 f'{b["logo_svg"]}</svg>')
     if b.get("logo_path"):
         return (f'<svg viewBox="0 0 100 100" width="{px}" height="{px}">'
                 f'<path fill-rule="evenodd" fill="{color}" d="{b["logo_path"]}"/></svg>')
+    # Cliente externo: PNG/SVG em branding/assets (sem path SVG canônico)
+    lf = _resolve_logo_file(b.get("logo_file") or "")
+    if lf:
+        ext = os.path.splitext(lf)[1].lower()
+        mime = {"png": "image/png", ".png": "image/png", ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml"}.get(ext, "image/png")
+        try:
+            data = base64.b64encode(open(lf, "rb").read()).decode()
+            return (f'<img src="data:{mime};base64,{data}" width="{px}" height="{px}" '
+                    f'alt="" style="object-fit:contain;display:block;border-radius:10px"/>')
+        except OSError:
+            pass
     return esc(b["glyph"])
 
 

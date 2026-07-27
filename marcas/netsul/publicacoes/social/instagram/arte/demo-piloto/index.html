@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NetSul · piloto multi-marca</title>
+<style>
+  :root {
+    --bg: #0f0c0a;
+    --pan: #1a1512;
+    --line: rgba(255,255,255,.1);
+    --txt: #fff8f4;
+    --muted: #b9a89c;
+    --acc: #E0562D;
+    --acc2: #FF7A4D;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Archivo", system-ui, -apple-system, sans-serif;
+    background: radial-gradient(120% 80% at 10% 0%, #3a1a10 0%, var(--bg) 55%);
+    color: var(--txt);
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+  }
+  header {
+    max-width: 1100px;
+    margin: 0 auto 36px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .logo {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: linear-gradient(155deg, #E0562D, #2A1CA8);
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 28px; color: #fff;
+    box-shadow: 0 10px 30px rgba(224,86,45,.35);
+  }
+  h1 { font-size: 28px; letter-spacing: -.02em; }
+  h1 span { color: var(--acc2); }
+  .meta { color: var(--muted); font-size: 14px; line-height: 1.5; max-width: 520px; }
+  .badge {
+    margin-left: auto;
+    border: 1px solid var(--line);
+    background: var(--pan);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .badge b { color: var(--acc2); }
+  .grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; max-width: 420px; }
+  }
+  .card {
+    background: var(--pan);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  }
+  .card img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 1080/1350;
+    object-fit: cover;
+    background: #000;
+  }
+  .cap {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cap b { font-size: 14px; }
+  .cap span { font-size: 12px; color: var(--muted); }
+  .note {
+    max-width: 1100px;
+    margin: 28px auto 0;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px dashed rgba(224,86,45,.4);
+    background: rgba(224,86,45,.08);
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .note strong { color: var(--acc2); }
+  a { color: var(--acc2); }
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">N</div>
+    <div>
+      <h1>NetSul <span>Fibra</span></h1>
+      <p class="meta">Piloto multi-marca · acento #E0562D · 3 peças rascunho (Seedream + compositor)</p>
+    </div>
+    <div class="badge">slug <b>netsul</b> · porta <b>8793</b></div>
+  </header>
+
+  <div class="grid">
+    <article class="card">
+      <img src="01.png" alt="NetSul 01 manifesto">
+      <div class="cap">
+        <b>01 · Manifesto</b>
+        <span>Internet rápida que chega de verdade</span>
+      </div>
+    </article>
+    <article class="card">
+      <img src="02.png" alt="NetSul 02 dor">
+      <div class="cap">
+        <b>02 · Dor</b>
+        <span>Sinal cai na hora do game?</span>
+      </div>
+    </article>
+    <article class="card">
+      <img src="03.png" alt="NetSul 03 CTA">
+      <div class="cap">
+        <b>03 · CTA</b>
+        <span>Troque hoje pela NetSul</span>
+      </div>
+    </article>
+  </div>
+
+  <p class="note">
+    <strong>Rascunho, não entrega final.</strong>
+    Fundos Seedream (~R$0,21 cada) + tipografia/moldura do compositor com paleta e logo NetSul.
+    Para publicável: <code>tier=final</code> (Gemini 4K) após aprovação visual.
+    Editor principal continua em <a href="http://localhost:8765">:8765</a>.
+  </p>
+</body>
+</html>

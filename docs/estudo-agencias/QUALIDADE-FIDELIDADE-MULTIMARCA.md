@@ -129,3 +129,32 @@ Implementação multi-marca só deve começar com:
 1. Tag/branch de backup ativa (feita)  
 2. Este checklist como critério de PR  
 3. Autorização explícita do Sprint 1 (marcas dinâmicas + nova-marca + paleta/logo no compositor)
+
+---
+
+## 8. Sprint 1 — status (2026-07-27)
+
+**Implementado:**
+
+| Peça | Onde |
+|------|------|
+| Registry dinâmico | `scripts/_marcas.py` (tokens.json = fonte) |
+| CLI criar/listar/check | `scripts/nova_marca.py` |
+| API UI | `GET /marcas`, `POST /nova-marca` |
+| Select dinâmico no Editor | `_editor2.html` → `carregarMarcas()` |
+| Paleta/mood por marca | `_direcao.py`, `_paleta.py` |
+| Logo PNG de cliente no chip | `compositor.py` → `brasao.principal` / `logo_file` |
+| Sem fallback silencioso em geração | `openai_image.require`, `estudio.require`, `require_marca` no editor |
+| Branding mínimo ao criar | identidade + voice + tom + do-and-dont |
+| Sync motor de imagem | `_sync_perfis` → família smark |
+
+**Uso:**
+
+```bash
+python3 scripts/nova_marca.py list
+python3 scripts/nova_marca.py add --slug netsul --nome "NetSul Fibra" --acento "#E0562D" --logo /path/logo.png
+python3 scripts/nova_marca.py check --slug netsul
+# No Editor: selecionar a marca no Estúdio / Novo post
+```
+
+**Ainda não é multi-tenant SaaS** — um operador, vault local, N marcas.

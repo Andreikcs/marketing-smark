@@ -76,3 +76,25 @@ def test_criar_hex_invalido(tmp_path, monkeypatch):
         assert False
     except ValueError as e:
         assert "hex" in str(e).lower() or "acento" in str(e).lower()
+
+
+def test_listar_detalhes_campos():
+    d = _marcas.listar_detalhes()
+    assert any(x["slug"] == "smark" and x["canonica"] for x in d)
+    for x in d:
+        assert "acento" in x and "pronta" in x
+
+
+def test_compositor_aceita_marca_do_tokens():
+    """Canônicas e qualquer slug em tokens carregam no compositor."""
+    import compositor  # noqa: E402
+    brands, _ = compositor.load_brands()
+    for s in _marcas.list_slugs():
+        assert s in brands
+        assert brands[s]["accent"]
+
+
+def test_direcao_usa_acento_da_marca():
+    import _direcao  # noqa: E402
+    p = _direcao.construir("smark", "manifesto", "claro")
+    assert "#8B3CF7" in p or "8B3CF7" in p.upper()

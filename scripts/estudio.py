@@ -45,7 +45,7 @@ REGRAS INVIOLÁVEIS:
    direto, humano.
 3. NUNCA prometa venda, faturamento ou número mágico ("venda 3x", "fature mais").
    Fale de gestão: custo, tempo, produtividade, escala — nunca resultado comercial.
-4. A marca pedida no contexto deve ser respeitada (slug). Se for smark/provider-max/elever-ai,
+4. A marca pedida no contexto deve ser respeitada (slug registrado). Se for canônica ou cliente,
    use o posicionamento do grupo; se for marca de cliente externo, use o tom genérico
    claro e concreto daquela marca (sem inventar jargão).
 5. smark (grupo) = assessoria com "funcionários de IA"; produtos Elever/Provider Max
@@ -211,11 +211,9 @@ def _via_openai(api_key, instrucao, imagem_b64=None, imagem_mime="image/jpeg"):
 def gerar(pedido, marca="smark", n_frames=3, tipo="", contexto="", historico=None,
           imagem_b64=None, imagem_mime="image/jpeg", slug=""):
     """Devolve (resultado_dict, provider_usado, meta_custo). Levanta RuntimeError em falha."""
+    # Marca desconhecida = erro explícito (sem fallback silencioso p/ smark)
     if _marcas:
-        try:
-            marca = _marcas.require(marca) if marca else "smark"
-        except ValueError:
-            marca = _marcas.safe_marca(marca or "smark")
+        marca = _marcas.require(marca) if marca else "smark"
     else:
         marca = marca or "smark"
     n_frames = max(1, min(10, int(n_frames or 3)))

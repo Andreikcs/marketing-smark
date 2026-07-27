@@ -122,8 +122,15 @@ def main():
     if not args.prompt and not args.prompt_file and not args.direcao:
         sys.exit("ERRO: informe --prompt, --prompt-file ou --direcao")
 
+    # Marca: default explícito smark; desconhecida = erro (sem fallback silencioso)
+    import _marcas  # noqa: E402
+    try:
+        args.marca = _marcas.require(args.marca) if args.marca else "smark"
+    except ValueError as e:
+        sys.exit(f"ERRO: {e}")
+
     slug = args.slug or os.path.splitext(os.path.basename(args.out))[0]
-    perfil = _perfil.resolver(args.marca or "smark", slug=slug,
+    perfil = _perfil.resolver(args.marca, slug=slug,
                               tipo=args.tipo, reroll=args.reroll, size=args.size,
                               tier=args.tier)
 
@@ -141,7 +148,7 @@ def main():
         prompt = args.prompt
         if args.prompt_file:
             prompt = open(args.prompt_file, "r", encoding="utf-8").read().strip()
-    prompt = aplicar_guard(prompt, args.paleta, not args.no_guard, marca=args.marca or "")
+    prompt = aplicar_guard(prompt, args.paleta, not args.no_guard, marca=args.marca)
     env = load_env(os.path.join(VAULT, ".env"))
     chaves = carregar_chaves(env)
 
