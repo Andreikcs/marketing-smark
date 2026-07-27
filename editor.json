@@ -2260,6 +2260,86 @@
         "image_gens_total": 0,
         "exports_total": 0
       }
+    },
+    {
+      "slug": "teste-105a",
+      "marca": "netsul",
+      "status": "rascunho",
+      "titulo": "Teste",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/netsul/publicacoes/social/instagram/arte/teste-105a/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ],
+      "roi": {
+        "active": {
+          "started_at": "2026-07-27T20:34:43",
+          "copy_calls": 0,
+          "image_gens": 0
+        },
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
+    },
+    {
+      "slug": "sul---x",
+      "marca": "sul-contabil",
+      "status": "rascunho",
+      "titulo": "Sul - X",
+      "size": "1080x1350",
+      "frames": [
+        {
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "sub": "",
+          "cta": "",
+          "page": "01/01",
+          "chip": true,
+          "tema": "claro",
+          "bgmode": "claro",
+          "bg": "",
+          "cor": "#F4F2FB",
+          "accent": "",
+          "hsize": 0,
+          "grade": true,
+          "n": 1,
+          "out": "marcas/sul-contabil/publicacoes/social/instagram/arte/sul---x/01.png"
+        }
+      ],
+      "caption": "",
+      "canais": [
+        "instagram"
+      ],
+      "roi": {
+        "active": {
+          "started_at": "2026-07-27T20:36:17",
+          "copy_calls": 1,
+          "image_gens": 0
+        },
+        "cycles": [],
+        "copy_calls_total": 1,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     }
   ]
 }
