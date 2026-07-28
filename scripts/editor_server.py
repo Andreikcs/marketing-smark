@@ -29,6 +29,7 @@ import _acervo  # noqa: E402
 import _perfil  # noqa: E402
 import _roi  # noqa: E402
 import _marcas  # noqa: E402
+import _dna_marca  # noqa: E402
 
 PORT = 8765
 PAINEL = os.path.join(VAULT, "painel.html")
@@ -483,7 +484,13 @@ tr:last-child td{{border-bottom:0}}
             <span id=mf_bb_status style="font-size:11px;color:var(--muted)"></span>
           </div>
         </div>
-        <div class=fld><label>Site (opcional)</label><input id=mf_site placeholder="https://cliente.com.br"></div>
+        <div class=fld><label>Site (opcional)</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id=mf_site placeholder="https://cliente.com.br" style="flex:1;min-width:180px">
+            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ler_site title="Lê o site e sugere nome, mood e segmento — você revisa e salva">Ler site</button>
+          </div>
+          <div id=mf_dna_msg style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4"></div>
+        </div>
         <div class=fld><label>Template padrão da arte (novos posts desta marca)</label>
           <div id=mf_moldura style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:4px">
             <label class=chk><input type=checkbox id=mf_m_chip checked> Selo (chip)</label>
@@ -970,6 +977,56 @@ async function runIaMarca(mode){{
 }}
 document.getElementById('mf_ia_mood').onclick=()=>runIaMarca('mood');
 document.getElementById('mf_ia_all').onclick=()=>runIaMarca('all');
+// DNA do site — opcional, preenche o form; não salva sozinho
+document.getElementById('mf_ler_site').onclick=async()=>{{
+  const site=(document.getElementById('mf_site').value||'').trim();
+  const dmsg=document.getElementById('mf_dna_msg');
+  const msg=document.getElementById('mf_msg');
+  if(!site){{
+    if(dmsg)dmsg.textContent='Cole a URL do site do cliente primeiro.';
+    return;
+  }}
+  if(dmsg)dmsg.textContent='Lendo o site…';
+  if(msg){{msg.className='';msg.textContent='Analisando site…'}}
+  const r=await api('/marca-ler-site',{{url:site}});
+  if(!r.ok){{
+    if(dmsg)dmsg.textContent=r.erro||'Não consegui ler o site';
+    if(msg){{msg.className='err';msg.textContent=r.erro||'falhou'}}
+    return;
+  }}
+  const f=r.formulario||{{}};
+  // só preenche se vazio ou se o usuário confirmar sobrescrever
+  const fill=(id,val,force)=>{{
+    if(!val)return;
+    const el=document.getElementById(id); if(!el)return;
+    if(force||!el.value.trim()) el.value=val;
+  }};
+  const sobrescrever=!!(
+    document.getElementById('mf_nome').value.trim()||
+    document.getElementById('mf_mood').value.trim()
+  );
+  let ok=true;
+  if(sobrescrever){{
+    ok=confirm('Já há dados no formulário. Usar as sugestões do site (pode preencher campos vazios e atualizar mood/segmento)?');
+  }}
+  if(!ok){{if(dmsg)dmsg.textContent='Cancelado.';return}}
+  fill('mf_nome', f.nome, true);
+  fill('mf_handle', f.handle, !document.getElementById('mf_handle').value.trim());
+  fill('mf_wordmark', f.wordmark, !document.getElementById('mf_wordmark').value.trim());
+  fill('mf_mood', f.mood, true);
+  fill('mf_site', f.site||site, true);
+  if(f.segmento) document.getElementById('mf_segmento').value=f.segmento;
+  if(f.acento&&/^#[0-9A-Fa-f]{{6}}$/.test(f.acento)){{
+    document.getElementById('mf_acento').value=f.acento;
+  }}
+  if(document.getElementById('mf_glyph_mode').value==='auto') syncGlyphMode();
+  const sc=r.score!=null?(' · confiança ~'+r.score+'%'):'';
+  const extra=[];
+  if(r.proposta) extra.push(r.proposta);
+  if(r.publico) extra.push('Público: '+r.publico);
+  if(dmsg)dmsg.textContent='Sugestões do site aplicadas'+sc+'. Revise e clique em Salvar.'+(extra.length?(' — '+extra[0]):'');
+  if(msg){{msg.className='ok';msg.textContent='Site lido — revise os campos e salve'}}
+}};
 document.getElementById('mf_save').onclick=async()=>{{
   const msg=document.getElementById('mf_msg');
   msg.className=''; msg.textContent='Salvando…';
@@ -2618,6 +2675,33 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-ler-site":
+            # DNA leve: crawl + LLM → sugere campos do form (não grava)
+            try:
+                url = str(req.get("url") or req.get("site") or "").strip()
+                if not url:
+                    return self._send(400, {"ok": False, "erro": "informe a URL do site"})
+                dna = _dna_marca.extrair_de_url(url)
+                form = _dna_marca.para_formulario(dna)
+                return self._send(200, {
+                    "ok": True,
+                    "formulario": form,
+                    "score": dna.get("score"),
+                    "proposta": dna.get("proposta"),
+                    "publico": dna.get("publico"),
+                    "tom": dna.get("tom"),
+                    "restricoes": dna.get("restricoes") or [],
+                    "confianca": dna.get("confianca") or {},
+                    "paginas_lidas": dna.get("paginas_lidas") or [],
+                    "meta_llm": dna.get("meta_llm") or {},
+                })
+            except ValueError as e:
+                return self._send(422, {"ok": False, "erro": str(e)})
+            except RuntimeError as e:
+                return self._send(503, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": f"falha na leitura: {e}"})
 
         if path == "/marca-ref":
             # upload imediato de uma referência (não espera salvar o form da marca)

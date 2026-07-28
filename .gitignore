@@ -11,3 +11,5 @@
 # então versionamos toda a árvore arte/. Só os PNG entram; nada de segredo aqui.
 __pycache__/
 *.pyc
+
+.backups/
