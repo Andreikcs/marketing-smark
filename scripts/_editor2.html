@@ -219,49 +219,64 @@ input[type=range]{accent-color:var(--accent)}
 #toast{background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius-md);box-shadow:var(--shadow-lg)}
 .th.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
-/* ===================== ESTÚDIO IA (chat flutuante) ===================== */
-#estudio{position:fixed;right:18px;bottom:18px;width:380px;max-width:92vw;max-height:78vh;display:none;flex-direction:column;
-  background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);z-index:400;overflow:hidden}
+/* ===================== ESTÚDIO IA (estilo Gemini) ===================== */
+#estudio{position:fixed;right:16px;bottom:16px;width:min(440px,94vw);height:min(72vh,720px);display:none;flex-direction:column;
+  background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.45);z-index:400;overflow:hidden}
 #estudio.on{display:flex}
-#estudio.min{max-height:none}
-#estudio.min .eslog,#estudio.min .esfoot{display:none}
+#estudio.min{height:auto;width:min(320px,90vw)}
+#estudio.min .eslog,#estudio.min .esfoot,#estudio.min .eswelcome{display:none}
 #estudio.min .eshead{border-bottom:0;cursor:pointer}
-.eshead{display:flex;align-items:center;gap:8px;padding:13px 15px;border-bottom:1px solid var(--line)}
-.eslogo{display:inline-flex;align-items:center;gap:7px}
-.esmark{width:24px;height:24px;border-radius:6px;background:linear-gradient(155deg,#9A4DFF,#2A1CA8);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
-.esword{font-family:var(--font-text);font-weight:800;font-size:16px;color:var(--txt)}
-.essub{font-size:12px;color:var(--muted);font-weight:600}
-.eshead .prov{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
-.eshead .x{background:transparent;border:0;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px}
-.eslog{flex:1;overflow:auto;padding:14px 15px;display:flex;flex-direction:column;gap:10px;min-height:90px}
-.esmsg{font-size:13px;line-height:1.45;border-radius:12px;padding:9px 12px;max-width:92%}
-.esmsg.u{align-self:flex-end;background:var(--accent);color:var(--accent-ink)}
-.esmsg.a{align-self:flex-start;background:var(--inset);color:var(--text)}
+.eshead{display:flex;align-items:center;gap:8px;padding:12px 14px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
+.eslogo{display:inline-flex;align-items:center;gap:8px}
+.esmark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#8B5CF6,#3B82F6 55%,#22D3EE);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.esword{font-family:var(--font-text);font-weight:800;font-size:15px;color:var(--txt);letter-spacing:-.02em}
+.essub{font-size:11px;color:var(--muted);font-weight:600}
+.eshead .prov{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--inset)}
+.eshead .x{background:transparent;border:0;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:8px}
+.eshead .x:hover{background:var(--inset);color:var(--text)}
+.eswelcome{padding:18px 18px 8px;text-align:center}
+.eswelcome h3{font-size:18px;font-weight:700;color:var(--txt);margin:0 0 6px;letter-spacing:-.02em}
+.eswelcome p{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0}
+.eslog{flex:1;overflow:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.esmsg{font-size:13px;line-height:1.5;border-radius:16px;padding:10px 13px;max-width:94%}
+.esmsg.u{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:6px}
+.esmsg.a{align-self:flex-start;background:var(--inset);color:var(--text);border-bottom-left-radius:6px}
 .esmsg.a .alert{color:var(--warn);font-size:11px;margin-top:5px}
 .esmsg .apply{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
-.esmsg .apply button{border:1px solid var(--field-line);background:var(--surface);color:var(--text);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer}
+.esmsg .apply button{border:1px solid var(--field-line);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer}
 .esmsg .apply button.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
-.esempty{color:var(--muted);font-size:12.5px;line-height:1.5}
-.esfoot{border-top:1px solid var(--line);padding:11px 13px;display:flex;flex-direction:column;gap:8px}
-.esopts{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;font-size:12px;color:var(--sub)}
-.esopts select{background:var(--field);border:1px solid var(--field-line);color:var(--text);border-radius:8px;padding:5px 7px;font-size:12px;max-width:42%}
-.esopts label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;margin:0;white-space:nowrap}
-.esopts .esrow1,.esopts .esrow2{display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:100%}
-.esbadge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 9px;background:var(--inset);white-space:nowrap}
+.esempty{display:none}
+.esfoot{border-top:1px solid transparent;padding:10px 12px 14px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,transparent,var(--surface) 18%)}
+.escomposer{background:var(--inset);border:1px solid var(--line);border-radius:28px;padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.escomposer:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.esopts{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:11px;color:var(--sub);padding:0 4px}
+.esopts select{background:var(--surface);border:1px solid var(--field-line);color:var(--text);border-radius:999px;padding:4px 10px;font-size:11px;max-width:46%}
+.esopts label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;margin:0;white-space:nowrap;padding:4px 8px;border-radius:999px;border:1px solid var(--field-line);background:var(--surface)}
+.esopts label.on{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.esopts .esrow1,.esopts .esrow2{display:flex;flex-wrap:wrap;align-items:center;gap:6px;width:100%}
+.esbadge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 8px;background:var(--surface);white-space:nowrap}
 .esbadge b{color:var(--accent);font-weight:700}
-.esattach{display:none;align-items:center;gap:9px;margin-bottom:8px;background:var(--inset);border:1px solid var(--line);border-radius:10px;padding:6px 9px}
+.esattach{display:none;align-items:center;gap:9px;margin:0 4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 9px}
 .esattach.on{display:flex}
-.esattach img{width:42px;height:42px;object-fit:cover;border-radius:7px;flex:0 0 auto}
+.esattach img{width:40px;height:40px;object-fit:cover;border-radius:10px;flex:0 0 auto}
 .esattach .rm{margin-left:auto;background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:15px}
 .esattach .rm:hover{color:var(--bad)}
-.esplus{width:44px;height:44px;flex:0 0 auto;background:var(--surface);border:1px solid var(--field-line);border-radius:11px;color:var(--sub);font-size:22px;cursor:pointer;transition:.15s}
-.esplus:hover{border-color:var(--accent);color:var(--text)}
-.esplus.has{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
-.esrow{display:flex;gap:8px;align-items:flex-end}
-.esrow textarea{flex:1;min-height:42px;max-height:120px;background:var(--field);border:1px solid var(--field-line);border-radius:11px;color:var(--text);padding:10px 11px;font-size:13px;font-family:var(--font-text);resize:none}
-.esrow textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.esrow .send{background:var(--accent);color:var(--accent-ink);border:0;border-radius:11px;padding:0 16px;height:44px;font-weight:600;cursor:pointer}
-.esrow .send:disabled{opacity:.5;cursor:wait}
+.esrow{display:flex;gap:6px;align-items:flex-end;padding:0 2px}
+.esplus{width:40px;height:40px;flex:0 0 auto;background:transparent;border:0;border-radius:50%;color:var(--sub);font-size:22px;cursor:pointer;transition:.15s;position:relative}
+.esplus:hover{background:var(--surface);color:var(--text)}
+.esplus.has{color:var(--accent);background:var(--accent-soft)}
+.esmenu{display:none;position:absolute;bottom:48px;left:0;min-width:200px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);padding:6px;z-index:5}
+.esmenu.on{display:block}
+.esmenu button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:var(--text);text-align:left;padding:10px 12px;border-radius:10px;font-size:13px;cursor:pointer}
+.esmenu button:hover{background:var(--inset)}
+.esmenu .sep{height:1px;background:var(--line);margin:4px 8px}
+.esrow textarea{flex:1;min-height:40px;max-height:110px;background:transparent;border:0;color:var(--text);padding:8px 6px;font-size:14px;font-family:var(--font-text);resize:none}
+.esrow textarea:focus{outline:none}
+.esrow .send{background:var(--accent);color:var(--accent-ink);border:0;border-radius:50%;width:40px;height:40px;font-weight:700;cursor:pointer;font-size:16px;flex:0 0 auto}
+.esrow .send:disabled{opacity:.45;cursor:wait}
+.eschips{display:flex;flex-wrap:wrap;gap:6px;padding:0 4px 2px}
+.eschip{border:1px solid var(--line);background:var(--surface);color:var(--sub);border-radius:999px;padding:5px 10px;font-size:11px;cursor:pointer}
+.eschip:hover{border-color:var(--accent);color:var(--text)}
 
 /* ===================== PROGRESSO DE GERAÇÃO DE IA ===================== */
 .genprog{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;gap:13px;background:color-mix(in srgb,var(--bg) 74%,transparent);backdrop-filter:blur(4px);border-radius:4px;text-align:center;padding:20px}
@@ -303,8 +318,9 @@ input[type=range]{accent-color:var(--accent)}
     <button class=hicon id=broi title="ROI humano — tempo e custo dos posts"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><circle cx=12 cy=12 r=9/><path d="M12 7v5l3 2"/></svg></button>
     <button class=hicon id=bhist title="Histórico de versões deste post"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg></button>
     <button class=hicon id=bexport title="exportar PNG (este frame ou o carrossel)"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></button>
+    <button class=hicon id=btheme title="Alternar claro/escuro" type=button>◐</button>
     <button class="sk-btn sk-btn--studio" style="width:auto" id=bestudio><svg viewBox="0 0 24 24" width=15 height=15 fill=currentColor style="margin-right:5px;vertical-align:-2px"><path d="M12 2l1.7 5.5L19 9l-5.3 1.5L12 16l-1.7-5.5L5 9l5.3-1.5z"/><path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>Estúdio IA</button>
-    <button class="btn" style="width:auto" id=bsave>💾 Salvar</button>
+    <button class="btn" style="width:auto" id=bsave>Salvar</button>
   </header>
   <div id=roipanel class=roipanel>
     <div class=roihead><span>⏱ Tempo e custo</span><button class=hicon id=roiclose title=fechar>✕</button></div>
@@ -692,7 +708,19 @@ function richField(label,val,onin,key){
     if(t.length>=2&&t[0]==='*'&&t[1]!=='*'&&t.slice(-1)==='*'&&t.slice(-2,-1)!=='*')t=t.slice(1,-1);return t};
   const wrapBI=m=>{const{s,e}=getSel();const sel=ta.value.slice(s,e)||'texto';commit(s,e,m+sel+m)};
   const accent=()=>{const{s,e}=getSel();if(s===e){toast('Selecione a palavra primeiro');return}commit(s,e,'*'+bare(ta.value.slice(s,e))+'*')};
-  const paint=(hex,ss)=>{const{s,e}=getSel(ss);if(s===e){toast('Selecione a palavra que quer pintar');return}commit(s,e,'{'+hex+':'+bare(ta.value.slice(s,e))+'}')};
+  const paint=(hex,ss)=>{
+    const{s,e}=getSel(ss);if(s===e){toast('Selecione a palavra que quer pintar');return}
+    // evita branco no tema claro (texto some na foto)
+    let hx=(hex||'').toUpperCase();
+    const tema=((typeof frame==='function'&&frame())||{}).tema||'claro';
+    if(tema==='claro'&&(hx==='#FFFFFF'||hx==='#FFF'||hx==='#F4F2FB'||hx==='#EEEEEE')){
+      hx='#100D1C';toast('Cor clara demais pro tema claro — ajustei para legível');
+    }
+    if(tema==='escuro'&&(hx==='#000000'||hx==='#000'||hx==='#0B0B0B'||hx==='#100D1C')){
+      hx='#FFFFFF';toast('Cor escura demais pro tema escuro — ajustei para legível');
+    }
+    commit(s,e,'{'+hx+':'+bare(ta.value.slice(s,e))+'}')
+  };
   ta.addEventListener('keydown',ev=>{if(ev.ctrlKey||ev.metaKey){const k=ev.key.toLowerCase();
     if(k==='b'){ev.preventDefault();wrapBI('**')}else if(k==='i'){ev.preventDefault();wrapBI('_')}}});
   // linha 1: acento / B / I
@@ -898,10 +926,18 @@ function renderCtrl(){
     }
     // geração por IA agora vive no ESTÚDIO IA (tom, conceito, referência) — item 19/20
     const reg=document.createElement('div');reg.style.marginTop='12px';
-    const rb=document.createElement('button');rb.className='btn ai';rb.innerHTML='🤖 Gerar / trocar fundo no Estúdio IA';
-    rb.onclick=()=>{const b=document.getElementById('bestudio');if(b)b.click()};reg.appendChild(rb);
+    // Um único caminho de geração: o Estúdio (evita dois botões fazendo a mesma coisa)
+    const rb=document.createElement('button');rb.className='btn ai';rb.innerHTML='✦ Abrir Estúdio IA';
+    rb.onclick=()=>{
+      const b=document.getElementById('bestudio');
+      const chk=document.getElementById('esfundo');
+      if(chk){chk.checked=true;chk.parentElement&&chk.parentElement.classList.add('on')}
+      if(b)b.click();
+      const t=document.getElementById('estxt');if(t){t.placeholder='Descreva a arte ou a mudança no fundo…';t.focus()}
+    };
+    reg.appendChild(rb);
     const hintp=document.createElement('div');hintp.className='mini';hintp.style.marginTop='6px';
-    hintp.textContent='Tom (claro/escuro), conceito e referência por imagem agora ficam no Estúdio IA.';
+    hintp.textContent='Copy, conceito e fundo ficam no Estúdio — um só lugar.';
     reg.appendChild(hintp);g2.appendChild(reg);
   }else if(mode==='cor'){
     const cw=document.createElement('div');cw.className='row';cw.style.marginTop='8px';
@@ -1315,34 +1351,68 @@ document.addEventListener('keydown',e=>{
     else if(e.key==='ArrowRight'){e.preventDefault();if(FI<post().frames.length-1)sel(PI,FI+1)}
   }
 });
+// Tema claro/escuro do app
+(function(){
+  const KEY='smark-ui-theme';
+  function apply(t){
+    t=(t==='claro'||t==='light')?'claro':'escuro';
+    document.documentElement.setAttribute('data-theme',t==='claro'?'claro':'escuro');
+    try{localStorage.setItem(KEY,t)}catch(e){}
+  }
+  try{apply(localStorage.getItem(KEY)||'escuro')}catch(e){apply('escuro')}
+  const bt=document.getElementById('btheme');
+  if(bt)bt.onclick=()=>{
+    const cur=document.documentElement.getAttribute('data-theme')||'escuro';
+    apply(cur==='claro'?'escuro':'claro');
+  };
+})();
 carregar().then(()=>snapshot());
 </script>
 
 <div id=estudio>
   <div class=eshead id=eshead>
-    <span class=eslogo><span class=esmark><svg viewBox="0 0 100 100" width=13 height=13><path fill-rule=evenodd fill=#fff d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></span><b class=esword>smark<span style="color:var(--accent)">.</span></b><span class=essub>studio IA</span></span>
+    <span class=eslogo><span class=esmark><svg viewBox="0 0 100 100" width=13 height=13><path fill-rule=evenodd fill=#fff d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></span>
+      <b class=esword>Estúdio</b><span class=essub>IA</span></span>
     <span style="flex:1"></span>
-    <span class=prov id=esprov></span><button class=x id=esmin title="minimizar">–</button><button class=x id=esclose title="fechar">✕</button></div>
-  <div class=eslog id=eslog><div class=esempty>Descreva o post que você quer — eu gero a copy (headline, sub, CTA, legenda, hashtags) já no markup do editor, e um conceito visual pro fundo.<br><br>Ex: <i>"carrossel de 3 sobre parar de perder tempo com tarefa repetitiva, tom leve"</i></div></div>
+    <span class=prov id=esprov></span>
+    <button class=x id=esmin title="minimizar">–</button>
+    <button class=x id=esclose title="fechar">✕</button>
+  </div>
+  <div class=eswelcome id=eswelcome>
+    <h3>E aí — o que vamos criar?</h3>
+    <p>Peça copy, carrossel ou arte. Anexe uma foto de referência pelo +.</p>
+  </div>
+  <div class=eslog id=eslog><div class=esempty></div></div>
   <div class=esfoot>
-    <div class=esopts>
-      <div class=esrow1>
-        <span>Marca</span>
-        <select id=esmarca><option value=smark>smark</option><option value=provider-max>provider-max</option><option value=elever-ai>elever-ai</option></select>
-        <span>Frames</span>
-        <select id=esn><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+    <div class=eschips id=eschips>
+      <button type=button class=eschip data-p="carrossel de 3 sobre ">Carrossel 3</button>
+      <button type=button class=eschip data-p="post único, tom direto: ">Post único</button>
+      <button type=button class=eschip data-p="gere uma nova arte de fundo: ">Nova arte</button>
+      <button type=button class=eschip data-p="reescreva a legenda: ">Legenda</button>
+    </div>
+    <div class=escomposer>
+      <div class=esopts>
+        <div class=esrow1>
+          <select id=esmarca title="Marca"><option value=smark>smark</option></select>
+          <select id=esn title="Peças"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+          <label id=esfundo_lab><input type=checkbox id=esfundo> Gerar arte</label>
+          <span class=esbadge>Seedream · rascunho</span>
+        </div>
       </div>
-      <div class=esrow2>
-        <label title="Gera fundo com Seedream (~US$0,04). Edição com referência usa Gemini."><input type=checkbox id=esfundo> gerar arte <span style="color:var(--warn)">(pago)</span></label>
-        <span class=esbadge title="Padrão do sistema — sem escolha no UI. Export final com Gemini só via edição com ref ou CLI --tier final.">fundo: <b>Seedream</b> · ~US$0,04</span>
+      <div class=esattach id=esattach></div>
+      <div class=esrow style="position:relative">
+        <button class=esplus id=esplus title="Mais opções" type=button>＋</button>
+        <div class=esmenu id=esmenu>
+          <button type=button data-act=anexo>📎 Anexar imagem de referência</button>
+          <button type=button data-act=arte>✦ Marcar “gerar arte”</button>
+          <div class=sep></div>
+          <button type=button data-act=tip>💡 Dica: descreva o que mudar na foto</button>
+        </div>
+        <input type=file id=esfile accept="image/*" style="display:none">
+        <textarea id=estxt placeholder="Peça ao Estúdio…" rows=1></textarea>
+        <button class=send id=essend title="Enviar">↑</button>
       </div>
     </div>
-    <div class=esattach id=esattach></div>
-    <div class=esrow>
-      <button class=esplus id=esplus title="anexar imagem de exemplo (Claude analisa e usa de referência)">＋</button>
-      <input type=file id=esfile accept="image/*" style="display:none">
-      <textarea id=estxt placeholder="ex: post sobre a Copa, tom leve…" rows=1></textarea>
-      <button class=send id=essend title="gerar (Enter)">➤</button></div>
   </div>
 </div>
 <script>
@@ -1357,32 +1427,63 @@ carregar().then(()=>snapshot());
   const CLAUDELOGO='<svg viewBox="0 0 24 24" width=12 height=12 style="flex:0 0 auto"><path fill="#D97757" d="M12 2.5c.3 0 .5.2.6.5l.9 4.3 3.1-3.1c.3-.3.7-.2.8.2l.5 2.9 2.9.5c.4.1.5.5.2.8l-3.1 3.1 4.3.9c.5.1.5.9 0 1l-4.3.9 3.1 3.1c.3.3.2.7-.2.8l-2.9.5-.5 2.9c-.1.4-.5.5-.8.2l-3.1-3.1-.9 4.3c-.1.5-.9.5-1 0l-.9-4.3-3.1 3.1c-.3.3-.7.2-.8-.2l-.5-2.9-2.9-.5c-.4-.1-.5-.5-.2-.8l3.1-3.1-4.3-.9c-.5-.1-.5-.9 0-1l4.3-.9-3.1-3.1c-.3-.3-.2-.7.2-.8l2.9-.5.5-2.9c.1-.4.5-.5.8-.2l3.1 3.1.9-4.3c.1-.3.3-.5.6-.5z"/></svg>';
   function setProv(name){provEl.innerHTML=(name==='Claude'?CLAUDELOGO:'')+'<span>'+name+'</span>';}
   const slugify=s=>(s||'post').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'post';
-  function addMsg(cls,html){const d=document.createElement('div');d.className='esmsg '+cls;d.innerHTML=html;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;return d}
+  function addMsg(cls,html){
+    const w=document.getElementById('eswelcome');if(w)w.style.display='none';
+    const d=document.createElement('div');d.className='esmsg '+cls;d.innerHTML=html;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;return d
+  }
   const hist=[];  // memória da conversa (role/content)
   function ctxAtual(){
     if(typeof D==='undefined'||!D||!post())return '';
     const p=post();const hs=(p.frames||[]).map((f,i)=>(i+1)+') '+((f.headline||'').replace(/\|/g,' ')).slice(0,60)).join(' | ');
     return 'Post aberto: "'+(p.titulo||p.slug||'')+'" ('+(p.marca||'smark')+', '+(p.frames||[]).length+' frames). Headlines atuais: '+hs;
   }
-  document.getElementById('bestudio').onclick=()=>{panel.classList.remove('min');panel.classList.toggle('on');if(panel.classList.contains('on')){setProv('Claude');if(typeof D!=='undefined'&&D&&post())optMarca.value=post().marca||'smark';txt.focus()}};
+  function openEstudio(opts){
+    panel.classList.remove('min');panel.classList.add('on');
+    setProv('Claude');
+    if(typeof D!=='undefined'&&D&&post()&&optMarca)optMarca.value=post().marca||'smark';
+    if(opts&&opts.fundo&&optFundo){optFundo.checked=true;syncFundoLab()}
+    txt.focus();
+  }
+  function syncFundoLab(){
+    const lab=document.getElementById('esfundo_lab');
+    if(lab)lab.classList.toggle('on',!!(optFundo&&optFundo.checked));
+  }
+  if(optFundo)optFundo.onchange=syncFundoLab;
+  document.getElementById('bestudio').onclick=()=>openEstudio();
   document.getElementById('esclose').onclick=()=>panel.classList.remove('on');
   document.getElementById('esmin').onclick=(e)=>{e.stopPropagation();panel.classList.toggle('min')};
   document.getElementById('eshead').onclick=(e)=>{if(panel.classList.contains('min')&&e.target.tagName!=='BUTTON')panel.classList.remove('min')};
-  // ===== Anexar imagem de exemplo (Claude analisa + usa de referência do fundo) =====
+  // chips de atalho
+  document.querySelectorAll('#eschips .eschip').forEach(b=>b.onclick=()=>{
+    txt.value=(b.dataset.p||'')+txt.value;txt.focus();
+    if((b.dataset.p||'').includes('arte')&&optFundo){optFundo.checked=true;syncFundoLab()}
+  });
+  // ===== Anexar imagem de exemplo =====
   let attB64=null,attMime='image/jpeg',attPath=null;
   const esfile=document.getElementById('esfile'),esplus=document.getElementById('esplus'),esattach=document.getElementById('esattach');
+  const esmenu=document.getElementById('esmenu');
   function fileToScaled(file){return new Promise(res=>{const img=new Image();const url=URL.createObjectURL(file);
     img.onload=()=>{URL.revokeObjectURL(url);let w=img.width,h=img.height;const sc=Math.min(1,1280/Math.max(w,h));w=Math.round(w*sc);h=Math.round(h*sc);
       const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);res(cv.toDataURL('image/jpeg',0.85))};
     img.onerror=()=>res(null);img.src=url})}
   function clearAtt(){attB64=null;attPath=null;esattach.className='esattach';esattach.innerHTML='';esplus.classList.remove('has')}
-  esplus.onclick=()=>esfile.click();
+  esplus.onclick=(e)=>{e.stopPropagation();esmenu.classList.toggle('on')};
+  document.addEventListener('click',()=>esmenu&&esmenu.classList.remove('on'));
+  if(esmenu)esmenu.onclick=e=>{
+    e.stopPropagation();
+    const b=e.target.closest('button');if(!b)return;
+    const a=b.dataset.act;esmenu.classList.remove('on');
+    if(a==='anexo')esfile.click();
+    if(a==='arte'&&optFundo){optFundo.checked=true;syncFundoLab();toast('Gerar arte ligado')}
+    if(a==='tip')toast('Descreva o que manter e o que mudar na foto');
+  };
   esfile.onchange=async e=>{const file=e.target.files[0];if(!file)return;
     const dataUrl=await fileToScaled(file);if(!dataUrl){toast('Não consegui ler a imagem');return}
     attB64=dataUrl.split(',')[1];attMime='image/jpeg';
     esattach.className='esattach on';
-    esattach.innerHTML='<img src="'+dataUrl+'"><span style="font-size:12px;color:var(--sub);line-height:1.3">Exemplo anexado — Claude analisa e usa de referência do fundo</span><button class=rm title=remover>✕</button>';
+    esattach.innerHTML='<img src="'+dataUrl+'"><span style="font-size:12px;color:var(--sub);line-height:1.3">Referência — usada na edição do fundo</span><button class=rm title=remover>✕</button>';
     esattach.querySelector('.rm').onclick=clearAtt;esplus.classList.add('has');
+    if(optFundo){optFundo.checked=true;syncFundoLab()}
     try{const r=await(await fetch('/estudio-upload',{method:'POST',headers:HJSON,body:JSON.stringify({data:attB64,mime:attMime,marca:optMarca.value})})).json();attPath=r.path||null}catch(e){attPath=null}
     esfile.value='';
   };
