@@ -484,6 +484,17 @@ tr:last-child td{{border-bottom:0}}
           </div>
         </div>
         <div class=fld><label>Site (opcional)</label><input id=mf_site placeholder="https://cliente.com.br"></div>
+        <div class=fld><label>Template padrão da arte (novos posts desta marca)</label>
+          <div id=mf_moldura style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:4px">
+            <label class=chk><input type=checkbox id=mf_m_chip checked> Selo (chip)</label>
+            <label class=chk><input type=checkbox id=mf_m_tab checked> Aba lateral</label>
+            <label class=chk><input type=checkbox id=mf_m_logo checked> Logo no selo/aba</label>
+            <label class=chk><input type=checkbox id=mf_m_footer checked> Rodapé</label>
+            <label class=chk><input type=checkbox id=mf_m_page checked> Paginação</label>
+            <label class=chk><input type=checkbox id=mf_m_grade checked> Acabamento</label>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px">Cada post ainda pode mudar isso no editor.</div>
+        </div>
       </div>
     </details>
 
@@ -530,6 +541,27 @@ function glyphFromForm(){{
   // auto
   const nome=(document.getElementById('mf_nome').value||'').trim();
   return (nome[0]||'M').toUpperCase();
+}}
+function molduraFromForm(){{
+  return {{
+    chip:!!document.getElementById('mf_m_chip').checked,
+    tab:!!document.getElementById('mf_m_tab').checked,
+    logo:!!document.getElementById('mf_m_logo').checked,
+    footer:!!document.getElementById('mf_m_footer').checked,
+    page:!!document.getElementById('mf_m_page').checked,
+    grade:!!document.getElementById('mf_m_grade').checked,
+  }};
+}}
+function setMolduraUI(m){{
+  m=m||{{}};
+  const set=(id,def)=>{{const el=document.getElementById(id);if(el)el.checked=m[id.replace('mf_m_','')]!==undefined?!!m[id.replace('mf_m_','')]:def}};
+  // map explícito
+  const map={{mf_m_chip:'chip',mf_m_tab:'tab',mf_m_logo:'logo',mf_m_footer:'footer',mf_m_page:'page',mf_m_grade:'grade'}};
+  Object.keys(map).forEach(id=>{{
+    const el=document.getElementById(id); if(!el)return;
+    const k=map[id];
+    el.checked=m[k]!==undefined?!!m[k]:true;
+  }});
 }}
 function setGlyphUI(glyph){{
   const modeEl=document.getElementById('mf_glyph_mode');
@@ -844,6 +876,7 @@ function openNew(){{
   document.getElementById('mf_ia_dica').textContent='';
   document.getElementById('mf_bb_status').textContent='';
   document.getElementById('mf_del').style.display='none';
+  setMolduraUI({{chip:true,tab:true,logo:true,footer:true,page:true,grade:true}});
   renderRefGrid();
   document.getElementById('mmodal').classList.add('on');
   setTimeout(()=>document.getElementById('mf_nome').focus(),80);
@@ -870,6 +903,7 @@ function openEdit(slug){{
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
   document.getElementById('mf_ia_dica').textContent='';
+  setMolduraUI(m.moldura||{{}});
   const del=document.getElementById('mf_del');
   if(m.canonica){{del.style.display='none'}}
   else{{del.style.display='inline-flex';del.onclick=()=>excluirMarca(slug)}}
@@ -950,6 +984,7 @@ document.getElementById('mf_save').onclick=async()=>{{
     mood:document.getElementById('mf_mood').value.trim(),
     site:document.getElementById('mf_site').value.trim(),
     segmento:document.getElementById('mf_segmento').value,
+    moldura:molduraFromForm(),
   }};
   if(LOGO_DATA) body.logo_dataurl=LOGO_DATA;
   // refs pendentes (só marca nova — em edição o upload já é imediato)
@@ -1750,12 +1785,23 @@ def frame_kwargs(fr, size, for_export, marca="smark"):
     grad = meta.get("gradiente") or f"linear-gradient(155deg,{acc} 0%,{_marcas._base_escura_de(acc)} 100%)"
     alt = meta.get("acento_alternativo") or ""
 
+    # moldura: herda defaults da marca se o frame não define a chave
+    md = _marcas.moldura_defaults(marca)
+    def _on(key, default=True):
+        if key in fr:
+            return bool(fr.get(key))
+        return bool(md.get(key, default))
+
     k = dict(marca=marca, headline=hl(fr.get("headline", "")), sub=hl(fr.get("sub", "")),
-             cta=fr.get("cta", ""), page=fr.get("page", ""), no_chip=not fr.get("chip", False),
+             cta=fr.get("cta", ""), page=fr.get("page", ""), no_chip=not _on("chip", True),
+             no_tab=not _on("tab", True),
+             no_logo=not _on("logo", True),
+             no_footer=not _on("footer", True),
+             no_page=not _on("page", True) or not fr.get("page"),
              tema=fr.get("tema", "escuro"), size=size, hsize=int(fr.get("hsize", 0) or 0),
              accent=fr.get("accent") or acc, bright=fr.get("bright") or acc2,
              square=fr.get("square") or grad,
-             no_grade=not fr.get("grade", True),
+             no_grade=not _on("grade", True),
              zoom=float(fr.get("zoom", 1.0) or 1.0), posx=int(fr.get("posx", 50)),
              posy=int(fr.get("posy", 50)), overlay=fr.get("overlay", "none"),
              overlay_op=float(fr.get("overlay_op", 0.85)),
@@ -2237,9 +2283,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 defs = {}
             tema = defs.get("tema_padrao", "claro")
             size = defs.get("editor_defaults", {}).get("size", "1080x1350")
-            fr = {"headline": "SEU TÍTULO|*AQUI.*", "sub": "", "cta": "", "page": "01/01",
-                  "chip": True, "tema": tema, "bgmode": tema, "bg": "", "cor": "#F4F2FB",
-                  "accent": "", "hsize": 0, "grade": True}
+            fr = _marcas.frame_from_moldura(marca, tema=tema, headline="SEU TÍTULO|*AQUI.*")
             d["posts"].append({"slug": slug, "marca": marca, "status": "rascunho",
                                "titulo": req.get("titulo") or "Novo post", "size": size,
                                "frames": [fr], "caption": "", "canais": ["instagram"]})
@@ -2523,6 +2567,8 @@ class H(http.server.BaseHTTPRequestHandler):
                         campos[k] = str(req[k] if req[k] is not None else "").strip()[:2]
                     elif req[k] is not None:
                         campos[k] = req[k]
+                if isinstance(req.get("moldura"), dict):
+                    campos["moldura"] = req["moldura"]
                 if "endossa" in req:
                     campos["endossa"] = bool(req["endossa"])
                 r = _marcas.atualizar(slug, **campos)

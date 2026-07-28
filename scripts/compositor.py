@@ -285,10 +285,11 @@ def _logo_badge_png(path, color, px, pad_ratio=0.14):
     return base64.b64encode(buf.getvalue()).decode()
 
 
-def glyph_html(b, color, px):
-    """Símbolo inteligente: SVG path > logo processado (mono+trim) > letra.
+def glyph_html(b, color, px, *, use_logo=True):
+    """Símbolo: logo_svg > path > logo_file (se use_logo) > letra.
 
-    Nunca cola foto de feed na tab/chip — se o arquivo não parecer marca, usa glyph.
+    use_logo=False: só glyph/letra (ou vazio). use_logo=True: tenta mono da logo;
+    se a imagem for inadequada como mark, ainda aplica contain com padding.
     """
     if b.get("logo_svg"):
         return (f'<svg viewBox="0 0 100 100" width="{px}" height="{px}" style="color:{color}">'
@@ -296,14 +297,12 @@ def glyph_html(b, color, px):
     if b.get("logo_path"):
         return (f'<svg viewBox="0 0 100 100" width="{px}" height="{px}">'
                 f'<path fill-rule="evenodd" fill="{color}" d="{b["logo_path"]}"/></svg>')
-    lf = _resolve_logo_file(b.get("logo_file") or "")
+    lf = _resolve_logo_file(b.get("logo_file") or "") if use_logo else ""
     if lf:
         ext = os.path.splitext(lf)[1].lower()
         if ext == ".svg":
             try:
-                # embute SVG inline limitado
                 raw = open(lf, "r", encoding="utf-8", errors="ignore").read()
-                # remove scripts
                 if "<script" not in raw.lower():
                     return (f'<span style="display:flex;width:{px}px;height:{px}px;align-items:center;'
                             f'justify-content:center;overflow:hidden">{raw}</span>')
@@ -314,22 +313,30 @@ def glyph_html(b, color, px):
             if data:
                 return (f'<img src="data:image/png;base64,{data}" width="{px}" height="{px}" '
                         f'alt="" style="object-fit:contain;display:block;width:{px}px;height:{px}px"/>')
-            # fallback: se for mark mas mono falhou, contain com padding
+            # fallback contain (mesmo se não for "mark" — usuário pediu logo na arte)
             try:
-                from PIL import Image
-                im = Image.open(lf)
-                if _logo_is_mark(im):
-                    mime = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
-                            ".webp": "image/webp"}.get(ext, "image/png")
-                    b64 = base64.b64encode(open(lf, "rb").read()).decode()
-                    return (f'<img src="data:{mime};base64,{b64}" width="{px}" height="{px}" alt="" '
-                            f'style="object-fit:contain;display:block;width:{int(px*0.78)}px;height:{int(px*0.78)}px;'
-                            f'margin:auto;padding:{max(2,int(px*0.08))}px;box-sizing:content-box"/>')
+                mime = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+                        ".webp": "image/webp"}.get(ext, "image/png")
+                b64 = base64.b64encode(open(lf, "rb").read()).decode()
+                # limita payload: se arquivo > 400kb, redimensiona via PIL
+                raw = open(lf, "rb").read()
+                if len(raw) > 400_000:
+                    from PIL import Image
+                    import io
+                    im = Image.open(io.BytesIO(raw)).convert("RGBA")
+                    im.thumbnail((px * 4, px * 4), Image.Resampling.LANCZOS
+                                 if hasattr(Image, "Resampling") else Image.LANCZOS)
+                    buf = io.BytesIO()
+                    im.save(buf, format="PNG", optimize=True)
+                    b64 = base64.b64encode(buf.getvalue()).decode()
+                    mime = "image/png"
+                return (f'<img src="data:{mime};base64,{b64}" width="{px}" height="{px}" alt="" '
+                        f'style="object-fit:contain;display:block;width:{int(px*0.82)}px;height:{int(px*0.82)}px;'
+                        f'margin:auto"/>')
             except Exception:
                 pass
     g = b.get("glyph")
     if g is None or g == "":
-        # sem glyph: retorna vazio (tab/chip usam só logo se houver; senão some o monograma)
         return ""
     return esc(g)
 
@@ -489,7 +496,8 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
                  bg="", bg_url="", placeholder=False, no_grade=False,
                  zoom=1.0, posx=50, posy=50, overlay="none", overlay_op=0.85,
                  ov_ang=180, ov_pos=20, brilho=1.0, contraste=1.0, satur=1.0,
-                 handle_over="", rodape_over="", raw=False):
+                 handle_over="", rodape_over="", raw=False,
+                 no_tab=False, no_logo=False, no_footer=False, no_page=False):
     """Constrói o HTML completo do frame (mesmo motor do PNG final).
     `bg` = caminho de imagem (embutida em base64, p/ render headless).
     `bg_url` = URL direta (ex.: rota estática do servidor, p/ preview leve no navegador)."""
@@ -586,25 +594,28 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
 
     sub_h = f'<div class="sub">{render_rich(sub, tema)}</div>' if sub else ""
     cta_h = f'<div><span class="cta">{esc(cta)}</span></div>' if cta else ""
-    page_h = f'<div class="page">{esc(page)}</div>' if page else ""
-    g_chip = glyph_html(b, on_acc, 50)
-    g_tab = glyph_html(b, on_acc, 46)
-    # se não há símbolo (sem logo + sem glyph), omite o avatar do chip e o ícone da tab
+    page_h = ("" if no_page or not page else f'<div class="page">{esc(page)}</div>')
+    use_logo = not no_logo
+    g_chip = glyph_html(b, on_acc, 50, use_logo=use_logo)
+    g_tab = glyph_html(b, on_acc, 46, use_logo=use_logo)
     av_h = f'<div class="av">{g_chip}</div>' if g_chip else ""
     ic_h = f'<div class="ic">{g_tab}</div>' if g_tab else ""
     chip_h = ("" if no_chip else
               f'<div class="chip">{av_h}'
               f'<div class="hd">{wordmark_html(b)}</div><div class="ck">&#10003;</div></div>')
-    # headline também com cores seguras
+    tab_h = ("" if no_tab else
+             f'<div class="tab">{ic_h}<div class="vt">{esc(b["tab"])}</div></div>')
+    foot_h = ("" if no_footer else
+              f'<div class="footer"><div>{esc(handle)}</div><div class="cred">{esc(rodape)}</div></div>')
     grade_on = (not no_grade) and (has_img or placeholder)
     grade_html = '<div class="grade"><i class="gt"></i><i class="gv"></i><i class="gg"></i></div>' if grade_on else ''
     if raw:  # só a imagem (arte já pronta importada) + overlay/filtros; sem texto/moldura
         body = '<div class="card"><div class="bg"></div><div class="ovx"></div></div>'
     else:
         body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ovx"></div><div class="ov"></div>{page_h}'
-                f'<div class="tab">{ic_h}<div class="vt">{esc(b["tab"])}</div></div>'
+                f'{tab_h}'
                 f'<div class="ct">{chip_h}<div class="h">{render_rich(headline, tema)}</div>{sub_h}{cta_h}</div>'
-                f'<div class="footer"><div>{esc(handle)}</div><div class="cred">{esc(rodape)}</div></div></div>')
+                f'{foot_h}</div>')
     return PAGE % {"CSS": css, "BODY": body}, w, h
 
 
@@ -657,6 +668,10 @@ def main():
     ap.add_argument("--cta", default="")
     ap.add_argument("--page", default="")
     ap.add_argument("--no-chip", action="store_true")
+    ap.add_argument("--no-tab", action="store_true")
+    ap.add_argument("--no-logo", action="store_true")
+    ap.add_argument("--no-footer", action="store_true")
+    ap.add_argument("--no-page", action="store_true")
     ap.add_argument("--tema", default="claro", choices=["escuro", "claro"])
     ap.add_argument("--base", default="", help="sobrescreve a cor base")
     ap.add_argument("--square", default="", help="override do fundo dos quadrados/CTA (teste de gradiente)")
@@ -669,7 +684,9 @@ def main():
             args.marca, args.headline, sub=args.sub, cta=args.cta, page=args.page,
             no_chip=args.no_chip, tema=args.tema, size=args.size, hsize=args.hsize,
             accent=args.accent, bright=args.bright, base=args.base, square=args.square,
-            bg=args.bg, placeholder=args.placeholder, no_grade=args.no_grade)
+            bg=args.bg, placeholder=args.placeholder, no_grade=args.no_grade,
+            no_tab=args.no_tab, no_logo=args.no_logo, no_footer=args.no_footer,
+            no_page=args.no_page)
     except ValueError as e:
         sys.exit(f"ERRO: {e}")
 

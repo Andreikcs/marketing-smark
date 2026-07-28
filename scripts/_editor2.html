@@ -761,43 +761,55 @@ function richField(label,val,onin,key){
   const ta=document.createElement('textarea');ta.rows=3;ta.value=val||'';ta.oninput=()=>onin(ta.value);ta.onfocus=()=>_lastTa=ta;if(key)ta.id='fld_'+key;
   const getSel=ss=>ss||{s:ta.selectionStart,e:ta.selectionEnd};
   const commit=(s,e,t)=>{ta.value=ta.value.slice(0,s)+t+ta.value.slice(e);ta.focus();ta.selectionStart=s;ta.selectionEnd=s+t.length;onin(ta.value)};
-  // remove marcador de cor e de acento (single *) de um trecho — evita aninhamento quebrado
-  const bare=t=>{t=t.replace(/\{#[0-9a-fA-F]{3,6}:/g,'').replace(/\}/g,'');
-    if(t.length>=2&&t[0]==='*'&&t[1]!=='*'&&t.slice(-1)==='*'&&t.slice(-2,-1)!=='*')t=t.slice(1,-1);return t};
-  const wrapBI=m=>{const{s,e}=getSel();const sel=ta.value.slice(s,e)||'texto';commit(s,e,m+sel+m)};
-  const accent=()=>{const{s,e}=getSel();if(s===e){toast('Selecione a palavra primeiro');return}commit(s,e,'*'+bare(ta.value.slice(s,e))+'*')};
+  // limpa marcações de estilo do trecho (sem deixar lixo técnico)
+  const bare=t=>{
+    if(!t)return t;
+    let s=String(t);
+    // {#HEX:texto} → texto (repete até limpar)
+    for(let i=0;i<8;i++){const n=s.replace(/\{#[0-9a-fA-F]{3,8}:([^}]*)\}/g,'$1');if(n===s)break;s=n}
+    s=s.replace(/\*\*([^*]+)\*\*/g,'$1');
+    s=s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g,'$1$2');
+    s=s.replace(/_([^_\n]+)_/g,'$1');
+    return s;
+  };
+  const wrapBI=m=>{const{s,e}=getSel();if(s===e){toast('Selecione o texto primeiro');return}
+    const sel=bare(ta.value.slice(s,e));commit(s,e,m+sel+m)};
+  const accent=()=>{const{s,e}=getSel();if(s===e){toast('Selecione a palavra primeiro');return}
+    commit(s,e,'*'+bare(ta.value.slice(s,e))+'*')};
   const paint=(hex,ss)=>{
-    const{s,e}=getSel(ss);if(s===e){toast('Selecione a palavra que quer pintar');return}
-    // evita branco no tema claro (texto some na foto)
+    const{s,e}=getSel(ss);if(s===e){toast('Selecione o texto que quer colorir');return}
     let hx=(hex||'').toUpperCase();
+    if(!/^#[0-9A-F]{6}$/.test(hx))hx='#8B3CF7';
     const tema=((typeof frame==='function'&&frame())||{}).tema||'claro';
     if(tema==='claro'&&(hx==='#FFFFFF'||hx==='#FFF'||hx==='#F4F2FB'||hx==='#EEEEEE')){
-      hx='#100D1C';toast('Cor clara demais pro tema claro — ajustei para legível');
+      hx='#100D1C';toast('Cor ajustada para ficar legível no tema claro');
     }
     if(tema==='escuro'&&(hx==='#000000'||hx==='#000'||hx==='#0B0B0B'||hx==='#100D1C')){
-      hx='#FFFFFF';toast('Cor escura demais pro tema escuro — ajustei para legível');
+      hx='#FFFFFF';toast('Cor ajustada para ficar legível no tema escuro');
     }
     commit(s,e,'{'+hx+':'+bare(ta.value.slice(s,e))+'}')
   };
   ta.addEventListener('keydown',ev=>{if(ev.ctrlKey||ev.metaKey){const k=ev.key.toLowerCase();
     if(k==='b'){ev.preventDefault();wrapBI('**')}else if(k==='i'){ev.preventDefault();wrapBI('_')}}});
-  // linha 1: acento / B / I
   const bar=document.createElement('div');bar.className='fmtbar';
-  [['★ destaque','','Destacar palavra na cor da marca',accent],['B','b','Negrito',()=>wrapBI('**')],['I','i','Itálico',()=>wrapBI('_')]]
-   .forEach(([lb,cls,tip,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.title=tip;
-     b.onmousedown=e=>e.preventDefault();b.onclick=fn;bar.appendChild(b)});
-  const hint=document.createElement('span');hint.className='fmthint';hint.textContent='Enter = nova linha';bar.appendChild(hint);
+  [
+    ['Cor da marca','','Destacar com a cor da marca',accent],
+    ['N','b','Negrito',()=>wrapBI('**')],
+    ['I','i','Itálico',()=>wrapBI('_')],
+  ].forEach(([lb,cls,tip,fn])=>{
+    const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.title=tip;
+    b.onmousedown=e=>e.preventDefault();b.onclick=fn;bar.appendChild(b)});
   w.appendChild(bar);
-  // linha 2: cor — seletor visual (hex) + presets + campo hex. Seleciona a palavra e clica.
   const bar2=document.createElement('div');bar2.className='fmtbar';let savedSel=null;
   const brandAcc=(typeof marcaMeta==='function'&&typeof post==='function'&&post())?(marcaMeta(post().marca||'smark').acento||'#8B3CF7'):'#8B3CF7';
-  const col=document.createElement('input');col.type='color';col.value=brandAcc;col.className='fmtcol';col.title='Escolher cor';
+  const col=document.createElement('input');col.type='color';col.value=brandAcc;col.className='fmtcol';col.title='Cor personalizada';
   col.onmousedown=()=>savedSel=getSel();
   col.oninput=()=>{const h=col.value.toUpperCase();paint(h,(savedSel&&savedSel.s!==savedSel.e)?savedSel:null)};
   bar2.appendChild(col);
-  [['marca',brandAcc],['claro','#FFFFFF'],['escuro','#100D1C']].forEach(([nm,hex])=>{
-    const b=document.createElement('button');b.type='button';b.className='fmtchip';b.title='Pintar seleção';
-    b.innerHTML='<span class=sw style="background:'+hex+'"></span>'+nm;b.onmousedown=e=>e.preventDefault();b.onclick=()=>paint(hex);bar2.appendChild(b)});
+  [['Marca',brandAcc],['Claro','#FFFFFF'],['Escuro','#100D1C']].forEach(([nm,hex])=>{
+    const b=document.createElement('button');b.type='button';b.className='fmtchip';b.title='Colorir seleção · '+nm;
+    b.innerHTML='<span class=sw style="background:'+hex+'"></span>'+nm;
+    b.onmousedown=e=>e.preventDefault();b.onclick=()=>paint(hex);bar2.appendChild(b)});
   w.appendChild(bar2);
   w.appendChild(ta);return w;
 }
@@ -881,20 +893,40 @@ function renderCtrl(){
   const rowpc=document.createElement('div');rowpc.className='row';rowpc.style.marginTop='8px';
   const pg=fld('Paginação',f.page,v=>{f.page=v;change()},0,0,'page');pg.style.flex='1';rowpc.appendChild(pg);
   c.appendChild(g1);
-  const chk=document.createElement('label');chk.className='chk';chk.style.marginTop='8px';
-  chk.innerHTML='<input type=checkbox '+(f.chip?'checked':'')+'> Mostrar selo (chip da capa)';
-  chk.querySelector('input').onchange=e=>{f.chip=e.target.checked;change()};g1.appendChild(chk);
-  // cor do template = acento da MARCA ativa (não roxo smark fixo)
+  // MOLDURA — elementos da arte (liga/desliga)
   const mmPal=marcaMeta(post().marca||'smark');
-  const palw=document.createElement('div');palw.style.marginTop='10px';
-  palw.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:5px">Cor do template (marca)</div>';
+  const md=mmPal.moldura||{chip:true,tab:true,logo:true,footer:true,page:true,grade:true};
+  const onKey=(k,def=true)=> (k in f)?!!f[k]:!!(md[k]!==undefined?md[k]:def);
+  const gmold=document.createElement('div');gmold.className='grp';
+  gmold.innerHTML='<h5>Moldura da arte</h5>';
+  const moldList=[
+    ['chip','Selo (chip)'],
+    ['tab','Aba lateral'],
+    ['logo','Logo no selo/aba'],
+    ['footer','Rodapé'],
+    ['page','Paginação'],
+    ['grade','Acabamento (grade)'],
+  ];
+  moldList.forEach(([k,lb])=>{
+    const lab=document.createElement('label');lab.className='chk';lab.style.marginTop='6px';
+    const checked=onKey(k,true);
+    lab.innerHTML='<input type=checkbox '+(checked?'checked':'')+'> '+lb;
+    lab.querySelector('input').onchange=e=>{f[k]=e.target.checked;change()};
+    gmold.appendChild(lab);
+  });
+  const mdHint=document.createElement('div');mdHint.className='mini';mdHint.style.marginTop='8px';
+  mdHint.textContent='Padrão da marca em Config → Editar marca → Mais opções.';
+  gmold.appendChild(mdHint);c.appendChild(gmold);
+
+  // cor do template = acento da MARCA ativa
+  const palw=document.createElement('div');palw.className='grp';
+  palw.innerHTML='<h5>Cor da marca nesta arte</h5>';
   const palseg=document.createElement('div');palseg.className='seg';
-  const palOpts=[['marca','● Acento da marca']];
+  const palOpts=[['marca','Acento']];
   if(mmPal.acento_alternativo||(mmPal.acento_claro&&mmPal.acento_claro!==mmPal.acento))
-    palOpts.push(['secundario','○ Secundário']);
-  // legado lima só se for família smark canônica
+    palOpts.push(['secundario','Secundário']);
   if(['smark','provider-max','elever-ai'].includes(post().marca||'smark'))
-    palOpts.push(['lima','🟢 Verde lima']);
+    palOpts.push(['lima','Verde lima']);
   const palCur=(f.paleta==='roxo'||!f.paleta)?'marca':f.paleta;
   palOpts.forEach(([k,lb])=>{
     const b=document.createElement('button');b.textContent=lb;
@@ -903,11 +935,7 @@ function renderCtrl(){
     if(k==='marca'&&palCur===k){b.style.background=mmPal.acento||'';b.style.color='#fff';b.style.borderColor=mmPal.acento||''}
     b.onclick=()=>{f.paleta=k;renderCtrl();change()};palseg.appendChild(b);
   });
-  palw.appendChild(palseg);
-  const psw=document.createElement('div');psw.className='mini';psw.style.marginTop='6px';
-  psw.innerHTML='<span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:'+esc(mmPal.acento||'#8B3CF7')+';vertical-align:middle;margin-right:6px"></span>'
-    +'Cor usada no selo, botões e palavras em destaque';
-  palw.appendChild(psw);g1.appendChild(palw);
+  palw.appendChild(palseg);c.appendChild(palw);
 
   // FUNDO
   const g2=document.createElement('div');g2.className='grp';g2.innerHTML='<h5>Fundo</h5>';
@@ -1242,7 +1270,17 @@ function openSim(){
 }
 
 // novo post / adicionar / excluir card
-function newFrame(){return {headline:'NOVO|*CARD.*',sub:'',cta:'',page:'',chip:false,tema:'claro',bgmode:'claro',bg:'',cor:'#F4F2FB',accent:'',paleta:'roxo',hsize:0,grade:true}}
+function newFrame(){
+  const slug=(typeof post==='function'&&post())?(post().marca||'smark'):'smark';
+  const md=(marcaMeta(slug).moldura)||{chip:true,tab:true,logo:true,footer:true,page:true,grade:true};
+  return {
+    headline:'NOVO|*CARD.*',sub:'',cta:'',
+    page:md.page!==false?'01/01':'',
+    chip:md.chip!==false, tab:md.tab!==false, logo:md.logo!==false,
+    footer:md.footer!==false, grade:md.grade!==false,
+    tema:'claro',bgmode:'claro',bg:'',cor:'#F4F2FB',accent:'',paleta:'marca',hsize:0
+  };
+}
 async function reload(pi,fi){D=await(await fetch('/dados')).json();syncAllPages();sel(pi,fi)}
 
 // ===== Histórico de versões (estilo Google Docs) — recupera qualquer versão salva pelo autosave =====

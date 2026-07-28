@@ -146,8 +146,78 @@ def listar_detalhes():
             "pronta": pronta(s),
             "canonica": s in CANONICAS,
             "branding_book": os.path.isfile(branding_book_path(s)) if exists(s) else False,
+            "moldura": moldura_defaults(s),
         })
     return out
+
+
+# Defaults de moldura por marca (template padrão de cada cliente)
+MOLDURA_KEYS = ("chip", "tab", "logo", "footer", "page", "grade")
+MOLDURA_DEFAULT = {
+    "chip": True,
+    "tab": True,
+    "logo": True,
+    "footer": True,
+    "page": True,
+    "grade": True,
+}
+
+
+def moldura_defaults(slug=None):
+    """Template de moldura da marca (o que entra na arte por padrão)."""
+    out = dict(MOLDURA_DEFAULT)
+    if not slug:
+        return out
+    try:
+        m = get(slug) or {}
+    except Exception:
+        return out
+    raw = m.get("moldura") or m.get("template_moldura") or {}
+    if isinstance(raw, dict):
+        for k in MOLDURA_KEYS:
+            if k in raw:
+                out[k] = bool(raw[k])
+    return out
+
+
+def set_moldura(slug, moldura):
+    """Grava moldura padrão da marca no tokens."""
+    slug = require(slug)
+    t = _load_tokens()
+    m = dict(t["marcas"][slug])
+    cur = dict(MOLDURA_DEFAULT)
+    cur.update(m.get("moldura") or {})
+    if isinstance(moldura, dict):
+        for k in MOLDURA_KEYS:
+            if k in moldura:
+                cur[k] = bool(moldura[k])
+    m["moldura"] = cur
+    t["marcas"][slug] = m
+    _save_tokens(t)
+    return cur
+
+
+def frame_from_moldura(slug, *, tema="claro", headline="SEU TÍTULO|*AQUI.*"):
+    """Frame inicial herdando o template de moldura da marca."""
+    md = moldura_defaults(slug)
+    return {
+        "headline": headline,
+        "sub": "",
+        "cta": "",
+        "page": "01/01" if md.get("page", True) else "",
+        "chip": bool(md.get("chip", True)),
+        "tab": bool(md.get("tab", True)),
+        "logo": bool(md.get("logo", True)),
+        "footer": bool(md.get("footer", True)),
+        "grade": bool(md.get("grade", True)),
+        "tema": tema,
+        "bgmode": tema,
+        "bg": "",
+        "cor": "#F4F2FB",
+        "accent": "",
+        "hsize": 0,
+        "paleta": "marca",
+    }
 
 
 def _hex_ok(h):
@@ -375,7 +445,7 @@ def gerar_texto_ia_marca(slug=None, nome="", segmento="", acento="", site=""):
 
 def atualizar(slug, *, nome=None, acento=None, acento_claro=None, handle=None,
               glyph=None, wordmark=None, mood=None, gradiente=None, endossa=None,
-              segmento=None, site=None):
+              segmento=None, site=None, moldura=None):
     """Atualiza campos editáveis de uma marca no tokens.json.
 
     Canônicas podem editar handle/mood/cores (cuidado), mas o slug não muda.
@@ -438,6 +508,13 @@ def atualizar(slug, *, nome=None, acento=None, acento_claro=None, handle=None,
             m["site"] = site
         elif "site" in m:
             m.pop("site", None)
+    if moldura is not None and isinstance(moldura, dict):
+        cur = dict(MOLDURA_DEFAULT)
+        cur.update(m.get("moldura") or {})
+        for k in MOLDURA_KEYS:
+            if k in moldura:
+                cur[k] = bool(moldura[k])
+        m["moldura"] = cur
 
     t["marcas"][slug] = m
     _save_tokens(t)
