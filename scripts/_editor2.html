@@ -242,8 +242,13 @@ input[type=color]{border-radius:var(--radius-sm);border:1px solid var(--field-li
 input[type=range]{accent-color:var(--accent)}
 .newpost{border-radius:var(--radius-md);border:1px dashed var(--field-line)}
 .newpost:hover,.addtile:hover,.stagenav:hover{border-color:var(--accent)}
-.npbox{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg)}
-.npbox h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:20px}
+.npbox{background:var(--surface)!important;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);width:min(440px,100%);color:var(--txt)}
+.npbox h3{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:20px;color:var(--txt)}
+.npbox input[type=text],.npbox input[type=search],.npbox input:not([type]),.npbox textarea{
+  background:var(--field)!important;border:1px solid var(--field-line)!important;color:var(--txt)!important;border-radius:10px}
+.npbrands{display:flex!important;flex-direction:column!important;gap:6px;max-height:220px;overflow:auto}
+.npbrands button{flex:none!important;display:flex!important;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px!important;border-radius:12px!important}
+.npbrands button.on{background:var(--accent)!important;border-color:var(--accent)!important;color:var(--accent-ink,#fff)!important}
 .npbtns .go{color:var(--accent-ink)}
 .stagenav{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-md);box-shadow:var(--shadow)}
 .stagenav:hover{background:var(--accent);color:var(--accent-ink)}
