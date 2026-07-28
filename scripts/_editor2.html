@@ -1321,7 +1321,7 @@ $('#capgen').onclick=async()=>{if(!post())return;const b=$('#capgen');b.disabled
     if(!st.ok||!st.job){b.disabled=false;b.textContent=old;toast('Erro ao iniciar');return}
     let tries=0;const poll=setInterval(async()=>{tries++;let s;try{s=await(await fetch('/job?id='+st.job)).json()}catch(e){return}
       if(s.status==='done'){clearInterval(poll);b.disabled=false;b.textContent=old;const r=s.resultado||{};
-        const cap=(r.caption||'')+(r.hashtags?('\n\n'+r.hashtags):'');$('#captext').value=cap;if(post())post().caption=cap;updCapCount();setDirty(true);toast('✦ Legenda gerada')}
+        const cap=(r.caption||'')+(r.hashtags?('\n\n'+r.hashtags):'');$('#captext').value=cap;if(post())post().caption=cap;updCapCount();setDirty(true);toast('★ Legenda gerada')}
       else if(s.status==='erro'||tries>60){clearInterval(poll);b.disabled=false;b.textContent=old;toast('Erro ao gerar')}
     },1500);
   }catch(e){b.disabled=false;b.textContent=old;toast('Erro')}

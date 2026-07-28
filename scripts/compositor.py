@@ -271,7 +271,11 @@ def _logo_badge_png(path, color, px, pad_ratio=0.14):
     canvas = Image.new("RGBA", (px * 2, px * 2), (0, 0, 0, 0))  # 2x nítido
     pad = int(px * 2 * pad_ratio)
     inner = px * 2 - pad * 2
-    badge.thumbnail((inner, inner), Image.Resampling.LANCZOS)
+    try:
+        resample = Image.Resampling.LANCZOS
+    except AttributeError:
+        resample = Image.LANCZOS
+    badge.thumbnail((inner, inner), resample)
     ox = (px * 2 - badge.size[0]) // 2
     oy = (px * 2 - badge.size[1]) // 2
     canvas.paste(badge, (ox, oy), badge)
@@ -432,11 +436,13 @@ body{width:%(W)spx;height:%(H)spx;overflow:hidden;}
 .grade .gg{background-image:%(GRAIN)s;background-size:180px 180px;mix-blend-mode:overlay;opacity:%(GGO)s;}
 .ov{position:absolute;inset:0;background:%(OV)s;}
 .tab{position:absolute;top:0;left:60px;width:72px;height:224px;background:%(SQUARE)s;border-radius:0 0 20px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:2;}
-.tab .ic{color:%(ONACC)s;display:flex;align-items:center;justify-content:center;}
+.tab .ic{color:%(ONACC)s;display:flex;align-items:center;justify-content:center;width:52px;height:52px;overflow:hidden;}
+.tab .ic img,.tab .ic svg{max-width:100%%;max-height:100%%;display:block}
 .tab .vt{writing-mode:vertical-rl;transform:rotate(180deg);color:%(ONACC)s;font-family:'Archivo';font-weight:800;font-size:%(TABF)spx;letter-spacing:2px;}
 .ct{position:absolute;left:64px;right:64px;top:50%%;bottom:132px;display:flex;flex-direction:column;justify-content:center;z-index:1;}
 .chip{display:flex;align-items:center;gap:16px;margin-bottom:26px;}
-.chip .av{width:64px;height:64px;border-radius:16px;background:%(SQUARE)s;color:%(ONACC)s;font-family:'Archivo';font-weight:800;font-size:40px;display:flex;align-items:center;justify-content:center;}
+.chip .av{width:64px;height:64px;border-radius:16px;background:%(SQUARE)s;color:%(ONACC)s;font-family:'Archivo';font-weight:800;font-size:40px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:6px;box-sizing:border-box;}
+.chip .av img,.chip .av svg{max-width:100%%;max-height:100%%;display:block}
 .chip .hd{color:%(TXT)s;font-family:'Archivo';font-weight:800;font-size:36px;letter-spacing:-1px;}
 .chip .hd .dot{color:%(DOT)s;}
 .chip .ck{width:32px;height:32px;border-radius:50%%;background:%(SQUARE)s;color:%(ONACC)s;font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center;}
