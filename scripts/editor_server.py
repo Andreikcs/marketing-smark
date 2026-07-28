@@ -2510,14 +2510,17 @@ class H(http.server.BaseHTTPRequestHandler):
                     wordmark=str(req.get("wordmark") or "") or None,
                     mood=str(req.get("mood") or ""),
                 )
-                # segmento / site pós-criação
+                # segmento / site / moldura pós-criação
                 try:
-                    if req.get("segmento") or req.get("site"):
-                        _marcas.atualizar(
-                            r["slug"],
-                            segmento=str(req.get("segmento") or "") or None,
-                            site=str(req.get("site") or "") or None,
-                        )
+                    campos_pos = {}
+                    if req.get("segmento"):
+                        campos_pos["segmento"] = str(req.get("segmento") or "") or None
+                    if req.get("site"):
+                        campos_pos["site"] = str(req.get("site") or "") or None
+                    if isinstance(req.get("moldura"), dict):
+                        campos_pos["moldura"] = req["moldura"]
+                    if campos_pos:
+                        _marcas.atualizar(r["slug"], **campos_pos)
                 except Exception:
                     pass
                 avisos = []
