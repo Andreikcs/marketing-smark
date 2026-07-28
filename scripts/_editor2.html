@@ -1,5 +1,6 @@
 <!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>smark · editor</title>
+<script>(function(){try{var t=localStorage.getItem('smark-ui-theme');if(t==='claro'||t==='escuro')document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css">
 <style>
 /* Design System smark: tokens locais herdam do DS (dark). Marcação intacta. */
@@ -7,11 +8,30 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--txt);font-family:var(--font-text);height:100vh;overflow:hidden}
 .app{display:grid;grid-template-columns:200px 1fr 320px;grid-template-rows:52px 1fr;height:100vh}
-#welcome{display:none;grid-column:2/4;background:var(--bg);align-items:center;justify-content:center;overflow:auto;padding:40px}
+#welcome{display:none;grid-column:2/4;background:var(--bg);align-items:center;justify-content:center;overflow:auto;padding:40px;position:relative}
 .app.welcome #welcome{display:flex}
 .app.welcome .main,.app.welcome .ctrl{display:none}
-.wc{max-width:840px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
-.wicon{width:76px;height:76px;border-radius:20px;background:linear-gradient(155deg,#9A4DFF,#2A1CA8);display:flex;align-items:center;justify-content:center;box-shadow:0 14px 44px rgba(139,60,247,.4)}
+#welcome .wambient{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 42%, color-mix(in srgb, var(--wbrand, var(--accent)) 28%, transparent), transparent 68%),
+    radial-gradient(ellipse 45% 40% at 18% 78%, color-mix(in srgb, var(--wbrand2, var(--accent-2)) 16%, transparent), transparent 70%),
+    radial-gradient(ellipse 40% 35% at 85% 20%, color-mix(in srgb, var(--wbrand, var(--accent)) 12%, transparent), transparent 65%),
+    var(--bg);
+  background-size:160% 160%;
+  animation:wbgdrift 16s ease-in-out infinite}
+@keyframes wbgdrift{
+  0%{background-position:20% 40%,0% 100%,100% 0%}
+  50%{background-position:70% 55%,30% 70%,60% 30%}
+  100%{background-position:20% 40%,0% 100%,100% 0%}
+}
+.wc{max-width:840px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:1}
+.wicon{width:76px;height:76px;border-radius:20px;background:linear-gradient(155deg,var(--wbrand,#9A4DFF),var(--wbrand2,#2A1CA8));display:flex;align-items:center;justify-content:center;
+  box-shadow:0 14px 44px color-mix(in srgb, var(--wbrand,#8B3CF7) 45%, transparent);
+  animation:wlogofloat 4.5s ease-in-out infinite}
+@keyframes wlogofloat{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-8px) scale(1.04)}
+}
 .wtitle{font-family:var(--font-text);font-weight:800;font-size:34px;color:var(--txt);margin:6px 0 0}.wlt{color:var(--muted);font-weight:600}
 .wsub{color:var(--sub);font-size:15px;line-height:1.6;max-width:540px}
 .wcards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px;width:100%}
@@ -1366,22 +1386,33 @@ document.addEventListener('keydown',e=>{
     else if(e.key==='ArrowRight'){e.preventDefault();if(FI<post().frames.length-1)sel(PI,FI+1)}
   }
 });
-// Tema claro/escuro do app
+// Tema claro/escuro — mesmo KEY do sistema inteiro
 (function(){
+  try{var t=localStorage.getItem('smark-ui-theme');if(t==='claro'||t==='escuro')document.documentElement.setAttribute('data-theme',t)}catch(e){}
   const KEY='smark-ui-theme';
   function apply(t){
+    if(window.smarkApplyTheme){window.smarkApplyTheme(t);return}
     t=(t==='claro'||t==='light')?'claro':'escuro';
-    document.documentElement.setAttribute('data-theme',t==='claro'?'claro':'escuro');
+    document.documentElement.setAttribute('data-theme',t);
     try{localStorage.setItem(KEY,t)}catch(e){}
   }
   try{apply(localStorage.getItem(KEY)||'escuro')}catch(e){apply('escuro')}
   const bt=document.getElementById('btheme');
-  if(bt)bt.onclick=()=>{
+  if(bt&&!bt._bound){bt._bound=1;bt.onclick=()=>{
     const cur=document.documentElement.getAttribute('data-theme')||'escuro';
     apply(cur==='claro'?'escuro':'claro');
-  };
+  }}
 })();
-carregar().then(()=>snapshot());
+function setAmbientBrand(slug){
+  const m=(typeof marcaMeta==='function'?marcaMeta(slug||'smark'):{})||{};
+  const a=m.acento||'#8B3CF7';
+  const a2=m.acento_claro||m.acento||'#A472FF';
+  document.documentElement.style.setProperty('--wbrand',a);
+  document.documentElement.style.setProperty('--wbrand2',a2);
+  const est=document.getElementById('estudio');
+  if(est){est.style.setProperty('--esbrand',a);est.style.setProperty('--esbrand2',a2)}
+}
+carregar().then(()=>{snapshot();if(typeof setAmbientBrand==='function')setAmbientBrand('smark')});
 </script>
 
 <div id=estudio>
