@@ -557,13 +557,23 @@ def painel_html():
 .dlmenu{position:fixed;z-index:600;background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow-lg);padding:6px;display:flex;flex-direction:column;gap:4px;min-width:190px}
 .dlmenu button{border:0;background:transparent;color:var(--text);text-align:left;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px}
 .dlmenu button:hover{background:var(--surface-2)}
-.ftbar{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:18px}
-.ftrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.ftlab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);min-width:52px}
-.ftchips{display:flex;flex-wrap:wrap;gap:6px;flex:1}
-.ftchip{border:1px solid var(--field-line);background:var(--surface-2);color:var(--sub);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer}
-.ftchip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.ftsearch{flex:1;min-width:160px;background:var(--inset);border:1px solid var(--field-line);border-radius:10px;color:var(--text);padding:8px 12px;font-size:13px}
+.ftbar{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:18px}
+.fttop{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ftsearch{flex:1;min-width:180px;background:var(--inset);border:1px solid var(--field-line);border-radius:10px;color:var(--text);padding:9px 12px;font-size:13px}
+.ftsel{background:var(--inset);border:1px solid var(--field-line);border-radius:10px;color:var(--text);padding:8px 10px;font-size:12px}
+.ftbtn{border:1px solid var(--field-line);background:var(--surface-2);color:var(--text);border-radius:10px;padding:8px 12px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.ftbtn.on,.ftbtn[aria-expanded=true]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.ftbadge{background:var(--accent);color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700}
+.ftpanel{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);gap:16px}
+.ftpanel.open{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}
+@media(max-width:720px){.ftpanel.open{grid-template-columns:1fr}}
+.ftcol h5{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 8px}
+.ftcheck{display:flex;flex-direction:column;gap:6px}
+.ftcheck label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer;padding:4px 0}
+.ftcheck input{accent-color:var(--accent);width:15px;height:15px}
+.ftactive{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:0}
+.fttag{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:var(--inset);cursor:pointer}
+.fttag:hover{border-color:var(--accent);color:var(--text)}
 .sk-cardgrid.mosaic{grid-template-columns:repeat(3,1fr);gap:10px}
 @media(max-width:900px){.sk-cardgrid.mosaic{grid-template-columns:repeat(2,1fr)}}
 .sk-cardgrid.mosaic .sk-post-body{padding:8px 10px}
@@ -580,23 +590,31 @@ __TOPBAR__
     <a class="sk-btn" href="/editor">＋ Novo post</a></div>
 </div>
 <div class=ftbar>
-  <div class=ftrow>
-    <span class=ftlab>Ver</span>
-    <div class=ftchips id=viewfilters></div>
-    <span class=ftlab style="margin-left:8px">Ordem</span>
-    <div class=ftchips id=sortfilters></div>
-    <span class=sk-spacer></span>
+  <div class=fttop>
     <input class=ftsearch id=psearch placeholder="Buscar título ou marca…" />
+    <select class=ftsel id=viewsel title="Layout">
+      <option value=cards>Cards</option>
+      <option value=mosaic>Mosaico · 3 colunas</option>
+    </select>
+    <select class=ftsel id=sortsel title="Ordem">
+      <option value=recent>Mais recentes</option>
+      <option value=old>Mais antigos</option>
+      <option value=alpha>A–Z</option>
+    </select>
+    <button type=button class=ftbtn id=ftoggle aria-expanded=false>Filtros <span class=ftbadge id=fcount hidden>0</span></button>
     <span id=count style="font-size:12px;color:var(--muted);white-space:nowrap"></span>
   </div>
-  <div class=ftrow>
-    <span class=ftlab>Status</span>
-    <div class=ftchips id=sfilters></div>
+  <div class=ftpanel id=fpanel>
+    <div class=ftcol>
+      <h5>Status</h5>
+      <div class=ftcheck id=sfilters></div>
+    </div>
+    <div class=ftcol>
+      <h5>Marcas</h5>
+      <div class=ftcheck id=filters></div>
+    </div>
   </div>
-  <div class=ftrow>
-    <span class=ftlab>Marca</span>
-    <div class=ftchips id=filters></div>
-  </div>
+  <div class=ftactive id=factive></div>
 </div>
 <div class="sk-cardgrid" id=grid></div>
 </div>
@@ -617,7 +635,8 @@ __TOPBAR__
   </div>
 </div>
 <script>
-const T="__EDITOR_TOKEN__";let D=null,FILT='',STATUSF='',VIEW='cards',SORT='recent',Q='',MI=0,MP=0;const SEL=new Set();
+const T="__EDITOR_TOKEN__";let D=null,VIEW='cards',SORT='recent',Q='',MI=0,MP=0;const SEL=new Set();
+let STATUS_SET=new Set(), MARCA_SET=new Set();
 let NOME_MARCA={};
 async function load(){
   try{const r=await(await fetch('/marcas')).json();if(r.ok)(r.marcas||[]).forEach(m=>NOME_MARCA[m.slug]=m.nome||m.slug)}catch(e){}
@@ -647,12 +666,39 @@ async function loadThumb(host,p){
     host.innerHTML='';host.appendChild(ifr);ifr.srcdoc=html;
   }catch(e){host.textContent='sem arte'}
 }
-function chips(host,opts,cur,cb){host.innerHTML='';opts.forEach(([v,lb])=>{const b=document.createElement('button');b.className='ftchip'+(cur===v?' on':'');b.textContent=lb;b.onclick=()=>cb(v);host.appendChild(b)})}
+function buildChecks(host,opts,set,onChange){
+  host.innerHTML='';
+  opts.forEach(([v,lb])=>{
+    const id='ck_'+host.id+'_'+v;
+    const lab=document.createElement('label');
+    lab.innerHTML='<input type=checkbox id="'+id+'" '+(set.has(v)?'checked':'')+'> <span>'+lb+'</span>';
+    lab.querySelector('input').onchange=e=>{if(e.target.checked)set.add(v);else set.delete(v);onChange()};
+    host.appendChild(lab);
+  });
+}
+function nActiveFilters(){return STATUS_SET.size+MARCA_SET.size}
+function renderActive(){
+  const el=document.getElementById('factive');if(!el)return;
+  const tags=[];
+  STATUS_SET.forEach(s=>tags.push(['s',s,s==='salvo'?'Pronto':'Rascunho']));
+  MARCA_SET.forEach(m=>tags.push(['m',m,nomeMarca(m)]));
+  const badge=document.getElementById('fcount');
+  if(badge){if(tags.length){badge.hidden=false;badge.textContent=tags.length}else badge.hidden=true}
+  if(!tags.length){el.innerHTML='';return}
+  el.innerHTML=tags.map(([t,v,lb])=>'<button type=button class=fttag data-t="'+t+'" data-v="'+v+'">'+lb+' ×</button>').join('')
+    +'<button type=button class=fttag data-t=clear>Limpar filtros</button>';
+  el.querySelectorAll('.fttag').forEach(b=>b.onclick=()=>{
+    if(b.dataset.t==='clear'){STATUS_SET.clear();MARCA_SET.clear()}
+    else if(b.dataset.t==='s')STATUS_SET.delete(b.dataset.v);
+    else if(b.dataset.t==='m')MARCA_SET.delete(b.dataset.v);
+    render();
+  });
+}
 function filtered(){
   let items=D.posts.map((p,i)=>({p,i}));
   items=items.filter(({p})=>{
-    if(FILT&&(p.marca||'smark')!==FILT)return false;
-    if(STATUSF&&(p.status||'rascunho')!==STATUSF)return false;
+    if(MARCA_SET.size&&!MARCA_SET.has(p.marca||'smark'))return false;
+    if(STATUS_SET.size&&!STATUS_SET.has(p.status||'rascunho'))return false;
     if(Q){const q=Q.toLowerCase();const t=((p.titulo||'')+' '+(p.slug||'')+' '+(p.marca||'')).toLowerCase();if(!t.includes(q))return false}
     return true;
   });
@@ -663,7 +709,6 @@ function filtered(){
       const tb=Date.parse(b.p.created_at||'')||b.i;
       return ta-tb;
     }
-    // recent (default): updated/created desc, fallback index
     const ta=Date.parse(a.p.updated_at||a.p.created_at||'')||a.i;
     const tb=Date.parse(b.p.updated_at||b.p.created_at||'')||b.i;
     return tb-ta || b.i-a.i;
@@ -671,10 +716,11 @@ function filtered(){
   return items;
 }
 function render(){
-  chips(document.getElementById('viewfilters'),[['cards','Cards'],['mosaic','Mosaico 3']],VIEW,v=>{VIEW=v;render()});
-  chips(document.getElementById('sortfilters'),[['recent','Mais recentes'],['old','Mais antigos'],['alpha','A–Z']],SORT,v=>{SORT=v;render()});
-  chips(document.getElementById('sfilters'),[['','Todos'],['rascunho','Rascunho'],['salvo','Pronto']],STATUSF,v=>{STATUSF=v;render()});
-  chips(document.getElementById('filters'),[['','Todas']].concat(brands().map(b=>[b,nomeMarca(b)])),FILT,v=>{FILT=v;render()});
+  VIEW=document.getElementById('viewsel').value||'cards';
+  SORT=document.getElementById('sortsel').value||'recent';
+  buildChecks(document.getElementById('sfilters'),[['rascunho','Rascunho'],['salvo','Pronto']],STATUS_SET,()=>render());
+  buildChecks(document.getElementById('filters'),brands().map(b=>[b,nomeMarca(b)]),MARCA_SET,()=>render());
+  renderActive();
   const g=document.getElementById('grid');g.innerHTML='';
   g.className='sk-cardgrid'+(VIEW==='mosaic'?' mosaic':'');
   const items=filtered();let n=0;
@@ -715,6 +761,13 @@ function render(){
 }
 let _qT=null;
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='psearch'){clearTimeout(_qT);_qT=setTimeout(()=>{Q=e.target.value.trim();render()},200)}});
+document.getElementById('viewsel').onchange=()=>render();
+document.getElementById('sortsel').onchange=()=>render();
+document.getElementById('ftoggle').onclick=()=>{
+  const pan=document.getElementById('fpanel');
+  const open=pan.classList.toggle('open');
+  document.getElementById('ftoggle').setAttribute('aria-expanded',open?'true':'false');
+};
 document.getElementById('grid').addEventListener('click',e=>{
   const chk=e.target.closest('.sk-post-check');if(chk){const i=+chk.dataset.i;SEL.has(i)?SEL.delete(i):SEL.add(i);render();return}
   const b=e.target.closest('[data-a]');if(!b)return;const i=+b.dataset.i,a=b.dataset.a;
@@ -780,10 +833,17 @@ def vitrine_html():
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
 body.sk{padding-bottom:50px;background:var(--bg)}
 .top{text-align:center;padding:14px;font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:16px;letter-spacing:.02em;border-bottom:1px solid var(--line);background:var(--surface)}.top span{color:var(--accent)}
-.toolbar{max-width:980px;margin:14px auto 8px;padding:0 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.chip{border:1px solid var(--line);background:var(--surface);color:var(--sub);border-radius:999px;padding:7px 13px;font-size:12px;cursor:pointer}
-.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-left:4px}
+.toolbar{max-width:980px;margin:14px auto 10px;padding:12px 14px;display:flex;flex-direction:column;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.ttop{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tsel{background:var(--inset);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:8px 10px;font-size:12px}
+.tbtn{border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:10px;padding:8px 12px;font-size:12px;cursor:pointer}
+.tbtn[aria-expanded=true]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.tbadge{background:var(--accent);color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px}
+.tpanel{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.tpanel.open{display:block}
+.tcheck{display:flex;flex-wrap:wrap;gap:10px 16px}
+.tcheck label{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer}
+.tcheck input{accent-color:var(--accent)}
 .count{margin-left:auto;font-size:12px;color:var(--muted)}
 /* feed */
 .feed{max-width:440px;margin:12px auto 30px;display:flex;flex-direction:column;gap:22px;padding:0 8px}
@@ -806,22 +866,29 @@ body.sk{padding-bottom:50px;background:var(--bg)}
 .age{font-size:11px;color:var(--muted);font-weight:400}
 </style></head><body class="sk">
 __TOPBAR__
-<div class=top><span id=vtbrand>smark</span> &middot; vitrine · feed pra aprovar</div>
+<div class=top><span id=vtbrand>todas as marcas</span> &middot; vitrine · feed pra aprovar</div>
 <div class=toolbar>
-  <span class=lab>Ver</span>
-  <button class="chip on" data-v=feed id=vfeed>Feed</button>
-  <button class=chip data-v=mosaic id=vmosaic>Mosaico · 3</button>
-  <span class=lab>Ordem</span>
-  <button class="chip on" data-s=recent id=srecent>Mais recentes</button>
-  <button class=chip data-s=old id=sold>Mais antigos</button>
-  <span class=lab>Marca</span>
-  <div id=vbrands style="display:flex;flex-wrap:wrap;gap:6px"></div>
-  <span class=count id=vcount></span>
+  <div class=ttop>
+    <select class=tsel id=viewsel>
+      <option value=feed>Feed</option>
+      <option value=mosaic>Mosaico · 3 colunas</option>
+    </select>
+    <select class=tsel id=sortsel>
+      <option value=recent>Mais recentes</option>
+      <option value=old>Mais antigos</option>
+    </select>
+    <button type=button class=tbtn id=ftoggle aria-expanded=false>Marcas <span class=tbadge id=fcount hidden>0</span></button>
+    <span class=count id=vcount></span>
+  </div>
+  <div class=tpanel id=fpanel>
+    <div class=tcheck id=vbrands></div>
+  </div>
 </div>
 <div class=feed id=feed></div>
 <script>
 const T="__EDITOR_TOKEN__";
-let D=null, VIEW='feed', SORT='recent', FILT='', NOMES={};
+let D=null, VIEW='feed', SORT='recent', NOMES={};
+const MARCA_SET=new Set();
 function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
 function relTime(iso){if(!iso)return '';const t=Date.parse(iso);if(!t)return '';const m=Math.floor((Date.now()-t)/60000);
   if(m<1)return 'agora';if(m<60)return m+' min';const h=Math.floor(m/60);if(h<48)return h+' h';return Math.floor(h/24)+' d'}
@@ -836,7 +903,7 @@ async function compose(host,fr,p){
 }
 function listPosts(){
   let items=(D.posts||[]).map((p,i)=>({p,i})).filter(({p})=>(p.frames||[]).length);
-  if(FILT)items=items.filter(({p})=>(p.marca||'smark')===FILT);
+  if(MARCA_SET.size)items=items.filter(({p})=>MARCA_SET.has(p.marca||'smark'));
   items.sort((a,b)=>{
     const ta=Date.parse(a.p.updated_at||a.p.created_at||'')||a.i;
     const tb=Date.parse(b.p.updated_at||b.p.created_at||'')||b.i;
@@ -845,15 +912,17 @@ function listPosts(){
   return items;
 }
 function render(){
-  document.getElementById('vfeed').classList.toggle('on',VIEW==='feed');
-  document.getElementById('vmosaic').classList.toggle('on',VIEW==='mosaic');
-  document.getElementById('srecent').classList.toggle('on',SORT==='recent');
-  document.getElementById('sold').classList.toggle('on',SORT==='old');
+  VIEW=document.getElementById('viewsel').value;
+  SORT=document.getElementById('sortsel').value;
+  const badge=document.getElementById('fcount');
+  if(MARCA_SET.size){badge.hidden=false;badge.textContent=MARCA_SET.size}else badge.hidden=true;
   const f=document.getElementById('feed');f.className='feed'+(VIEW==='mosaic'?' mosaic':'');f.innerHTML='';
   const items=listPosts();
   document.getElementById('vcount').textContent=items.length+' peça'+(items.length===1?'':'s');
-  document.getElementById('vtbrand').textContent=FILT?(NOMES[FILT]||FILT):'todas as marcas';
-  if(!items.length){f.innerHTML='<div class=empty>Nenhum post ainda. Crie no editor pra ver aqui.</div>';return}
+  if(MARCA_SET.size===1)document.getElementById('vtbrand').textContent=NOMES[[...MARCA_SET][0]]||[...MARCA_SET][0];
+  else if(MARCA_SET.size>1)document.getElementById('vtbrand').textContent=MARCA_SET.size+' marcas';
+  else document.getElementById('vtbrand').textContent='todas as marcas';
+  if(!items.length){f.innerHTML='<div class=empty>Nenhum post com esses filtros.</div>';return}
   items.forEach(({p})=>{
     const frames=p.frames||[];
     const nome=NOMES[p.marca||'smark']||p.marca||'smark';
@@ -883,12 +952,17 @@ async function load(){
   D=await(await fetch('/dados')).json();
   const brands=[...new Set((D.posts||[]).map(p=>p.marca||'smark'))];
   const hb=document.getElementById('vbrands');
-  hb.innerHTML='<button class="chip on" data-m="">Todas</button>'+brands.map(b=>'<button class=chip data-m="'+b+'">'+(NOMES[b]||b)+'</button>').join('');
-  hb.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{FILT=b.dataset.m||'';hb.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===b));render()});
-  document.getElementById('vfeed').onclick=()=>{VIEW='feed';render()};
-  document.getElementById('vmosaic').onclick=()=>{VIEW='mosaic';render()};
-  document.getElementById('srecent').onclick=()=>{SORT='recent';render()};
-  document.getElementById('sold').onclick=()=>{SORT='old';render()};
+  hb.innerHTML=brands.map(b=>'<label><input type=checkbox data-m="'+b+'"> '+(NOMES[b]||b)+'</label>').join('');
+  hb.querySelectorAll('input').forEach(inp=>inp.onchange=()=>{
+    if(inp.checked)MARCA_SET.add(inp.dataset.m);else MARCA_SET.delete(inp.dataset.m);
+    render();
+  });
+  document.getElementById('viewsel').onchange=()=>render();
+  document.getElementById('sortsel').onchange=()=>render();
+  document.getElementById('ftoggle').onclick=()=>{
+    const open=document.getElementById('fpanel').classList.toggle('open');
+    document.getElementById('ftoggle').setAttribute('aria-expanded',open?'true':'false');
+  };
   render();
 }
 load();
