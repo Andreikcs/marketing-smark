@@ -490,6 +490,13 @@ tr:last-child td{{border-bottom:0}}
             <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ler_site title="Lê o site e sugere nome, mood e segmento — você revisa e salva">Ler site</button>
           </div>
           <div id=mf_dna_msg style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4"></div>
+          <details class=msec id=mf_dna_box style="display:none;margin-top:10px">
+            <summary>Resumo da marca (do site)</summary>
+            <div class=msec-body>
+              <div id=mf_dna_resumo style="font-size:13px;line-height:1.5;color:var(--text);margin-bottom:10px"></div>
+              <div id=mf_dna_meta style="font-size:12px;color:var(--muted);line-height:1.45"></div>
+            </div>
+          </details>
         </div>
         <div class=fld><label>Template padrão da arte (novos posts desta marca)</label>
           <div id=mf_moldura style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:4px">
@@ -982,50 +989,75 @@ document.getElementById('mf_ler_site').onclick=async()=>{{
   const site=(document.getElementById('mf_site').value||'').trim();
   const dmsg=document.getElementById('mf_dna_msg');
   const msg=document.getElementById('mf_msg');
+  const box=document.getElementById('mf_dna_box');
+  const btn=document.getElementById('mf_ler_site');
   if(!site){{
     if(dmsg)dmsg.textContent='Cole a URL do site do cliente primeiro.';
     return;
   }}
-  if(dmsg)dmsg.textContent='Lendo o site…';
-  if(msg){{msg.className='';msg.textContent='Analisando site…'}}
-  const r=await api('/marca-ler-site',{{url:site}});
-  if(!r.ok){{
-    if(dmsg)dmsg.textContent=r.erro||'Não consegui ler o site';
-    if(msg){{msg.className='err';msg.textContent=r.erro||'falhou'}}
+  if(btn){{btn.disabled=true;btn.textContent='Lendo…'}}
+  if(dmsg)dmsg.textContent='Lendo o site (home + uma página)…';
+  if(msg){{msg.className='';msg.textContent=''}}
+  if(box)box.style.display='none';
+  let r;
+  try{{
+    r=await api('/marca-ler-site',{{url:site}});
+  }}catch(e){{
+    r={{ok:false,erro:'falha de rede'}};
+  }}
+  if(btn){{btn.disabled=false;btn.textContent='Ler site'}}
+  if(!r||!r.ok){{
+    if(dmsg)dmsg.textContent=r&&r.erro?r.erro:'Não consegui ler o site';
+    if(msg){{msg.className='err';msg.textContent=r&&r.erro?r.erro:'falhou'}}
     return;
   }}
   const f=r.formulario||{{}};
-  // só preenche se vazio ou se o usuário confirmar sobrescrever
   const fill=(id,val,force)=>{{
     if(!val)return;
     const el=document.getElementById(id); if(!el)return;
     if(force||!el.value.trim()) el.value=val;
   }};
-  const sobrescrever=!!(
+  const temDados=!!(
     document.getElementById('mf_nome').value.trim()||
     document.getElementById('mf_mood').value.trim()
   );
   let ok=true;
-  if(sobrescrever){{
-    ok=confirm('Já há dados no formulário. Usar as sugestões do site (pode preencher campos vazios e atualizar mood/segmento)?');
+  if(temDados){{
+    ok=confirm('Já há dados no formulário. Aplicar as sugestões do site?');
   }}
-  if(!ok){{if(dmsg)dmsg.textContent='Cancelado.';return}}
-  fill('mf_nome', f.nome, true);
-  fill('mf_handle', f.handle, !document.getElementById('mf_handle').value.trim());
-  fill('mf_wordmark', f.wordmark, !document.getElementById('mf_wordmark').value.trim());
-  fill('mf_mood', f.mood, true);
-  fill('mf_site', f.site||site, true);
-  if(f.segmento) document.getElementById('mf_segmento').value=f.segmento;
-  if(f.acento&&/^#[0-9A-Fa-f]{{6}}$/.test(f.acento)){{
-    document.getElementById('mf_acento').value=f.acento;
+  if(!ok){{
+    // mesmo cancelando o fill, mostra o resumo para o usuário ler
+    if(dmsg)dmsg.textContent='Sugestões não aplicadas — veja o resumo abaixo.';
+  }}else{{
+    fill('mf_nome', f.nome, true);
+    fill('mf_handle', f.handle, !document.getElementById('mf_handle').value.trim());
+    fill('mf_wordmark', f.wordmark, !document.getElementById('mf_wordmark').value.trim());
+    fill('mf_mood', f.mood, true);
+    fill('mf_site', f.site||site, true);
+    if(f.segmento) document.getElementById('mf_segmento').value=f.segmento;
+    if(f.acento&&/^#[0-9A-Fa-f]{{6}}$/.test(f.acento)){{
+      document.getElementById('mf_acento').value=f.acento;
+    }}
+    if(document.getElementById('mf_glyph_mode').value==='auto') syncGlyphMode();
+    if(dmsg)dmsg.textContent='Campos preenchidos. Abra o resumo, revise e salve.';
+    if(msg){{msg.className='ok';msg.textContent='Site lido — revise e salve'}}
   }}
-  if(document.getElementById('mf_glyph_mode').value==='auto') syncGlyphMode();
-  const sc=r.score!=null?(' · confiança ~'+r.score+'%'):'';
-  const extra=[];
-  if(r.proposta) extra.push(r.proposta);
-  if(r.publico) extra.push('Público: '+r.publico);
-  if(dmsg)dmsg.textContent='Sugestões do site aplicadas'+sc+'. Revise e clique em Salvar.'+(extra.length?(' — '+extra[0]):'');
-  if(msg){{msg.className='ok';msg.textContent='Site lido — revise os campos e salve'}}
+  // resumo em sanfona
+  const resumoEl=document.getElementById('mf_dna_resumo');
+  const metaEl=document.getElementById('mf_dna_meta');
+  if(box&&resumoEl&&metaEl){{
+    resumoEl.textContent=r.resumo||r.proposta||'Sem resumo textual.';
+    const lines=[];
+    if(r.score!=null) lines.push('Confiança geral: ~'+r.score+'%');
+    if(r.proposta) lines.push('Proposta: '+r.proposta);
+    if(r.publico) lines.push('Público: '+r.publico);
+    if(r.tom) lines.push('Tom: '+r.tom);
+    if(r.restricoes&&r.restricoes.length) lines.push('Evitar: '+r.restricoes.slice(0,4).join(' · '));
+    if(r.paginas_lidas&&r.paginas_lidas.length) lines.push('Páginas lidas: '+r.paginas_lidas.length);
+    metaEl.innerHTML=lines.map(l=>'<div style="margin:3px 0">'+esc(l)+'</div>').join('');
+    box.style.display='block';
+    box.open=true;
+  }}
 }};
 document.getElementById('mf_save').onclick=async()=>{{
   const msg=document.getElementById('mf_msg');
@@ -2688,6 +2720,7 @@ class H(http.server.BaseHTTPRequestHandler):
                     "ok": True,
                     "formulario": form,
                     "score": dna.get("score"),
+                    "resumo": dna.get("resumo") or "",
                     "proposta": dna.get("proposta"),
                     "publico": dna.get("publico"),
                     "tom": dna.get("tom"),

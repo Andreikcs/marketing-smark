@@ -23,8 +23,8 @@ from typing import Optional
 
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Subpáginas comuns (legado v2) — no máx. 3 além da home
-SUBPAGES = ("/sobre", "/about", "/produto", "/solucao", "/pricing", "/features", "/como-funciona")
+# Poucas subpáginas (rápido) — home já basta na maioria dos casos
+SUBPAGES = ("/sobre", "/about", "/produto")
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; smark-studio/1.0; +local)",
@@ -107,10 +107,10 @@ def _load_env():
     return env
 
 
-def _fetch(url: str, timeout: int = 12) -> str:
+def _fetch(url: str, timeout: int = 6) -> str:
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=timeout) as r:
-        raw = r.read()
+        raw = r.read(600_000)  # cap ~600kb HTML
         charset = "utf-8"
         ct = r.headers.get_content_charset()
         if ct:
@@ -139,8 +139,10 @@ def _html_to_text(html: str) -> dict:
     }
 
 
-def crawl(url: str) -> dict:
-    """Crawl home + até 3 subpáginas. Devolve texto limpo + metas."""
+def crawl(url: str, *, rapido: bool = True) -> dict:
+    """Crawl home (+ 1 subpágina se rápido). Devolve texto limpo + metas."""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
     url = (url or "").strip()
     if not url:
         raise ValueError("URL vazia")
@@ -151,28 +153,37 @@ def crawl(url: str) -> dict:
     chunks = []
     meta = {"title": "", "meta_desc": "", "og_image": "", "theme_color": "", "pages": []}
     try:
-        html = _fetch(url)
+        html = _fetch(url, timeout=5)
         d = _html_to_text(html)
         meta.update({k: d[k] for k in ("title", "meta_desc", "og_image", "theme_color") if d.get(k)})
         if d["text"]:
-            chunks.append(d["text"])
+            chunks.append(d["text"][:2800])
         meta["pages"].append(url)
     except Exception as e:
         raise ValueError(f"Não consegui abrir o site: {e}") from e
 
-    for sub in SUBPAGES:
-        if len(chunks) >= 4:
-            break
-        try:
-            html = _fetch(url + sub, timeout=8)
-            d = _html_to_text(html)
-            if d["text"] and len(d["text"]) > 120:
-                chunks.append(d["text"][:2000])
-                meta["pages"].append(url + sub)
-        except Exception:
-            continue
+    # paralelo: tenta 1 subpágina útil (rápido); se home já tem bastante texto, pula
+    if not rapido or len(" ".join(chunks)) < 600:
+        def _try(sub):
+            try:
+                return sub, _html_to_text(_fetch(url + sub, timeout=4))
+            except Exception:
+                return sub, None
 
-    content = "\n\n".join(chunks)[:8000]
+        with ThreadPoolExecutor(max_workers=3) as ex:
+            futs = [ex.submit(_try, s) for s in SUBPAGES[:3]]
+            for fut in as_completed(futs, timeout=6):
+                try:
+                    sub, d = fut.result()
+                except Exception:
+                    continue
+                if d and d.get("text") and len(d["text"]) > 150:
+                    chunks.append(d["text"][:1500])
+                    meta["pages"].append(url + sub)
+                    if rapido:
+                        break  # uma subpágina basta
+
+    content = "\n\n".join(chunks)[:4500]
     if len(content) < 80:
         raise ValueError("Site quase sem texto legível (pode ser só JavaScript). Cole o site ou envie referências.")
     meta["content"] = content
@@ -180,41 +191,29 @@ def crawl(url: str) -> dict:
     return meta
 
 
-DNA_PROMPT = """Você é especialista em branding B2B no Brasil.
-Analise o conteúdo do site e extraia o essencial da marca para preencher um cadastro de studio de conteúdo.
+DNA_PROMPT = """Especialista em branding BR. Extraia o essencial do site para um cadastro de studio.
 
 URL: {url}
 TÍTULO: {title}
 META: {meta_desc}
-
-CONTEÚDO:
+TEXTO:
 {content}
 
-Retorne APENAS um JSON válido (sem markdown) com esta estrutura:
+JSON puro (sem markdown):
 {{
-  "nome": "nome comercial da marca",
-  "handle": "@semespacos",
-  "segmento": "um de: contabilidade|telecom|varejo|imobiliaria|saude|servicos|educacao|industria|outro",
-  "mood": "1-2 frases em português descrevendo o clima visual e de arte (sem jargão vazio)",
-  "wordmark": "nome curto pro chip da arte",
-  "proposta": "proposta de valor em 1 frase",
-  "publico": "público-alvo em 1 frase",
-  "tom": "tom de voz em poucas palavras",
-  "restricoes": ["o que evitar na comunicação"],
-  "confianca": {{
-    "nome": "Alta|Média|Baixa",
-    "mood": "Alta|Média|Baixa",
-    "segmento": "Alta|Média|Baixa",
-    "proposta": "Alta|Média|Baixa"
-  }}
+  "nome": "",
+  "handle": "@slug",
+  "segmento": "contabilidade|telecom|varejo|imobiliaria|saude|servicos|educacao|industria|outro",
+  "mood": "1-2 frases clima visual em português, concreto",
+  "wordmark": "nome curto no chip",
+  "proposta": "1 frase",
+  "publico": "1 frase",
+  "tom": "poucas palavras",
+  "resumo": "2-4 frases em português: o que a marca é, para quem, como fala e o que evitar",
+  "restricoes": ["evitar…"],
+  "confianca": {{"nome":"Alta|Média|Baixa","mood":"Alta|Média|Baixa","segmento":"Alta|Média|Baixa","proposta":"Alta|Média|Baixa"}}
 }}
-
-Regras:
-- Português do Brasil.
-- handle só [a-z0-9] após @, minúsculo.
-- mood serve para gerar fundo de IA: concreto e visual.
-- Não invente números ou prêmios que não estejam no texto.
-- Se incerto, confianca Baixa e valor conservador.
+Regras: pt-BR; handle só a-z0-9; não invente prêmios/números; se incerto use confianca Baixa.
 """
 
 
@@ -249,14 +248,17 @@ def _llm_json(prompt: str) -> tuple[dict, dict]:
     meta = {"ok": False, "custo_usd": None, "provider": None, "modelo": None}
 
     if ant:
-        model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
-        # DNA é tarefa barata: sonnet default (override via env)
+        # tarefa barata e rápida — sonnet (não opus)
+        model = os.environ.get("ANTHROPIC_DNA_MODEL") or os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
+        if "opus" in model.lower():
+            model = "claude-sonnet-4-6"
         data = _post_json(
             "https://api.anthropic.com/v1/messages",
             {"x-api-key": ant, "anthropic-version": "2023-06-01",
              "content-type": "application/json"},
-            {"model": model, "max_tokens": 2000,
+            {"model": model, "max_tokens": 1200,
              "messages": [{"role": "user", "content": prompt}]},
+            timeout=45,
         )
         parts = [b.get("text", "") for b in data.get("content", []) if b.get("type") == "text"]
         usage = data.get("usage") or {}
@@ -336,6 +338,15 @@ def _sanea(raw: dict, crawled: dict) -> dict:
         acento = tc if tc.startswith("#") else ("#" + tc)
         acento = acento.upper()
 
+    resumo = str(raw.get("resumo") or "").strip()[:600]
+    if not resumo:
+        bits = [p for p in (
+            str(raw.get("proposta") or "").strip(),
+            ("Público: " + str(raw.get("publico")).strip()) if raw.get("publico") else "",
+            ("Tom: " + str(raw.get("tom")).strip()) if raw.get("tom") else "",
+        ) if p]
+        resumo = " ".join(bits)[:600]
+
     return {
         "nome": nome,
         "handle": handle,
@@ -345,6 +356,7 @@ def _sanea(raw: dict, crawled: dict) -> dict:
         "proposta": str(raw.get("proposta") or "").strip()[:300],
         "publico": str(raw.get("publico") or "").strip()[:300],
         "tom": str(raw.get("tom") or "").strip()[:120],
+        "resumo": resumo,
         "restricoes": [str(x).strip() for x in (raw.get("restricoes") or []) if str(x).strip()][:8],
         "confianca": conf,
         "score": score,

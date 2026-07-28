@@ -225,11 +225,11 @@ def _logo_to_icon_rgba(path):
     if im.mode != "RGBA":
         im = im.convert("RGBA")
     # remove fundo quase-branco
-    alpha = im.split()[-1]
-    if alpha.getextrema()[0] > 240:
-        px = list(im.getdata())
+    a0 = im.split()[-1]
+    if a0.getextrema()[0] > 240:
+        px_list = list(im.getdata())
         out = []
-        for r, g, b, a in px:
+        for r, g, b, a in px_list:
             if r > 248 and g > 248 and b > 248:
                 out.append((r, g, b, 0))
             else:
@@ -242,12 +242,11 @@ def _logo_to_icon_rgba(path):
     if w < 8 or h < 8:
         return None
     ratio = w / max(1, h)
-    # foto de feed / post vertical → não é ícone
-    if ratio < 0.55 or (not _logo_is_mark(im) and max(w, h) > 900 and 0.75 <= ratio <= 1.35):
-        # tenta só se tiver alpha útil e tamanho moderado
-        if max(w, h) > 700 and alpha.getextrema()[0] > 200:
-            return None
-    # wordmark largo → recorte quadrado (preferência esquerda = brasão)
+    # foto de feed full-bleed sem transparência real → recusa (usa glyph)
+    a_min = im.split()[-1].getextrema()[0]
+    if max(w, h) >= 900 and a_min > 200 and 0.72 <= ratio <= 1.35:
+        return None
+    # wordmark largo → recorte quadrado (preferência = janela mais "tinta")
     if ratio > 1.35:
         side = h
         # densidade de tinta em colunas: pega a janela side×side mais "cheia"
