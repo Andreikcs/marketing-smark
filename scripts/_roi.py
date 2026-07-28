@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
-"""ROI humano v1 — tempo e contadores por post no editor.
+"""ROI humano — tempo e contadores por post no editor.
 
-Cada post em editor.json pode ter:
+Ciclo = do primeiro trabalho real (copy/imagem) até o export PNG.
+Não conta “aba aberta” nem foco passivo.
 
   "roi": {
-    "active": { "started_at", "copy_calls", "image_gens" } | null,
+    "active": { started_at, last_activity_at, copy_calls, image_gens } | null,
     "cycles": [ { started_at, exported_at, minutes, copy_calls, image_gens } ],
-    "copy_calls_total": int,
-    "image_gens_total": int,
-    "exports_total": int
+    "copy_calls_total", "image_gens_total", "exports_total"
   }
-
-Ciclo = do primeiro trabalho (copy/imagem/início manual) até o export PNG.
 """
 import datetime
 from statistics import mean, median
+
+# teto de um ciclo (evita 26h se algo ficar preso)
+MAX_CICLO_MIN = 180.0
+# se ativo sem atividade há mais que isso → descarta (minutos)
+STALE_IDLE_MIN = 45.0
 
 
 def _agora():
@@ -41,25 +43,103 @@ def ensure(post):
     r.setdefault("copy_calls_total", 0)
     r.setdefault("image_gens_total", 0)
     r.setdefault("exports_total", 0)
+    # limpa ciclos absurdos e ativos stale
+    _sanitizar(r)
     return r
 
 
+def _sanitizar(r):
+    """Remove ciclos com minutos absurdos e fecha ativos ociosos."""
+    cycles = []
+    for c in (r.get("cycles") or []):
+        try:
+            m = float(c.get("minutes") or 0)
+        except (TypeError, ValueError):
+            m = 0
+        if m > MAX_CICLO_MIN:
+            c = dict(c)
+            c["minutes"] = MAX_CICLO_MIN
+            c["capped"] = True
+        if m >= 0:
+            cycles.append(c)
+    r["cycles"] = cycles[-50:]
+
+    act = r.get("active")
+    if not isinstance(act, dict) or not act.get("started_at"):
+        r["active"] = None
+        return
+    last = _parse(act.get("last_activity_at") or act.get("started_at"))
+    if not last:
+        r["active"] = None
+        return
+    idle = (datetime.datetime.now() - last).total_seconds() / 60.0
+    # ocioso sem trabalho real → descarta
+    work = int(act.get("copy_calls") or 0) + int(act.get("image_gens") or 0)
+    if idle > STALE_IDLE_MIN and work == 0:
+        r["active"] = None
+        return
+    # ocioso há muito com trabalho → fecha como ciclo (usa last_activity)
+    if idle > STALE_IDLE_MIN and work > 0:
+        _fechar_ativo(r, act, exported=False)
+        return
+
+
+def _fechar_ativo(r, act, exported=True):
+    t0 = _parse(act.get("started_at"))
+    t1 = _parse(act.get("last_activity_at") or act.get("started_at")) or datetime.datetime.now()
+    if t0 and t1 < t0:
+        t1 = t0
+    minutes = 0.0
+    if t0:
+        minutes = max(0.0, (t1 - t0).total_seconds() / 60.0)
+    minutes = min(minutes, MAX_CICLO_MIN)
+    cycle = {
+        "started_at": act.get("started_at"),
+        "exported_at": _agora() if exported else (act.get("last_activity_at") or _agora()),
+        "minutes": round(minutes, 2),
+        "copy_calls": int(act.get("copy_calls") or 0),
+        "image_gens": int(act.get("image_gens") or 0),
+        "auto_closed": not exported,
+    }
+    cycles = list(r.get("cycles") or [])
+    cycles.append(cycle)
+    r["cycles"] = cycles[-50:]
+    if exported:
+        r["exports_total"] = int(r.get("exports_total") or 0) + 1
+        r["last_cycle"] = cycle
+    r["active"] = None
+    return cycle
+
+
 def start(post, force=False):
-    """Abre ciclo ativo se não houver. force=True reinicia ciclo."""
+    """Abre ciclo ativo só com trabalho real — preferir touch_copy/touch_image.
+
+    force=True reinicia. Sem force, se já há ativo, só renova last_activity.
+    """
     r = ensure(post)
+    now = _agora()
     if force or not r.get("active"):
         r["active"] = {
-            "started_at": _agora(),
+            "started_at": now,
+            "last_activity_at": now,
             "copy_calls": 0,
             "image_gens": 0,
         }
+    else:
+        act = r["active"]
+        act["last_activity_at"] = now
+        r["active"] = act
     return r["active"]
 
 
 def touch_copy(post):
     """+1 copy no ciclo ativo (abre ciclo se preciso)."""
     r = ensure(post)
-    act = r.get("active") or start(post)
+    act = r.get("active")
+    if not act:
+        act = start(post)
+    else:
+        act["last_activity_at"] = _agora()
     act["copy_calls"] = int(act.get("copy_calls") or 0) + 1
     r["copy_calls_total"] = int(r.get("copy_calls_total") or 0) + 1
     r["active"] = act
@@ -69,7 +149,11 @@ def touch_copy(post):
 def touch_image(post):
     """+1 imagem no ciclo ativo (abre ciclo se preciso)."""
     r = ensure(post)
-    act = r.get("active") or start(post)
+    act = r.get("active")
+    if not act:
+        act = start(post)
+    else:
+        act["last_activity_at"] = _agora()
     act["image_gens"] = int(act.get("image_gens") or 0) + 1
     r["image_gens_total"] = int(r.get("image_gens_total") or 0) + 1
     r["active"] = act
@@ -81,75 +165,79 @@ def close_export(post):
     r = ensure(post)
     act = r.get("active")
     if not act or not act.get("started_at"):
-        # export sem start: ciclo mínimo de 0 min
-        act = {"started_at": _agora(), "copy_calls": 0, "image_gens": 0}
-    end = _agora()
-    t0 = _parse(act.get("started_at"))
-    t1 = _parse(end)
-    minutes = 0.0
-    if t0 and t1:
-        minutes = max(0.0, round((t1 - t0).total_seconds() / 60.0, 2))
-    cycle = {
-        "started_at": act.get("started_at"),
-        "exported_at": end,
-        "minutes": minutes,
-        "copy_calls": int(act.get("copy_calls") or 0),
-        "image_gens": int(act.get("image_gens") or 0),
-    }
-    cycles = list(r.get("cycles") or [])
-    cycles.append(cycle)
-    # mantém últimos 50 ciclos por post
-    r["cycles"] = cycles[-50:]
-    r["exports_total"] = int(r.get("exports_total") or 0) + 1
-    r["active"] = None  # pronto para novo ciclo
-    r["last_cycle"] = cycle
-    return cycle
+        # export sem trabalho prévio: ciclo mínimo
+        return {
+            "started_at": _agora(),
+            "exported_at": _agora(),
+            "minutes": 0.0,
+            "copy_calls": 0,
+            "image_gens": 0,
+        }
+    act["last_activity_at"] = _agora()
+    return _fechar_ativo(r, act, exported=True)
 
 
 def minutos_medios(post):
     """Média de minutes dos ciclos fechados; None se vazio."""
-    cycles = (post.get("roi") or {}).get("cycles") or []
-    vals = [float(c.get("minutes") or 0) for c in cycles if c.get("exported_at")]
+    r = ensure(post) if isinstance(post, dict) else {}
+    cycles = r.get("cycles") or []
+    vals = [float(c.get("minutes") or 0) for c in cycles if c.get("exported_at") or c.get("minutes") is not None]
+    vals = [v for v in vals if 0 <= v <= MAX_CICLO_MIN]
     if not vals:
         return None
     return round(mean(vals), 2)
 
 
+def _ativo_span_min(act):
+    """Minutos do ciclo ativo = started → last_activity (NÃO até agora)."""
+    if not act or not act.get("started_at"):
+        return 0.0
+    t0 = _parse(act.get("started_at"))
+    t1 = _parse(act.get("last_activity_at") or act.get("started_at"))
+    if not t0 or not t1:
+        return 0.0
+    if t1 < t0:
+        t1 = t0
+    m = (t1 - t0).total_seconds() / 60.0
+    return min(max(0.0, m), MAX_CICLO_MIN)
+
+
 def minutos_totais(post):
-    """Soma de minutos dos ciclos fechados + ciclo ativo em andamento."""
-    r = post.get("roi") if isinstance(post.get("roi"), dict) else {}
-    total = sum(float(c.get("minutes") or 0) for c in (r.get("cycles") or []))
+    """Soma de minutos dos ciclos fechados + trecho ativo (até última atividade)."""
+    r = ensure(post) if isinstance(post, dict) else {}
+    total = 0.0
+    for c in (r.get("cycles") or []):
+        try:
+            m = float(c.get("minutes") or 0)
+        except (TypeError, ValueError):
+            m = 0
+        total += min(max(0.0, m), MAX_CICLO_MIN)
     act = r.get("active") or {}
-    if act.get("started_at"):
-        t0 = _parse(act["started_at"])
-        if t0:
-            total += max(0.0, (datetime.datetime.now() - t0).total_seconds() / 60.0)
+    work = int(act.get("copy_calls") or 0) + int(act.get("image_gens") or 0)
+    if work > 0:
+        total += _ativo_span_min(act)
     return round(total, 2)
 
 
 def ativo_minutos(post):
-    """Minutos do ciclo ativo agora (ou None)."""
-    r = post.get("roi") if isinstance(post.get("roi"), dict) else {}
+    """Minutos do ciclo ativo (até última atividade), ou None."""
+    r = ensure(post) if isinstance(post, dict) else {}
     act = r.get("active") or {}
     if not act.get("started_at"):
         return None
-    t0 = _parse(act["started_at"])
-    if not t0:
-        return None
-    return round(max(0.0, (datetime.datetime.now() - t0).total_seconds() / 60.0), 2)
+    work = int(act.get("copy_calls") or 0) + int(act.get("image_gens") or 0)
+    if work == 0:
+        return None  # foco sem trabalho não conta
+    return round(_ativo_span_min(act), 2)
 
 
 def resumo_posts(posts, limit=50, totais_fn=None):
-    """Lista posts com ROI + COGS — do mais recente ao mais antigo.
-
-    `totais_fn(slug, marca) -> dict` se fornecido (ex. _ledger.totais_por_post).
-    """
+    """Lista posts com ROI + COGS — do mais recente ao mais antigo."""
     items = []
-    # índices originais + ordem do mais novo (fim da lista) ao mais antigo
     indexed = list(enumerate(posts or []))
     indexed.reverse()
     for i, p in indexed[: max(1, int(limit or 50))]:
-        r = p.get("roi") if isinstance(p.get("roi"), dict) else {}
+        r = ensure(p) if isinstance(p, dict) else {}
         cycles = r.get("cycles") or []
         last = r.get("last_cycle") or (cycles[-1] if cycles else None)
         avg_m = minutos_medios(p)
@@ -172,7 +260,10 @@ def resumo_posts(posts, limit=50, totais_fn=None):
             "active_minutes": ativo_minutos(p),
             "last_minutes": (last or {}).get("minutes"),
             "last_exported_at": (last or {}).get("exported_at"),
-            "active": bool(r.get("active")),
+            "active": bool(r.get("active") and (
+                int((r.get("active") or {}).get("copy_calls") or 0)
+                + int((r.get("active") or {}).get("image_gens") or 0)
+            ) > 0),
             "imagem_usd": None,
             "copy_usd": None,
             "total_usd": None,
@@ -191,7 +282,6 @@ def resumo_posts(posts, limit=50, totais_fn=None):
                 pass
         items.append(row)
 
-    # agregados
     mins = [x["avg_minutes"] for x in items if x["avg_minutes"] is not None]
     lasts = [x["last_minutes"] for x in items if x["last_minutes"] is not None]
     costs = [x["total_usd"] for x in items if x["total_usd"] is not None]
@@ -216,7 +306,6 @@ def resumo_posts(posts, limit=50, totais_fn=None):
             "cogs_usd": _stat(costs),
             "cogs_brl": _stat(costs_brl),
         },
-        # proxy ROI vs baseline 45 min (documentado no dossiê; ajustável)
         "baseline_minutes": 45.0,
         "estimated_hours_saved": (
             round((45.0 * len(mins) - sum(mins)) / 60.0, 2) if mins else None

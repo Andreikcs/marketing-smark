@@ -136,9 +136,12 @@ def listar_detalhes():
             "glyph": m.get("logo_glyph") or (m.get("nome") or s)[:1].upper(),
             "mood": m.get("mood") or "",
             "gradiente": m.get("gradiente") or "",
+            "segmento": m.get("segmento") or "",
+            "site": m.get("site") or "",
             "papel": m.get("papel") or ("canonica" if s in CANONICAS else "cliente"),
             "logo": logo,
             "logo_url": ("/" + logo.lstrip("/")) if logo else "",
+            "refs_n": len(listar_refs(s)) if exists(s) else 0,
             "pronta": pronta(s),
             "canonica": s in CANONICAS,
         })
@@ -177,8 +180,151 @@ def _base_escura_de(acento_hex):
     return "#0B0B0B"
 
 
+SEGMENTOS = (
+    ("contabilidade", "Contabilidade / fiscal"),
+    ("telecom", "Telecom / ISP"),
+    ("varejo", "Varejo / e-commerce"),
+    ("imobiliaria", "Imobiliário"),
+    ("saude", "Saúde / clínicas"),
+    ("servicos", "Serviços B2B"),
+    ("educacao", "Educação"),
+    ("industria", "Indústria"),
+    ("outro", "Outro"),
+)
+
+# mood base por segmento (inglês, direção de arte)
+MOOD_POR_SEGMENTO = {
+    "contabilidade": "premium B2B accounting and tax advisory — deep navy and teal, clean corporate photography, geometric curves, trustworthy Contabilidade de Resultado style",
+    "telecom": "regional ISP fiber broadband brand — infrastructure at scale, warm reliable neighborhood connectivity, clean industrial-premium",
+    "varejo": "retail commerce brand — bright product photography, clean shelves, modern storefront energy, approachable premium",
+    "imobiliaria": "real estate premium brand — bright interiors, architectural photography, trust and aspiration, airy composition",
+    "saude": "healthcare clinic brand — calm clinical whites and soft blues, human care, clean medical photography",
+    "servicos": "B2B professional services brand — restrained corporate, clean desks, trustworthy premium photography",
+    "educacao": "education brand — bright hopeful learning spaces, modern campus energy, clean human photography",
+    "industria": "industrial manufacturing brand — steel, precision machinery, safety and scale, dark premium engineering",
+    "outro": "premium on-brand visual — clean, professional, restrained",
+}
+
+
+def listar_refs(slug):
+    """Lista arquivos de feed + acervo da marca."""
+    require(slug)
+    out = []
+    for kind, sub in (("feed", "referencias/feed"), ("acervo", "referencias/acervo")):
+        d = os.path.join(MARCAS_DIR, slug, *sub.split("/"))
+        if not os.path.isdir(d):
+            continue
+        for n in sorted(os.listdir(d)):
+            if n.startswith("."):
+                continue
+            low = n.lower()
+            if not low.endswith((".png", ".jpg", ".jpeg", ".webp")):
+                continue
+            rel = os.path.join("marcas", slug, sub, n).replace("\\", "/")
+            out.append({
+                "nome": n,
+                "kind": kind,
+                "path": rel,
+                "url": "/" + rel,
+                "base": os.path.splitext(n)[0],
+            })
+    return out
+
+
+def remover_ref(slug, nome):
+    """Remove ref do feed e/ou acervo pelo nome do arquivo (ou base)."""
+    require(slug)
+    nome = os.path.basename(nome or "")
+    if not nome or ".." in nome:
+        raise ValueError("nome inválido")
+    base = os.path.splitext(nome)[0]
+    removed = []
+    for sub in ("referencias/feed", "referencias/acervo"):
+        d = os.path.join(MARCAS_DIR, slug, *sub.split("/"))
+        if not os.path.isdir(d):
+            continue
+        for n in list(os.listdir(d)):
+            if n == nome or os.path.splitext(n)[0] == base:
+                p = os.path.join(d, n)
+                try:
+                    os.remove(p)
+                    removed.append(os.path.join("marcas", slug, sub, n).replace("\\", "/"))
+                except OSError:
+                    pass
+    if not removed:
+        raise FileNotFoundError(nome)
+    return removed
+
+
+def remover_logo(slug):
+    """Remove logo e limpa brasao.principal no tokens."""
+    require(slug)
+    t = _load_tokens()
+    m = t["marcas"][slug]
+    brasao = m.get("brasao") or {}
+    rel = brasao.get("principal") or ""
+    removed = []
+    if rel:
+        p = os.path.join(VAULT, rel) if not os.path.isabs(rel) else rel
+        if os.path.isfile(p):
+            os.remove(p)
+            removed.append(rel)
+    assets = os.path.join(MARCAS_DIR, slug, "branding", "assets")
+    if os.path.isdir(assets):
+        for n in os.listdir(assets):
+            if n.lower().startswith("logo"):
+                try:
+                    os.remove(os.path.join(assets, n))
+                    removed.append(os.path.join("marcas", slug, "branding/assets", n).replace("\\", "/"))
+                except OSError:
+                    pass
+    if "brasao" in m and isinstance(m["brasao"], dict):
+        m["brasao"].pop("principal", None)
+    t["marcas"][slug] = m
+    _save_tokens(t)
+    return removed
+
+
+def gerar_texto_ia_marca(slug=None, nome="", segmento="", acento="", site=""):
+    """Gera mood + sugestões de copy sem chamar API externa (template por segmento).
+
+    Retorna dict pronto para preencher o formulário.
+    """
+    seg = (segmento or "outro").strip().lower()
+    if seg not in MOOD_POR_SEGMENTO:
+        seg = "outro"
+    nome = (nome or slug or "marca").strip()
+    handle = "@" + re.sub(r"[^a-z0-9]", "", (slug or nome).lower())[:24]
+    mood = MOOD_POR_SEGMENTO[seg]
+    # personaliza levemente com o nome
+    mood = f"{mood} — brand name {nome}"
+    glyph = (nome[:1] or "M").upper()
+    wordmark = nome
+    dicas = {
+        "contabilidade": "Use navy/teal, tema escuro, prazos e riscos fiscais sem prometer economia.",
+        "telecom": "Use acento da marca, dor de queda de sinal e fibra local.",
+        "varejo": "Tema claro, produto e oferta, CTA de loja/WhatsApp.",
+        "imobiliaria": "Fotos de imóvel e confiança, sem promessa de venda.",
+        "saude": "Tom calmo, humano, sem diagnóstico médico na arte.",
+        "servicos": "B2B direto, autoridade e clareza.",
+        "educacao": "Tom esperançoso e claro.",
+        "industria": "Precisão e escala, fundo escuro.",
+        "outro": "Siga paleta e referências enviadas.",
+    }
+    return {
+        "segmento": seg,
+        "mood": mood,
+        "handle": handle,
+        "glyph": glyph,
+        "wordmark": wordmark,
+        "dica": dicas.get(seg, dicas["outro"]),
+        "site": (site or "").strip(),
+    }
+
+
 def atualizar(slug, *, nome=None, acento=None, acento_claro=None, handle=None,
-              glyph=None, wordmark=None, mood=None, gradiente=None, endossa=None):
+              glyph=None, wordmark=None, mood=None, gradiente=None, endossa=None,
+              segmento=None, site=None):
     """Atualiza campos editáveis de uma marca no tokens.json.
 
     Canônicas podem editar handle/mood/cores (cuidado), mas o slug não muda.
@@ -229,6 +375,17 @@ def atualizar(slug, *, nome=None, acento=None, acento_claro=None, handle=None,
             m["gradiente"] = g
     if endossa is not None:
         m["endossa"] = bool(endossa)
+    if segmento is not None:
+        seg = str(segmento).strip().lower()
+        if seg and seg not in dict(SEGMENTOS):
+            raise ValueError(f"segmento inválido: {seg}")
+        m["segmento"] = seg or m.get("segmento") or "outro"
+    if site is not None:
+        site = str(site).strip()[:200]
+        if site:
+            m["site"] = site
+        elif "site" in m:
+            m.pop("site", None)
 
     t["marcas"][slug] = m
     _save_tokens(t)

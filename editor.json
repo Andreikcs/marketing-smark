@@ -99,11 +99,7 @@
         "instagram"
       ],
       "roi": {
-        "active": {
-          "started_at": "2026-07-26T19:11:54",
-          "copy_calls": 0,
-          "image_gens": 0
-        },
+        "active": null,
         "cycles": [],
         "copy_calls_total": 0,
         "image_gens_total": 0,
@@ -1213,11 +1209,7 @@
         }
       ],
       "roi": {
-        "active": {
-          "started_at": "2026-07-27T20:16:17",
-          "copy_calls": 0,
-          "image_gens": 0
-        },
+        "active": null,
         "cycles": [],
         "copy_calls_total": 0,
         "image_gens_total": 0,
@@ -1255,11 +1247,7 @@
         "instagram"
       ],
       "roi": {
-        "active": {
-          "started_at": "2026-07-26T19:28:19",
-          "copy_calls": 0,
-          "image_gens": 0
-        },
+        "active": null,
         "cycles": [],
         "copy_calls_total": 0,
         "image_gens_total": 0,
@@ -1298,11 +1286,7 @@
         "instagram"
       ],
       "roi": {
-        "active": {
-          "started_at": "2026-07-26T19:28:21",
-          "copy_calls": 0,
-          "image_gens": 0
-        },
+        "active": null,
         "cycles": [],
         "copy_calls_total": 0,
         "image_gens_total": 0,
@@ -1348,11 +1332,7 @@
         "instagram"
       ],
       "roi": {
-        "active": {
-          "started_at": "2026-07-26T19:24:49",
-          "copy_calls": 0,
-          "image_gens": 0
-        },
+        "active": null,
         "cycles": [],
         "copy_calls_total": 0,
         "image_gens_total": 0,
@@ -1390,11 +1370,7 @@
         "instagram"
       ],
       "roi": {
-        "active": {
-          "started_at": "2026-07-27T14:04:03",
-          "copy_calls": 0,
-          "image_gens": 0
-        },
+        "active": null,
         "cycles": [],
         "copy_calls_total": 0,
         "image_gens_total": 0,
@@ -1432,11 +1408,7 @@
         "instagram"
       ],
       "roi": {
-        "active": {
-          "started_at": "2026-07-27T20:32:27",
-          "copy_calls": 0,
-          "image_gens": 0
-        },
+        "active": null,
         "cycles": [],
         "copy_calls_total": 0,
         "image_gens_total": 0,
@@ -1474,11 +1446,7 @@
         "instagram"
       ],
       "roi": {
-        "active": {
-          "started_at": "2026-07-27T20:34:43",
-          "copy_calls": 0,
-          "image_gens": 0
-        },
+        "active": null,
         "cycles": [],
         "copy_calls_total": 0,
         "image_gens_total": 0,
@@ -1538,12 +1506,17 @@
         "instagram"
       ],
       "roi": {
-        "active": {
-          "started_at": "2026-07-27T20:36:17",
-          "copy_calls": 1,
-          "image_gens": 0
-        },
-        "cycles": [],
+        "active": null,
+        "cycles": [
+          {
+            "started_at": "2026-07-27T20:36:17",
+            "exported_at": "2026-07-27T21:58:18",
+            "minutes": 0.0,
+            "copy_calls": 1,
+            "image_gens": 0,
+            "auto_closed": true
+          }
+        ],
         "copy_calls_total": 1,
         "image_gens_total": 0,
         "exports_total": 0

@@ -615,10 +615,11 @@ async function reorderFrame(from,to){
 }
 function sel(pi,fi){hideWelcome();PI=pi;FI=fi;aplicarTemaMarca((D.posts[pi]||{}).marca||'smark');renderPosts();renderStrip();renderCtrl();preview();roiStartQuiet()}
 async function roiStartQuiet(){
+  // NÃO inicia ciclo só por abrir o post — isso inflava 26h+ de “tempo”.
+  // Ciclo começa só com trabalho real (texto IA / gerar imagem / export).
   try{
     if(!D||!D.posts[PI])return;
-    const r=await(await fetch('/roi-start',{method:'POST',headers:HJSON,body:JSON.stringify({post:PI,force:false})})).json();
-    if(r.ok&&r.roi&&D.posts[PI])D.posts[PI].roi=r.roi;
+    // só recarrega dados do post se já houver roi
   }catch(e){}
 }
 function fmtMinUI(m){if(m==null||m===undefined)return '—';m=Number(m);if(m<60)return m.toFixed(1)+' min';return (m/60).toFixed(1)+' h'}
@@ -630,8 +631,6 @@ async function openRoi(){
   const body=document.getElementById('roibody');
   body.innerHTML='<div class=roihint>Carregando…</div>';
   try{
-    // garante ciclo no post atual
-    if(typeof PI==='number'&&PI>=0){try{await fetch('/roi-start',{method:'POST',headers:HJSON,body:JSON.stringify({post:PI,force:false})})}catch(e){}}
     const r=await(await fetch('/roi-resumo',{method:'POST',headers:HJSON,body:JSON.stringify({limit:40})})).json();
     if(!r.ok){body.innerHTML='Não consegui carregar. Tente de novo.';return}
     const s=r.stats||{};
