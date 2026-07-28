@@ -164,6 +164,17 @@ LUCRO ....................................  R$ 13.396  ·  37%
 | LTV (churn de 24 meses) | R$ 28.195 |
 | LTV / CAC | 10× (saudável é acima de 3×) |
 
+**Onde essa margem nos coloca no setor.** O benchmark de margem bruta de empresas
+AI-native é de **50% a 60%** (Bessemer, fev/2026; ICONIQ mediu média de 52%), contra
+80–90% do SaaS clássico. A nossa fica acima disso porque o custo de inferência é baixo
+(R$ 1,92/post medido), o compositor roda local sem API e o carrossel consome um fundo só.
+
+Não é sorte — é a arquitetura de duas camadas. Vale tratar como ativo a ser defendido:
+toda decisão que empurre trabalho do compositor local para chamada de API come exatamente
+a vantagem que nos separa do benchmark. O mesmo estudo mostra o custo de inferência
+**subindo** de 20% para 23% do gasto conforme os produtos amadurecem — a pressão é real e
+vem de dentro do produto, não do fornecedor.
+
 **O onboarding produtizado não é opcional.** Sem ele, os mesmos 20 parceiros custam
 R$ 7.500/mês a mais e o lucro cai para R$ 5.896 (16%) — e a operação não passa de 20
 parceiros sem contratar.
@@ -189,6 +200,16 @@ invisível, e escala por parceiro.
 **4. Gate anti-texto depende de tesseract instalado.**
 Sem ele, rascunho poluído pode ser promovido — vira dano de marca no cliente final do
 parceiro.
+
+**5. Cláusula de não-concorrência com o parceiro.**
+O contrato precisa dizer, em uma linha e sem letra miúda, que **a smark não atende cliente
+final na carteira do parceiro**. Custa nada hoje e vale muito: é o que torna seguro
+entregar a tecnologia a quem depende dela para viver.
+
+Não é só cortesia — é a trava que nos protege de nós mesmos. Se um dia testarmos venda
+direta ao cliente final, a cláusula obriga que seja em nicho ou região sem parceiro. Sem
+ela, a tentação de curto prazo destrói a confiança que sustenta o white-label, e confiança
+não se recompra. **Precisa estar escrita antes do primeiro contrato assinado.**
 
 ---
 
@@ -231,6 +252,26 @@ Raro e vendável: quase todo custo de agência piora com escala (mais gente, mai
 Aqui melhora. É o argumento que fecha o sócio cético. Agência tradicional trabalha com
 20% a 30% de margem.
 
+### Argumento 4 — o que te diferencia deixou de ser a arte
+
+Este é o argumento de posicionamento, e o único que fala do medo que o parceiro já tem
+antes de você chegar. Ele lê todo dia que a IA vai acabar com a agência dele. Não adianta
+fingir que não.
+
+> *"A arte deixou de ser o que te diferencia — daqui a pouco todo mundo vai ter. O que te
+> diferencia é conhecer o cliente: saber o que pode e o que não pode falar, quem decide,
+> o que deu certo ano passado. A gente tira a produção do seu caminho pra você usar o
+> tempo no que a IA não faz — relacionamento, estratégia e a decisão do que publicar."*
+
+Por que funciona: a pressão sobre a agência pequena é real e está bem documentada. Quem
+só repassa arte perde a função. **O white studio é o que muda o parceiro de lado dessa
+linha** — ele para de ser quem executa e vira quem decide. Vendido assim, o medo do
+mercado trabalha a nosso favor em vez de contra.
+
+Regra de uso: é argumento de abertura ou de fechamento, nunca de meio. E nunca usar em
+tom de ameaça ("se você não fizer isso, vai quebrar") — o tom é de aliado, não de vendedor
+de seguro.
+
 ### Objeções e respostas
 
 | Objeção | Resposta |
@@ -242,6 +283,8 @@ Aqui melhora. É o argumento que fecha o sócio cético. Agência tradicional tr
 | "É caro" | "R$ 164 por cliente. Um post de freelancer custa R$ 80. Você faz 20." |
 | "Não sei operar" | "Formação inclusa, e ativamos seus 2 primeiros clientes com você." |
 | "E se eu cobrar mais de R$ 547?" | "Deve cobrar. Os 30% incidem sempre sobre 547, não sobre o seu preço." |
+| "IA não vai acabar com a agência?" | "Vai acabar com quem só entrega arte. Você entrega decisão. É pra isso que serve tirar a produção do seu caminho." |
+| "Vocês não vão vender direto pro meu cliente?" | "Não. Está no contrato: a gente não atende cliente final na sua carteira. Nosso negócio é você crescer." |
 
 ### Regra de comunicação
 
@@ -280,6 +323,17 @@ Faixas dos controles: clientes 2–25 · posts por cliente 4–40 · preço por 
    retém é a tecnologia. Reforça a prioridade do moat de aprendizado por marca.
 5. **Dependência de fornecedor.** A produção depende de crédito no OpenRouter; o suplente
    OpenAI é vulnerável a hard limit de billing.
+6. **Desintermediação do parceiro.** O modelo vende para a camada que executa — e é
+   exatamente essa camada que está sob pressão de mercado. Se alguém passar a vender o
+   feed pronto direto ao ISP ou à contabilidade, o parceiro perde a função e nós perdemos
+   a receita junto. **Mitigação em vigor:** o Argumento 4 vende justamente a saída dessa
+   posição, e o produto ganha valor conforme o parceiro sobe para decisão e relacionamento.
+   *Não muda nada no plano atual — é o risco a observar nos indicadores de churn.*
+7. **Custo de opção futura.** Cada licença vendida encarece um eventual movimento nosso de
+   vender direto ao cliente final, porque cria um parceiro a proteger. Hoje reverter custa
+   zero; com 30 parceiros, custa caro. *Registrado conscientemente:* a decisão de emprestar
+   distribuição em vez de construí-la já foi tomada no spec de 21/07 e segue valendo. A
+   trava 5 é o que mantém as duas portas abertas sem trair ninguém.
 
 ---
 

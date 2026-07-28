@@ -94,9 +94,23 @@ tese cita (contabilidade), nosso pricing híbrido é o padrão real do mercado (
 - cada licença vendida encarece um futuro movimento nosso de vender direto (dilema do inovador)
 - os níveis "assistido" e "sob demanda" do spec de 21/07 — o nosso autopilot — nunca foram precificados
 
-**Encaminhamento proposto (não decidido):** dois trilhos. A = white studio como está, executa
-o GTM sem mudança. B = piloto de "trabalho pronto" direto ao cliente final, mês 3, em nicho
-sem parceiro nosso. Regra dura: B nunca opera onde A tem parceiro.
+**Decisão de 28/07: a proposta não muda.** Preços, segmentos e GTM seguem como estão. Da
+análise foi incorporado só o que amadurece sem mexer na oferta:
+
+| O quê | Onde entrou |
+|---|---|
+| Argumento 4 — "o que te diferencia deixou de ser a arte" | `MODELO-DE-NEGOCIO.md` §6, GTM §4.5 (fechamento), apresentação (close + FAQ) |
+| Duas objeções novas (IA acaba com a agência / vocês vão vender direto?) | `MODELO-DE-NEGOCIO.md` §6 |
+| Trava 5 — cláusula de não-concorrência com o parceiro | `MODELO-DE-NEGOCIO.md` §5 + termo no contrato da apresentação |
+| Riscos 6 e 7 — desintermediação e custo de opção futura | `MODELO-DE-NEGOCIO.md` §8, apenas para observação |
+| Benchmark de margem AI-native (50–60%) como referência | `MODELO-DE-NEGOCIO.md` §4 |
+| Critério 5 de validação — anotar o preço real cobrado do cliente final | `SEGMENTOS-E-GTM.md` §4.7 |
+| Risco 7 do GTM — não levar o argumento de posicionamento cedo demais | `SEGMENTOS-E-GTM.md` §5 |
+
+**O trilho B (vender o trabalho pronto direto ao cliente final) NÃO entrou no plano.**
+Fica registrado como risco a observar e decisão de mês 3. O critério 5 de validação existe
+justamente para que essa decisão futura tenha dado real em vez de premissa — sem custar
+nada agora.
 
 **Correção de fato importante:** o "1 dólar de software para 6 de serviço" do reel é citação
 real de Bek, mas refere-se a *todo* gasto com serviços. Em IA especificamente, Gartner 2026
@@ -134,6 +148,6 @@ mostra **1,3 : 1**. E para cada US$ 1 que sai de folha, só US$ 0,03 entra em IA
 | 1 | Anterioridade de "white studio" no INPI e em domínio | alto — antes de imprimir material |
 | 2 | Quem executa as 12 abordagens/dia do GTM | alto — o plano não roda sem isso |
 | 3 | Amostragem de custo real por faixa de uso | médio — hoje é projeção |
-| 4 | Decidir sobre o trilho B (autopilot direto) | médio — decisão do mês 3 |
-| 5 | Cláusula de não-concorrência entre trilhos A e B | alto — antes do 1º contrato |
+| 4 | Decidir sobre o trilho B (autopilot direto) | médio — decisão do mês 3, com o dado do critério 5 na mão |
+| 5 | ~~Cláusula de não-concorrência~~ | **resolvida em 28/07** — trava 5 do modelo, entra no contrato |
 | 6 | Precificar níveis "assistido" e "sob demanda" | médio |

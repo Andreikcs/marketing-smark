@@ -245,6 +245,18 @@ uma peça na frente dele. O produto vende sozinho quando é o cliente dele na te
 **Contato 4 — a conta.** Abre a calculadora com os números dele. Não fale de tecnologia,
 fale do que ele economiza e de quantos clientes a mais ele atende.
 
+**O fechamento — o argumento de posicionamento.** Depois da conta, e só depois, a frase
+que tira a decisão do campo do custo:
+
+> *"A arte deixou de ser o que te diferencia — daqui a pouco todo mundo vai ter. O que te
+> diferencia é conhecer o cliente. A gente tira a produção do seu caminho pra você usar o
+> tempo no que a IA não faz."*
+
+Ele já ouviu que a IA vai acabar com a agência dele. Fingir que não existe deixa o medo
+trabalhando contra você em silêncio. Nomear e oferecer a saída vira o jogo — o white studio
+deixa de ser mais uma ferramenta que ele compra e passa a ser o que muda o lado dele da
+linha: para de ser quem executa, vira quem decide. Tom de aliado, nunca de ameaça.
+
 ### 4.6 Métricas de controle semanal
 
 | Métrica | Meta/semana | Sinal de alerta |
@@ -267,8 +279,15 @@ Cinco assinaturas não validam nada sozinhas. O critério honesto:
 2. **3 delas produzindo de verdade no mês 2** — pelo menos 10 peças cada
 3. **Tempo de produção medido** — do briefing à peça aprovada
 4. **1 indicação espontânea** — o sinal mais forte de todos
+5. **O preço real que o parceiro cobra do cliente final** — anotado em toda demo
 
 Sem o item 2, você vendeu software e não validou produto.
+
+O item 5 é novo e custa uma pergunta: *"e você cobra quanto desse cliente hoje?"*. Sai de
+graça em conversa que já vai acontecer, e é o único dado que a operação atual nunca
+produz — a régua de R$ 547 é premissa nossa, não medição. Trinta dias de anotação
+transformam ela em fato, e todo cálculo de margem futura passa a ter chão. Anotar,
+não discutir: o preço dele não é assunto de negociação, é informação.
 
 ---
 
@@ -285,6 +304,9 @@ Sem o item 2, você vendeu software e não validou produto.
 5. **Franquia como aposta de curto prazo.** Ciclo longo. Se a meta depender de uma rede
    fechar em 30 dias, a meta falha.
 6. **Não ter quem execute.** 12 abordagens por dia não acontecem sozinhas.
+7. **Levar o argumento de posicionamento cedo demais.** O Argumento 4 fecha bem e abre
+   bem, mas no meio da conversa soa como discurso de futurologia e esfria a conta. Se
+   entrar antes da calculadora, o parceiro discute tese em vez de decidir.
 
 ---
 
