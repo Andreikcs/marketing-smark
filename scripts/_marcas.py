@@ -142,6 +142,7 @@ def listar_detalhes():
             "papel": m.get("papel") or ("canonica" if s in CANONICAS else "cliente"),
             "logo": logo,
             "logo_url": ("/" + logo.lstrip("/")) if logo else "",
+            "logo_estilo": (brasao.get("estilo") or m.get("logo_estilo") or "mono"),
             "refs_n": len(listar_refs(s)) if exists(s) else 0,
             "pronta": pronta(s),
             "canonica": s in CANONICAS,

@@ -1135,7 +1135,16 @@ document.getElementById('mf_logo').onchange=e=>{{
   if(f.size>8*1024*1024){{alert('Logo maior que 8 MB');e.target.value='';return}}
   LOGO_RM=false;
   const rd=new FileReader();
-  rd.onload=()=>{{LOGO_DATA=rd.result;document.getElementById('mf_logoprev').innerHTML=`<img src="${{rd.result}}">`}};
+  rd.onload=async()=>{{
+    LOGO_DATA=rd.result;
+    document.getElementById('mf_logoprev').innerHTML=`<img src="${{rd.result}}">`;
+    // se marca já existe, grava logo na hora e gera ícones
+    if(EDIT){{
+      const r=await api('/marca-logo',{{slug:EDIT,logo_dataurl:LOGO_DATA}});
+      if(r.ok){{LOGO_DATA=null; refreshLogoVars(); document.getElementById('mf_logo_msg').textContent='Logo salva — escolha o estilo abaixo';}}
+      else document.getElementById('mf_logo_msg').textContent=r.erro||'falha ao salvar logo';
+    }}else refreshLogoVars();
+  }};
   rd.onerror=()=>{{alert('Não consegui ler o arquivo');LOGO_DATA=null}};
   rd.readAsDataURL(f);
 }};
@@ -1264,6 +1273,7 @@ document.getElementById('mf_save').onclick=async()=>{{
     site:document.getElementById('mf_site').value.trim(),
     segmento:document.getElementById('mf_segmento').value,
     moldura:molduraFromForm(),
+    logo_estilo:document.getElementById('mf_logo_estilo').value||'mono',
   }};
   if(LOGO_DATA) body.logo_dataurl=LOGO_DATA;
   // refs pendentes (só marca nova — em edição o upload já é imediato)
@@ -2800,6 +2810,11 @@ class H(http.server.BaseHTTPRequestHandler):
                         campos_pos["moldura"] = req["moldura"]
                     if campos_pos:
                         _marcas.atualizar(r["slug"], **campos_pos)
+                    if req.get("logo_estilo"):
+                        try:
+                            _marcas.set_logo_estilo(r["slug"], str(req["logo_estilo"]))
+                        except Exception:
+                            pass
                 except Exception:
                     pass
                 avisos = []
@@ -2854,6 +2869,11 @@ class H(http.server.BaseHTTPRequestHandler):
                 if "endossa" in req:
                     campos["endossa"] = bool(req["endossa"])
                 r = _marcas.atualizar(slug, **campos)
+                if req.get("logo_estilo"):
+                    try:
+                        _marcas.set_logo_estilo(slug, str(req["logo_estilo"]))
+                    except Exception:
+                        pass
                 if req.get("logo_dataurl"):
                     try:
                         _logo_from_dataurl(slug, req["logo_dataurl"])
@@ -2882,6 +2902,39 @@ class H(http.server.BaseHTTPRequestHandler):
                                         "path": os.path.relpath(dest, VAULT).replace("\\", "/"),
                                         "detalhe": next((d for d in _marcas.listar_detalhes()
                                                          if d["slug"] == slug), None)})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-logo-icones":
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                meta = _marcas.get(slug)
+                brasao = (meta or {}).get("brasao") or {}
+                rel = brasao.get("principal") or (meta or {}).get("logo_file") or ""
+                path = os.path.join(VAULT, rel) if rel and not os.path.isabs(rel) else rel
+                acc = str(req.get("acento") or (meta or {}).get("acento") or "#FFFFFF")
+                vars_ = compositor.logo_variantes(path if path and os.path.isfile(path) else "",
+                                                  color=acc, px=64)
+                glyph = (meta or {}).get("logo_glyph") or ((meta or {}).get("nome") or "M")[:1]
+                return self._send(200, {
+                    "ok": True,
+                    "mono": vars_.get("mono"),
+                    "color": vars_.get("color"),
+                    "glyph": str(glyph)[:2].upper(),
+                    "estilo": brasao.get("estilo") or "mono",
+                })
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-logo-estilo":
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                r = _marcas.set_logo_estilo(slug, str(req.get("estilo") or "mono"))
+                return self._send(200, {"ok": True, **r})
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:
