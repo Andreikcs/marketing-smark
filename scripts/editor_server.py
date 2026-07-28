@@ -255,14 +255,20 @@ tr:last-child td{{border-bottom:0}}
 
 <div class="sk-card"><div class=gh>Conceitos de direção de arte ({len(conceitos)})</div>{chips}</div>
 
-<div class="sk-card"><div class=gh>Posts no editor ({len(ed.get('posts',[]))})</div>
-<table><tr><th>#</th><th>Título</th><th>Slug</th><th>Marca</th><th>Frames</th></tr>{rows_p}</table></div>
+<div class="sk-card">
+  <div class=gh><span>Publicações &amp; tempo</span><span id=plog_count style="font-size:12px;font-weight:500;color:var(--muted)"></span></div>
+  <div class=kv style="margin-bottom:12px">
+    <div class=cell>Marca: <select class="sk-select mini" id=plog_marca><option value="">Todas</option></select></div>
+    <div class=cell>Busca: <input class="sk-input mini" id=plog_q placeholder="título…" style="width:160px"></div>
+  </div>
+  <div id=plog_stats class=kv style="margin-bottom:12px"></div>
+  <div id=plog_list style="display:flex;flex-direction:column;gap:6px"></div>
+</div>
 
-<div class="sk-card"><div class=gh>Servidor & segurança</div><div class=kv>
+<div class="sk-card"><div class=gh>Servidor</div><div class=kv>
 <div class=cell>Porta: <b>{PORT}</b></div>
-<div class=cell>Hosts permitidos: <b>localhost:{PORT} / 127.0.0.1:{PORT}</b></div>
-<div class=cell>Proteção CSRF/DNS: <b class=ok>ativa</b></div>
-<div class=cell>Dados do editor: <b>editor.json</b></div>
+<div class=cell>Acesso: <b>só neste computador</b></div>
+<div class=cell>Proteção: <b class=ok>ativa</b></div>
 </div></div>
 </div>
 
@@ -443,7 +449,70 @@ document.getElementById('mf_save').onclick=async()=>{{
   setTimeout(()=>document.getElementById('mmodal').classList.remove('on'),700);
 }};
 loadMarcas();
-// deep-link: /config?nova=1 ou /config?editar=slug
+
+function fmtMin(m){{if(m==null||m===undefined)return '—';m=Number(m);if(m<60)return m.toFixed(1)+' min';return (m/60).toFixed(1)+' h'}}
+function relTime(iso){{if(!iso)return '—';const t=Date.parse(iso);if(!t)return '—';const min=Math.floor((Date.now()-t)/60000);
+  if(min<1)return 'agora';if(min<60)return min+' min atrás';const h=Math.floor(min/60);if(h<48)return h+' h atrás';return Math.floor(h/24)+' d atrás'}}
+async function loadPostLog(){{
+  const list=document.getElementById('plog_list');
+  const stats=document.getElementById('plog_stats');
+  if(!list)return;
+  list.innerHTML='<div style="color:var(--muted);font-size:13px">Carregando…</div>';
+  try{{
+    const r=await(await fetch('/roi-resumo',{{method:'POST',headers:H,body:JSON.stringify({{limit:80}})}})).json();
+    if(!r.ok){{list.innerHTML='Não consegui carregar o histórico.';return}}
+    const s=r.stats||{{}};
+    const am=(s.avg_minutes_per_post||{{}}).mean;
+    const cb=(s.cogs_brl||{{}}).sum;
+    const cu=(s.cogs_usd||{{}}).sum;
+    stats.innerHTML=
+      '<div class=cell>Tempo médio / post: <b>'+(am!=null?fmtMin(am):'—')+'</b></div>'
+      +'<div class=cell>Custo total (amostra): <b>'+(cb!=null?('R$ '+Number(cb).toFixed(2)): (cu!=null?('US$ '+Number(cu).toFixed(2)):'—'))+'</b></div>'
+      +'<div class=cell>Posts no log: <b>'+(r.n||0)+'</b></div>';
+    window._PLOG=r.posts||[];
+    const sel=document.getElementById('plog_marca');
+    const brands=[...new Set(window._PLOG.map(p=>p.marca).filter(Boolean))];
+    const cur=sel.value;
+    sel.innerHTML='<option value="">Todas</option>'+brands.map(b=>'<option value="'+esc(b)+'">'+esc(b)+'</option>').join('');
+    if(cur)sel.value=cur;
+    renderPostLog();
+  }}catch(e){{list.innerHTML='Erro ao carregar';}}
+}}
+function renderPostLog(){{
+  const list=document.getElementById('plog_list');
+  if(!list)return;
+  const marca=document.getElementById('plog_marca').value;
+  const q=(document.getElementById('plog_q').value||'').toLowerCase();
+  let rows=window._PLOG||[];
+  if(marca)rows=rows.filter(p=>p.marca===marca);
+  if(q)rows=rows.filter(p=>((p.titulo||'')+' '+(p.slug||'')).toLowerCase().includes(q));
+  document.getElementById('plog_count').textContent=rows.length+' post(s)';
+  if(!rows.length){{list.innerHTML='<div style="color:var(--muted);font-size:13px">Nenhum post neste filtro.</div>';return}}
+  list.innerHTML=rows.map((p)=>{{
+    const custo=p.total_brl!=null?('R$ '+Number(p.total_brl).toFixed(2)):(p.total_usd!=null?('US$ '+Number(p.total_usd).toFixed(3)):'—');
+    const tempo=fmtMin(p.total_minutes);
+    const ativo=p.active?(' · <span style="color:var(--accent)">em edição '+fmtMin(p.active_minutes)+'</span>'):'';
+    return '<details style="border:1px solid var(--line);border-radius:12px;background:var(--inset);overflow:hidden">'
+      +'<summary style="cursor:pointer;padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;list-style:none">'
+      +'<b style="flex:1;min-width:140px">'+esc(p.titulo)+'</b>'
+      +'<span class=pill>'+esc(p.marca)+'</span>'
+      +'<span style="font-size:12px;color:var(--muted)">⏱ '+tempo+ativo+'</span>'
+      +'<span style="font-size:12px;color:var(--muted)">💰 '+custo+'</span>'
+      +'<span style="font-size:12px;color:var(--muted)">'+relTime(p.updated_at||p.created_at)+'</span>'
+      +'</summary>'
+      +'<div style="padding:0 14px 14px;font-size:12px;color:var(--muted);line-height:1.55;border-top:1px solid var(--line)">'
+      +'<div style="margin-top:10px">Criado: <b style="color:var(--text)">'+esc(p.created_at||'—')+'</b> · Atualizado: <b style="color:var(--text)">'+esc(p.updated_at||'—')+'</b></div>'
+      +'<div>Peças: '+(p.n_frames||0)+' · Textos IA: '+(p.copy_calls_total||0)+' · Imagens: '+(p.image_gens_total||0)+' · Exports: '+(p.exports_total||0)+'</div>'
+      +'<div>Ciclos: '+(p.cycles_n||0)+(p.avg_minutes!=null?(' · média '+fmtMin(p.avg_minutes)):'')+(p.last_minutes!=null?(' · último '+fmtMin(p.last_minutes)):'')+'</div>'
+      +'<div style="margin-top:8px"><a class="sk-btn sk-btn--sm" href="/editor?post='+p.idx+'">Abrir no editor</a></div>'
+      +'</div></details>';
+  }}).join('');
+}}
+document.getElementById('plog_marca').onchange=renderPostLog;
+document.getElementById('plog_q').oninput=()=>{{clearTimeout(window._plogT);window._plogT=setTimeout(renderPostLog,180)}};
+loadPostLog();
+
+// deep-link
 const qs=new URLSearchParams(location.search);
 if(qs.get('nova')) setTimeout(openNew,80);
 else if(qs.get('editar')) setTimeout(()=>openEdit(qs.get('editar')),120);
@@ -488,6 +557,19 @@ def painel_html():
 .dlmenu{position:fixed;z-index:600;background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow-lg);padding:6px;display:flex;flex-direction:column;gap:4px;min-width:190px}
 .dlmenu button{border:0;background:transparent;color:var(--text);text-align:left;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px}
 .dlmenu button:hover{background:var(--surface-2)}
+.ftbar{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:18px}
+.ftrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ftlab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);min-width:52px}
+.ftchips{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.ftchip{border:1px solid var(--field-line);background:var(--surface-2);color:var(--sub);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer}
+.ftchip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.ftsearch{flex:1;min-width:160px;background:var(--inset);border:1px solid var(--field-line);border-radius:10px;color:var(--text);padding:8px 12px;font-size:13px}
+.sk-cardgrid.mosaic{grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:900px){.sk-cardgrid.mosaic{grid-template-columns:repeat(2,1fr)}}
+.sk-cardgrid.mosaic .sk-post-body{padding:8px 10px}
+.sk-cardgrid.mosaic .sk-post-title{font-size:13px}
+.sk-cardgrid.mosaic .sk-post-actions{display:none}
+.timetag{font-size:11px;color:var(--muted)}
 </style></head><body class="sk">
 __TOPBAR__
 <div class=wrap>
@@ -497,12 +579,24 @@ __TOPBAR__
     <button class="sk-btn sk-btn--danger sk-btn--sm" id=delsel>🗑 Excluir selecionados</button>
     <a class="sk-btn" href="/editor">＋ Novo post</a></div>
 </div>
-<div class="sk-toolbar">
-  <div class="sk-filter-group"><span class="sk-filter-label">Status</span><div class="sk-segmented" id=sfilters></div></div>
-  <div class="sk-toolbar-sep"></div>
-  <div class="sk-filter-group"><span class="sk-filter-label">Marca</span><div class="sk-segmented" id=filters></div></div>
-  <span class="sk-spacer"></span>
-  <span id=count style="font-size:12px;color:var(--muted)"></span>
+<div class=ftbar>
+  <div class=ftrow>
+    <span class=ftlab>Ver</span>
+    <div class=ftchips id=viewfilters></div>
+    <span class=ftlab style="margin-left:8px">Ordem</span>
+    <div class=ftchips id=sortfilters></div>
+    <span class=sk-spacer></span>
+    <input class=ftsearch id=psearch placeholder="Buscar título ou marca…" />
+    <span id=count style="font-size:12px;color:var(--muted);white-space:nowrap"></span>
+  </div>
+  <div class=ftrow>
+    <span class=ftlab>Status</span>
+    <div class=ftchips id=sfilters></div>
+  </div>
+  <div class=ftrow>
+    <span class=ftlab>Marca</span>
+    <div class=ftchips id=filters></div>
+  </div>
 </div>
 <div class="sk-cardgrid" id=grid></div>
 </div>
@@ -523,10 +617,22 @@ __TOPBAR__
   </div>
 </div>
 <script>
-const T="__EDITOR_TOKEN__";let D=null,FILT='',STATUSF='',MI=0,MP=0;const SEL=new Set();
-async function load(){D=await(await fetch('/dados')).json();render()}
+const T="__EDITOR_TOKEN__";let D=null,FILT='',STATUSF='',VIEW='cards',SORT='recent',Q='',MI=0,MP=0;const SEL=new Set();
+let NOME_MARCA={};
+async function load(){
+  try{const r=await(await fetch('/marcas')).json();if(r.ok)(r.marcas||[]).forEach(m=>NOME_MARCA[m.slug]=m.nome||m.slug)}catch(e){}
+  D=await(await fetch('/dados')).json();render()}
 function brands(){return [...new Set(D.posts.map(p=>p.marca||'smark'))]}
-function fmtTipo(n){return n<=1?'post único':'carrossel · '+n}
+function nomeMarca(s){return NOME_MARCA[s]||s}
+function fmtTipo(n){return n<=1?'1 peça':n+' peças'}
+function relTime(iso){
+  if(!iso)return '';
+  const t=Date.parse(iso);if(!t)return '';
+  const m=Math.floor((Date.now()-t)/60000);
+  if(m<1)return 'agora';if(m<60)return m+' min';
+  const h=Math.floor(m/60);if(h<48)return h+' h';
+  const d=Math.floor(h/24);return d+' d';
+}
 function chIcon(c){
   if(c==='linkedin')return '<span class="chpill chIN" title=LinkedIn><svg viewBox="0 0 24 24" width=13 height=13 fill="#fff"><path d="M4.98 3.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.4 8.65 21 11 21 14v7h-4v-6.2c0-1.48-.03-3.4-2.07-3.4-2.07 0-2.39 1.62-2.39 3.29V21H9z"/></svg></span>';
   return '<span class="chpill chIG" title=Instagram><svg viewBox="0 0 24 24" width=13 height=13 fill="none" stroke="#fff" stroke-width="2.1"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.6" cy="6.4" r="1.2" fill="#fff" stroke="none"/></svg></span>';}
@@ -541,20 +647,44 @@ async function loadThumb(host,p){
     host.innerHTML='';host.appendChild(ifr);ifr.srcdoc=html;
   }catch(e){host.textContent='sem arte'}
 }
-function seg(host,opts,cur,cb){host.innerHTML='';opts.forEach(([v,lb])=>{const b=document.createElement('button');b.textContent=lb;if(cur===v)b.className='is-active';b.onclick=()=>cb(v);host.appendChild(b)})}
+function chips(host,opts,cur,cb){host.innerHTML='';opts.forEach(([v,lb])=>{const b=document.createElement('button');b.className='ftchip'+(cur===v?' on':'');b.textContent=lb;b.onclick=()=>cb(v);host.appendChild(b)})}
+function filtered(){
+  let items=D.posts.map((p,i)=>({p,i}));
+  items=items.filter(({p})=>{
+    if(FILT&&(p.marca||'smark')!==FILT)return false;
+    if(STATUSF&&(p.status||'rascunho')!==STATUSF)return false;
+    if(Q){const q=Q.toLowerCase();const t=((p.titulo||'')+' '+(p.slug||'')+' '+(p.marca||'')).toLowerCase();if(!t.includes(q))return false}
+    return true;
+  });
+  items.sort((a,b)=>{
+    if(SORT==='alpha')return (a.p.titulo||a.p.slug||'').localeCompare(b.p.titulo||b.p.slug||'','pt');
+    if(SORT==='old'){
+      const ta=Date.parse(a.p.created_at||'')||a.i;
+      const tb=Date.parse(b.p.created_at||'')||b.i;
+      return ta-tb;
+    }
+    // recent (default): updated/created desc, fallback index
+    const ta=Date.parse(a.p.updated_at||a.p.created_at||'')||a.i;
+    const tb=Date.parse(b.p.updated_at||b.p.created_at||'')||b.i;
+    return tb-ta || b.i-a.i;
+  });
+  return items;
+}
 function render(){
-  seg(document.getElementById('sfilters'),[['','Todos'],['rascunho','Rascunho'],['salvo','Salvo']],STATUSF,v=>{STATUSF=v;render()});
-  seg(document.getElementById('filters'),[['','Todas']].concat(brands().map(b=>[b,b])),FILT,v=>{FILT=v;render()});
-  const g=document.getElementById('grid');g.innerHTML='';let n=0;
-  const items=D.posts.map((p,i)=>({p,i})).reverse();
+  chips(document.getElementById('viewfilters'),[['cards','Cards'],['mosaic','Mosaico 3']],VIEW,v=>{VIEW=v;render()});
+  chips(document.getElementById('sortfilters'),[['recent','Mais recentes'],['old','Mais antigos'],['alpha','A–Z']],SORT,v=>{SORT=v;render()});
+  chips(document.getElementById('sfilters'),[['','Todos'],['rascunho','Rascunho'],['salvo','Pronto']],STATUSF,v=>{STATUSF=v;render()});
+  chips(document.getElementById('filters'),[['','Todas']].concat(brands().map(b=>[b,nomeMarca(b)])),FILT,v=>{FILT=v;render()});
+  const g=document.getElementById('grid');g.innerHTML='';
+  g.className='sk-cardgrid'+(VIEW==='mosaic'?' mosaic':'');
+  const items=filtered();let n=0;
   items.forEach(({p,i})=>{
-    if(FILT&&(p.marca||'smark')!==FILT)return;
-    if(STATUSF&&(p.status||'rascunho')!==STATUSF)return;
     n++;
     const salvo=p.status==='salvo';
-    const badge='<span class="stdot '+(salvo?'st-s':'st-r')+'" title="'+(salvo?'salvo':'rascunho')+'"></span>';
+    const badge='<span class="stdot '+(salvo?'st-s':'st-r')+'" title="'+(salvo?'pronto':'rascunho')+'"></span>';
     const ch=(p.canais||['instagram']).map(chIcon).join('');
     const on=SEL.has(i);
+    const age=relTime(p.updated_at||p.created_at);
     const c=document.createElement('div');c.className='sk-post'+(on?' is-selected':'');
     c.dataset.pi=i;
     c.innerHTML='<div class="sk-post-thumb">'
@@ -563,25 +693,28 @@ function render(){
       +'<div class="sk-post-channel">'+ch+'</div>'
       +'</div><div class="sk-post-body">'
       +'<div class="sk-post-title">'+(p.titulo||p.slug)+'</div>'
-      +'<div class="sk-post-meta">'+badge+(p.marca||'smark')+'<span class=sk-dot></span>'+fmtTipo(p.frames?p.frames.length:0)+'</div>'
+      +'<div class="sk-post-meta">'+badge+nomeMarca(p.marca||'smark')+'<span class=sk-dot></span>'+fmtTipo(p.frames?p.frames.length:0)
+      +(age?('<span class=sk-dot></span><span class=timetag>'+age+'</span>'):'')
+      +'</div>'
       +'<div class="sk-post-actions a5">'
       +'<button data-a=ver data-i="'+i+'" title=Ver>👁</button>'
       +'<button class=act-edit data-a=edit data-i="'+i+'" title=Editar>✎</button>'
-      +'<button data-a=dl data-i="'+i+'" title="Baixar (um ou todos)">⬇</button>'
+      +'<button data-a=dl data-i="'+i+'" title="Baixar">⬇</button>'
       +'<button data-a=dup data-i="'+i+'" title=Duplicar>⧉</button>'
       +'<button class=act-del data-a=del data-i="'+i+'" title=Excluir>🗑</button>'
       +'</div></div>';
     g.appendChild(c)});
   document.getElementById('count').textContent=n+' publicação'+(n===1?'':'ões');
   if(n===0){g.innerHTML='<div class="sk-empty" style="grid-column:1/-1"><div class="sk-empty-icon sk-empty-icon--muted">▦</div>'
-    +'<div class="sk-empty-title">'+((FILT||STATUSF)?'Nada com esse filtro':'Nenhuma publicação ainda')+'</div>'
-    +'<div class="sk-empty-text">'+((FILT||STATUSF)?'Ajuste os filtros acima.':'Crie a primeira no editor ou peça pro Estúdio IA.')+'</div>'
+    +'<div class="sk-empty-title">'+((FILT||STATUSF||Q)?'Nada com esse filtro':'Nenhuma publicação ainda')+'</div>'
+    +'<div class="sk-empty-text">'+((FILT||STATUSF||Q)?'Ajuste os filtros acima.':'Crie a primeira no editor.')+'</div>'
     +'<a class="sk-btn" href="/editor">＋ Novo post</a></div>';}
-  // lazy-load das miniaturas compiladas (mostra a headline, nunca quebra)
   const io=new IntersectionObserver((es)=>{es.forEach(en=>{if(en.isIntersecting){const card=en.target;io.unobserve(card);
     const host=card.querySelector('.thumbhost');const pi=+card.dataset.pi;if(host&&D.posts[pi])loadThumb(host,D.posts[pi])}})},{rootMargin:'200px'});
   g.querySelectorAll('.sk-post').forEach(card=>io.observe(card));
 }
+let _qT=null;
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='psearch'){clearTimeout(_qT);_qT=setTimeout(()=>{Q=e.target.value.trim();render()},200)}});
 document.getElementById('grid').addEventListener('click',e=>{
   const chk=e.target.closest('.sk-post-check');if(chk){const i=+chk.dataset.i;SEL.has(i)?SEL.delete(i):SEL.add(i);render();return}
   const b=e.target.closest('[data-a]');if(!b)return;const i=+b.dataset.i,a=b.dataset.a;
@@ -641,16 +774,27 @@ load();
 
 
 def vitrine_html():
-    """Vitrine estilo feed do Instagram — todas as publicações do editor.json."""
+    """Vitrine — feed Instagram, mosaico 3 colunas, ordenação e filtro de marca."""
     return ("""<!doctype html><html lang=pt-BR data-theme="claro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Vitrine · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
-body.sk{padding-bottom:50px}
+body.sk{padding-bottom:50px;background:var(--bg)}
 .top{text-align:center;padding:14px;font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:16px;letter-spacing:.02em;border-bottom:1px solid var(--line);background:var(--surface)}.top span{color:var(--accent)}
-.feed{max-width:440px;margin:18px auto;display:flex;flex-direction:column;gap:22px;padding:0 8px}
+.toolbar{max-width:980px;margin:14px auto 8px;padding:0 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--sub);border-radius:999px;padding:7px 13px;font-size:12px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-left:4px}
+.count{margin-left:auto;font-size:12px;color:var(--muted)}
+/* feed */
+.feed{max-width:440px;margin:12px auto 30px;display:flex;flex-direction:column;gap:22px;padding:0 8px}
+.feed.mosaic{max-width:980px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:0 12px}
+@media(max-width:700px){.feed.mosaic{grid-template-columns:repeat(2,1fr)}}
 .post{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
+.feed.mosaic .post{border-radius:0;border:0;box-shadow:none;background:#000}
+.feed.mosaic .ph,.feed.mosaic .icons,.feed.mosaic .cap,.feed.mosaic .dots{display:none}
+.feed.mosaic .media{aspect-ratio:1/1;cursor:pointer}
 .ph{display:flex;align-items:center;gap:9px;padding:11px 13px;font-size:14px;font-weight:600}
-.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));flex:0 0 auto}
 .media{position:relative;background:#000;aspect-ratio:4/5;cursor:pointer;overflow:hidden}
 .vhost{position:absolute;inset:0;overflow:hidden;background:#000}
 .cbadge{position:absolute;top:10px;right:10px;background:#000a;color:#fff;font-size:12px;padding:2px 9px;border-radius:12px}
@@ -658,36 +802,94 @@ body.sk{padding-bottom:50px}
 .dot{width:6px;height:6px;border-radius:50%;background:#ffffff88}.dot.on{background:#fff}
 .icons{display:flex;gap:15px;padding:10px 13px;font-size:22px}
 .cap{padding:0 13px 14px;font-size:14px;line-height:1.4;white-space:pre-wrap;color:var(--text)}.cap b{font-weight:600}
-.empty{text-align:center;color:var(--muted);padding:40px;font-size:14px}
+.empty{text-align:center;color:var(--muted);padding:40px;font-size:14px;grid-column:1/-1}
+.age{font-size:11px;color:var(--muted);font-weight:400}
 </style></head><body class="sk">
 __TOPBAR__
-<div class=top><span>smark</span> &middot; vitrine · feed pra aprovar</div>
+<div class=top><span id=vtbrand>smark</span> &middot; vitrine · feed pra aprovar</div>
+<div class=toolbar>
+  <span class=lab>Ver</span>
+  <button class="chip on" data-v=feed id=vfeed>Feed</button>
+  <button class=chip data-v=mosaic id=vmosaic>Mosaico · 3</button>
+  <span class=lab>Ordem</span>
+  <button class="chip on" data-s=recent id=srecent>Mais recentes</button>
+  <button class=chip data-s=old id=sold>Mais antigos</button>
+  <span class=lab>Marca</span>
+  <div id=vbrands style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  <span class=count id=vcount></span>
+</div>
 <div class=feed id=feed></div>
 <script>
 const T="__EDITOR_TOKEN__";
+let D=null, VIEW='feed', SORT='recent', FILT='', NOMES={};
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function relTime(iso){if(!iso)return '';const t=Date.parse(iso);if(!t)return '';const m=Math.floor((Date.now()-t)/60000);
+  if(m<1)return 'agora';if(m<60)return m+' min';const h=Math.floor(m/60);if(h<48)return h+' h';return Math.floor(h/24)+' d'}
 async function compose(host,fr,p){
   try{
     const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
-    const html=await r.text();const s=(host.clientWidth||424)/1080;
+    const html=await r.text();const s=(host.clientWidth||200)/1080;
     host.innerHTML='';const ifr=document.createElement('iframe');
     ifr.style.cssText='position:absolute;top:0;left:0;border:0;width:1080px;height:1350px;transform-origin:top left;pointer-events:none;transform:scale('+s+')';
     host.appendChild(ifr);ifr.srcdoc=html;
   }catch(e){host.textContent=''}
 }
-async function load(){const D=await(await fetch('/dados')).json();const f=document.getElementById('feed');f.innerHTML='';let n=0;
-  D.posts.forEach(p=>{
-    const frames=(p.frames||[]);if(!frames.length)return;n++;
+function listPosts(){
+  let items=(D.posts||[]).map((p,i)=>({p,i})).filter(({p})=>(p.frames||[]).length);
+  if(FILT)items=items.filter(({p})=>(p.marca||'smark')===FILT);
+  items.sort((a,b)=>{
+    const ta=Date.parse(a.p.updated_at||a.p.created_at||'')||a.i;
+    const tb=Date.parse(b.p.updated_at||b.p.created_at||'')||b.i;
+    return SORT==='old'?(ta-tb):(tb-ta||b.i-a.i);
+  });
+  return items;
+}
+function render(){
+  document.getElementById('vfeed').classList.toggle('on',VIEW==='feed');
+  document.getElementById('vmosaic').classList.toggle('on',VIEW==='mosaic');
+  document.getElementById('srecent').classList.toggle('on',SORT==='recent');
+  document.getElementById('sold').classList.toggle('on',SORT==='old');
+  const f=document.getElementById('feed');f.className='feed'+(VIEW==='mosaic'?' mosaic':'');f.innerHTML='';
+  const items=listPosts();
+  document.getElementById('vcount').textContent=items.length+' peça'+(items.length===1?'':'s');
+  document.getElementById('vtbrand').textContent=FILT?(NOMES[FILT]||FILT):'todas as marcas';
+  if(!items.length){f.innerHTML='<div class=empty>Nenhum post ainda. Crie no editor pra ver aqui.</div>';return}
+  items.forEach(({p})=>{
+    const frames=p.frames||[];
+    const nome=NOMES[p.marca||'smark']||p.marca||'smark';
+    const age=relTime(p.updated_at||p.created_at);
     const el=document.createElement('div');el.className='post';
-    el.innerHTML='<div class=ph><div class=av></div>'+(p.marca||'smark')+'<span style="flex:1"></span>&middot;&middot;&middot;</div>'
-      +'<div class=media><div class=vhost><div class="sk-skel" style="position:absolute;inset:0"></div></div><div class=cbadge>1/'+frames.length+'</div><div class=dots>'+frames.map((_,i)=>'<span class="dot'+(i?'':' on')+'"></span>').join('')+'</div></div>'
-      +'<div class=icons><span>&#9825;</span><span>&#128172;</span><span>&#10148;</span><span style="flex:1"></span><span>&#128278;</span></div>'
-      +'<div class=cap><b>'+(p.marca||'smark')+'</b> '+((p.caption||'').replace(/</g,'&lt;'))+'</div>';
-    const host=el.querySelector('.vhost'),badge=el.querySelector('.cbadge'),dots=el.querySelectorAll('.dot');
+    el.innerHTML='<div class=ph><div class=av></div><span>'+esc(nome)+'</span>'
+      +(age?('<span class=age style="margin-left:8px">'+age+'</span>'):'')
+      +'<span style="flex:1"></span>&middot;&middot;&middot;</div>'
+      +'<div class=media><div class=vhost><div class="sk-skel" style="position:absolute;inset:0"></div></div>'
+      +(VIEW==='feed'?('<div class=cbadge>1/'+frames.length+'</div><div class=dots>'+frames.map((_,i)=>'<span class="dot'+(i?'':' on')+'"></span>').join('')+'</div>'):'')
+      +'</div>'
+      +(VIEW==='feed'?('<div class=icons><span>&#9825;</span><span>&#128172;</span><span>&#10148;</span><span style="flex:1"></span><span>&#128278;</span></div>'
+        +'<div class=cap><b>'+esc(nome)+'</b> '+esc(p.caption||p.titulo||'')+'</div>'):'');
+    const host=el.querySelector('.vhost');
     let idx=0;
-    el.querySelector('.media').onclick=()=>{idx=(idx+1)%frames.length;compose(host,frames[idx],p);badge.textContent=(idx+1)+'/'+frames.length;dots.forEach((d,i)=>d.classList.toggle('on',i===idx))};
+    el.querySelector('.media').onclick=()=>{
+      if(VIEW==='mosaic'){location.href='/editor';return}
+      idx=(idx+1)%frames.length;compose(host,frames[idx],p);
+      const badge=el.querySelector('.cbadge');if(badge)badge.textContent=(idx+1)+'/'+frames.length;
+      el.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===idx));
+    };
     f.appendChild(el);compose(host,frames[0],p);
   });
-  if(!n)f.innerHTML='<div class=empty>Nenhum post ainda. Crie no editor pra ver aqui.</div>';
+}
+async function load(){
+  try{const r=await(await fetch('/marcas')).json();if(r.ok)(r.marcas||[]).forEach(m=>NOMES[m.slug]=m.nome||m.slug)}catch(e){}
+  D=await(await fetch('/dados')).json();
+  const brands=[...new Set((D.posts||[]).map(p=>p.marca||'smark'))];
+  const hb=document.getElementById('vbrands');
+  hb.innerHTML='<button class="chip on" data-m="">Todas</button>'+brands.map(b=>'<button class=chip data-m="'+b+'">'+(NOMES[b]||b)+'</button>').join('');
+  hb.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{FILT=b.dataset.m||'';hb.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===b));render()});
+  document.getElementById('vfeed').onclick=()=>{VIEW='feed';render()};
+  document.getElementById('vmosaic').onclick=()=>{VIEW='mosaic';render()};
+  document.getElementById('srecent').onclick=()=>{SORT='recent';render()};
+  document.getElementById('sold').onclick=()=>{SORT='old';render()};
+  render();
 }
 load();
 </script></body></html>""").replace("__TOPBAR__", topbar("vitrine"))
@@ -994,13 +1196,23 @@ def safe_slug(s):
     return s or "post"
 
 
+def _agora_iso():
+    import datetime
+    return datetime.datetime.now().isoformat(timespec="seconds")
+
+
 def normaliza(d):
-    """Garante n sequencial, marca/slug seguros e caminho 'out' pra todo frame."""
+    """Garante n sequencial, marca/slug seguros, datas e caminho 'out' pra todo frame."""
+    now = _agora_iso()
     for p in d.get("posts", []):
         p["marca"] = safe_marca(p.get("marca", "smark"))
         p["slug"] = safe_slug(p.get("slug", ""))
         if not p.get("canais"):
             p["canais"] = ["instagram"]
+        if not p.get("created_at"):
+            p["created_at"] = now
+        p["updated_at"] = now
+        _roi.ensure(p)
         A = f"marcas/{p['marca']}/publicacoes/social/instagram/arte"
         for i, fr in enumerate(p.get("frames", []), 1):
             fr["n"] = i

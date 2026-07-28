@@ -115,35 +115,61 @@ def minutos_medios(post):
     return round(mean(vals), 2)
 
 
-def resumo_posts(posts, limit=20, totais_fn=None):
-    """Lista os últimos `limit` posts com ROI + COGS opcional.
+def minutos_totais(post):
+    """Soma de minutos dos ciclos fechados + ciclo ativo em andamento."""
+    r = post.get("roi") if isinstance(post.get("roi"), dict) else {}
+    total = sum(float(c.get("minutes") or 0) for c in (r.get("cycles") or []))
+    act = r.get("active") or {}
+    if act.get("started_at"):
+        t0 = _parse(act["started_at"])
+        if t0:
+            total += max(0.0, (datetime.datetime.now() - t0).total_seconds() / 60.0)
+    return round(total, 2)
+
+
+def ativo_minutos(post):
+    """Minutos do ciclo ativo agora (ou None)."""
+    r = post.get("roi") if isinstance(post.get("roi"), dict) else {}
+    act = r.get("active") or {}
+    if not act.get("started_at"):
+        return None
+    t0 = _parse(act["started_at"])
+    if not t0:
+        return None
+    return round(max(0.0, (datetime.datetime.now() - t0).total_seconds() / 60.0), 2)
+
+
+def resumo_posts(posts, limit=50, totais_fn=None):
+    """Lista posts com ROI + COGS — do mais recente ao mais antigo.
 
     `totais_fn(slug, marca) -> dict` se fornecido (ex. _ledger.totais_por_post).
     """
     items = []
-    # mais recentes: invert order (editor costuma ter novos no topo = índice alto ou baixo?)
-    # Usa ordem atual da lista; pega os primeiros `limit` que tenham algum sinal de ROI ou todos
-    ordered = list(posts or [])
-    # preferir posts com cycles ou activity; senão os primeiros N
-    for i, p in enumerate(ordered):
-        if len(items) >= limit:
-            break
+    # índices originais + ordem do mais novo (fim da lista) ao mais antigo
+    indexed = list(enumerate(posts or []))
+    indexed.reverse()
+    for i, p in indexed[: max(1, int(limit or 50))]:
         r = p.get("roi") if isinstance(p.get("roi"), dict) else {}
         cycles = r.get("cycles") or []
         last = r.get("last_cycle") or (cycles[-1] if cycles else None)
         avg_m = minutos_medios(p)
+        tot_m = minutos_totais(p)
         row = {
             "idx": i,
             "titulo": p.get("titulo") or p.get("slug") or f"post-{i}",
             "slug": p.get("slug") or "",
             "marca": p.get("marca") or "smark",
-            "status": p.get("status") or "",
+            "status": p.get("status") or "rascunho",
             "n_frames": len(p.get("frames") or []),
+            "created_at": p.get("created_at") or "",
+            "updated_at": p.get("updated_at") or "",
             "copy_calls_total": int(r.get("copy_calls_total") or 0),
             "image_gens_total": int(r.get("image_gens_total") or 0),
             "exports_total": int(r.get("exports_total") or 0),
             "cycles_n": len(cycles),
             "avg_minutes": avg_m,
+            "total_minutes": tot_m,
+            "active_minutes": ativo_minutos(p),
             "last_minutes": (last or {}).get("minutes"),
             "last_exported_at": (last or {}).get("exported_at"),
             "active": bool(r.get("active")),
