@@ -37,6 +37,7 @@ VITRINE = os.path.join(VAULT, "lancamento.html")
 HUB = """<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>smark · Sistema</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+<script>(function(){try{var t=localStorage.getItem('smark-ui-theme');if(t==='claro'||t==='escuro')document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
 <style>
 body.sk{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px}
 .wrap{max-width:820px;width:100%}
@@ -59,9 +60,13 @@ a.tile:hover .sk-card{border-color:var(--accent);transform:translateY(-2px)}
   <a class=tile href="/config"><div class=sk-card><span class=ic>⚙</span><b>Configurações</b><p>Como o sistema está se comportando: temas, cores, degradês, conceitos e estado.</p></div></a>
   <a class=tile href="/design-system/dist/smark-design-system.html"><div class="sk-card sk-card--brand"><span class=ic>◈</span><b style="color:#fff">Design System</b><p style="color:#ffffffcc">Catálogo vivo: tokens, botões, cards, badges e o toggle claro/escuro. Fonte visual do painel.</p></div></a>
 </div>
-<div class=foot>Editor, Painel, Vitrine e Design System servidos pelo mesmo servidor.</div>
+<div class=foot style="display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap">
+  <button type="button" id="btheme" title="Alternar claro/escuro">◐</button>
+  <span>Editor, Painel, Vitrine e Config · tema do sistema inteiro</span>
 </div>
-</body></html>"""
+</div>
+__THEME_BOOT__
+</body></html>""".replace("__THEME_BOOT__", THEME_BOOT if "THEME_BOOT" in dir() else "")
 
 SMARK_MARK = "M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"
 
@@ -155,6 +160,45 @@ def cmdk():
 """
 
 
+# Tema UI compartilhado (claro/escuro) — localStorage + data-theme em TODAS as telas
+HEAD_THEME = (
+    '<script>(function(){try{var t=localStorage.getItem("smark-ui-theme");'
+    'if(t==="claro"||t==="escuro")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>'
+)
+THEME_BOOT = r"""
+<style>
+#btheme{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+  color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  font-size:15px;flex:0 0 auto;margin-right:6px}
+#btheme:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+<script>
+(function(){
+  var KEY='smark-ui-theme';
+  function apply(t){
+    t=(t==='claro'||t==='light')?'claro':'escuro';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem(KEY,t)}catch(e){}
+    var b=document.getElementById('btheme');
+    if(b){b.title=t==='claro'?'Mudar para tema escuro':'Mudar para tema claro';
+      b.setAttribute('aria-label',b.title);
+      b.textContent=t==='claro'?'◐':'◑';}
+  }
+  try{apply(localStorage.getItem(KEY)||document.documentElement.getAttribute('data-theme')||'escuro')}catch(e){apply('escuro')}
+  function bind(){
+    var b=document.getElementById('btheme');
+    if(b&&!b._bound){b._bound=1;b.onclick=function(){
+      var cur=document.documentElement.getAttribute('data-theme')||'escuro';
+      apply(cur==='claro'?'escuro':'claro');
+    }}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+  window.smarkApplyTheme=apply;
+})();
+</script>
+"""
+
+
 def topbar(active=""):
     """App shell topbar (.sk-topbar) — substitui o botão flutuante de menu em todas as telas."""
     def lk(href, label, key):
@@ -165,8 +209,9 @@ def topbar(active=""):
             + lk("/painel", "Painel", "painel") + lk("/vitrine", "Vitrine", "vitrine")
             + lk("/config", "Config", "config") + lk("/editor", "Editor", "editor")
             + '<span class="sk-spacer"></span>'
+            '<button type="button" id="btheme" title="Alternar claro/escuro" aria-label="Tema">◐</button>'
             '<a class="sk-btn sk-btn--secondary sk-btn--sm" href="/editor">✎ Abrir editor</a>'
-            '</div>' + cmdk())
+            '</div>' + THEME_BOOT + cmdk())
 
 
 def config_html():
