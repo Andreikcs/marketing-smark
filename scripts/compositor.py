@@ -87,6 +87,49 @@ def readable_on(accent, base, target=4.0):
     return "#%02X%02X%02X" % rgb
 
 
+def readable_against(hex_c, tema="claro", target=4.5):
+    """Garante contraste de TEXTO sobre fundo claro/escuro (evita branco no claro).
+
+    Tema claro → base branca; se a cor for clara demais, escurece.
+    Tema escuro → base preta; se a cor for escura demais, clareia.
+    """
+    if not hex_c or not str(hex_c).startswith("#"):
+        return "#100D1C" if tema == "claro" else "#FFFFFF"
+    h = str(hex_c).strip()
+    if len(h) == 4:  # #RGB
+        h = "#" + "".join(c * 2 for c in h[1:])
+    try:
+        rgb = _hex2rgb(h)
+    except Exception:
+        return "#100D1C" if tema == "claro" else "#FFFFFF"
+    base = "#FFFFFF" if tema == "claro" else "#0B0B0B"
+    bl = _lum(_hex2rgb(base))
+
+    def contrast(r):
+        l = _lum(r)
+        hi, lo = max(l, bl), min(l, bl)
+        return (hi + 0.05) / (lo + 0.05)
+
+    if contrast(rgb) >= target:
+        return h.upper() if len(h) == 7 else h
+
+    if tema == "claro":
+        # escurece
+        f = 1.0
+        out = rgb
+        while contrast(out) < target and f > 0.08:
+            f -= 0.05
+            out = tuple(int(c * f) for c in rgb)
+        return "#%02X%02X%02X" % out
+    # escuro: clareia misturando com branco
+    t = 0.0
+    out = rgb
+    while contrast(out) < target and t < 0.92:
+        t += 0.06
+        out = tuple(int(c + (255 - c) * t) for c in rgb)
+    return "#%02X%02X%02X" % out
+
+
 def load_brands():
     with open(TOKENS, "r", encoding="utf-8") as f:
         t = json.load(f)
@@ -173,17 +216,22 @@ def render_headline(text):
     return "<br>".join(out)
 
 
-def render_rich(text):
+def render_rich(text, tema="claro"):
     """Formatação: '|' ou '\\n'/Enter = quebra · **negrito** · _itálico_ · *acento* · {#hex:texto} = cor.
-    Processa os marcadores no TEXTO INTEIRO antes de quebrar linhas — assim uma quebra dentro de
-    {#hex:...} ou *...* não parte o marcador (bug corrigido)."""
-    # normaliza toda quebra (| e \\n do hl e newline real) para um marcador único invisível
+
+    Cores manuais passam por `readable_against` — branco no tema claro vira escuro legível.
+    """
     s = esc((text or "").replace("\r", "").replace("|", "\n").replace("\\n", "\n"))
     BR = "\x00BR\x00"
     s = s.replace("\n", BR)
-    # cor {#hex:texto} — resolve aninhamento e limpa artefatos
+
+    def _rep_cor(m):
+        hx, body = m.group(1), m.group(2)
+        safe = readable_against(hx, tema)
+        return f'<span style="color:{safe}">{body}</span>'
+
     for _ in range(12):
-        new = re.sub(r"\{(#[0-9a-fA-F]{3,6}):([^{}]*)\}", r'<span style="color:\1">\2</span>', s)
+        new = re.sub(r"\{(#[0-9a-fA-F]{3,6}):([^{}]*)\}", _rep_cor, s)
         if new == s:
             break
         s = new
@@ -320,17 +368,32 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     rodape = rodape_over or fund.get("rodape", "@copywriting2026")
     handle = handle_over or b["handle"]
 
+    has_img = bool(bg_url or bg)
+
     # grade/duotone usa acento da MARCA (não roxo smark fixo)
     gtint = accent_c
     if tema == "claro":
         cl = fund.get("_claro", {})
         base_c = base or cl.get("base", "#F4F2FB")
         txt = cl.get("texto", "#100D1C")
-        base_hex = base_c if (base_c.startswith("#") and len(base_c) in (4, 7)) else cl.get("base", "#F4F2FB")
-        acc_txt = readable_on(accent_c, base_hex)
-        T = {"BASE": base_c, "TXT": txt, "SUBC": cl.get("sub", "#4A4560"), "LH": ".98",
-             "OV": "linear-gradient(180deg, rgba(244,242,251,.30) 0%%, rgba(244,242,251,0) 28%%, rgba(244,242,251,.5) 52%%, rgba(244,242,251,.93) 78%%, rgba(244,242,251,1) 100%%)",
-             "HSHADOW": "none", "VSTYLE": f"color:{acc_txt};", "DOT": acc_txt,
+        # com foto, assume fundo claro no terço inferior → acento precisa contrastar com BRANCO
+        base_for_acc = "#FFFFFF" if has_img else (
+            base_c if (base_c.startswith("#") and len(base_c) in (4, 7)) else "#F4F2FB")
+        acc_txt = readable_on(accent_c, base_for_acc, target=5.0 if has_img else 4.0)
+        # scrim mais forte com imagem (garante legibilidade do apoio)
+        if has_img:
+            ov = ("linear-gradient(180deg, rgba(255,255,255,.15) 0%%, rgba(255,255,255,0) 22%%, "
+                  "rgba(255,255,255,.55) 48%%, rgba(255,255,255,.92) 72%%, rgba(255,255,255,.98) 100%%)")
+            subc = "#1A1830"
+            hshadow = "0 2px 18px rgba(255,255,255,.55)"
+        else:
+            ov = ("linear-gradient(180deg, rgba(244,242,251,.30) 0%%, rgba(244,242,251,0) 28%%, "
+                  "rgba(244,242,251,.5) 52%%, rgba(244,242,251,.93) 78%%, rgba(244,242,251,1) 100%%)")
+            subc = cl.get("sub", "#4A4560")
+            hshadow = "none"
+        T = {"BASE": base_c, "TXT": txt, "SUBC": subc, "LH": ".98",
+             "OV": ov,
+             "HSHADOW": hshadow, "VSTYLE": f"color:{acc_txt};", "DOT": acc_txt,
              "FOOTTXT": cl.get("apoio", "#6B6680"), "FOOTBORDER": "rgba(0,0,0,.14)", "FOOTCRED": "#8B8698",
              "PAGETXT": txt, "PAGEBG": "rgba(255,255,255,.6)", "PAGEBORDER": "rgba(0,0,0,.14)",
              "GTINT": gtint, "GTO": ".07",
@@ -338,36 +401,40 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
              "GGO": ".05"}
     else:
         base_c = base or fund.get("base", "#0B0B0B")
-        T = {"BASE": base_c, "TXT": "#FFFFFF", "SUBC": "#DCDCDC", "LH": ".96",
+        # acento claro precisa contrastar com preto/navy
+        acc_dark = readable_against(bright_c or accent_c, "escuro", target=4.5)
+        T = {"BASE": base_c, "TXT": "#FFFFFF", "SUBC": "#E8E8EC", "LH": ".96",
              "OV": "linear-gradient(180deg, rgba(11,11,11,.5) 0%%, rgba(11,11,11,0) 30%%, rgba(11,11,11,.42) 50%%, rgba(11,11,11,.9) 76%%, rgba(11,11,11,.99) 100%%)",
-             "HSHADOW": "0 6px 34px rgba(0,0,0,.7)", "VSTYLE": f"color:{bright_c};", "DOT": bright_c,
+             "HSHADOW": "0 6px 34px rgba(0,0,0,.7)", "VSTYLE": f"color:{acc_dark};", "DOT": acc_dark,
              "FOOTTXT": "#9A9A9A", "FOOTBORDER": "rgba(255,255,255,.14)", "FOOTCRED": "#7A7A7A",
              "PAGETXT": "rgba(255,255,255,.7)", "PAGEBG": "rgba(0,0,0,.28)", "PAGEBORDER": "rgba(255,255,255,.14)",
              "GTINT": gtint, "GTO": ".12",
              "GVIG": "radial-gradient(135% 120% at 50% 34%, transparent 42%, rgba(0,0,0,.78) 100%)",
              "GGO": ".08"}
 
-    has_img = False
     bg_css = "none"
     if bg_url:
         bg_css = f"url({bg_url})"
-        has_img = True
     elif bg:
         bgp = bg if os.path.isabs(bg) else os.path.join(VAULT, bg)
         bg_css = f"url(data:image/png;base64,{base64.b64encode(open(bgp,'rb').read()).decode()})"
-        has_img = True
     elif placeholder:
         base_e = (b.get("base_escura") or "")
         if not base_e:
-            # tenta extrair do gradiente "... #HEX 100%)"
             import re as _re
             gm = _re.search(r"(#[0-9A-Fa-f]{6})\s+100%", b.get("gradiente") or "")
             base_e = gm.group(1) if gm else "#0B0B0B"
         bg_css = mesh_da_marca(accent_c, tema, base_e)
 
     hsz = hsize if hsize > 0 else min(auto_hsize(headline), 92 if cta else 104)
-    ovx_bg = _ovx_bg(overlay, ov_ang, ov_pos, accent=accent_c)
-    ovx_op = 0 if overlay == "none" else max(0.0, min(1.0, float(overlay_op)))
+    # foto + tema claro sem overlay: força degradê branco legível
+    use_ov = overlay
+    use_op = overlay_op
+    if has_img and tema == "claro" and (overlay or "none") in ("none", ""):
+        use_ov = "branco"
+        use_op = max(float(overlay_op or 0.85), 0.88)
+    ovx_bg = _ovx_bg(use_ov, ov_ang, ov_pos, accent=accent_c)
+    ovx_op = 0 if use_ov == "none" else max(0.0, min(1.0, float(use_op)))
     cssvars = {"W": w, "H": h, "BG": bg_css, "ACCENT": accent_c, "SQUARE": square, "ONACC": on_acc,
                "HSIZE": hsz, "TABF": tab_font(b["tab"]), "GRAIN": GRAIN,
                "POSX": posx, "POSY": posy, "ZOOM": zoom, "OVX": ovx_bg, "OVXO": ovx_op,
@@ -375,12 +442,13 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     cssvars.update(T)
     css = CSS % cssvars
 
-    sub_h = f'<div class="sub">{render_rich(sub)}</div>' if sub else ""
+    sub_h = f'<div class="sub">{render_rich(sub, tema)}</div>' if sub else ""
     cta_h = f'<div><span class="cta">{esc(cta)}</span></div>' if cta else ""
     page_h = f'<div class="page">{esc(page)}</div>' if page else ""
     chip_h = ("" if no_chip else
               f'<div class="chip"><div class="av">{glyph_html(b, on_acc, 50)}</div>'
               f'<div class="hd">{wordmark_html(b)}</div><div class="ck">&#10003;</div></div>')
+    # headline também com cores seguras
     grade_on = (not no_grade) and (has_img or placeholder)
     grade_html = '<div class="grade"><i class="gt"></i><i class="gv"></i><i class="gg"></i></div>' if grade_on else ''
     if raw:  # só a imagem (arte já pronta importada) + overlay/filtros; sem texto/moldura
@@ -388,7 +456,7 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     else:
         body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ovx"></div><div class="ov"></div>{page_h}'
                 f'<div class="tab"><div class="ic">{glyph_html(b, on_acc, 46)}</div><div class="vt">{esc(b["tab"])}</div></div>'
-                f'<div class="ct">{chip_h}<div class="h">{render_rich(headline)}</div>{sub_h}{cta_h}</div>'
+                f'<div class="ct">{chip_h}<div class="h">{render_rich(headline, tema)}</div>{sub_h}{cta_h}</div>'
                 f'<div class="footer"><div>{esc(handle)}</div><div class="cred">{esc(rodape)}</div></div></div>')
     return PAGE % {"CSS": css, "BODY": body}, w, h
 
