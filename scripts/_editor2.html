@@ -273,13 +273,13 @@ input[type=range]{accent-color:var(--accent)}
   100%{background-position:30% 0%, 0% 100%, 100% 50%}
 }
 #estudio .eshead,#estudio .eswelcome,#estudio .eslog,#estudio .esfoot{position:relative;z-index:1}
-#estudio .esmark{animation:wlogofloat 4.2s ease-in-out infinite;background:linear-gradient(135deg,var(--esbrand, #8B5CF6),var(--esbrand2, #3B82F6) 55%,var(--esbrand, #22D3EE))}
+#estudio .esmark{animation:wlogofloat 4.2s ease-in-out infinite;background:linear-gradient(155deg,#9A4DFF,#2A1CA8)!important}
 #estudio.min{height:auto;width:min(320px,90vw)}
 #estudio.min .eslog,#estudio.min .esfoot,#estudio.min .eswelcome{display:none}
 #estudio.min .eshead{border-bottom:0;cursor:pointer}
 .eshead{display:flex;align-items:center;gap:8px;padding:12px 14px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
 .eslogo{display:inline-flex;align-items:center;gap:8px}
-.esmark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#8B5CF6,#3B82F6 55%,#22D3EE);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.esmark{width:26px;height:26px;border-radius:8px;background:linear-gradient(155deg,#9A4DFF,#2A1CA8);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
 .esword{font-family:var(--font-text);font-weight:800;font-size:15px;color:var(--txt);letter-spacing:-.02em}
 .essub{font-size:11px;color:var(--muted);font-weight:600}
 .eshead .prov{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--inset)}
@@ -1468,7 +1468,7 @@ carregar().then(()=>{snapshot();if(typeof setAmbientBrand==='function')setAmbien
 <div id=estudio>
   <div class=es-ambient aria-hidden=true></div>
   <div class=eshead id=eshead>
-    <span class=eslogo><span class=esmark><svg viewBox="0 0 100 100" width=13 height=13><path fill-rule=evenodd fill=#fff d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></span>
+    <span class=eslogo><span class=esmark><svg viewBox="0 0 100 100" width=14 height=14><path fill-rule="evenodd" fill="#fff" d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></span>
       <b class=esword>Estúdio</b><span class=essub>IA</span></span>
     <span style="flex:1"></span>
     <span class=prov id=esprov></span>

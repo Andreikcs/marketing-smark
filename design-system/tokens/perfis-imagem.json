@@ -85,7 +85,8 @@
         "elever-ai",
         "netsul",
         "sul-contabil",
-        "deatec"
+        "deatec",
+        "track-brasil"
       ],
       "registro": "abstrato-material",
       "modelo": "google/gemini-3-pro-image",

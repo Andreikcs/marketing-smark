@@ -641,8 +641,15 @@ def criar(slug, nome, acento, *, acento_claro=None, handle=None, glyph=None,
     slug = (slug or "").strip().lower()
     if not is_slug_ok(slug):
         raise ValueError(f"slug inválido (use kebab-case [a-z0-9-]): {slug!r}")
+    # se colidir, acrescenta -2, -3… (slug gerado automaticamente a partir do nome)
     if exists(slug):
-        raise ValueError(f"marca '{slug}' já existe no tokens.json")
+        base = slug
+        n = 2
+        while exists(f"{base}-{n}") and n < 50:
+            n += 1
+        if exists(f"{base}-{n}"):
+            raise ValueError(f"marca '{slug}' já existe no tokens.json")
+        slug = f"{base}-{n}"
 
     nome = (nome or slug).strip()
     acento = (acento or "").strip()
