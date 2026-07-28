@@ -294,7 +294,11 @@ def gerar_texto_ia_marca(slug=None, nome="", segmento="", acento="", site=""):
     if seg not in MOOD_POR_SEGMENTO:
         seg = "outro"
     nome = (nome or slug or "marca").strip()
-    handle = "@" + re.sub(r"[^a-z0-9]", "", (slug or nome).lower())[:24]
+    import unicodedata
+    base = (slug or nome).lower()
+    base = unicodedata.normalize("NFD", base)
+    base = "".join(c for c in base if unicodedata.category(c) != "Mn")
+    handle = "@" + re.sub(r"[^a-z0-9]", "", base)[:24]
     mood = MOOD_POR_SEGMENTO[seg]
     # personaliza levemente com o nome
     mood = f"{mood} — brand name {nome}"

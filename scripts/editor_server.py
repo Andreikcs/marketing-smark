@@ -291,17 +291,40 @@ tr:last-child td{{border-bottom:0}}
       <div class=fld><label>Glyph (1–2 letras)</label><input id=mf_glyph placeholder="N" maxlength=2></div>
     </div>
     <div class=fld><label>Wordmark (chip)</label><input id=mf_wordmark placeholder="NetSul"></div>
-    <div class=fld><label>Mood (inglês, direção de arte)</label><textarea id=mf_mood placeholder="regional ISP fiber brand — warm, reliable, clean"></textarea></div>
-    <div class=fld><label>Logo (PNG/SVG)</label>
-      <div style="display:flex;gap:12px;align-items:center">
+    <div class=fld><label>Segmento</label>
+      <select id=mf_segmento class="sk-select" style="width:100%;padding:10px 12px;border-radius:10px;background:var(--inset);border:1px solid var(--line);color:var(--text)">
+        <option value="">Selecione…</option>
+        <option value="contabilidade">Contabilidade / fiscal</option>
+        <option value="telecom">Telecom / ISP</option>
+        <option value="varejo">Varejo / e-commerce</option>
+        <option value="imobiliaria">Imobiliário</option>
+        <option value="saude">Saúde / clínicas</option>
+        <option value="servicos">Serviços B2B</option>
+        <option value="educacao">Educação</option>
+        <option value="industria">Indústria</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
+    <div class=fld><label>Mood (direção de arte)</label>
+      <textarea id=mf_mood placeholder="Descreva o clima visual da marca…"></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_mood>✦ Gerar mood com IA</button>
+        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_all>✦ Sugerir handle + glyph + mood</button>
+      </div>
+      <div id=mf_ia_dica style="font-size:11px;color:var(--muted);margin-top:6px"></div>
+    </div>
+    <div class=fld><label>Logo</label>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
         <div class=logoprev id=mf_logoprev>sem logo</div>
         <input type=file id=mf_logo accept="image/*" style="font-size:12px;color:var(--muted)">
+        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_logo_rm title="Remover logo">Remover logo</button>
       </div>
     </div>
-    <div class=fld><label>Referências da marca (prints do feed / peças aprovadas)</label>
+    <div class=fld><label>Referências da marca</label>
       <input type=file id=mf_refs accept="image/*" multiple style="font-size:12px;color:var(--muted)">
-      <div id=mf_refs_prev style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Entra no acervo da marca e guia as próximas gerações de fundo.</div>
+      <div id=mf_refs_saved style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
+      <div id=mf_refs_prev style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Fotos aprovadas guiam o fundo. Clique no × para excluir.</div>
     </div>
     <div class=fld><label>Site (opcional)</label><input id=mf_site placeholder="https://cliente.com.br"></div>
     <div id=mf_msg style="font-size:13px;min-height:18px;margin:4px 0"></div>
@@ -368,7 +391,7 @@ function clearRefsPrev(){{
   const inp=document.getElementById('mf_refs'); if(inp) inp.value='';
 }}
 function openNew(){{
-  EDIT=null; LOGO_DATA=null; clearRefsPrev();
+  EDIT=null; LOGO_DATA=null; LOGO_RM=false; clearRefsPrev();
   document.getElementById('mtitle').textContent='Nova marca';
   document.getElementById('fld_slug').style.display='';
   document.getElementById('mf_slug').value='';
@@ -380,15 +403,18 @@ function openNew(){{
   document.getElementById('mf_glyph').value='';
   document.getElementById('mf_wordmark').value='';
   document.getElementById('mf_mood').value='';
+  document.getElementById('mf_segmento').value='';
   document.getElementById('mf_site').value='';
   document.getElementById('mf_logoprev').innerHTML='sem logo';
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
+  document.getElementById('mf_ia_dica').textContent='';
+  document.getElementById('mf_refs_saved').innerHTML='';
   document.getElementById('mmodal').classList.add('on');
 }}
 function openEdit(slug){{
   const m=MARCAS.find(x=>x.slug===slug); if(!m)return;
-  EDIT=slug; LOGO_DATA=null; clearRefsPrev();
+  EDIT=slug; LOGO_DATA=null; LOGO_RM=false; clearRefsPrev();
   document.getElementById('mtitle').textContent='Editar · '+m.nome;
   document.getElementById('fld_slug').style.display='';
   document.getElementById('mf_slug').value=m.slug;
@@ -400,20 +426,64 @@ function openEdit(slug){{
   document.getElementById('mf_glyph').value=m.glyph||'';
   document.getElementById('mf_wordmark').value=m.wordmark||'';
   document.getElementById('mf_mood').value=m.mood||'';
-  document.getElementById('mf_site').value='';
+  document.getElementById('mf_segmento').value=m.segmento||'';
+  document.getElementById('mf_site').value=m.site||'';
   document.getElementById('mf_logoprev').innerHTML=m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}">`:'sem logo';
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
+  document.getElementById('mf_ia_dica').textContent='';
   document.getElementById('mmodal').classList.add('on');
+  loadSavedRefs(slug);
+}}
+async function loadSavedRefs(slug){{
+  const box=document.getElementById('mf_refs_saved');
+  if(!box||!slug){{if(box)box.innerHTML='';return}}
+  box.innerHTML='<span style="font-size:12px;color:var(--muted)">Carregando refs…</span>';
+  try{{
+    const r=await(await fetch('/marca-refs?slug='+encodeURIComponent(slug))).json();
+    if(!r.ok){{box.innerHTML='';return}}
+    const refs=r.refs||[];
+    // dedupe por base (feed+acervo)
+    const seen=new Set();
+    const uniq=[];
+    refs.forEach(x=>{{const k=x.base||x.nome;if(seen.has(k))return;seen.add(k);uniq.push(x)}});
+    if(!uniq.length){{box.innerHTML='<span style="font-size:12px;color:var(--muted)">Nenhuma referência salva.</span>';return}}
+    box.innerHTML=uniq.map(x=>`
+      <div class=refthumb data-nome="${{esc(x.nome)}}" style="position:relative;width:56px;height:56px">
+        <img src="${{esc(x.url)}}?t=${{Date.now()}}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block">
+        <button type=button title="Excluir" data-del-ref="${{esc(x.nome)}}"
+          style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:0;background:#c44;color:#fff;font-size:12px;cursor:pointer;line-height:20px">×</button>
+      </div>`).join('');
+    box.querySelectorAll('[data-del-ref]').forEach(b=>b.onclick=async(e)=>{{
+      e.preventDefault();
+      if(!confirm('Remover esta referência?'))return;
+      const rr=await(await fetch('/marca-ref-del',{{method:'POST',headers:H,body:JSON.stringify({{slug:EDIT,nome:b.dataset.delRef}})}})).json();
+      if(!rr.ok){{alert(rr.erro||'falhou');return}}
+      loadSavedRefs(EDIT);
+      loadMarcas();
+    }});
+  }}catch(e){{box.innerHTML=''}}
 }}
 document.getElementById('bm_new').onclick=openNew;
 document.getElementById('mf_cancel').onclick=()=>document.getElementById('mmodal').classList.remove('on');
 document.getElementById('mmodal').onclick=e=>{{if(e.target.id==='mmodal')e.currentTarget.classList.remove('on')}};
+let LOGO_RM=false;
 document.getElementById('mf_logo').onchange=e=>{{
   const f=e.target.files&&e.target.files[0]; if(!f)return;
+  LOGO_RM=false;
   const rd=new FileReader();
   rd.onload=()=>{{LOGO_DATA=rd.result;document.getElementById('mf_logoprev').innerHTML=`<img src="${{rd.result}}">`}};
   rd.readAsDataURL(f);
+}};
+document.getElementById('mf_logo_rm').onclick=async()=>{{
+  if(EDIT){{
+    if(!confirm('Remover o logo desta marca?'))return;
+    const r=await(await fetch('/marca-logo-del',{{method:'POST',headers:H,body:JSON.stringify({{slug:EDIT}})}})).json();
+    if(!r.ok){{alert(r.erro||'falhou');return}}
+  }}
+  LOGO_DATA=null; LOGO_RM=true;
+  document.getElementById('mf_logoprev').innerHTML='sem logo';
+  document.getElementById('mf_logo').value='';
 }};
 document.getElementById('mf_refs').onchange=async e=>{{
   const files=[...(e.target.files||[])].slice(0,12);
@@ -421,12 +491,46 @@ document.getElementById('mf_refs').onchange=async e=>{{
   const prev=document.getElementById('mf_refs_prev'); prev.innerHTML='';
   for(const f of files){{
     const dataurl=await new Promise(res=>{{const rd=new FileReader();rd.onload=()=>res(rd.result);rd.readAsDataURL(f)}});
-    REFS_DATA.push({{nome:f.name.replace(/\\.[^.]+$/,''), dataurl}});
-    const thumb=document.createElement('img');
-    thumb.src=dataurl; thumb.style.cssText='width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid var(--line)';
-    prev.appendChild(thumb);
+    const item={{nome:f.name.replace(/\\.[^.]+$/,''), dataurl}};
+    REFS_DATA.push(item);
+    const wrap=document.createElement('div');
+    wrap.style.cssText='position:relative;width:56px;height:56px';
+    wrap.innerHTML=`<img src="${{dataurl}}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block">
+      <button type=button title="Tirar da fila" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:0;background:#c44;color:#fff;font-size:12px;cursor:pointer">×</button>`;
+    wrap.querySelector('button').onclick=()=>{{
+      REFS_DATA=REFS_DATA.filter(x=>x.dataurl!==item.dataurl);
+      wrap.remove();
+    }};
+    prev.appendChild(wrap);
   }}
 }};
+async function runIaMarca(mode){{
+  const msg=document.getElementById('mf_msg');
+  msg.className=''; msg.textContent='Gerando sugestões…';
+  const body={{
+    nome:document.getElementById('mf_nome').value.trim(),
+    slug:EDIT||document.getElementById('mf_slug').value.trim(),
+    segmento:document.getElementById('mf_segmento').value,
+    acento:document.getElementById('mf_acento').value,
+    site:document.getElementById('mf_site').value.trim(),
+    mode:mode||'all',
+  }};
+  try{{
+    const r=await(await fetch('/marca-ia',{{method:'POST',headers:H,body:JSON.stringify(body)}})).json();
+    if(!r.ok){{msg.className='err';msg.textContent=r.erro||'falhou';return}}
+    if(r.mood) document.getElementById('mf_mood').value=r.mood;
+    if(mode==='all'){{
+      if(r.handle) document.getElementById('mf_handle').value=r.handle;
+      if(r.glyph) document.getElementById('mf_glyph').value=r.glyph;
+      if(r.wordmark) document.getElementById('mf_wordmark').value=r.wordmark;
+      if(r.segmento) document.getElementById('mf_segmento').value=r.segmento;
+    }}
+    document.getElementById('mf_ia_dica').textContent=r.dica||'';
+    msg.className='ok'; msg.textContent='Sugestões aplicadas — revise e salve';
+  }}catch(e){{msg.className='err';msg.textContent='Erro na IA'}}
+}}
+document.getElementById('mf_ia_mood').onclick=()=>runIaMarca('mood');
+document.getElementById('mf_ia_all').onclick=()=>runIaMarca('all');
 document.getElementById('mf_save').onclick=async()=>{{
   const msg=document.getElementById('mf_msg');
   msg.className=''; msg.textContent='Salvando…';
@@ -439,6 +543,7 @@ document.getElementById('mf_save').onclick=async()=>{{
     wordmark:document.getElementById('mf_wordmark').value.trim(),
     mood:document.getElementById('mf_mood').value.trim(),
     site:document.getElementById('mf_site').value.trim(),
+    segmento:document.getElementById('mf_segmento').value,
   }};
   if(LOGO_DATA) body.logo_dataurl=LOGO_DATA;
   if(REFS_DATA.length) body.referencias=REFS_DATA;
@@ -449,13 +554,16 @@ document.getElementById('mf_save').onclick=async()=>{{
   }}else{{
     body.slug=document.getElementById('mf_slug').value.trim().toLowerCase();
     if(!body.slug||!body.nome){{msg.className='err';msg.textContent='Preencha slug e nome';return}}
+    if(!body.segmento){{msg.className='err';msg.textContent='Selecione o segmento';return}}
     r=await(await fetch('/nova-marca',{{method:'POST',headers:H,body:JSON.stringify(body)}})).json();
   }}
   if(!r.ok){{msg.className='err';msg.textContent=r.erro||'erro';return}}
   const nref=(r.referencias||[]).filter(x=>x&&x.feed).length;
   msg.className='ok';
-  msg.textContent='Salvo ✓'+(nref?(' · '+nref+' ref(s)'):'')+(r.avisos&&r.avisos.length?(' · '+r.avisos.join('; ')): '');
+  msg.textContent='Salvo ✓'+(nref?(' · '+nref+' ref(s) novas'):'');
   await loadMarcas();
+  if(EDIT) loadSavedRefs(EDIT);
+  REFS_DATA=[]; document.getElementById('mf_refs_prev').innerHTML='';
   setTimeout(()=>document.getElementById('mmodal').classList.remove('on'),700);
 }};
 loadMarcas();
@@ -1378,6 +1486,15 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(200, {"ok": True, "marcas": _marcas.listar_detalhes()})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
+        if path == "/marca-refs":
+            try:
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                slug = (qs.get("slug") or [""])[0].strip().lower()
+                return self._send(200, {"ok": True, "slug": slug, "refs": _marcas.listar_refs(slug)})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
         if path == "/historico":
             # versões de UM post ao longo dos autosaves do git (dedupe: só quando o post mudou)
             try:
@@ -1794,6 +1911,16 @@ class H(http.server.BaseHTTPRequestHandler):
                     wordmark=str(req.get("wordmark") or "") or None,
                     mood=str(req.get("mood") or ""),
                 )
+                # segmento / site pós-criação
+                try:
+                    if req.get("segmento") or req.get("site"):
+                        _marcas.atualizar(
+                            r["slug"],
+                            segmento=str(req.get("segmento") or "") or None,
+                            site=str(req.get("site") or "") or None,
+                        )
+                except Exception:
+                    pass
                 avisos = []
                 if req.get("logo_dataurl"):
                     try:
@@ -1833,7 +1960,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 slug = str(req.get("slug", "")).strip().lower()
                 campos = {}
                 for k in ("nome", "acento", "acento_claro", "handle", "glyph",
-                          "wordmark", "mood", "gradiente"):
+                          "wordmark", "mood", "gradiente", "segmento", "site"):
                     if k in req and req[k] is not None:
                         campos[k] = req[k]
                 if "endossa" in req:
@@ -1869,6 +1996,46 @@ class H(http.server.BaseHTTPRequestHandler):
                                                          if d["slug"] == slug), None)})
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-ref-del":
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                nome = str(req.get("nome", "")).strip()
+                removed = _marcas.remover_ref(slug, nome)
+                return self._send(200, {"ok": True, "removed": removed, "refs": _marcas.listar_refs(slug)})
+            except FileNotFoundError as e:
+                return self._send(404, {"ok": False, "erro": str(e)})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-logo-del":
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                removed = _marcas.remover_logo(slug)
+                return self._send(200, {"ok": True, "removed": removed})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-ia":
+            try:
+                sug = _marcas.gerar_texto_ia_marca(
+                    slug=str(req.get("slug") or ""),
+                    nome=str(req.get("nome") or ""),
+                    segmento=str(req.get("segmento") or ""),
+                    acento=str(req.get("acento") or ""),
+                    site=str(req.get("site") or ""),
+                )
+                mode = str(req.get("mode") or "all")
+                if mode == "mood":
+                    return self._send(200, {"ok": True, "mood": sug["mood"], "dica": sug["dica"],
+                                            "segmento": sug["segmento"]})
+                return self._send(200, {"ok": True, **sug})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 

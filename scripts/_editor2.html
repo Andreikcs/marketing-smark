@@ -758,14 +758,20 @@ function renderCtrl(){
   const created=p.created_at||'';
   const roi=p.roi||{};
   const cycles=roi.cycles||[];
-  let totalMin=cycles.reduce((s,c)=>s+(Number(c.minutes)||0),0);
-  if(roi.active&&roi.active.started_at){const t0=Date.parse(roi.active.started_at);if(t0)totalMin+=(Date.now()-t0)/60000}
+  let totalMin=cycles.reduce((s,c)=>s+Math.min(180,Number(c.minutes)||0),0);
+  // ciclo ativo: só conta se houve trabalho E usa last_activity (não o relógio correndo)
+  const act=roi.active||{};
+  const work=(Number(act.copy_calls)||0)+(Number(act.image_gens)||0);
+  if(work>0&&act.started_at){
+    const t0=Date.parse(act.started_at), t1=Date.parse(act.last_activity_at||act.started_at);
+    if(t0&&t1) totalMin+=Math.min(180,Math.max(0,(t1-t0)/60000));
+  }
   function rel(iso){if(!iso)return '—';const t=Date.parse(iso);if(!t)return '—';const m=Math.floor((Date.now()-t)/60000);if(m<1)return 'agora';if(m<60)return m+' min';const h=Math.floor(m/60);if(h<48)return h+' h';return Math.floor(h/24)+' d'}
   tbox.innerHTML='<b style="color:var(--txt)">⏱ Tempo deste post</b><br>'
     +'Criado: <b style="color:var(--txt)">'+esc(rel(created))+'</b>'
     +(created?(' <span style="opacity:.7">('+esc(created.replace('T',' ').slice(0,16))+')</span>'):'')
     +'<br>Trabalho registrado: <b style="color:var(--txt)">'+(totalMin? (totalMin<60?totalMin.toFixed(1)+' min':(totalMin/60).toFixed(1)+' h') : '—')+'</b>'
-    +(roi.active?' · <span style="color:var(--accent)">ciclo ativo</span>':'')
+    +(work>0?' · <span style="color:var(--accent)">em edição</span>':'')
     +'<br><span style="opacity:.75">Textos IA: '+(roi.copy_calls_total||0)+' · Imagens: '+(roi.image_gens_total||0)+' · Exports: '+(roi.exports_total||0)+'</span>';
   gm.appendChild(tbox);c.appendChild(gm);
   // PUBLICAÇÃO (canais)
