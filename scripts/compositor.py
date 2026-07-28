@@ -145,6 +145,7 @@ def load_brands():
             "endossa": m.get("endossa", False),
             "logo_path": m.get("logo_path", ""), "logo_svg": m.get("logo_svg", ""),
             "logo_file": brasao.get("principal") or m.get("logo_file") or "",
+            "logo_estilo": brasao.get("estilo") or m.get("logo_estilo") or "mono",
             "wordmark": m.get("wordmark", ""), "gradiente": m.get("gradiente", ""),
             "base_escura": m.get("base_escura") or (m.get("paleta_extra") or {}).get("navy") or "",
             "tab": (m["wordmark"].split("*")[0].split()[0].upper() if m.get("wordmark")
@@ -311,10 +312,51 @@ def _logo_badge_png(path, color, px, pad_ratio=0.16):
     return base64.b64encode(buf.getvalue()).decode()
 
 
-def glyph_html(b, color, px, *, use_logo=True):
-    """Símbolo na tab/chip: sempre ÍCONE (mono) ou letra — nunca wordmark/foto full.
+def _logo_color_icon_png(path, px, pad_ratio=0.14):
+    """Ícone com cores originais (contain em canvas quadrado)."""
+    try:
+        from PIL import Image
+        import io
+    except ImportError:
+        return None
+    im = _logo_to_icon_rgba(path)
+    if im is None:
+        return None
+    canvas = Image.new("RGBA", (px * 2, px * 2), (0, 0, 0, 0))
+    pad = int(px * 2 * pad_ratio)
+    inner = px * 2 - pad * 2
+    try:
+        resample = Image.Resampling.LANCZOS
+    except AttributeError:
+        resample = Image.LANCZOS
+    im = im.copy()
+    im.thumbnail((inner, inner), resample)
+    ox = (px * 2 - im.size[0]) // 2
+    oy = (px * 2 - im.size[1]) // 2
+    canvas.paste(im, (ox, oy), im)
+    buf = io.BytesIO()
+    canvas.save(buf, format="PNG", optimize=True)
+    return base64.b64encode(buf.getvalue()).decode()
 
-    use_logo=False: só glyph. use_logo=True: mono da logo se der; senão letra.
+
+def logo_variantes(path, color="#FFFFFF", px=64):
+    """Gera 3 aplicações da logo para o usuário escolher.
+
+    - mono: ícone monocromático na cor do acento (melhor p/ tab)
+    - color: ícone com cores originais
+    - glyph: monograma (1ª letra) — sem arquivo
+    """
+    out = {"mono": None, "color": None, "glyph": True}
+    if path and os.path.isfile(path):
+        out["mono"] = _logo_badge_png(path, color if (color or "").startswith("#") else "#FFFFFF", px)
+        out["color"] = _logo_color_icon_png(path, px)
+    return out
+
+
+def glyph_html(b, color, px, *, use_logo=True):
+    """Símbolo na tab/chip: estilo da marca (mono|color|glyph) ou fallback.
+
+    use_logo=False: só glyph. use_logo=True: aplica brasao.estilo.
     """
     if b.get("logo_svg"):
         return (f'<svg viewBox="0 0 100 100" width="{px}" height="{px}" style="color:{color}">'
@@ -322,15 +364,18 @@ def glyph_html(b, color, px, *, use_logo=True):
     if b.get("logo_path"):
         return (f'<svg viewBox="0 0 100 100" width="{px}" height="{px}">'
                 f'<path fill-rule="evenodd" fill="{color}" d="{b["logo_path"]}"/></svg>')
-    lf = _resolve_logo_file(b.get("logo_file") or "") if use_logo else ""
+
+    estilo = (b.get("logo_estilo") or "mono").lower()
+    if not use_logo or estilo == "glyph":
+        g = b.get("glyph")
+        if g is None or g == "":
+            nm = (b.get("name") or b.get("wordmark") or "•")[:1]
+            g = nm.upper() if nm else "•"
+        return esc(g)
+
+    lf = _resolve_logo_file(b.get("logo_file") or "")
     if lf:
         ext = os.path.splitext(lf)[1].lower()
-        if ext != ".svg":
-            data = _logo_badge_png(lf, color if (color or "").startswith("#") else "#FFFFFF", px)
-            if data:
-                return (f'<img src="data:image/png;base64,{data}" width="{px}" height="{px}" '
-                        f'alt="" style="object-fit:contain;display:block;width:{px}px;height:{px}px"/>')
-        # SVG: embute limitado
         if ext == ".svg":
             try:
                 raw = open(lf, "r", encoding="utf-8", errors="ignore").read()
@@ -339,10 +384,17 @@ def glyph_html(b, color, px, *, use_logo=True):
                             f'justify-content:center;overflow:hidden">{raw}</span>')
             except OSError:
                 pass
-    # monograma (letra) — fallback limpo
+        else:
+            data = None
+            if estilo == "color":
+                data = _logo_color_icon_png(lf, px)
+            if not data:
+                data = _logo_badge_png(lf, color if (color or "").startswith("#") else "#FFFFFF", px)
+            if data:
+                return (f'<img src="data:image/png;base64,{data}" width="{px}" height="{px}" '
+                        f'alt="" style="object-fit:contain;display:block;width:{px}px;height:{px}px"/>')
     g = b.get("glyph")
     if g is None or g == "":
-        # tenta 1ª letra do name/wordmark
         nm = (b.get("name") or b.get("wordmark") or "•")[:1]
         g = nm.upper() if nm else "•"
     return esc(g)

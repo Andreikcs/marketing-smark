@@ -979,15 +979,46 @@ def branding_book_status(slug):
     p = branding_book_path(slug)
     assets = os.path.join(MARCAS_DIR, slug, "branding", "branding-book")
     n_assets = 0
+    asset_urls = []
     if os.path.isdir(assets):
-        n_assets = len([f for f in os.listdir(assets)
-                        if not f.startswith(".") and os.path.isfile(os.path.join(assets, f))])
+        for f in sorted(os.listdir(assets)):
+            if f.startswith("."):
+                continue
+            fp = os.path.join(assets, f)
+            if os.path.isfile(fp):
+                n_assets += 1
+                asset_urls.append({
+                    "nome": f,
+                    "url": "/" + os.path.relpath(fp, VAULT).replace("\\", "/"),
+                })
+    preview = ""
+    if os.path.isfile(p):
+        try:
+            preview = open(p, encoding="utf-8").read()[:4000]
+        except OSError:
+            preview = ""
     return {
         "existe": os.path.isfile(p),
         "path": os.path.relpath(p, VAULT).replace("\\", "/") if os.path.isfile(p) else "",
         "assets_n": n_assets,
+        "assets": asset_urls,
         "assets_dir": os.path.relpath(assets, VAULT).replace("\\", "/") if os.path.isdir(assets) else "",
+        "preview_md": preview,
     }
+
+
+def set_logo_estilo(slug, estilo):
+    """Define como a logo aparece na tab/chip: mono | color | glyph."""
+    require(slug)
+    estilo = (estilo or "mono").strip().lower()
+    if estilo not in ("mono", "color", "glyph"):
+        raise ValueError("estilo deve ser mono, color ou glyph")
+    t = _load_tokens()
+    m = t["marcas"][slug]
+    m.setdefault("brasao", {})["estilo"] = estilo
+    t["marcas"][slug] = m
+    _save_tokens(t)
+    return {"estilo": estilo}
 
 
 def gerar_branding_book(slug, *, forcar=False):

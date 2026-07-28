@@ -310,32 +310,51 @@ tr:last-child td{{border-bottom:0}}
 .msec>summary::after{{content:'▸';color:var(--muted);font-size:11px}}
 .msec[open]>summary::after{{transform:rotate(90deg)}}
 .msec .msec-body{{padding:4px 14px 14px;border-top:1px solid var(--line)}}
-.mbtns{{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}}
+.mbtns{{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap;align-items:center}}
 .mbtns .del-left{{margin-right:auto}}
 .logoprev{{width:64px;height:64px;border-radius:14px;border:1px dashed var(--line);display:grid;place-items:center;overflow:hidden;background:var(--inset);font-size:11px;color:var(--muted)}}
 .logoprev img{{width:100%;height:100%;object-fit:contain;padding:4px;box-sizing:border-box;background:#fff}}
+/* wizard */
+.wiz-steps{{display:flex;gap:6px;margin:0 0 18px;flex-wrap:wrap}}
+.wiz-step{{flex:1;min-width:72px;text-align:center;padding:8px 6px;border-radius:12px;border:1px solid var(--line);background:var(--inset);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s}}
+.wiz-step.on{{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}}
+.wiz-step.done{{border-color:color-mix(in srgb,var(--good) 40%,var(--line));color:var(--good)}}
+.wiz-step .n{{display:block;font-size:14px;margin-bottom:2px}}
+.wiz-pane{{display:none}}
+.wiz-pane.on{{display:block}}
+.wiz-tip{{font-size:13px;color:var(--muted);line-height:1.45;margin:0 0 14px;padding:10px 12px;border-radius:12px;background:var(--inset);border:1px solid var(--line)}}
+.logo-vars{{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}}
+.logo-var{{border:2px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;background:var(--surface);transition:.15s}}
+.logo-var:hover{{border-color:var(--accent)}}
+.logo-var.on{{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}}
+.logo-var .lv-prev{{width:56px;height:56px;margin:0 auto 8px;border-radius:12px;background:#1a1a22;display:grid;place-items:center;overflow:hidden;color:#fff;font-weight:800;font-size:22px}}
+.logo-var .lv-prev img{{width:100%;height:100%;object-fit:contain;padding:6px;box-sizing:border-box}}
+.logo-var .lv-lb{{font-size:12px;font-weight:600;color:var(--text)}}
+.logo-var .lv-ds{{font-size:10px;color:var(--muted);margin-top:2px}}
+.bb-preview{{margin-top:10px;max-height:220px;overflow:auto;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--inset);font-size:12px;line-height:1.5;color:var(--text);white-space:pre-wrap;font-family:var(--font-mono,ui-monospace,monospace)}}
+.bb-assets{{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}}
+.bb-assets img{{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}}
 /* galeria de refs — estilo Claude Projects */
 .refdrop{{border:1.5px dashed var(--line);border-radius:16px;padding:18px 14px;text-align:center;background:var(--inset);cursor:pointer;transition:border-color .15s,background .15s}}
 .refdrop:hover,.refdrop.drag{{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--inset))}}
 .refdrop b{{display:block;font-size:14px;color:var(--text);margin-bottom:4px}}
 .refdrop span{{font-size:12px;color:var(--muted);line-height:1.4}}
-.refgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:12px}}
+.refgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:12px}}
 .refcard{{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;transition:border-color .15s,transform .15s}}
 .refcard:hover{{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));transform:translateY(-1px)}}
 .refcard .thumb{{aspect-ratio:4/3;background:#1a1a1e;display:grid;place-items:center;overflow:hidden}}
 .refcard .thumb img{{width:100%;height:100%;object-fit:cover;display:block}}
-.refcard .thumb .docico{{font-size:28px;opacity:.7}}
 .refcard .meta{{padding:8px 10px 10px}}
 .refcard .meta .t{{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 .refcard .meta .s{{font-size:10px;color:var(--muted);margin-top:2px}}
 .refcard .x{{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:14px;cursor:pointer;line-height:24px;padding:0;opacity:0;transition:opacity .12s}}
 .refcard:hover .x{{opacity:1}}
 .refcard.pending{{opacity:.75}}
-.refcard.pending .s{{color:var(--accent)}}
 .refcount{{font-size:12px;color:var(--muted);margin-top:8px}}
 .glyphrow{{display:flex;gap:8px;align-items:center}}
 .glyphrow select{{flex:1}}
 .glyphrow input{{width:72px;flex:0 0 72px;text-align:center}}
+.mbox{{width:min(680px,100%)}}
 </style></head><body class="sk">
 {topbar("config")}
 <div class=wrap>
@@ -391,132 +410,176 @@ tr:last-child td{{border-bottom:0}}
 <div class=modal id=mmodal>
   <div class=mbox>
     <h2 id=mtitle>Nova marca</h2>
-    <p class=msub id=msub>Preencha o essencial. O identificador interno (slug) é gerado sozinho a partir do nome.</p>
+    <p class=msub id=msub>Assistente em 4 passos: o site e as fotos preenchem o resto.</p>
+    <div class=wiz-steps id=wiz_steps>
+      <div class="wiz-step on" data-step=1><span class=n>1</span>Fontes</div>
+      <div class=wiz-step data-step=2><span class=n>2</span>Identidade</div>
+      <div class=wiz-step data-step=3><span class=n>3</span>Logo</div>
+      <div class=wiz-step data-step=4><span class=n>4</span>Revisão</div>
+    </div>
     <div class=fld id=fld_slug style="display:none"><label>Slug</label><input id=mf_slug readonly disabled></div>
-    <div class=fld><label>Nome da empresa</label><input id=mf_nome placeholder="Ex.: NetSul Fibra" autocomplete=organization></div>
 
-    <div class=fld><label>Referências visuais</label>
-      <div class=refdrop id=mf_refdrop tabindex=0 role=button aria-label="Adicionar referências">
-        <b>Arraste imagens ou clique para enviar</b>
-        <span>JPG, PNG, WebP · salva na hora · até 12 por vez</span>
-        <input type=file id=mf_refs accept="image/png,image/jpeg,image/webp,image/jpg" multiple style="display:none">
+    <!-- PASSO 1: fontes primeiro (puxam o resto) -->
+    <div class="wiz-pane on" id=wiz1>
+      <div class=wiz-tip>Comece pelo <b>site</b> e pelas <b>fotos</b> do cliente. O sistema sugere nome, cores e clima — você só revisa.</div>
+      <div class=fld><label>Site do cliente</label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input id=mf_site placeholder="https://cliente.com.br" style="flex:1;min-width:180px">
+          <button type=button class="sk-btn sk-btn--sm" id=mf_ler_site>Ler site</button>
+        </div>
+        <div id=mf_dna_msg style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4"></div>
+        <details class=msec id=mf_dna_box style="display:none;margin-top:10px">
+          <summary>Resumo da marca (do site)</summary>
+          <div class=msec-body>
+            <div id=mf_dna_resumo style="font-size:13px;line-height:1.5;color:var(--text);margin-bottom:10px"></div>
+            <div id=mf_dna_meta style="font-size:12px;color:var(--muted);line-height:1.45"></div>
+          </div>
+        </details>
       </div>
-      <div id=mf_refgrid class=refgrid></div>
-      <div class=refcount id=mf_refcount></div>
+      <div class=fld><label>Referências visuais (feed, site, impressos)</label>
+        <div class=refdrop id=mf_refdrop tabindex=0 role=button>
+          <b>Arraste imagens ou clique</b>
+          <span>JPG/PNG · após salvar a marca, envio é imediato</span>
+          <input type=file id=mf_refs accept="image/png,image/jpeg,image/webp,image/jpg" multiple style="display:none">
+        </div>
+        <div id=mf_refgrid class=refgrid></div>
+        <div class=refcount id=mf_refcount></div>
+      </div>
+      <div class=fld><label>Cores (sugeridas pelas fotos ou pelo site)</label>
+        <div class=row2>
+          <div class=fld style="margin:0"><label style="font-size:11px;font-weight:500">Principal</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id=mf_acento type=color value="#1CA5B2" style="height:42px;padding:4px;flex:1">
+              <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_pick_acc>🖌</button>
+            </div>
+          </div>
+          <div class=fld style="margin:0"><label style="font-size:11px;font-weight:500">Clara</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id=mf_acento_claro type=color value="#3DC4D0" style="height:42px;padding:4px;flex:1">
+              <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_pick_acc2>🖌</button>
+            </div>
+          </div>
+        </div>
+        <div id=mf_swatches style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center">
+          <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_extract_colors>Sugerir cores das fotos</button>
+          <span id=mf_colors_msg style="font-size:12px;color:var(--muted)"></span>
+        </div>
+      </div>
     </div>
 
-    <div class=fld><label>Cores</label>
+    <!-- PASSO 2: identidade (pré-preenchida) -->
+    <div class=wiz-pane id=wiz2>
+      <div class=wiz-tip>Revise o que o site sugeriu. Ajuste só o que estiver errado.</div>
+      <div class=fld><label>Nome da empresa</label><input id=mf_nome placeholder="Ex.: NetSul Fibra" autocomplete=organization></div>
       <div class=row2>
-        <div class=fld style="margin:0"><label style="font-size:11px;font-weight:500">Principal</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input id=mf_acento type=color value="#1CA5B2" style="height:42px;padding:4px;flex:1">
-            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_pick_acc title="Pincel — copiar cor da tela">🖌</button>
-          </div>
-        </div>
-        <div class=fld style="margin:0"><label style="font-size:11px;font-weight:500">Clara</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input id=mf_acento_claro type=color value="#3DC4D0" style="height:42px;padding:4px;flex:1">
-            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_pick_acc2 title="Pincel — copiar cor da tela">🖌</button>
-          </div>
-        </div>
+        <div class=fld><label>@ Instagram / handle</label><input id=mf_handle placeholder="@marca"></div>
+        <div class=fld><label>Nome no chip</label><input id=mf_wordmark placeholder="NetSul"></div>
       </div>
-      <div id=mf_swatches style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center">
-        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_extract_colors>Sugerir cores das fotos</button>
-        <span id=mf_colors_msg style="font-size:12px;color:var(--muted)"></span>
+      <div class=fld><label>Segmento</label>
+        <select id=mf_segmento>
+          <option value="">Selecione…</option>
+          <option value="contabilidade">Contabilidade / fiscal</option>
+          <option value="telecom">Telecom / ISP</option>
+          <option value="varejo">Varejo / e-commerce</option>
+          <option value="imobiliaria">Imobiliário</option>
+          <option value="saude">Saúde / clínicas</option>
+          <option value="servicos">Serviços B2B</option>
+          <option value="educacao">Educação</option>
+          <option value="industria">Indústria</option>
+          <option value="outro">Outro</option>
+        </select>
       </div>
-    </div>
-
-    <div class=row2>
-      <div class=fld><label>@ no Instagram / handle</label><input id=mf_handle placeholder="@marca"></div>
-      <div class=fld><label>Símbolo no chip</label>
+      <div class=fld><label>Clima visual (mood)</label>
+        <textarea id=mf_mood placeholder="Como a marca deve parecer nas artes…"></textarea>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_mood style="display:inline-flex;align-items:center">{ICON_IA_SM}Gerar mood</button>
+          <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_all style="display:inline-flex;align-items:center">{ICON_IA_SM}Sugerir handle</button>
+        </div>
+        <div id=mf_ia_dica style="font-size:11px;color:var(--muted);margin-top:6px"></div>
+      </div>
+      <div class=fld style="display:none"><label>Símbolo</label>
         <div class=glyphrow>
           <select id=mf_glyph_mode>
-            <option value="auto">Automático (1ª letra)</option>
+            <option value="auto">Automático</option>
             <option value="custom">Personalizado</option>
             <option value="none">Nenhum</option>
           </select>
-          <input id=mf_glyph placeholder="N" maxlength=2 title="1–2 letras">
+          <input id=mf_glyph placeholder="N" maxlength=2>
         </div>
       </div>
     </div>
-    <div class=fld><label>Nome no chip (wordmark)</label><input id=mf_wordmark placeholder="NetSul"></div>
 
-    <details class=msec>
-      <summary>Mais opções</summary>
-      <div class=msec-body>
-        <div class=fld><label>Segmento</label>
-          <select id=mf_segmento>
-            <option value="">Selecione…</option>
-            <option value="contabilidade">Contabilidade / fiscal</option>
-            <option value="telecom">Telecom / ISP</option>
-            <option value="varejo">Varejo / e-commerce</option>
-            <option value="imobiliaria">Imobiliário</option>
-            <option value="saude">Saúde / clínicas</option>
-            <option value="servicos">Serviços B2B</option>
-            <option value="educacao">Educação</option>
-            <option value="industria">Indústria</option>
-            <option value="outro">Outro</option>
-          </select>
-        </div>
-        <div class=fld><label>Clima visual (mood)</label>
-          <textarea id=mf_mood placeholder="Como a marca deve parecer nas artes…"></textarea>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_mood style="display:inline-flex;align-items:center">{ICON_IA_SM}Gerar mood</button>
-            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_all style="display:inline-flex;align-items:center">{ICON_IA_SM}Sugerir handle + símbolo</button>
-          </div>
-          <div id=mf_ia_dica style="font-size:11px;color:var(--muted);margin-top:6px"></div>
-        </div>
-        <div class=fld><label>Logo (PNG transparente ou SVG — não use foto de post)</label>
-          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-            <div class=logoprev id=mf_logoprev>sem logo</div>
-            <input type=file id=mf_logo accept="image/png,image/svg+xml,image/webp,image/jpeg" style="font-size:12px;color:var(--muted)">
-            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_logo_rm title="Remover logo">Remover</button>
-          </div>
-        </div>
-        <div class=fld><label>Branding book</label>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_bb_gen>Gerar book</button>
-            <label class="sk-btn sk-btn--secondary sk-btn--sm" style="cursor:pointer;margin:0">
-              + Anexar páginas
-              <input type=file id=mf_bb_files accept="image/*,.pdf" multiple style="display:none">
-            </label>
-            <span id=mf_bb_status style="font-size:11px;color:var(--muted)"></span>
-          </div>
-        </div>
-        <div class=fld><label>Site (opcional)</label>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input id=mf_site placeholder="https://cliente.com.br" style="flex:1;min-width:180px">
-            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ler_site title="Lê o site e sugere nome, mood e segmento — você revisa e salva">Ler site</button>
-          </div>
-          <div id=mf_dna_msg style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4"></div>
-          <details class=msec id=mf_dna_box style="display:none;margin-top:10px">
-            <summary>Resumo da marca (do site)</summary>
-            <div class=msec-body>
-              <div id=mf_dna_resumo style="font-size:13px;line-height:1.5;color:var(--text);margin-bottom:10px"></div>
-              <div id=mf_dna_meta style="font-size:12px;color:var(--muted);line-height:1.45"></div>
-            </div>
-          </details>
-        </div>
-        <div class=fld><label>Template padrão da arte (novos posts desta marca)</label>
-          <div id=mf_moldura style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:4px">
-            <label class=chk><input type=checkbox id=mf_m_chip checked> Selo (chip)</label>
-            <label class=chk><input type=checkbox id=mf_m_tab checked> Aba lateral</label>
-            <label class=chk><input type=checkbox id=mf_m_logo checked> Logo no selo/aba</label>
-            <label class=chk><input type=checkbox id=mf_m_footer checked> Rodapé</label>
-            <label class=chk><input type=checkbox id=mf_m_page checked> Paginação</label>
-            <label class=chk><input type=checkbox id=mf_m_grade checked> Acabamento</label>
-          </div>
-          <div style="font-size:11px;color:var(--muted);margin-top:6px">Cada post ainda pode mudar isso no editor.</div>
+    <!-- PASSO 3: logo + 3 estilos -->
+    <div class=wiz-pane id=wiz3>
+      <div class=wiz-tip>A logo é a <b>assinatura</b> na tab e no chip. Envie o arquivo e escolha como aplicar (ícone mono, colorido ou letra).</div>
+      <div class=fld><label>Arquivo da logo (PNG transparente preferível)</label>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <div class=logoprev id=mf_logoprev>sem logo</div>
+          <input type=file id=mf_logo accept="image/png,image/svg+xml,image/webp,image/jpeg" style="font-size:12px;color:var(--muted)">
+          <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_logo_rm>Remover</button>
         </div>
       </div>
-    </details>
+      <div class=fld><label>Como aplicar na arte</label>
+        <div class=logo-vars id=mf_logo_vars>
+          <div class="logo-var on" data-estilo=mono>
+            <div class=lv-prev id=lv_mono>—</div>
+            <div class=lv-lb>Mono</div>
+            <div class=lv-ds>Ícone na cor do acento</div>
+          </div>
+          <div class=logo-var data-estilo=color>
+            <div class=lv-prev id=lv_color>—</div>
+            <div class=lv-lb>Colorido</div>
+            <div class=lv-ds>Cores originais</div>
+          </div>
+          <div class=logo-var data-estilo=glyph>
+            <div class=lv-prev id=lv_glyph>A</div>
+            <div class=lv-lb>Letra</div>
+            <div class=lv-ds>Monograma limpo</div>
+          </div>
+        </div>
+        <input type=hidden id=mf_logo_estilo value=mono>
+        <div id=mf_logo_msg style="font-size:12px;color:var(--muted);margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- PASSO 4: moldura + book + salvar -->
+    <div class=wiz-pane id=wiz4>
+      <div class=wiz-tip>Defina o que entra na arte por padrão e gere o branding book (resumo da marca no vault).</div>
+      <div class=fld><label>Template padrão da arte</label>
+        <div id=mf_moldura style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:4px">
+          <label class=chk><input type=checkbox id=mf_m_chip checked> Selo (chip)</label>
+          <label class=chk><input type=checkbox id=mf_m_tab checked> Aba lateral</label>
+          <label class=chk><input type=checkbox id=mf_m_logo checked> Logo no selo/aba</label>
+          <label class=chk><input type=checkbox id=mf_m_footer checked> Rodapé</label>
+          <label class=chk><input type=checkbox id=mf_m_page checked> Paginação</label>
+          <label class=chk><input type=checkbox id=mf_m_grade checked> Acabamento</label>
+        </div>
+      </div>
+      <div class=fld><label>Branding book</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_bb_gen>Gerar book</button>
+          <label class="sk-btn sk-btn--secondary sk-btn--sm" style="cursor:pointer;margin:0">
+            + Anexar páginas
+            <input type=file id=mf_bb_files accept="image/*,.pdf" multiple style="display:none">
+          </label>
+          <span id=mf_bb_status style="font-size:12px;color:var(--muted)"></span>
+        </div>
+        <div id=mf_bb_preview class=bb-preview style="display:none"></div>
+        <div id=mf_bb_assets class=bb-assets></div>
+      </div>
+      <div class=fld><label>Conferência rápida</label>
+        <div id=mf_review style="font-size:13px;line-height:1.55;color:var(--muted);padding:10px 12px;border-radius:12px;background:var(--inset);border:1px solid var(--line)"></div>
+      </div>
+    </div>
 
     <div id=mf_msg style="font-size:13px;min-height:18px;margin:4px 0"></div>
     <div class=mbtns>
-      <button type=button class="sk-btn sk-btn--secondary sk-btn--sm del-left" id=mf_del style="display:none">Excluir marca</button>
+      <button type=button class="sk-btn sk-btn--secondary sk-btn--sm del-left" id=mf_del style="display:none">Excluir</button>
       <button class="sk-btn sk-btn--secondary" id=mf_cancel>Cancelar</button>
-      <button class="sk-btn" id=mf_save>Salvar</button>
+      <button type=button class="sk-btn sk-btn--secondary" id=mf_prev style="display:none">← Voltar</button>
+      <button type=button class="sk-btn" id=mf_next>Continuar →</button>
+      <button class="sk-btn" id=mf_save style="display:none">Salvar marca</button>
     </div>
   </div>
 </div>
@@ -548,6 +611,52 @@ document.getElementById('cf_save').onclick=async()=>{{
 }};
 
 let MARCAS=[], EDIT=null, LOGO_DATA=null, REFS_DATA=[], REFS_SAVED=[];
+let WIZ_STEP=1, LOGO_ESTILO='mono';
+function goWiz(n){{
+  WIZ_STEP=Math.max(1,Math.min(4,n|0));
+  document.querySelectorAll('.wiz-pane').forEach((p,i)=>p.classList.toggle('on',i+1===WIZ_STEP));
+  document.querySelectorAll('.wiz-step').forEach(s=>{{
+    const sn=+s.dataset.step;
+    s.classList.toggle('on',sn===WIZ_STEP);
+    s.classList.toggle('done',sn<WIZ_STEP);
+  }});
+  const prev=document.getElementById('mf_prev');
+  const next=document.getElementById('mf_next');
+  const save=document.getElementById('mf_save');
+  if(prev)prev.style.display=WIZ_STEP>1?'':'none';
+  if(next)next.style.display=WIZ_STEP<4?'':'none';
+  if(save)save.style.display=WIZ_STEP===4?'':'none';
+  if(WIZ_STEP===3) refreshLogoVars();
+  if(WIZ_STEP===4){{updateReview();if(EDIT)refreshBbStatus(EDIT)}}
+}}
+function updateReview(){{
+  const el=document.getElementById('mf_review'); if(!el)return;
+  const nome=document.getElementById('mf_nome').value.trim()||'—';
+  const handle=document.getElementById('mf_handle').value.trim()||'—';
+  const seg=document.getElementById('mf_segmento').value||'—';
+  const site=document.getElementById('mf_site').value.trim()||'—';
+  const acc=document.getElementById('mf_acento').value;
+  const nref=(REFS_SAVED||[]).length+(REFS_DATA||[]).length;
+  const estilo=document.getElementById('mf_logo_estilo').value||'mono';
+  el.innerHTML=
+    '<div><b style="color:var(--text)">'+esc(nome)+'</b> · '+esc(handle)+'</div>'
+    +'<div>Segmento: '+esc(seg)+' · Site: '+esc(site)+'</div>'
+    +'<div>Cor: <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:'+esc(acc)+';vertical-align:middle"></span> '
+    +esc(acc)+' · Logo: '+esc(estilo)+' · Refs: '+nref+'</div>';
+}}
+document.getElementById('mf_prev').onclick=()=>goWiz(WIZ_STEP-1);
+document.getElementById('mf_next').onclick=()=>{{
+  if(WIZ_STEP===1){{
+    // se tem site e ainda não leu, avisa mas deixa seguir
+  }}
+  if(WIZ_STEP===2){{
+    const nome=document.getElementById('mf_nome').value.trim();
+    if(!nome){{document.getElementById('mf_msg').className='err';document.getElementById('mf_msg').textContent='Informe o nome da empresa';return}}
+  }}
+  goWiz(WIZ_STEP+1);
+}};
+document.querySelectorAll('.wiz-step').forEach(s=>s.onclick=()=>goWiz(+s.dataset.step));
+
 function glyphFromForm(){{
   const mode=(document.getElementById('mf_glyph_mode')||{{}}).value||'auto';
   if(mode==='none') return '';
@@ -834,27 +943,49 @@ async function uploadRefFiles(fileList){{
   }};
 }})();
 
-async function refreshBbStatus(slug){{
+function showBbPreview(r){{
+  const prev=document.getElementById('mf_bb_preview');
+  const assets=document.getElementById('mf_bb_assets');
   const el=document.getElementById('mf_bb_status');
-  if(!el||!slug){{if(el)el.textContent='';return}}
+  if(el){{
+    if(r&&r.existe) el.textContent='Book pronto ✓'+(r.assets_n?(' · '+r.assets_n+' anexo(s)'):'');
+    else el.textContent='ainda sem book';
+  }}
+  if(prev){{
+    if(r&&r.preview_md){{
+      // tira frontmatter pra leitura
+      let md=r.preview_md;
+      if(md.startsWith('---')){{const p=md.split('---'); if(p.length>=3) md=p.slice(2).join('---').trim()}}
+      prev.style.display='block';
+      prev.textContent=md.slice(0,2500)+(md.length>2500?'\\n…':'');
+    }}else{{prev.style.display='none';prev.textContent=''}}
+  }}
+  if(assets){{
+    const list=(r&&r.assets)||[];
+    assets.innerHTML=list.filter(a=>/\\.(png|jpe?g|webp)$/i.test(a.nome||'')).slice(0,12)
+      .map(a=>`<img src="${{esc(a.url)}}?t=${{Date.now()}}" alt="${{esc(a.nome)}}" title="${{esc(a.nome)}}">`).join('');
+  }}
+}}
+async function refreshBbStatus(slug){{
+  if(!slug){{showBbPreview(null);return}}
   try{{
     const r=await(await fetch('/marca-branding-book?slug='+encodeURIComponent(slug))).json();
-    if(!r.ok){{el.textContent='';return}}
-    if(r.existe) el.textContent='Book ✓'+(r.assets_n?(' · '+r.assets_n+' anexo(s)'):'');
-    else el.textContent='sem book ainda';
-  }}catch(e){{el.textContent=''}}
+    if(!r.ok){{showBbPreview(null);return}}
+    showBbPreview(r);
+  }}catch(e){{showBbPreview(null)}}
 }}
 document.getElementById('mf_bb_gen').onclick=async()=>{{
   const msg=document.getElementById('mf_msg');
-  if(!EDIT){{msg.className='err';msg.textContent='Salve a marca antes de gerar o book';return}}
+  if(!EDIT){{msg.className='err';msg.textContent='Salve a marca (passo final) antes de gerar o book — ou salve agora e volte.';return}}
+  msg.className='';msg.textContent='Gerando branding book…';
   const r=await api('/marca-branding-book',{{slug:EDIT,forcar:true}});
   if(!r.ok){{msg.className='err';msg.textContent=r.erro||'falhou';return}}
-  msg.className='ok';msg.textContent=r.msg||'Book gerado';
-  refreshBbStatus(EDIT);
+  msg.className='ok';msg.textContent='Book gerado — veja o preview abaixo';
+  showBbPreview(r);
 }};
 document.getElementById('mf_bb_files').onchange=async e=>{{
   const msg=document.getElementById('mf_msg');
-  if(!EDIT){{msg.className='err';msg.textContent='Salve a marca antes de anexar o book';e.target.value='';return}}
+  if(!EDIT){{msg.className='err';msg.textContent='Salve a marca antes de anexar páginas';e.target.value='';return}}
   const files=[...(e.target.files||[])].slice(0,12);
   if(!files.length)return;
   msg.className='';msg.textContent='Enviando '+files.length+' arquivo(s)…';
@@ -868,10 +999,61 @@ document.getElementById('mf_bb_files').onchange=async e=>{{
   refreshBbStatus(EDIT);
 }};
 
+async function refreshLogoVars(){{
+  const mono=document.getElementById('lv_mono');
+  const col=document.getElementById('lv_color');
+  const gly=document.getElementById('lv_glyph');
+  const msg=document.getElementById('mf_logo_msg');
+  const acc=document.getElementById('mf_acento').value||'#FFFFFF';
+  const letter=(document.getElementById('mf_nome').value||'M').trim().charAt(0).toUpperCase()||'M';
+  if(gly){{gly.textContent=letter;gly.style.background=acc}}
+  // se tem dataurl local
+  if(LOGO_DATA){{
+    if(msg)msg.textContent='Prévia local — ao salvar, as 3 aplicações ficam disponíveis na arte.';
+    if(mono)mono.innerHTML=`<img src="${{LOGO_DATA}}" style="filter:grayscale(1) brightness(10);mix-blend-mode:screen;padding:8px;box-sizing:border-box;width:100%;height:100%;object-fit:contain">`;
+    if(col)col.innerHTML=`<img src="${{LOGO_DATA}}">`;
+    return;
+  }}
+  if(!EDIT){{
+    if(msg)msg.textContent='Envie a logo ou salve a marca para gerar prévias nítidas.';
+    if(mono)mono.textContent=letter;
+    if(col)col.textContent=letter;
+    return;
+  }}
+  if(msg)msg.textContent='Gerando variações…';
+  const r=await api('/marca-logo-icones',{{slug:EDIT,acento:acc}});
+  if(!r.ok){{if(msg)msg.textContent=r.erro||'sem logo';return}}
+  if(mono){{
+    if(r.mono) mono.innerHTML=`<img src="data:image/png;base64,${{r.mono}}">`;
+    else mono.textContent=letter;
+  }}
+  if(col){{
+    if(r.color) col.innerHTML=`<img src="data:image/png;base64,${{r.color}}">`;
+    else col.textContent=letter;
+  }}
+  if(gly){{gly.textContent=r.glyph||letter;gly.style.background=acc}}
+  if(msg)msg.textContent='Escolha um estilo — mono costuma funcionar melhor na tab.';
+  // marca estilo atual
+  const cur=r.estilo||document.getElementById('mf_logo_estilo').value||'mono';
+  document.getElementById('mf_logo_estilo').value=cur;
+  document.querySelectorAll('.logo-var').forEach(v=>v.classList.toggle('on',v.dataset.estilo===cur));
+}}
+document.querySelectorAll('.logo-var').forEach(v=>v.onclick=async()=>{{
+  const est=v.dataset.estilo;
+  document.getElementById('mf_logo_estilo').value=est;
+  document.querySelectorAll('.logo-var').forEach(x=>x.classList.toggle('on',x===v));
+  LOGO_ESTILO=est;
+  if(EDIT){{
+    const r=await api('/marca-logo-estilo',{{slug:EDIT,estilo:est}});
+    if(!r.ok) document.getElementById('mf_logo_msg').textContent=r.erro||'';
+    else document.getElementById('mf_logo_msg').textContent='Estilo “'+est+'” salvo para a arte.';
+  }}
+}});
+
 function openNew(){{
-  EDIT=null; LOGO_DATA=null; LOGO_RM=false; clearRefsPrev();
+  EDIT=null; LOGO_DATA=null; LOGO_RM=false; LOGO_ESTILO='mono'; clearRefsPrev();
   document.getElementById('mtitle').textContent='Nova marca';
-  document.getElementById('msub').textContent='Preencha o essencial. O identificador interno é gerado sozinho a partir do nome.';
+  document.getElementById('msub').textContent='Assistente em 4 passos — site e fotos primeiro.';
   document.getElementById('fld_slug').style.display='none';
   document.getElementById('mf_slug').value='';
   document.getElementById('mf_nome').value='';
@@ -886,20 +1068,25 @@ function openNew(){{
   document.getElementById('mf_site').value='';
   document.getElementById('mf_logoprev').innerHTML='sem logo';
   document.getElementById('mf_logo').value='';
+  document.getElementById('mf_logo_estilo').value='mono';
   document.getElementById('mf_msg').textContent='';
   document.getElementById('mf_ia_dica').textContent='';
   document.getElementById('mf_bb_status').textContent='';
+  document.getElementById('mf_dna_msg').textContent='';
+  document.getElementById('mf_dna_box').style.display='none';
+  showBbPreview(null);
   document.getElementById('mf_del').style.display='none';
   setMolduraUI({{chip:true,tab:true,logo:true,footer:true,page:true,grade:true}});
   renderRefGrid();
+  goWiz(1);
   document.getElementById('mmodal').classList.add('on');
-  setTimeout(()=>document.getElementById('mf_nome').focus(),80);
+  setTimeout(()=>document.getElementById('mf_site').focus(),80);
 }}
 function openEdit(slug){{
   const m=MARCAS.find(x=>x.slug===slug); if(!m)return;
   EDIT=slug; LOGO_DATA=null; LOGO_RM=false; clearRefsPrev();
   document.getElementById('mtitle').textContent='Editar · '+m.nome;
-  document.getElementById('msub').textContent='Ajuste cores, logo e referências. O código interno da marca não muda.';
+  document.getElementById('msub').textContent='Mesmo assistente — altere o que precisar e salve no passo 4.';
   document.getElementById('fld_slug').style.display='none';
   document.getElementById('mf_slug').value=m.slug;
   document.getElementById('mf_nome').value=m.nome||'';
@@ -915,12 +1102,15 @@ function openEdit(slug){{
   document.getElementById('mf_site').value=m.site||'';
   document.getElementById('mf_logoprev').innerHTML=m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}">`:'sem logo';
   document.getElementById('mf_logo').value='';
+  document.getElementById('mf_logo_estilo').value=(m.logo_estilo||'mono');
+  LOGO_ESTILO=m.logo_estilo||'mono';
   document.getElementById('mf_msg').textContent='';
   document.getElementById('mf_ia_dica').textContent='';
   setMolduraUI(m.moldura||{{}});
   const del=document.getElementById('mf_del');
   if(m.canonica){{del.style.display='none'}}
   else{{del.style.display='inline-flex';del.onclick=()=>excluirMarca(slug)}}
+  goWiz(1);
   document.getElementById('mmodal').classList.add('on');
   loadSavedRefs(slug);
   refreshBbStatus(slug);
