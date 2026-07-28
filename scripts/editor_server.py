@@ -259,38 +259,79 @@ tr:last-child td{{border-bottom:0}}
 .kv{{display:flex;flex-wrap:wrap;gap:10px;align-items:center}}.kv .cell{{background:var(--inset);border:1px solid var(--line);border-radius:var(--radius-md);padding:8px 12px;font-size:13px}}.kv b{{color:var(--accent-2)}}
 .ok{{color:var(--good);font-weight:600}}.err{{color:#e07070;font-weight:600}}
 .sk-input.mini,.sk-select.mini{{padding:7px 10px;font-size:13px;width:auto}}
-.mgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}}
-.mcard{{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}}
-.mcard:hover{{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));transform:translateY(-1px)}}
-.mcard .mhero{{height:56px;position:relative;flex:0 0 auto}}
-.mcard .top{{display:flex;gap:12px;align-items:center;padding:0 16px;margin-top:-22px;position:relative;z-index:1;min-width:0}}
-.mlogo{{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:18px;color:#fff;flex:0 0 48px;overflow:hidden;background:var(--accent);border:3px solid var(--surface);box-shadow:0 4px 14px rgba(0,0,0,.2)}}
-.mlogo img{{width:100%;height:100%;object-fit:contain;padding:5px;background:#fff;box-sizing:border-box}}
-.mcard .mtit{{min-width:0;flex:1;padding-top:18px;display:flex;flex-direction:column;justify-content:center;gap:1px}}
-.mcard h3{{font-size:15px;margin:0;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;color:var(--text);font-weight:700}}
-.mcard .slug{{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}}
-.mbody{{padding:12px 16px 14px;display:flex;flex-direction:column;gap:10px;flex:1;min-width:0}}
-.mswatches{{display:flex;gap:6px;align-items:center}}
-.msw{{width:22px;height:22px;border-radius:7px;border:1px solid var(--line);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}}
-.macts{{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:4px}}
-.macts .sk-btn{{flex:1;justify-content:center;text-align:center;min-width:0}}
-.macts .sk-btn--icon-del{{flex:0 0 auto;width:38px;padding:0;color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,var(--line))}}
-.macts .sk-btn--icon-del:hover{{background:var(--bad-soft)}}
-.pill{{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10px;border:1px solid var(--line);color:var(--muted);font-weight:600}}
-.pill.ok{{border-color:color-mix(in srgb,var(--good) 50%,transparent);color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}}
-.pill.warn{{border-color:#c90;color:#c90}}
-.mpills{{display:flex;flex-wrap:wrap;gap:6px}}
-.chrow{{display:flex;flex-direction:column;gap:6px;margin-top:2px}}
-.chitem{{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--inset);font-size:12px}}
-.chitem .chico{{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;flex:0 0 22px;background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);color:#fff;font-size:11px;font-weight:800}}
-.chitem .chico.li{{background:#0a66c2}}
-.chitem .chmeta{{flex:1;min-width:0;line-height:1.25}}
-.chitem .chmeta b{{display:block;color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-.chitem .chmeta span{{color:var(--muted);font-size:11px}}
-.chitem .chbtn{{flex:0 0 auto;padding:5px 10px;font-size:11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-weight:600}}
-.chitem .chbtn.go{{background:var(--accent);border-color:var(--accent);color:#fff}}
-.chitem .chbtn.danger{{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,var(--line))}}
-.chbanner{{font-size:12px;color:var(--muted);padding:8px 12px;border-radius:10px;background:var(--inset);border:1px dashed var(--line);margin-bottom:12px;line-height:1.45}}
+/* ── Galeria de marcas — visual clean ───────────────────────────────── */
+.mgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}}
+.mcard{{
+  background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;
+  display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+  transition:border-color .18s,transform .18s,box-shadow .18s;position:relative;
+}}
+.mcard:hover{{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));transform:translateY(-2px);
+  box-shadow:0 4px 8px rgba(0,0,0,.06),0 16px 36px rgba(0,0,0,.1)}}
+.mcard .mhero{{height:92px;position:relative;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:center}}
+.mcard .mhero::after{{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.12) 100%);pointer-events:none}}
+.mlogo{{
+  width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff;
+  overflow:hidden;background:#fff;border:3px solid var(--surface);box-shadow:0 6px 18px rgba(0,0,0,.18);
+  position:relative;z-index:2;margin-bottom:-32px;flex:0 0 64px;
+}}
+.mlogo img{{width:100%;height:100%;object-fit:contain;padding:7px;background:#fff;box-sizing:border-box}}
+.mlogo .glyph{{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}}
+/* canais: ícones oficiais discretos + bolinha de status */
+.msocial{{
+  position:absolute;top:10px;right:10px;z-index:3;display:flex;gap:6px;
+  padding:5px 7px;border-radius:999px;background:rgba(0,0,0,.28);backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);
+}}
+.soc{{
+  position:relative;width:28px;height:28px;border-radius:9px;border:0;padding:0;cursor:pointer;
+  display:grid;place-items:center;background:rgba(255,255,255,.12);transition:transform .12s,background .12s;
+}}
+.soc:hover{{transform:scale(1.08);background:rgba(255,255,255,.22)}}
+.soc:disabled{{cursor:default;opacity:.85}}
+.soc:disabled:hover{{transform:none;background:rgba(255,255,255,.12)}}
+.soc svg{{width:16px;height:16px;display:block}}
+.soc .dot{{
+  position:absolute;right:-2px;bottom:-2px;width:9px;height:9px;border-radius:50%;
+  border:2px solid rgba(20,16,30,.85);box-sizing:border-box;
+}}
+.soc .dot.on{{background:#34c759}}
+.soc .dot.off{{background:#8e8e93}}
+.soc .dot.wait{{background:#ffcc00}}
+/* corpo: nome SEMPRE em superfície clara legível — nunca sobre o degradê */
+.mbody{{
+  padding:40px 16px 14px;display:flex;flex-direction:column;gap:10px;flex:1;min-width:0;
+  background:var(--surface);text-align:center;
+}}
+.mcard h3{{
+  font-size:15.5px;margin:0;letter-spacing:-.02em;line-height:1.25;font-weight:700;
+  color:var(--text) !important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;word-break:break-word;
+}}
+.mcard .slug{{
+  color:var(--muted);font-size:12.5px;line-height:1.3;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}}
+.mmeta{{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;min-height:18px}}
+.mswatches{{display:flex;gap:5px;align-items:center;justify-content:center}}
+.msw{{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}}
+.mtag{{font-size:10px;font-weight:600;letter-spacing:.02em;color:var(--muted);padding:2px 8px;border-radius:999px;background:var(--inset);border:1px solid var(--line)}}
+.macts{{display:flex;gap:8px;align-items:center;margin-top:auto;padding-top:6px}}
+.macts .sk-btn{{flex:1;justify-content:center;text-align:center;min-width:0;border-radius:12px}}
+.macts .sk-btn--primary{{background:var(--accent);color:#fff;border-color:var(--accent)}}
+.macts .iconbtn{{
+  flex:0 0 38px;width:38px;height:38px;border-radius:12px;border:1px solid var(--line);
+  background:var(--inset);color:var(--muted);cursor:pointer;display:grid;place-items:center;padding:0;
+  transition:border-color .12s,color .12s,background .12s;
+}}
+.macts .iconbtn:hover{{border-color:var(--accent);color:var(--text);background:var(--surface)}}
+.macts .iconbtn.del:hover{{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}}
+.macts .iconbtn svg{{width:16px;height:16px}}
+.chbanner{{
+  font-size:12px;color:var(--muted);padding:10px 14px;border-radius:12px;
+  background:var(--inset);border:1px solid var(--line);margin-bottom:14px;line-height:1.45;
+}}
+.chbanner code{{font-size:11px;background:var(--surface);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}}
 /* log de posts — sanfona + tabela */
 .plog-acc{{border:1px solid var(--line);border-radius:14px;background:var(--inset);overflow:hidden}}
 .plog-acc>summary{{cursor:pointer;padding:14px 16px;font-weight:600;font-size:14px;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;user-select:none}}
@@ -731,32 +772,32 @@ document.getElementById('mf_nome').addEventListener('input',()=>{{
   if(document.getElementById('mf_glyph_mode').value==='auto') syncGlyphMode();
 }});
 
-function canalIgHtml(m){{
+/* Ícones oficiais do sistema (IG / LI) */
+function svgIg(id){{
+  return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="${{id}}" x1="0" y1="24" x2="24" y2="0"><stop stop-color="#f58529"/><stop offset=".5" stop-color="#dd2a7b"/><stop offset="1" stop-color="#515bd4"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="5.5" fill="url(#${{id}})"/><circle cx="12" cy="12" r="4.2" stroke="#fff" stroke-width="1.7"/><circle cx="17.4" cy="6.6" r="1.25" fill="#fff"/></svg>`;
+}}
+const SVG_LI=`<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4H4.7V19h2.4V9.4zM5.9 5A1.4 1.4 0 105.9 7.8 1.4 1.4 0 005.9 5zM19.3 13.2c0-2.5-1.3-3.7-3.1-3.7a2.7 2.7 0 00-2.4 1.3h-.05V9.4h-2.3c.03.7 0 9.6 0 9.6h2.3v-5.4c0-.3 0-.5.1-.7.2-.5.7-1 1.5-1 1.1 0 1.5.8 1.5 2v5.1h2.4v-5.8z"/></svg>`;
+const SVG_EDIT=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>`;
+const SVG_TRASH=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>`;
+
+function socialBar(m){{
   const ig=(m.canais&&m.canais.instagram)||{{}};
   const li=(m.canais&&m.canais.linkedin)||{{}};
   const igOk=!!ig.conectado;
-  const igLabel=igOk?('@'+(ig.username||'conectado')):'Não conectado';
+  const igSvg=svgIg('ig_'+String(m.slug||'x').replace(/[^a-z0-9]/gi,''));
+  const igTitle=igOk
+    ?('Instagram @'+(ig.username||'')+(ig.modo==='fake'?' (simulado)':'')+' — clique p/ desconectar')
+    :'Conectar Instagram';
+  const liTitle=li.conectado?('LinkedIn @'+(li.username||'')):'LinkedIn em breve';
   const igBtn=igOk
-    ?`<button type=button class="chbtn danger" data-ig-off="${{esc(m.slug)}}">Desconectar</button>`
-    :`<button type=button class="chbtn go" data-ig-on="${{esc(m.slug)}}">Conectar</button>`;
-  const liLabel=li.conectado?('@'+(li.username||'ok')):'Em breve';
-  return `<div class=chrow>
-    <div class=chitem>
-      <div class=chico>IG</div>
-      <div class=chmeta><b>Instagram</b><span>${{esc(igLabel)}}${{ig.modo==='fake'?' · simulado':(igOk?' · ativo':'')}}</span></div>
-      ${{igBtn}}
-    </div>
-    <div class=chitem title="LinkedIn na próxima etapa">
-      <div class="chico li">in</div>
-      <div class=chmeta><b>LinkedIn</b><span>${{esc(liLabel)}}</span></div>
-      <button type=button class=chbtn disabled style="opacity:.5;cursor:not-allowed">Em breve</button>
-    </div>
-  </div>`;
+    ?`<button type=button class=soc data-ig-off="${{esc(m.slug)}}" title="${{esc(igTitle)}}">${{igSvg}}<i class="dot on"></i></button>`
+    :`<button type=button class=soc data-ig-on="${{esc(m.slug)}}" title="${{esc(igTitle)}}">${{igSvg}}<i class="dot off"></i></button>`;
+  const liBtn=`<button type=button class=soc disabled title="${{esc(liTitle)}}">${{SVG_LI}}<i class="dot ${{li.conectado?'on':'wait'}}"></i></button>`;
+  return `<div class=msocial>${{igBtn}}${{liBtn}}</div>`;
 }}
 async function conectarIg(slug){{
   const r=await api('/canais/conectar',{{marca:slug,canal:'instagram',return_to:'/config?editar='+encodeURIComponent(slug)}});
   if(!r.ok){{alert(r.erro||'não foi possível iniciar a conexão');return}}
-  // abre a autenticação (fake ou Instagram real)
   location.href=r.url;
 }}
 async function desconectarIg(slug){{
@@ -774,43 +815,43 @@ async function loadMarcas(){{
   if(ban){{
     const modo=r.canais_modo||'fake';
     ban.innerHTML=modo==='real'
-      ?'App Meta <b>real</b> ativo — ao clicar em Conectar abre o login oficial do Instagram.'
-      :'Modo <b>simulado</b> (app fake). Amanhã coloque <code>INSTAGRAM_APP_ID</code> e <code>INSTAGRAM_APP_SECRET</code> no <code>.env</code> e vira OAuth real. Cada cliente conecta o próprio @.';
+      ?'App Meta <b>real</b> · toque no ícone do Instagram no card para conectar a conta do cliente.'
+      :'Toque no <b>ícone do Instagram</b> no card para conectar · modo simulado até configurar o App Meta no <code>.env</code>.';
   }}
   const g=document.getElementById('mgrid');
   if(!MARCAS.length){{g.innerHTML='<div style="color:var(--muted)">Nenhuma marca.</div>';return}}
-  g.innerHTML=MARCAS.map(m=>`
-    <div class=mcard>
-      <div class=mhero style="background:${{esc(m.gradiente||m.acento||'#333')}}"></div>
-      <div class=top>
-        <div class=mlogo style="background:${{esc(m.gradiente||m.acento)}}">${{
-          m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" alt="">`:esc(m.glyph||'?')
-        }}</div>
-        <div class=mtit>
+  g.innerHTML=MARCAS.map(m=>{{
+    const hero=esc(m.gradiente||m.acento||'#5b3fd4');
+    const logo=m.logo_url
+      ?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" alt="">`
+      :`<span class=glyph style="background:${{hero}};width:100%;height:100%;display:grid;place-items:center;border-radius:15px">${{esc((m.glyph||m.nome||'?')[0]||'?')}}</span>`;
+    const tag=m.canonica?'Grupo':'Cliente';
+    return `<article class=mcard data-slug="${{esc(m.slug)}}">
+      <div class=mhero style="background:${{hero}}">
+        ${{socialBar(m)}}
+        <div class=mlogo title="${{esc(m.nome)}}">${{logo}}</div>
+      </div>
+      <div class=mbody>
+        <div>
           <h3 title="${{esc(m.nome)}}">${{esc(m.nome)}}</h3>
           <div class=slug title="${{esc(m.handle||('@'+m.slug))}}">${{esc(m.handle||('@'+m.slug))}}</div>
         </div>
-      </div>
-      <div class=mbody>
-        <div class=mswatches title="Cores da marca">
-          <span class=msw style="background:${{esc(m.acento)}}"></span>
-          <span class=msw style="background:${{esc(m.acento_claro||m.acento)}}"></span>
-          ${{m.base_escura?`<span class=msw style="background:${{esc(m.base_escura)}}"></span>`:''}}
+        <div class=mmeta>
+          <div class=mswatches title="Paleta">
+            <span class=msw style="background:${{esc(m.acento)}}"></span>
+            <span class=msw style="background:${{esc(m.acento_claro||m.acento)}}"></span>
+            ${{m.base_escura?`<span class=msw style="background:${{esc(m.base_escura)}}"></span>`:''}}
+          </div>
+          <span class=mtag>${{tag}}</span>
         </div>
-        <div class=mpills>
-          <span class="pill ${{m.pronta?'ok':'warn'}}">${{m.pronta?'Pronta p/ criar':'Em setup'}}</span>
-          ${{m.canonica?'<span class=pill>Grupo smark</span>':'<span class=pill>Cliente</span>'}}
-          ${{(m.canais&&m.canais.instagram&&m.canais.instagram.conectado)?'<span class="pill ok">IG ✓</span>':'<span class="pill warn">IG off</span>'}}
-          ${{m.branding_book?'<span class=pill>Book</span>':''}}
-        </div>
-        ${{canalIgHtml(m)}}
         <div class=macts>
-          <button class="sk-btn sk-btn--secondary sk-btn--sm" data-edit="${{esc(m.slug)}}">Editar</button>
-          <a class="sk-btn sk-btn--sm" href="/editor?novo=1&marca=${{encodeURIComponent(m.slug)}}">Novo post</a>
-          ${{m.canonica?'':`<button type=button class="sk-btn sk-btn--secondary sk-btn--sm sk-btn--icon-del" data-del="${{esc(m.slug)}}" title="Excluir marca">🗑</button>`}}
+          <button type=button class="iconbtn" data-edit="${{esc(m.slug)}}" title="Editar marca">${{SVG_EDIT}}</button>
+          <a class="sk-btn sk-btn--sm sk-btn--primary" href="/editor?novo=1&marca=${{encodeURIComponent(m.slug)}}">Novo post</a>
+          ${{m.canonica?'':`<button type=button class="iconbtn del" data-del="${{esc(m.slug)}}" title="Excluir marca">${{SVG_TRASH}}</button>`}}
         </div>
       </div>
-    </div>`).join('');
+    </article>`;
+  }}).join('');
   g.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
   g.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>excluirMarca(b.dataset.del));
   g.querySelectorAll('[data-ig-on]').forEach(b=>b.onclick=()=>conectarIg(b.dataset.igOn));
