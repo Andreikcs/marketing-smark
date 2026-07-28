@@ -30,13 +30,19 @@ _PADROES_POLUICAO = [
     re.compile(r"\b(EXCLUSIVO|AMANH[ÃA]|PASSE AQUI|GARANTA)\b", re.I),
 ]
 
-# qualquer "palavra" de 3+ letras conta (fundos devem ser sem texto)
-_RE_PALAVRA = re.compile(r"[A-Za-zÀ-ÿ]{3,}")
+# Palavras "reais" para OCR: 4+ letras (3 letras geram lixo tipo "Tet", "Ara", "Ion")
+_RE_PALAVRA = re.compile(r"[A-Za-zÀ-ÿ]{4,}")
 _RUIDO = {
     "the", "and", "with", "this", "that", "from", "for", "are", "was", "you",
     "not", "but", "all", "can", "had", "her", "his", "one", "our", "out",
     "uma", "com", "para", "por", "dos", "das", "que", "não", "nao", "seu",
+    "over", "into", "than", "then", "when", "what", "who", "how", "why",
+    "mais", "menos", "como", "onde", "essa", "esse", "isto", "aqui", "ali",
+    "also", "only", "just", "very", "some", "have", "been", "were", "will",
+    "logo", "mark", "brand", "text", "image", "photo", "soft", "hard",
 }
+# Vogais — tokens sem vogal costumam ser ruído de textura (MTAR, XZPQ…)
+_RE_VOGAL = re.compile(r"[aeiouáéíóúâêôãõàüAEIOUÁÉÍÓÚÂÊÔÃÕÀÜ]")
 
 
 def tesseract_disponivel():
@@ -97,20 +103,61 @@ def _ocr_tesseract(png_path):
     return "\n".join(texts)
 
 
+def _palavra_util(p):
+    """Filtra lixo típico de OCR em fotos/texturas (não texto real)."""
+    if not p or len(p) < 4:
+        return False
+    low = p.lower()
+    if low in _RUIDO:
+        return False
+    # tokens só consoante / quase sem vogal = textura lida como letra
+    if not _RE_VOGAL.search(p):
+        return False
+    # repetições absurdas (AAAA, xxx)
+    if len(set(low)) <= 1:
+        return False
+    # sequência monótona tipo "abab" / "xxxx" curta
+    if len(p) <= 5 and len(set(low)) <= 2 and not any(c in "aeiouáéíóú" for c in low):
+        return False
+    return True
+
+
 def _achados_poluicao(texto):
+    """Só bloqueia com evidência forte — falso positivo gasta crédito e quebra UX.
+
+    Regras (qualquer uma):
+      1. padrão forte (_PADROES_POLUICAO: hex, CJK, NEGATIVE, EXCLUSIVO…)
+      2. ≥3 palavras úteis distintas de 4+ letras
+      3. ≥1 palavra útil de 7+ letras (headline óbvia: EXCLUSIVO, AMANHÃ…)
+    """
     hits = []
     for pat in _PADROES_POLUICAO:
         m = pat.search(texto or "")
         if m:
             hits.append(m.group(0)[:40])
+    # padrões fortes sozinhos já bastam
+    if hits:
+        return hits
+
     palavras = _RE_PALAVRA.findall(texto or "")
-    palavras = [p for p in palavras if p.lower() not in _RUIDO and len(p) >= 3]
-    # 2+ palavras legíveis = texto no fundo (antes era 4)
-    if len(palavras) >= 2:
+    palavras = [p for p in palavras if _palavra_util(p)]
+    # dedupe case-insensitive mantendo ordem
+    seen, uniq = set(), []
+    for p in palavras:
+        k = p.lower()
+        if k not in seen:
+            seen.add(k)
+            uniq.append(p)
+    palavras = uniq
+
+    # 3+ palavras legíveis distintas = tipografia no fundo
+    if len(palavras) >= 3:
         hits.append("palavras:" + ",".join(palavras[:8]))
-    # uma palavra longa (ex. MTARO, EXCLUSIVO) já basta
-    longas = [p for p in palavras if len(p) >= 5]
-    if longas and not any(h.startswith("palavras:") for h in hits):
+        return hits
+
+    # uma palavra bem longa (headline) — 7+ evita "Tet"/"MTARO" solto de textura
+    longas = [p for p in palavras if len(p) >= 7]
+    if longas:
         hits.append("palavra:" + longas[0])
     return hits
 

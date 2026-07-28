@@ -1207,6 +1207,7 @@ async function regen(btn,ref){
   if(!confirm(msg))return;
   const pi=PI,fi=FI;  // fixa o alvo — pode navegar/editar enquanto gera
   btn.disabled=true;const old=btn.textContent;btn.textContent='Gerando…';
+  try{await salvar(true)}catch(e){btn.disabled=false;btn.textContent=old;toast('Salve o post antes de gerar');return}
   if(pi===PI&&fi===FI)genStart(ref?'Gerando com referência…':(tema==='claro'?'Gerando fundo CLARO…':'Gerando fundo escuro…'));
   toast('Gerando em background — pode continuar editando, atualiza sozinho.');
   const st=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,
@@ -1223,12 +1224,14 @@ async function regen(btn,ref){
         if(s.provider)tf.bg_provider=s.provider;
         if(s.seed!=null)tf.bg_seed=s.seed;
         if(s.suplente!=null)tf.bg_suplente=!!s.suplente;
+        if(s.gate_falhou){tf.bg_gate_falhou=true;tf.bg_publicavel=false}
+        else{delete tf.bg_gate_falhou}
       }
       if(pi===PI&&fi===FI){genStop(true);renderCtrl();preview();}else{renderStrip();}
       renderStrip();setDirty(true);
       const cst=s.custo_usd!=null?(' · US$ '+Number(s.custo_usd).toFixed(3)):'';
-      toast('✨ Fundo pronto'+cst+(s.modelo?(' · '+s.modelo):''));}
-    else if(s.status==='erro'){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Erro: '+String(s.erro||'').slice(0,120));}
+      toast((s.gate_falhou?'⚠️ Rascunho (gate de texto)':'✨ Fundo pronto')+cst+(s.modelo?(' · '+s.modelo):''));}
+    else if(s.status==='erro'){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Erro: '+String(s.erro||'').slice(0,180));}
     else if(tries>180){clearInterval(poll);btn.disabled=false;btn.textContent=old;genStop(false);toast('Ainda gerando… aparece ao recarregar em ~1 min.');}
   },2000);
 }
@@ -1753,7 +1756,11 @@ carregar().then(()=>{snapshot();if(typeof setAmbientBrand==='function')setAmbien
   function genFundos(pi,idxs,r,pedido,refFallback){
     toast('🎨 Gerando '+idxs.length+' fundo(s)…');
     const ped=pedido||lastPedido||'';
-    (async()=>{for(const i of idxs){await gerarFundo(pi,i,r.conceito_visual||'',r.tipo,(D.posts[pi].frames[i]||{}).tema,ped,refFallback)}})();
+    (async()=>{
+      // CRÍTICO: /regerar-fundo lê editor.json no disco — sem salvar = "list index out of range"
+      try{await salvar(true)}catch(e){toast('⚠️ Não deu pra salvar antes de gerar: '+(e.message||e));return}
+      for(const i of idxs){await gerarFundo(pi,i,r.conceito_visual||'',r.tipo,(D.posts[pi].frames[i]||{}).tema,ped,refFallback)}
+    })();
   }
   // scope: 'card' | 'todos' | 'novo' — fundo é decidido no clique (checkbox + texto do pedido)
   function aplicar(r,scope){
@@ -1815,6 +1822,8 @@ carregar().then(()=>{snapshot();if(typeof setAmbientBrand==='function')setAmbien
     const lblTier=tier==='rascunho'?'rascunho Seedream ~US$0,04':'final Gemini ~US$0,24';
     const prog=addMsg('a','🎨 Gerando arte <b>'+(fi+1)+'/'+total+'</b> · '+lblTier+'… <span class=dots></span>'+(withRef?'<div style="font-size:11px;color:var(--muted);margin-top:3px">editando a partir da imagem atual — 1 a 3 min</div>':(tier==='rascunho'?'<div style="font-size:11px;color:var(--muted);margin-top:3px">rascunho barato — NÃO publicável até promover a final</div>':'<div style="font-size:11px;color:var(--muted);margin-top:3px">geração final publicável</div>')));
     try{
+      // Garante que post/frame existem no editor.json antes do POST (evita IndexError)
+      try{await salvar(true)}catch(e){/* auto-save best-effort */}
       if(pi===PI){FI=fi;renderPosts();renderStrip();renderCtrl();preview();if(typeof genStart==='function')genStart(withRef?('Editando fundo '+(fi+1)+'/'+total+'…'):('Gerando '+tier+' '+(fi+1)+'/'+total+'…'))}
       const st=await(await fetch('/regerar-fundo',{method:'POST',headers:HJSON,body:JSON.stringify({
         post:pi,frame:fi,conceito:conceito||'',tipo:tipo||'manifesto',tema:tema||'claro',
@@ -1833,13 +1842,13 @@ carregar().then(()=>{snapshot();if(typeof setAmbientBrand==='function')setAmbien
           if(j.suplente!=null)tf.bg_suplente=!!j.suplente;
           tf.bg_tier=tier;
           tf.bg_publicavel=j.gate_falhou?false:(tier==='final');
-          if(j.gate_falhou)tf.bg_gate_falhou=true;
+          if(j.gate_falhou){tf.bg_gate_falhou=true}else{delete tf.bg_gate_falhou}
         }
         const cstU=j.custo_usd!=null?('US$ '+Number(j.custo_usd).toFixed(3)):'';
         const cstB=j.custo_brl!=null?('R$ '+Number(j.custo_brl).toFixed(2)):'';
         const cst=(cstU||cstB)?(' · <b>'+[cstU,cstB].filter(Boolean).join(' · ')+'</b>'):'';
         if(j.gate_falhou){
-          prog.innerHTML='⚠️ Fundo <b>'+(fi+1)+'</b> gerado mas <b>gate de texto falhou</b> (possível poluição Seedream). Não publique — mude para <b>final</b> ou tente de novo.'+cst;
+          prog.innerHTML='⚠️ Fundo <b>'+(fi+1)+'</b> entregue como <b>rascunho</b> (gate suspeitou de texto no fundo). Imagem mantida — não publique; use tier <b>final</b> ou regenere.'+cst;
         }else{
           const modo=withRef?' (edição)':(tier==='rascunho'?' (rascunho)':' (final)');
           prog.innerHTML='✨ Fundo <b>'+(fi+1)+'/'+total+'</b> pronto'+modo+cst+(j.modelo?(' · '+esc(j.modelo)):'');
@@ -1858,7 +1867,7 @@ carregar().then(()=>{snapshot();if(typeof setAmbientBrand==='function')setAmbien
           }
         }catch(e){}
         if(pi===PI){if(typeof genStop==='function')genStop(true);renderStrip();if(fi===FI){renderCtrl();preview()}}setDirty(true)}
-      else{prog.innerHTML=(j.status==='timeout'?'⏳ Fundo '+(fi+1)+' ainda gerando — recarregue a página em 1 min pra ver.':'⚠️ Fundo '+(fi+1)+' falhou'+(j.erro?': '+esc(String(j.erro).slice(0,120)):''));if(pi===PI&&typeof genStop==='function')genStop(false)}
+      else{prog.innerHTML=(j.status==='timeout'?'⏳ Fundo '+(fi+1)+' ainda gerando — recarregue a página em 1 min pra ver.':'⚠️ Fundo '+(fi+1)+' falhou'+(j.erro?': '+esc(String(j.erro).slice(0,180)):''));if(pi===PI&&typeof genStop==='function')genStop(false)}
     }catch(e){prog.innerHTML='⚠️ Erro no fundo '+(fi+1)+': '+esc(e.message);if(pi===PI&&typeof genStop==='function')genStop(false)}
   }
   txt.addEventListener('input',()=>{txt.style.height='auto';txt.style.height=Math.min(txt.scrollHeight,120)+'px'});

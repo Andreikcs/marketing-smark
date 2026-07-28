@@ -1959,6 +1959,27 @@ def _parse_arte_meta(stdout):
     return meta
 
 
+def _erro_cli_limpo(stderr, stdout="", max_len=220):
+    """Extrai a última linha legível de ERRO/AVISO do CLI (sem stack/ruído)."""
+    blob = (stderr or "") + "\n" + (stdout or "")
+    lines = [ln.strip() for ln in blob.splitlines() if ln.strip()]
+    # prioriza linhas de erro humanas
+    for ln in reversed(lines):
+        low = ln.lower()
+        if any(k in low for k in ("erro", "error", "fail", "gate", "timeout", "quota",
+                                   "rate", "billing", "credit", "denied", "invalid")):
+            # corta lixo unicode/ANSI
+            clean = re.sub(r"[\x00-\x1f\x7f-\x9f]", "", ln)
+            clean = re.sub(r"\s+", " ", clean).strip()
+            if len(clean) >= 8:
+                return clean[:max_len]
+    if lines:
+        clean = re.sub(r"[\x00-\x1f\x7f-\x9f]", "", lines[-1])
+        clean = re.sub(r"\s+", " ", clean).strip()
+        return (clean or "geração falhou")[:max_len]
+    return "geração falhou (sem detalhe do provedor)"
+
+
 def _run_gen(job_id, cmd, out, pi, fi):
     """Roda a geração de IA em background (cap de 2 simultâneas). Persiste o fundo no editor.json."""
     with GEN_SEM:
@@ -1970,6 +1991,8 @@ def _run_gen(job_id, cmd, out, pi, fi):
         if os.path.exists(out):
             rel = os.path.relpath(out, VAULT)
             meta = _parse_arte_meta(r.stdout or "")
+            gate_fail = (r.returncode == 3 or "GATE_FALHOU" in (r.stdout or "")
+                         or bool(meta.get("gate_falhou")))
             try:  # persiste pra não perder ao sair da tela
                 with IO_LOCK:
                     d = load()
@@ -1987,6 +2010,9 @@ def _run_gen(job_id, cmd, out, pi, fi):
                             f["bg_seed"] = meta["seed"]
                         if "suplente" in meta:
                             f["bg_suplente"] = meta["suplente"]
+                        if gate_fail:
+                            f["bg_gate_falhou"] = True
+                            f["bg_publicavel"] = False
                         # ROI humano: +1 imagem no ciclo ativo
                         try:
                             _roi.touch_image(d["posts"][pi])
@@ -2008,13 +2034,16 @@ def _run_gen(job_id, cmd, out, pi, fi):
                     job["cambio_fonte"] = pack["cambio_fonte"]
             except Exception:
                 pass
-            # exit 3 = gate de texto falhou (rascunho poluído); arquivo existe
-            if r.returncode == 3 or "GATE_FALHOU" in (r.stdout or ""):
+            # exit 3 = gate de texto; arquivo MANTIDO como rascunho
+            if gate_fail:
                 job["gate_falhou"] = True
                 job["publicavel"] = False
             JOBS[job_id] = job
         else:
-            JOBS[job_id] = {"status": "erro", "erro": (r.stderr or r.stdout or "falhou")[-400:]}
+            JOBS[job_id] = {
+                "status": "erro",
+                "erro": _erro_cli_limpo(r.stderr, r.stdout),
+            }
 
 
 def _run_estudio(job_id, pedido, marca, n, tipo, contexto="", historico=None,
@@ -2660,9 +2689,32 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/regerar-fundo":
             try:
                 d = load()
-                post = d["posts"][req["post"]]
-                fr = post["frames"][req["frame"]]
+                try:
+                    pi = int(req.get("post", -1))
+                    fi = int(req.get("frame", -1))
+                except (TypeError, ValueError):
+                    return self._send(400, {"ok": False,
+                                            "erro": "post/frame inválidos — salve o post e tente de novo"})
+                posts = d.get("posts") or []
+                if not (0 <= pi < len(posts)):
+                    return self._send(400, {
+                        "ok": False,
+                        "erro": (f"post #{pi} não existe no servidor (tem {len(posts)}). "
+                                 "Salve o editor antes de gerar o fundo."),
+                    })
+                post = posts[pi]
+                frames = post.get("frames") or []
+                if not (0 <= fi < len(frames)):
+                    return self._send(400, {
+                        "ok": False,
+                        "erro": (f"card #{fi + 1} não existe neste post "
+                                 f"({len(frames)} card(s)). Salve e tente de novo."),
+                    })
+                fr = frames[fi]
                 slug = safe_slug(post.get("slug", ""))
+                if not slug:
+                    return self._send(400, {"ok": False,
+                                            "erro": "post sem slug — salve o post antes de gerar fundo"})
                 try:
                     marca = require_marca(post.get("marca", "smark"))
                 except ValueError as e:
@@ -2670,7 +2722,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 dd = os.path.join(VAULT, "marcas", marca, "publicacoes", "social", "instagram",
                                   "arte", slug, "_regen")
                 os.makedirs(dd, exist_ok=True)
-                out = os.path.join(dd, f"{req['frame']+1:02d}-{secrets.token_hex(3)}.png")
+                out = os.path.join(dd, f"{fi+1:02d}-{secrets.token_hex(3)}.png")
                 # ref: anexo do Estúdio OU fundo atual do card. Com ref = EDIÇÃO (gpt-image).
                 # Sem ref = geração do zero (Gemini + direção de arte).
                 ref = (req.get("ref") or "").strip().lstrip("/")
@@ -2716,7 +2768,7 @@ class H(http.server.BaseHTTPRequestHandler):
                         cmd += ["--conceito", str(req["conceito"])[:400]]
                 job_id = secrets.token_hex(6)
                 JOBS[job_id] = {"status": "running"}
-                threading.Thread(target=_run_gen, args=(job_id, cmd, out, req["post"], req["frame"]),
+                threading.Thread(target=_run_gen, args=(job_id, cmd, out, pi, fi),
                                  daemon=True).start()
                 return self._send(200, {"ok": True, "job": job_id})
             except Exception as e:

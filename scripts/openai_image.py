@@ -231,22 +231,20 @@ def main():
         if gate.get("aviso"):
             print(f"AVISO gate: {gate['aviso']}", file=sys.stderr)
         if gate.get("poluido"):
+            # MANTÉM o PNG: o crédito já foi gasto. Entrega como rascunho
+            # NÃO publicável (bg_gate_falhou) em vez de apagar e devolver "erro".
             evento["ok"] = True
             evento["publicavel"] = False
             evento["gate_falhou"] = True
-            # remove arquivo poluído para não vazar pro editor como "pronto"
-            try:
-                os.remove(out)
-            except OSError:
-                pass
             _ledger.registrar_imagem(evento)
             brl = evento.get("custo_brl")
             brl_s = f" R${brl:.2f}" if brl is not None else ""
-            print(f"ERRO: gate anti-texto FALHOU — arte descartada "
+            print(f"AVISO: gate anti-texto marcou poluição — arte MANTIDA como rascunho "
                   f"(tier={perfil['tier']}, {r['modelo']} via {r['provider']}, "
                   f"custo=${evento.get('custo_usd') or '?'}{brl_s}). "
                   f"Detalhe: {gate.get('aviso')}", file=sys.stderr)
-            print(meta_block(out if os.path.isfile(out) else "", {
+            print("GATE_FALHOU")
+            print(meta_block(out, {
                 "modelo": r["modelo"], "provider": r["provider"],
                 "qualidade": args.quality, "tamanho": args.size, "paleta": args.paleta,
                 "seed": perfil["seed"], "custo_usd": evento.get("custo_usd"),
