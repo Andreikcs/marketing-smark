@@ -204,72 +204,99 @@ def _logo_is_mark(im):
     return True
 
 
-def _logo_badge_png(path, color, px, pad_ratio=0.14):
-    """Gera PNG base64 do logo para tab/chip: trim + mono na cor + padding.
+def _logo_to_icon_rgba(path):
+    """Converte qualquer logo em recorte quadrado de ÍCONE (não wordmark largo).
 
-    Devolve None se o arquivo for inadequado (foto/feed) — aí o caller usa glyph.
+    - trim
+    - se aspect ratio largo (wordmark): recorta o quadrado mais denso à esquerda
+      (brasão costuma ficar no início) ou o centro
+    - devolve PIL RGBA ou None
     """
     try:
-        from PIL import Image, ImageOps
-        import io
+        from PIL import Image
     except ImportError:
         return None
     try:
         im = Image.open(path)
     except Exception:
         return None
-    # SVG não passa por PIL normalmente
     if path.lower().endswith(".svg"):
         return None
-    if not _logo_is_mark(im):
-        return None
-    # RGBA
     if im.mode != "RGBA":
         im = im.convert("RGBA")
-    # trim por alpha ou por fundo quase-branco/uniforme
+    # remove fundo quase-branco
+    alpha = im.split()[-1]
+    if alpha.getextrema()[0] > 240:
+        px = list(im.getdata())
+        out = []
+        for r, g, b, a in px:
+            if r > 248 and g > 248 and b > 248:
+                out.append((r, g, b, 0))
+            else:
+                out.append((r, g, b, a))
+        im.putdata(out)
     bbox = im.getbbox()
     if bbox:
         im = im.crop(bbox)
-    # se quase sem alpha útil, tenta tratar fundo claro como transparente
-    alpha = im.split()[-1]
-    if alpha.getextrema()[0] > 250:
-        # sem transparência real — remove fundo claro
-        rgb = im.convert("RGB")
-        datas = list(rgb.getdata())
-        out_px = []
-        for r, g, b in datas:
-            if r > 245 and g > 245 and b > 245:
-                out_px.append((r, g, b, 0))
-            else:
-                out_px.append((r, g, b, 255))
-        im = Image.new("RGBA", rgb.size)
-        im.putdata(out_px)
-        bbox = im.getbbox()
-        if bbox:
-            im = im.crop(bbox)
-    # mono: usa luminância invertida como alpha, preenche com `color`
+    w, h = im.size
+    if w < 8 or h < 8:
+        return None
+    ratio = w / max(1, h)
+    # foto de feed / post vertical → não é ícone
+    if ratio < 0.55 or (not _logo_is_mark(im) and max(w, h) > 900 and 0.75 <= ratio <= 1.35):
+        # tenta só se tiver alpha útil e tamanho moderado
+        if max(w, h) > 700 and alpha.getextrema()[0] > 200:
+            return None
+    # wordmark largo → recorte quadrado (preferência esquerda = brasão)
+    if ratio > 1.35:
+        side = h
+        # densidade de tinta em colunas: pega a janela side×side mais "cheia"
+        gray = im.convert("L")
+        best_x, best_score = 0, -1
+        step = max(1, side // 8)
+        for x in range(0, max(1, w - side + 1), step):
+            crop = gray.crop((x, 0, x + side, side))
+            # tinta = pixels escuros
+            hist = crop.histogram()
+            score = sum(hist[:128])
+            if score > best_score:
+                best_score = score
+                best_x = x
+        im = im.crop((best_x, 0, best_x + side, side))
+    elif ratio < 0.75:
+        side = w
+        y = max(0, (h - side) // 4)  # um pouco do topo
+        im = im.crop((0, y, side, y + side))
+    return im
+
+
+def _logo_badge_png(path, color, px, pad_ratio=0.16):
+    """Ícone mono na cor do acento, canvas quadrado — para tab/chip."""
+    try:
+        from PIL import Image, ImageOps
+        import io
+    except ImportError:
+        return None
+    im = _logo_to_icon_rgba(path)
+    if im is None:
+        return None
     if (color or "").startswith("#") and len(color) >= 7:
         r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
     else:
         r, g, b = 255, 255, 255
     gray = ImageOps.grayscale(im.convert("RGB"))
-    # pixels escuros = símbolo; claros = fundo → alpha
-    # se o logo já é claro em fundo escuro, inverte
     hist = gray.histogram()
     dark = sum(hist[:96])
     light = sum(hist[160:])
     if light > dark * 1.4:
-        # símbolo claro em fundo escuro
         mask = gray.point(lambda p: min(255, max(0, int((p - 40) * 1.2))))
     else:
         mask = gray.point(lambda p: min(255, max(0, int((220 - p) * 1.15))))
-    # combina com alpha original
     a_orig = im.split()[-1]
     mask = Image.composite(mask, Image.new("L", mask.size, 0), a_orig)
     badge = Image.new("RGBA", im.size, (r, g, b, 0))
     badge.putalpha(mask)
-    # encaixa em canvas px×px com padding
-    canvas = Image.new("RGBA", (px * 2, px * 2), (0, 0, 0, 0))  # 2x nítido
+    canvas = Image.new("RGBA", (px * 2, px * 2), (0, 0, 0, 0))
     pad = int(px * 2 * pad_ratio)
     inner = px * 2 - pad * 2
     try:
@@ -286,10 +313,9 @@ def _logo_badge_png(path, color, px, pad_ratio=0.14):
 
 
 def glyph_html(b, color, px, *, use_logo=True):
-    """Símbolo: logo_svg > path > logo_file (se use_logo) > letra.
+    """Símbolo na tab/chip: sempre ÍCONE (mono) ou letra — nunca wordmark/foto full.
 
-    use_logo=False: só glyph/letra (ou vazio). use_logo=True: tenta mono da logo;
-    se a imagem for inadequada como mark, ainda aplica contain com padding.
+    use_logo=False: só glyph. use_logo=True: mono da logo se der; senão letra.
     """
     if b.get("logo_svg"):
         return (f'<svg viewBox="0 0 100 100" width="{px}" height="{px}" style="color:{color}">'
@@ -300,6 +326,12 @@ def glyph_html(b, color, px, *, use_logo=True):
     lf = _resolve_logo_file(b.get("logo_file") or "") if use_logo else ""
     if lf:
         ext = os.path.splitext(lf)[1].lower()
+        if ext != ".svg":
+            data = _logo_badge_png(lf, color if (color or "").startswith("#") else "#FFFFFF", px)
+            if data:
+                return (f'<img src="data:image/png;base64,{data}" width="{px}" height="{px}" '
+                        f'alt="" style="object-fit:contain;display:block;width:{px}px;height:{px}px"/>')
+        # SVG: embute limitado
         if ext == ".svg":
             try:
                 raw = open(lf, "r", encoding="utf-8", errors="ignore").read()
@@ -308,36 +340,12 @@ def glyph_html(b, color, px, *, use_logo=True):
                             f'justify-content:center;overflow:hidden">{raw}</span>')
             except OSError:
                 pass
-        else:
-            data = _logo_badge_png(lf, color if (color or "").startswith("#") else "#FFFFFF", px)
-            if data:
-                return (f'<img src="data:image/png;base64,{data}" width="{px}" height="{px}" '
-                        f'alt="" style="object-fit:contain;display:block;width:{px}px;height:{px}px"/>')
-            # fallback contain (mesmo se não for "mark" — usuário pediu logo na arte)
-            try:
-                mime = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
-                        ".webp": "image/webp"}.get(ext, "image/png")
-                b64 = base64.b64encode(open(lf, "rb").read()).decode()
-                # limita payload: se arquivo > 400kb, redimensiona via PIL
-                raw = open(lf, "rb").read()
-                if len(raw) > 400_000:
-                    from PIL import Image
-                    import io
-                    im = Image.open(io.BytesIO(raw)).convert("RGBA")
-                    im.thumbnail((px * 4, px * 4), Image.Resampling.LANCZOS
-                                 if hasattr(Image, "Resampling") else Image.LANCZOS)
-                    buf = io.BytesIO()
-                    im.save(buf, format="PNG", optimize=True)
-                    b64 = base64.b64encode(buf.getvalue()).decode()
-                    mime = "image/png"
-                return (f'<img src="data:{mime};base64,{b64}" width="{px}" height="{px}" alt="" '
-                        f'style="object-fit:contain;display:block;width:{int(px*0.82)}px;height:{int(px*0.82)}px;'
-                        f'margin:auto"/>')
-            except Exception:
-                pass
+    # monograma (letra) — fallback limpo
     g = b.get("glyph")
     if g is None or g == "":
-        return ""
+        # tenta 1ª letra do name/wordmark
+        nm = (b.get("name") or b.get("wordmark") or "•")[:1]
+        g = nm.upper() if nm else "•"
     return esc(g)
 
 

@@ -137,7 +137,8 @@ def resolver(marca, slug="", tipo="", reroll=0, size="1024x1536", cfg=None, tier
         "suplente_provider": suplente.get("provider", "openai"),
         "nao_calibrado": nao_calibrado,
         "publicavel": bool(tier_cfg.get("publicavel", tier == "final")),
-        "gate_texto": bool(tier_cfg.get("gate_texto", tier == "rascunho")),
+        # SEMPRE gate anti-texto (fundo nunca pode ter tipografia)
+        "gate_texto": True if tier_cfg.get("gate_texto") is not False else False,
         "prompt_modo": tier_cfg.get("prompt") or ("curto" if tier == "rascunho" else "direcao"),
         "acervo_ativo": acervo_ativo,
         "acervo_dir": acervo_dir_abs,

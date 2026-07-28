@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Gate anti-poluição: detecta texto legível em um PNG de fundo.
+"""Gate anti-poluição: detecta TEXTO legível em PNG de fundo.
 
-Seedream (e outros) às vezes tipografam o prompt na arte. Este módulo decide
-se o rascunho pode ser mostrado / promovido.
+Regra do studio: fundo de IA NUNCA pode ter texto/letras/números.
+Tipografia só no compositor.
 
-Estratégia (stdlib + binários do sistema, sem pip novo):
-  1. tesseract CLI se instalado (`brew install tesseract`)
-  2. senão: gate "indisponível" — não bloqueia, mas marca para revisão humana
+Estratégia:
+  1. tesseract CLI se instalado → OCR + padrões
+  2. fallback PIL: densidade de bordas em faixas (heurística barata)
+  3. se ambos falharem de forma ambígua → bloqueia promoção (ok=False só se poluído)
 
-Padrões de poluição típicos do bake-off Seedream: hex (#9A4DFF), 85mm, CJK, etc.
+Poluição típica: hex, palavras latinas, CJK, NEGATIVE, etc.
 """
 import os
 import re
@@ -16,20 +17,26 @@ import shutil
 import subprocess
 import tempfile
 
-# Sinais fortes de "prompt impresso na arte" (bake-off 2026-07-24)
 _PADROES_POLUICAO = [
-    re.compile(r"#[0-9A-Fa-f]{6}"),           # hex de paleta
-    re.compile(r"\b\d{2,3}\s*mm\b", re.I),  # 85mm
+    re.compile(r"#[0-9A-Fa-f]{6}"),
+    re.compile(r"\b\d{2,3}\s*mm\b", re.I),
     re.compile(r"\bNEGATIVE\b", re.I),
     re.compile(r"\bCAMERA\b", re.I),
     re.compile(r"\bCOMPOSITION\b", re.I),
-    re.compile(r"[\u4e00-\u9fff]{2,}"),       # CJK (ex. 時裝)
+    re.compile(r"[\u4e00-\u9fff]{2,}"),
     re.compile(r"\b(BAZATUR|Brandia|watermark)\b", re.I),
     re.compile(r"\b(no text|no letters|no logos)\b", re.I),
+    # marcas de UI / tipografia gerada
+    re.compile(r"\b(EXCLUSIVO|AMANH[ÃA]|PASSE AQUI|GARANTA)\b", re.I),
 ]
 
-# OCR devolve lixo residual; exige tamanho mínimo de "palavra" alfanumérica
-_RE_PALAVRA = re.compile(r"[A-Za-zÀ-ÿ]{4,}")
+# qualquer "palavra" de 3+ letras conta (fundos devem ser sem texto)
+_RE_PALAVRA = re.compile(r"[A-Za-zÀ-ÿ]{3,}")
+_RUIDO = {
+    "the", "and", "with", "this", "that", "from", "for", "are", "was", "you",
+    "not", "but", "all", "can", "had", "her", "his", "one", "our", "out",
+    "uma", "com", "para", "por", "dos", "das", "que", "não", "nao", "seu",
+}
 
 
 def tesseract_disponivel():
@@ -37,14 +44,12 @@ def tesseract_disponivel():
 
 
 def _ocr_tesseract(png_path):
-    """Devolve texto OCR ou '' se falhar."""
     if not tesseract_disponivel():
         return ""
     try:
-        # imagem pode ser enorme (4K); tesseract aguenta, mas limitamos timeout
         r = subprocess.run(
             ["tesseract", png_path, "stdout", "-l", "eng+por", "--psm", "11"],
-            capture_output=True, text=True, timeout=60,
+            capture_output=True, text=True, timeout=45,
         )
         if r.returncode != 0:
             return ""
@@ -59,25 +64,46 @@ def _achados_poluicao(texto):
         m = pat.search(texto or "")
         if m:
             hits.append(m.group(0)[:40])
-    # muitas palavras latinas em fundo "abstrato" também suspeito
     palavras = _RE_PALAVRA.findall(texto or "")
-    # filtra lixo OCR comum
-    ruido = {"the", "and", "with", "this", "that", "from", "for", "are", "was"}
-    palavras = [p for p in palavras if p.lower() not in ruido]
-    if len(palavras) >= 4:
-        hits.append("palavras:" + ",".join(palavras[:6]))
+    palavras = [p for p in palavras if p.lower() not in _RUIDO and len(p) >= 3]
+    # 2+ palavras legíveis = texto no fundo (antes era 4)
+    if len(palavras) >= 2:
+        hits.append("palavras:" + ",".join(palavras[:8]))
+    # uma palavra longa (ex. MTARO, EXCLUSIVO) já basta
+    longas = [p for p in palavras if len(p) >= 5]
+    if longas and not any(h.startswith("palavras:") for h in hits):
+        hits.append("palavra:" + longas[0])
     return hits
 
 
-def avaliar(png_path):
+def _heuristica_bordas(png_path):
+    """Fallback sem tesseract: regiões com muitas bordas horizontais/verticais
+    no centro-superior (onde o modelo costuma tipografar) elevam suspeita.
+
+    Não é OCR — só sinal fraco. Usado para AVISO, não bloqueio duro sozinho.
+    """
+    try:
+        from PIL import Image, ImageFilter, ImageStat
+        im = Image.open(png_path).convert("L")
+        im.thumbnail((480, 480))
+        w, h = im.size
+        # terço superior e meio (onde headline falsa aparece)
+        box = (0, 0, w, int(h * 0.55))
+        crop = im.crop(box)
+        edges = crop.filter(ImageFilter.FIND_EDGES)
+        st = ImageStat.Stat(edges)
+        mean = st.mean[0] if st.mean else 0
+        # fundos limpos de foto têm mean baixo; tipografia/UI eleva
+        return float(mean)
+    except Exception:
+        return 0.0
+
+
+def avaliar(png_path, *, exigir_ocr=False):
     """Avalia se o PNG tem texto poluente.
 
-    Retorna dict:
-      ok: bool — True se pode seguir (limpo OU gate indisponível)
-      poluido: bool — True se OCR/padrões acharam texto de briefing
-      metodo: 'tesseract' | 'indisponivel'
-      trechos: list[str]
-      aviso: str
+    ok: True se limpo (pode publicar)
+    poluido: True se achou texto
     """
     if not png_path or not os.path.isfile(png_path):
         return {
@@ -85,18 +111,6 @@ def avaliar(png_path):
             "trechos": [], "aviso": "arquivo ausente para gate de texto",
         }
 
-    if not tesseract_disponivel():
-        return {
-            "ok": True,  # não bloqueia o pipeline se OCR não está instalado
-            "poluido": False,
-            "metodo": "indisponivel",
-            "trechos": [],
-            "aviso": "tesseract não instalado — gate de texto pulado "
-                     "(brew install tesseract). Revise o rascunho visualmente "
-                     "antes de promover a final.",
-        }
-
-    # tesseract prefere path com extensão legível; se for tmp sem .png, copia
     path = png_path
     tmp = None
     if not png_path.lower().endswith((".png", ".jpg", ".jpeg", ".tif", ".webp")):
@@ -107,28 +121,52 @@ def avaliar(png_path):
         path = tmp
 
     try:
-        texto = _ocr_tesseract(path)
+        if tesseract_disponivel():
+            texto = _ocr_tesseract(path)
+            hits = _achados_poluicao(texto)
+            if hits:
+                return {
+                    "ok": False,
+                    "poluido": True,
+                    "metodo": "tesseract",
+                    "trechos": hits,
+                    "aviso": "texto detectado no fundo (proibido): " + "; ".join(hits[:5]),
+                }
+            return {
+                "ok": True, "poluido": False, "metodo": "tesseract",
+                "trechos": [], "aviso": "",
+            }
+
+        # sem tesseract: heurística + política segura
+        edge = _heuristica_bordas(path)
+        if edge > 28:
+            return {
+                "ok": False,
+                "poluido": True,
+                "metodo": "heuristica",
+                "trechos": [f"bordas={edge:.1f}"],
+                "aviso": "fundo com padrões tipográficos suspeitos (instale tesseract "
+                         "para OCR: brew install tesseract). Arte bloqueada por segurança.",
+            }
+        if exigir_ocr:
+            return {
+                "ok": False,
+                "poluido": True,
+                "metodo": "indisponivel",
+                "trechos": [],
+                "aviso": "gate de texto exige tesseract (brew install tesseract)",
+            }
+        return {
+            "ok": True,
+            "poluido": False,
+            "metodo": "heuristica",
+            "trechos": [],
+            "aviso": "tesseract ausente — gate fraco (heurística). "
+                     "Instale: brew install tesseract",
+        }
     finally:
         if tmp and os.path.exists(tmp):
             try:
                 os.remove(tmp)
             except OSError:
                 pass
-
-    hits = _achados_poluicao(texto)
-    if hits:
-        return {
-            "ok": False,
-            "poluido": True,
-            "metodo": "tesseract",
-            "trechos": hits,
-            "aviso": "texto detectado no fundo (possível prompt impresso): "
-                     + "; ".join(hits[:5]),
-        }
-    return {
-        "ok": True,
-        "poluido": False,
-        "metodo": "tesseract",
-        "trechos": [],
-        "aviso": "",
-    }

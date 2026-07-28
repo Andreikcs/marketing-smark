@@ -222,9 +222,9 @@ def main():
                  f"não pôde ser salva em '{out}' ({e}). O gasto foi registrado no "
                  f"ledger; a arte não foi entregue.")
 
-    # Gate de texto (rascunho Seedream)
+    # Gate anti-texto — SEMPRE (fundo de IA nunca tipografa; tipografia só no compositor)
     gate = {"ok": True, "poluido": False, "metodo": "n/a", "aviso": "", "trechos": []}
-    if perfil.get("gate_texto") and not args.sem_gate:
+    if not args.sem_gate:
         gate = _gate_texto.avaliar(out)
         evento["gate_metodo"] = gate.get("metodo")
         evento["gate_poluido"] = bool(gate.get("poluido"))
@@ -234,17 +234,23 @@ def main():
             evento["ok"] = True
             evento["publicavel"] = False
             evento["gate_falhou"] = True
+            # remove arquivo poluído para não vazar pro editor como "pronto"
+            try:
+                os.remove(out)
+            except OSError:
+                pass
             _ledger.registrar_imagem(evento)
             brl = evento.get("custo_brl")
             brl_s = f" R${brl:.2f}" if brl is not None else ""
-            print(f"OK: {out}  (tier={perfil['tier']}, {r['modelo']} via {r['provider']}, "
-                  f"seed={perfil['seed']}, custo=${evento.get('custo_usd') or '?'}{brl_s}, "
-                  f"GATE_FALHOU poluído)")
-            print(meta_block(out, {"modelo": r["modelo"], "provider": r["provider"],
-                                   "qualidade": args.quality,
-                                   "tamanho": args.size, "paleta": args.paleta,
-                                   "seed": perfil["seed"], "custo_usd": evento.get("custo_usd"),
-                                   "suplente_usado": r["suplente_usado"]}))
+            print(f"ERRO: gate anti-texto FALHOU — arte descartada "
+                  f"(tier={perfil['tier']}, {r['modelo']} via {r['provider']}, "
+                  f"custo=${evento.get('custo_usd') or '?'}{brl_s}). "
+                  f"Detalhe: {gate.get('aviso')}", file=sys.stderr)
+            print(meta_block(out if os.path.isfile(out) else "", {
+                "modelo": r["modelo"], "provider": r["provider"],
+                "qualidade": args.quality, "tamanho": args.size, "paleta": args.paleta,
+                "seed": perfil["seed"], "custo_usd": evento.get("custo_usd"),
+                "suplente_usado": r["suplente_usado"], "gate_falhou": True}))
             sys.exit(3)
 
     evento["ok"] = True

@@ -98,6 +98,10 @@ def construir(marca, tipo="", tema="escuro", headline="", conceito=""):
         f"MATERIAL: {_material(tema)}. "
         "MOOD: restrained, sophisticated, expensive, confident, calm. "
         "FINISH: hyper-detailed where lit, sharp focus, color-graded like a magazine cover, 4k. "
+        "CRITICAL HARD RULE: the image must contain ZERO written language — no text, no letters, "
+        "no words, no typography, no numbers, no captions, no brand names written out, no logos with text, "
+        "no watermark, no signage, no menu boards, no packaging labels with readable words. "
+        "Pure visual photography/materials only; all typography is added later by a separate compositor. "
         "NEGATIVE: no text, no letters, no words, no numbers, no logos, no watermark, no people, no faces, "
         "no UI, no charts, no clutter, no busy patterns, no rainbow colors.")
 
@@ -145,8 +149,10 @@ def construir_rascunho(marca, tipo="", tema="escuro", headline="", conceito=""):
     return (
         f"Premium brand background, {base}, clean empty lower third for headline, "
         f"visual interest in upper two thirds, abstract editorial, sophisticated, "
-        f"photorealistic materials, no text, no letters, no words, no numbers, "
-        f"no logos, no watermark, no UI. Concept: {conc}."
+        f"photorealistic materials. "
+        f"HARD RULE: zero text zero letters zero words zero numbers zero logos zero watermark "
+        f"zero packaging labels zero signage — pure visual only, typography added later. "
+        f"no UI. Concept: {conc}."
     )
 
 
