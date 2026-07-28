@@ -446,6 +446,23 @@ function syncAllPages(){((D&&D.posts)||[]).forEach(syncPages)}
 let MARCAS_LIST=[{slug:'smark',nome:'smark'},{slug:'provider-max',nome:'Provider Max'},{slug:'elever-ai',nome:'Elever AI'}];
 let MB_LOGO=null;
 function marcaMeta(slug){return MARCAS_LIST.find(m=>m.slug===slug)||{slug:slug||'smark',nome:slug||'smark'}}
+/** Injeta acento da marca nos tokens CSS do Editor (botões, foco, chips). */
+function aplicarTemaMarca(slug){
+  const m=marcaMeta(slug||'smark');
+  const acc=m.acento||'#8B3CF7';
+  const acc2=m.acento_claro||acc;
+  const root=document.documentElement;
+  root.style.setProperty('--accent',acc);
+  root.style.setProperty('--accent-2',acc2);
+  root.style.setProperty('--rox',acc);
+  root.style.setProperty('--accent-soft',acc+'33');
+  // botões .on / seg usam var(--rox) ou accent
+  try{
+    const hmark=document.querySelector('.hmark');
+    if(hmark&&m.gradiente)hmark.style.background=m.gradiente;
+    else if(hmark)hmark.style.background=acc;
+  }catch(e){}
+}
 async function carregarMarcas(){
   try{
     const r=await(await fetch('/marcas')).json();
@@ -596,7 +613,7 @@ async function reorderFrame(from,to){
   if(from===to||isNaN(from))return;const fr=post().frames;const[m]=fr.splice(from,1);fr.splice(to,0,m);
   await salvar(true);await reload(PI,to);toast('Reordenado');
 }
-function sel(pi,fi){hideWelcome();PI=pi;FI=fi;renderPosts();renderStrip();renderCtrl();preview();roiStartQuiet()}
+function sel(pi,fi){hideWelcome();PI=pi;FI=fi;aplicarTemaMarca((D.posts[pi]||{}).marca||'smark');renderPosts();renderStrip();renderCtrl();preview();roiStartQuiet()}
 async function roiStartQuiet(){
   try{
     if(!D||!D.posts[PI])return;
@@ -704,8 +721,14 @@ function renderCtrl(){
     const nova=msel.value;
     if(nova===(post().marca||'smark'))return;
     post().marca=nova;
-    // paths de arte seguem a marca (normaliza no save)
-    setDirty(true);renderPosts();change();toast('Marca: '+(marcaMeta(nova).nome||nova));
+    // limpa overrides de paleta legada smark
+    (post().frames||[]).forEach(fr=>{
+      if(fr.paleta==='roxo'||fr.paleta==='lima')fr.paleta='marca';
+      if(fr.overlay==='roxo')fr.overlay='acento';
+      if(fr.overlay==='todo-roxo')fr.overlay='todo-acento';
+    });
+    aplicarTemaMarca(nova);
+    setDirty(true);renderPosts();renderCtrl();change();toast('Marca: '+(marcaMeta(nova).nome||nova));
   };
   mrow.appendChild(msel);
   const bedit=document.createElement('button');bedit.className='btn';bedit.style.cssText='width:auto;padding:8px 10px;font-size:12px';bedit.textContent='✎';
@@ -742,15 +765,30 @@ function renderCtrl(){
   const chk=document.createElement('label');chk.className='chk';chk.style.marginTop='8px';
   chk.innerHTML='<input type=checkbox '+(f.chip?'checked':'')+'> Mostrar selo (chip da capa)';
   chk.querySelector('input').onchange=e=>{f.chip=e.target.checked;change()};g1.appendChild(chk);
-  // cor de marca do template (selo, tab, CTA, logo, palavra-destaque)
+  // cor do template = acento da MARCA ativa (não roxo smark fixo)
+  const mmPal=marcaMeta(post().marca||'smark');
   const palw=document.createElement('div');palw.style.marginTop='10px';
-  palw.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:5px">Cor do template</div>';
+  palw.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:5px">Cor do template (marca)</div>';
   const palseg=document.createElement('div');palseg.className='seg';
-  [['roxo','🟣 Roxo'],['lima','🟢 Verde lima']].forEach(([k,lb])=>{
-    const b=document.createElement('button');b.textContent=lb;if((f.paleta||'roxo')===k)b.classList.add('on');
+  const palOpts=[['marca','● Acento da marca']];
+  if(mmPal.acento_alternativo||(mmPal.acento_claro&&mmPal.acento_claro!==mmPal.acento))
+    palOpts.push(['secundario','○ Secundário']);
+  // legado lima só se for família smark canônica
+  if(['smark','provider-max','elever-ai'].includes(post().marca||'smark'))
+    palOpts.push(['lima','🟢 Verde lima']);
+  const palCur=(f.paleta==='roxo'||!f.paleta)?'marca':f.paleta;
+  palOpts.forEach(([k,lb])=>{
+    const b=document.createElement('button');b.textContent=lb;
+    if(palCur===k)b.classList.add('on');
+    b.style.borderColor=(k==='marca'||k==='secundario')?(mmPal.acento||'var(--line)'):'';
+    if(k==='marca'&&palCur===k){b.style.background=mmPal.acento||'';b.style.color='#fff';b.style.borderColor=mmPal.acento||''}
     b.onclick=()=>{f.paleta=k;renderCtrl();change()};palseg.appendChild(b);
   });
-  palw.appendChild(palseg);g1.appendChild(palw);
+  palw.appendChild(palseg);
+  const psw=document.createElement('div');psw.className='mini';psw.style.marginTop='6px';
+  psw.innerHTML='<span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:'+esc(mmPal.acento||'#8B3CF7')+';vertical-align:middle;margin-right:6px"></span>'
+    +esc(mmPal.acento||'')+' · chip/tab/CTA/palavra *acento*';
+  palw.appendChild(psw);g1.appendChild(palw);
 
   // FUNDO
   const g2=document.createElement('div');g2.className='grp';g2.innerHTML='<h5>Fundo</h5>';
@@ -808,16 +846,20 @@ function renderCtrl(){
     sb.appendChild(slider('Contraste: '+Math.round((f.contraste||1)*100)+'%',(f.contraste||1),0.4,1.8,0.05,(v,l)=>{f.contraste=v;l.textContent='Contraste: '+Math.round(v*100)+'%';touch()}));
     sb.appendChild(slider('Saturação: '+Math.round((f.satur||1)*100)+'%',(f.satur||1),0,2,0.05,(v,l)=>{f.satur=v;l.textContent='Saturação: '+Math.round(v*100)+'%';touch()}));
     g2.appendChild(acc);
-    // camada por cima
+    // camada por cima — "acento" usa a cor da marca (legado "roxo" mapeado)
     const ol=document.createElement('div');ol.style.marginTop='10px';ol.innerHTML='<label>Camada por cima da imagem</label>';
     const os=document.createElement('div');os.className='seg';
-    [['none','Nenhuma'],['branco','Degradê branco'],['roxo','Degradê roxo'],['todo-branco','Todo branco'],['todo-roxo','Todo roxo']].forEach(([k,lb])=>{
-      const b=document.createElement('button');b.textContent=lb;if((f.overlay||'none')===k)b.classList.add('on');
+    [['none','Nenhuma'],['branco','Degradê branco'],['acento','Degradê acento'],['todo-branco','Todo branco'],['todo-acento','Todo acento']].forEach(([k,lb])=>{
+      const b=document.createElement('button');b.textContent=lb;
+      const cur=f.overlay||'none';
+      const on=(cur===k)||(k==='acento'&&cur==='roxo')||(k==='todo-acento'&&cur==='todo-roxo');
+      if(on)b.classList.add('on');
+      if(k==='acento'||k==='todo-acento'){b.style.borderColor=mmPal.acento||'';if(on){b.style.background=mmPal.acento||'';b.style.color='#fff'}}
       b.onclick=()=>{f.overlay=k;renderCtrl();change()};os.appendChild(b)});
     ol.appendChild(os);g2.appendChild(ol);
     if((f.overlay||'none')!=='none')
       g2.appendChild(slider('Opacidade da camada: '+Math.round((f.overlay_op==null?.85:f.overlay_op)*100)+'%',(f.overlay_op==null?.85:f.overlay_op),0,1,0.05,(v,l)=>{f.overlay_op=v;l.textContent='Opacidade da camada: '+Math.round(v*100)+'%';touch()}));
-    if(['branco','roxo'].includes(f.overlay||'')){
+    if(['branco','roxo','acento'].includes(f.overlay||'')){
       g2.appendChild(slider('Rotação do degradê: '+(f.ov_ang==null?180:f.ov_ang)+'°',(f.ov_ang==null?180:f.ov_ang),0,360,5,(v,l)=>{f.ov_ang=v;l.textContent='Rotação do degradê: '+v+'°';touch()}));
       g2.appendChild(slider('Mover o degradê: '+(f.ov_pos==null?20:f.ov_pos)+'%',(f.ov_pos==null?20:f.ov_pos),0,90,2,(v,l)=>{f.ov_pos=v;l.textContent='Mover o degradê: '+v+'%';touch()}));
     }

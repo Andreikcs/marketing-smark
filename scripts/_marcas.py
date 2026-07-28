@@ -130,6 +130,8 @@ def listar_detalhes():
             "handle": m.get("handle") or ("@" + s.replace("-", "")),
             "acento": m.get("acento") or "#8B3CF7",
             "acento_claro": m.get("acento_claro") or m.get("acento") or "#8B3CF7",
+            "acento_alternativo": m.get("acento_alternativo") or "",
+            "base_escura": m.get("base_escura") or "",
             "wordmark": m.get("wordmark") or m.get("nome") or s,
             "glyph": m.get("logo_glyph") or (m.get("nome") or s)[:1].upper(),
             "mood": m.get("mood") or "",
@@ -145,6 +147,34 @@ def listar_detalhes():
 
 def _hex_ok(h):
     return bool(h and re.match(r"^#[0-9A-Fa-f]{6}$", h.strip()))
+
+
+def _base_escura_de(acento_hex):
+    """Tom escuro parceiro do acento — NUNCA roxo smark (#2A1CA8).
+
+    Teal/ciano → navy; vermelho/laranja → marrom-escuro; verde → verde-quase-preto;
+    demais → near-black levemente tingido.
+    """
+    h = (acento_hex or "").strip().upper()
+    if not _hex_ok(h):
+        return "#0B0B0B"
+    r, g, b = int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
+    # teal / ciano (Revoe, contábil)
+    if g > 100 and b > 100 and abs(g - b) < 50 and r < min(g, b) + 40:
+        return "#001A34"
+    # laranja / vermelho quente
+    if r > g + 30 and r > b + 20:
+        return "#1A0A08"
+    # lime / verde
+    if g > r + 30 and g > b + 20:
+        return "#0A1408"
+    # azul puro
+    if b > r + 30 and b >= g:
+        return "#050D1A"
+    # roxo/violeta (smark canônica)
+    if r > 80 and b > 100 and g < r:
+        return "#2A1CA8"
+    return "#0B0B0B"
 
 
 def atualizar(slug, *, nome=None, acento=None, acento_claro=None, handle=None,
@@ -168,11 +198,11 @@ def atualizar(slug, *, nome=None, acento=None, acento_claro=None, handle=None,
         if not _hex_ok(acento):
             raise ValueError(f"acento deve ser hex #RRGGBB: {acento!r}")
         m["acento"] = acento.upper()
-        if gradiente is None and not m.get("gradiente"):
-            m["gradiente"] = f"linear-gradient(155deg,{m['acento']} 0%,#2A1CA8 100%)"
-        elif gradiente is None:
-            # recompõe gradiente a partir do novo acento
-            m["gradiente"] = f"linear-gradient(155deg,{m['acento']} 0%,#2A1CA8 100%)"
+        base_e = m.get("base_escura") or _base_escura_de(m["acento"])
+        m["base_escura"] = base_e
+        if gradiente is None:
+            # recompõe gradiente on-brand (sem roxo smark)
+            m["gradiente"] = f"linear-gradient(155deg,{m['acento']} 0%,{base_e} 100%)"
     if acento_claro is not None:
         acento_claro = str(acento_claro).strip()
         if not _hex_ok(acento_claro):
@@ -423,15 +453,19 @@ def criar(slug, nome, acento, *, acento_claro=None, handle=None, glyph=None,
     glyph = (glyph or nome[:1].upper() or "M")[:2]
     wordmark = wordmark or nome
 
-    # gradiente a partir do acento
-    grad = f"linear-gradient(155deg,{acento} 0%,#2A1CA8 100%)"
+    acc_u = acento.upper() if acento.startswith("#") else acento
+    acc2_u = acento_claro.upper() if acento_claro.startswith("#") else acento_claro
+    # base escura do degradê = tom da própria marca (NUNCA roxo smark #2A1CA8)
+    base_escura = _base_escura_de(acc_u)
+    grad = f"linear-gradient(155deg,{acc_u} 0%,{base_escura} 100%)"
 
     entry = {
         "nome": nome,
         "papel": "cliente",
-        "acento": acento.upper() if acento.startswith("#") else acento,
-        "acento_claro": acento_claro.upper() if acento_claro.startswith("#") else acento_claro,
+        "acento": acc_u,
+        "acento_claro": acc2_u,
         "gradiente": grad,
+        "base_escura": base_escura,
         "logo_glyph": glyph,
         "wordmark": wordmark,
         "handle": handle,

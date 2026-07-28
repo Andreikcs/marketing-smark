@@ -31,6 +31,25 @@ MESH_ESCURO = ("radial-gradient(60% 50% at 28% 16%, #2e2658 0%, transparent 60%)
 MESH_CLARO = ("radial-gradient(60% 50% at 72% 16%, #e7dcff 0%, transparent 60%),"
               "radial-gradient(55% 48% at 16% 84%, #efeaf8 0%, transparent 62%),"
               "linear-gradient(160deg, #f6f3fc 0%, #F4F2FB 72%)")
+
+
+def mesh_da_marca(acento, tema="escuro", base_escura="#0B0B0B"):
+    """Mesh de placeholder tingido pelo acento (sem roxo smark fixo)."""
+    r, g, b = _hex_rgb(acento)
+    if tema == "claro":
+        c1 = (min(255, r + 180), min(255, g + 180), min(255, b + 180))
+        c2 = (min(255, r + 200), min(255, g + 200), min(255, b + 200))
+        return (f"radial-gradient(60% 50% at 72% 16%, #{c1[0]:02x}{c1[1]:02x}{c1[2]:02x} 0%, transparent 60%),"
+                f"radial-gradient(55% 48% at 16% 84%, #{c2[0]:02x}{c2[1]:02x}{c2[2]:02x} 0%, transparent 62%),"
+                "linear-gradient(160deg, #f7f8fa 0%, #F4F2FB 72%)")
+    # escuro: blobs na cor da marca, base near-black/navy da marca
+    c1 = (max(0, r // 3), max(0, g // 3), max(0, b // 3))
+    c2 = (max(0, r // 2), max(0, g // 2), max(0, b // 2))
+    base = base_escura if (base_escura or "").startswith("#") else "#0B0B0B"
+    mid = f"#{max(0,c1[0]//2):02x}{max(0,c1[1]//2):02x}{max(0,c1[2]//2):02x}"
+    return (f"radial-gradient(60% 50% at 28% 16%, #{c1[0]:02x}{c1[1]:02x}{c1[2]:02x} 0%, transparent 60%),"
+            f"radial-gradient(55% 48% at 84% 66%, #{c2[0]:02x}{c2[1]:02x}{c2[2]:02x} 0%, transparent 62%),"
+            f"linear-gradient(160deg, {mid} 0%, {base} 72%)")
 # Grão de filme (ruído fractal SVG, dessaturado) — camada da "grade" de acabamento
 GRAIN = ("url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E"
          "%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' "
@@ -83,6 +102,7 @@ def load_brands():
             "logo_path": m.get("logo_path", ""), "logo_svg": m.get("logo_svg", ""),
             "logo_file": brasao.get("principal") or m.get("logo_file") or "",
             "wordmark": m.get("wordmark", ""), "gradiente": m.get("gradiente", ""),
+            "base_escura": m.get("base_escura") or (m.get("paleta_extra") or {}).get("navy") or "",
             "tab": (m["wordmark"].split("*")[0].split()[0].upper() if m.get("wordmark")
                     else m["nome"].split()[0].replace(".", "").upper()),
         }
@@ -174,8 +194,36 @@ def render_rich(text):
     return s.replace(BR, "<br>")
 
 
-# Degradê claro da marca (fundo instantâneo, sem IA) — off-white → lavanda → roxo suave
+# Fallback legado (smark). Preferir degrade_claro_da_marca(acento).
 DEGRADE_CLARO = "linear-gradient(155deg,#F4F2FB 0%,#EFE6FF 42%,#D9C2FF 78%,#C6A8FF 100%)"
+
+
+def _hex_rgb(h):
+    h = (h or "").lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    if len(h) != 6:
+        return (139, 60, 247)
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def degrade_claro_da_marca(acento, acento_claro=None):
+    """Degradê claro tingido pelo acento da marca (não lavanda smark)."""
+    r, g, b = _hex_rgb(acento)
+    r2, g2, b2 = _hex_rgb(acento_claro or acento)
+    # misturas claras
+    def mix(a, t):
+        return tuple(int(255 * (1 - t) + c * t) for c in a)
+    c1 = mix((r, g, b), 0.08)
+    c2 = mix((r2, g2, b2), 0.18)
+    c3 = mix((r, g, b), 0.35)
+    return (f"linear-gradient(155deg,#F7F8FA 0%,#{c1[0]:02x}{c1[1]:02x}{c1[2]:02x} 40%,"
+            f"#{c2[0]:02x}{c2[1]:02x}{c2[2]:02x} 72%,#{c3[0]:02x}{c3[1]:02x}{c3[2]:02x} 100%)")
+
+
+def _rgba(h, a):
+    r, g, b = _hex_rgb(h)
+    return f"rgba({r},{g},{b},{a})"
 
 
 def tab_font(label):
@@ -228,15 +276,21 @@ body{width:%(W)spx;height:%(H)spx;overflow:hidden;}
 PAGE = "<!doctype html><html><head><meta charset='utf-8'><style>%(CSS)s</style></head><body>%(BODY)s</body></html>"
 
 
-def _ovx_bg(overlay, ang, pos):
-    if overlay == "branco":
+def _ovx_bg(overlay, ang, pos, accent="#8B3CF7"):
+    """Overlays. 'roxo'/'todo-roxo' = legado; usam o acento da marca ativa."""
+    acc = accent or "#8B3CF7"
+    r, g, b = _hex_rgb(acc)
+    # versão mais escura pro fim do degradê
+    rd, gd, bd = max(0, r // 2), max(0, g // 2), max(0, b // 2)
+    if overlay in ("branco",):
         return f"linear-gradient({ang}deg, rgba(255,255,255,0) {pos}%, rgba(255,255,255,1) 100%)"
-    if overlay == "roxo":
-        return f"linear-gradient({ang}deg, rgba(138,60,247,0) {pos}%, rgba(74,30,150,.96) 100%)"
-    if overlay == "todo-branco":
+    if overlay in ("roxo", "acento", "marca"):
+        return (f"linear-gradient({ang}deg, rgba({r},{g},{b},0) {pos}%, "
+                f"rgba({rd},{gd},{bd},.96) 100%)")
+    if overlay in ("todo-branco",):
         return "#FFFFFF"
-    if overlay == "todo-roxo":
-        return "#8A3CF7"
+    if overlay in ("todo-roxo", "todo-acento", "todo-marca"):
+        return acc if acc.startswith("#") else f"#{acc}"
     return "none"
 
 
@@ -266,6 +320,8 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     rodape = rodape_over or fund.get("rodape", "@copywriting2026")
     handle = handle_over or b["handle"]
 
+    # grade/duotone usa acento da MARCA (não roxo smark fixo)
+    gtint = accent_c
     if tema == "claro":
         cl = fund.get("_claro", {})
         base_c = base or cl.get("base", "#F4F2FB")
@@ -277,8 +333,9 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
              "HSHADOW": "none", "VSTYLE": f"color:{acc_txt};", "DOT": acc_txt,
              "FOOTTXT": cl.get("apoio", "#6B6680"), "FOOTBORDER": "rgba(0,0,0,.14)", "FOOTCRED": "#8B8698",
              "PAGETXT": txt, "PAGEBG": "rgba(255,255,255,.6)", "PAGEBORDER": "rgba(0,0,0,.14)",
-             "GTINT": "#8B3CF7", "GTO": ".07",
-             "GVIG": "radial-gradient(150% 130% at 50% 30%, transparent 60%, rgba(40,28,168,.10) 100%)", "GGO": ".05"}
+             "GTINT": gtint, "GTO": ".07",
+             "GVIG": f"radial-gradient(150% 130% at 50% 30%, transparent 60%, {_rgba(accent_c, 0.10)} 100%)",
+             "GGO": ".05"}
     else:
         base_c = base or fund.get("base", "#0B0B0B")
         T = {"BASE": base_c, "TXT": "#FFFFFF", "SUBC": "#DCDCDC", "LH": ".96",
@@ -286,8 +343,9 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
              "HSHADOW": "0 6px 34px rgba(0,0,0,.7)", "VSTYLE": f"color:{bright_c};", "DOT": bright_c,
              "FOOTTXT": "#9A9A9A", "FOOTBORDER": "rgba(255,255,255,.14)", "FOOTCRED": "#7A7A7A",
              "PAGETXT": "rgba(255,255,255,.7)", "PAGEBG": "rgba(0,0,0,.28)", "PAGEBORDER": "rgba(255,255,255,.14)",
-             "GTINT": "#2A1CA8", "GTO": ".15",
-             "GVIG": "radial-gradient(135% 120% at 50% 34%, transparent 42%, rgba(0,0,0,.78) 100%)", "GGO": ".08"}
+             "GTINT": gtint, "GTO": ".12",
+             "GVIG": "radial-gradient(135% 120% at 50% 34%, transparent 42%, rgba(0,0,0,.78) 100%)",
+             "GGO": ".08"}
 
     has_img = False
     bg_css = "none"
@@ -299,10 +357,16 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
         bg_css = f"url(data:image/png;base64,{base64.b64encode(open(bgp,'rb').read()).decode()})"
         has_img = True
     elif placeholder:
-        bg_css = MESH_CLARO if tema == "claro" else MESH_ESCURO
+        base_e = (b.get("base_escura") or "")
+        if not base_e:
+            # tenta extrair do gradiente "... #HEX 100%)"
+            import re as _re
+            gm = _re.search(r"(#[0-9A-Fa-f]{6})\s+100%", b.get("gradiente") or "")
+            base_e = gm.group(1) if gm else "#0B0B0B"
+        bg_css = mesh_da_marca(accent_c, tema, base_e)
 
     hsz = hsize if hsize > 0 else min(auto_hsize(headline), 92 if cta else 104)
-    ovx_bg = _ovx_bg(overlay, ov_ang, ov_pos)
+    ovx_bg = _ovx_bg(overlay, ov_ang, ov_pos, accent=accent_c)
     ovx_op = 0 if overlay == "none" else max(0.0, min(1.0, float(overlay_op)))
     cssvars = {"W": w, "H": h, "BG": bg_css, "ACCENT": accent_c, "SQUARE": square, "ONACC": on_acc,
                "HSIZE": hsz, "TABF": tab_font(b["tab"]), "GRAIN": GRAIN,

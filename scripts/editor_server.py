@@ -872,22 +872,48 @@ def hl(text):
 
 def frame_kwargs(fr, size, for_export, marca="smark"):
     """Traduz um frame do editor.json nos kwargs do compose_html.
-    for_export=True embute a imagem (base64, render headless); False usa URL estática (preview leve)."""
+    for_export=True embute a imagem (base64, render headless); False usa URL estática (preview leve).
+
+    Cores vêm SEMPRE da marca ativa (tokens) — nunca roxo smark em cliente.
+    """
+    meta = _marcas.get(marca) or {}
+    acc = meta.get("acento") or "#8B3CF7"
+    acc2 = meta.get("acento_claro") or acc
+    grad = meta.get("gradiente") or f"linear-gradient(155deg,{acc} 0%,{_marcas._base_escura_de(acc)} 100%)"
+    alt = meta.get("acento_alternativo") or ""
+
     k = dict(marca=marca, headline=hl(fr.get("headline", "")), sub=hl(fr.get("sub", "")),
              cta=fr.get("cta", ""), page=fr.get("page", ""), no_chip=not fr.get("chip", False),
              tema=fr.get("tema", "escuro"), size=size, hsize=int(fr.get("hsize", 0) or 0),
-             accent=fr.get("accent", ""), no_grade=not fr.get("grade", True),
+             accent=fr.get("accent") or acc, bright=fr.get("bright") or acc2,
+             square=fr.get("square") or grad,
+             no_grade=not fr.get("grade", True),
              zoom=float(fr.get("zoom", 1.0) or 1.0), posx=int(fr.get("posx", 50)),
              posy=int(fr.get("posy", 50)), overlay=fr.get("overlay", "none"),
              overlay_op=float(fr.get("overlay_op", 0.85)),
              ov_ang=int(fr.get("ov_ang", 180)), ov_pos=int(fr.get("ov_pos", 20)),
              brilho=float(fr.get("brilho", 1.0)), contraste=float(fr.get("contraste", 1.0)),
              satur=float(fr.get("satur", 1.0)),
-             handle_over=fr.get("handle", ""), rodape_over=fr.get("rodape", ""),
+             handle_over=fr.get("handle", "") or meta.get("handle", ""),
+             rodape_over=fr.get("rodape", ""),
              raw=bool(fr.get("raw", False)))
-    if fr.get("paleta") == "lima":  # acento secundário da marca — pinta selo, tab, CTA, logo e destaque
-        k["accent"] = "#C6F24E"
-        k["square"] = "#C6F24E"
+
+    # paleta: "marca" (default) | "secundario" | legado "lima"/"roxo"
+    pal = (fr.get("paleta") or "marca").lower()
+    if pal in ("lima", "secundario", "alt"):
+        sec = alt or acc2 or "#C6F24E"
+        k["accent"] = sec
+        k["bright"] = sec
+        k["square"] = sec
+    elif pal in ("marca", "roxo", "", "primario"):
+        k["accent"] = acc
+        k["bright"] = acc2
+        k["square"] = grad
+    # se o frame forçou accent manual, respeita
+    if fr.get("accent"):
+        k["accent"] = fr["accent"]
+        k["bright"] = fr.get("bright") or fr["accent"]
+
     mode = fr.get("bgmode", "imagem")
     if mode == "imagem" and fr.get("bg"):
         if for_export:
@@ -896,10 +922,10 @@ def frame_kwargs(fr, size, for_export, marca="smark"):
             k["bg_url"] = "/" + urllib.parse.quote(fr["bg"])
     elif mode == "cor":
         k["base"] = fr.get("cor") or ""
-    elif mode == "degrade":  # degradê claro da marca (instantâneo, sem IA)
-        k["base"] = compositor.DEGRADE_CLARO
+    elif mode == "degrade":  # degradê claro TINGIDO pela marca
+        k["base"] = compositor.degrade_claro_da_marca(acc, acc2)
         k["tema"] = "claro"
-    else:  # escuro | claro (preset com mesh)
+    else:  # escuro | claro (preset com mesh on-brand)
         k["placeholder"] = True
         k["tema"] = "claro" if mode == "claro" else "escuro"
     return k
