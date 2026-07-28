@@ -192,16 +192,28 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .fsmodal{display:none;position:fixed;inset:0;background:#000e;z-index:300;align-items:center;justify-content:center}
 .fsmodal iframe{border:0;width:1080px;height:1350px;transform-origin:center center}
 .fsmodal .x{position:absolute;top:14px;right:18px;background:var(--rox);color:#fff;border:0;border-radius:8px;padding:9px 15px;cursor:pointer;z-index:2;font-size:13px}
-.npmodal{display:none;position:fixed;inset:0;background:#000b;z-index:250;align-items:center;justify-content:center}
-.npbox{background:#141019;border:1px solid var(--line);border-radius:14px;padding:20px;width:350px}
-.npbox h3{font-size:16px;margin-bottom:12px}.npbox label{display:block;margin:12px 0 5px;font-size:12px;color:var(--sub)}
-.npbox input{width:100%;background:#0f0d17;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:9px;font-size:13px}
-.npbrands{display:flex;gap:6px}
-.npbrands button{flex:1;padding:10px 6px;border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:8px;cursor:pointer;font-size:12px}
-.npbrands button.on{background:var(--rox);border-color:var(--rox);color:#fff;font-weight:600}
+.npmodal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:250;align-items:center;justify-content:center;padding:16px}
+.npbox{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 22px 18px;width:min(440px,100%);box-shadow:0 24px 70px rgba(0,0,0,.35);color:var(--txt)}
+.npbox h3{font-size:18px;margin:0 0 14px;font-family:var(--font-display);font-weight:400;text-transform:uppercase;letter-spacing:.02em;color:var(--txt)}
+.npbox label{display:block;margin:12px 0 5px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.npbox input[type=text],.npbox input:not([type]),.npbox input[type=search],.npbox textarea{
+  width:100%;background:var(--field,var(--inset,#f4f2fb));border:1px solid var(--field-line,var(--line));
+  color:var(--txt);border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;box-sizing:border-box}
+.npbox input:focus,.npbox textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.npbox input::placeholder,.npbox textarea::placeholder{color:var(--muted);opacity:.85}
+.npsearch{margin-top:4px}
+.npbrands{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto;padding:4px 2px 2px;margin-top:6px}
+.npbrands button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--field-line,var(--line));background:var(--surface);color:var(--txt);border-radius:12px;cursor:pointer;font-size:13px;transition:.12s}
+.npbrands button:hover{border-color:var(--accent);background:var(--pan2,var(--inset))}
+.npbrands button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink,#fff);font-weight:600}
+.npbrands button .dot{width:10px;height:10px;border-radius:3px;flex:0 0 auto;border:1px solid rgba(0,0,0,.12)}
+.npbrands button .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.npbrands button .hd{font-size:11px;opacity:.75;flex:0 0 auto}
+.npbrands .empty{padding:14px;text-align:center;color:var(--muted);font-size:13px}
 .npbtns{display:flex;gap:8px;margin-top:18px}
-.npbtns button{flex:1;padding:10px;border:1px solid var(--line);background:#1b1729;color:var(--txt);border-radius:9px;cursor:pointer}
-.npbtns .go{background:var(--rox);border-color:var(--rox);font-weight:600}
+.npbtns button{flex:1;padding:11px;border:1px solid var(--field-line,var(--line));background:var(--surface);color:var(--txt);border-radius:10px;cursor:pointer;font-size:13px;font-weight:600}
+.npbtns .go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink,#fff)}
+.npbtns .go:hover{filter:brightness(1.05)}
 
 /* ===================== DESIGN SYSTEM — harmonização ===================== */
 /* reveste os componentes nativos do editor com a estética do smark-ds (raios, sombras, focus ring, botões). Só CSS. */
@@ -268,10 +280,21 @@ input[type=range]{accent-color:var(--accent)}
 .eshead .prov{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--inset)}
 .eshead .x{background:transparent;border:0;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:8px}
 .eshead .x:hover{background:var(--inset);color:var(--text)}
-.eswelcome{padding:18px 18px 8px;text-align:center}
+.eswelcome{padding:16px 16px 10px;text-align:center;flex:1;overflow:auto;min-height:0;display:flex;flex-direction:column}
 .eswelcome h3{font-size:18px;font-weight:700;color:var(--txt);margin:0 0 6px;letter-spacing:-.02em}
-.eswelcome p{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0}
+.eswelcome p{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 14px}
+.es-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;margin-top:4px}
+.es-act{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:12px 12px;border:1px solid var(--line);background:var(--surface);border-radius:14px;cursor:pointer;transition:.15s;color:var(--txt);font:inherit;text-align:left;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.es-act:hover{border-color:var(--accent);transform:translateY(-1px);background:var(--pan2,var(--inset));box-shadow:0 6px 18px color-mix(in srgb,var(--esbrand,var(--accent)) 18%,transparent)}
+.es-act b{font-size:13px;font-weight:700;letter-spacing:-.01em;display:inline-flex;align-items:center;gap:6px}
+.es-act span{font-size:11px;color:var(--muted);line-height:1.35}
+.es-act.soon{opacity:.55;cursor:not-allowed}
+.es-act.soon:hover{transform:none;border-color:var(--line);box-shadow:none}
+.es-act .ico{font-size:15px;line-height:1}
+#estudio:has(.eslog .esmsg) .eswelcome{display:none}
 .eslog{flex:1;overflow:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.eslog:empty,.eslog:has(.esempty:only-child){display:none}
+#estudio:has(.eslog .esmsg) .eslog{display:flex;flex:1}
 .esmsg{font-size:13px;line-height:1.5;border-radius:16px;padding:10px 13px;max-width:94%}
 .esmsg.u{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:6px}
 .esmsg.a{align-self:flex-start;background:var(--inset);color:var(--text);border-bottom-left-radius:6px}
@@ -437,14 +460,16 @@ input[type=range]{accent-color:var(--accent)}
 <div id=fsmodal class=fsmodal><button class=x id=fsx>✕ fechar</button><iframe id=fsif></iframe></div>
 <div id=npmodal class=npmodal><div class=npbox>
   <h3>Novo post</h3>
-  <label>Título</label><input id=nptitle placeholder="ex.: Chegada do funcionário de IA">
-  <label>Marca</label>
-  <div class=npbrands><button data-m=smark class=on>smark</button><button data-m=provider-max>Provider Max</button><button data-m=elever-ai>Elever AI</button></div>
-  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+  <label for=nptitle>Título</label>
+  <input id=nptitle type=text placeholder="ex.: Chegada do funcionário de IA" autocomplete=off>
+  <label for=npsearch>Marca</label>
+  <input id=npsearch class=npsearch type=search placeholder="Buscar marca…" autocomplete=off>
+  <div class=npbrands id=npbrands></div>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
     <button type=button id=npnewmarca class=btn style="width:auto;padding:8px 12px;font-size:12px">＋ Nova marca</button>
     <a href="/config" class=btn style="width:auto;padding:8px 12px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center">⚙ Gerenciar marcas</a>
   </div>
-  <div class=npbtns><button id=npcancel>Cancelar</button><button id=npok class=go>Criar post</button></div>
+  <div class=npbtns><button type=button id=npcancel>Cancelar</button><button type=button id=npok class=go>Criar post</button></div>
 </div></div>
 <div id=mbmodal class=npmodal style="display:none"><div class=npbox style="max-width:440px">
   <h3 id=mbtitle>Nova marca</h3>
@@ -459,7 +484,7 @@ input[type=range]{accent-color:var(--accent)}
     <div><label>Glyph</label><input id=mb_glyph placeholder="N" maxlength=2></div>
   </div>
   <label>Wordmark</label><input id=mb_wordmark placeholder="NetSul">
-  <label>Mood (inglês, p/ fundo IA)</label><textarea id=mb_mood rows=2 placeholder="warm regional ISP brand — clean, reliable"></textarea>
+  <label>Mood (direção de arte, pt-BR)</label><textarea id=mb_mood rows=2 placeholder="visual limpo e profissional da marca — cores da identidade, foto corporativa"></textarea>
   <label>Logo (opcional)</label>
   <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
     <div id=mb_logoprev style="width:48px;height:48px;border-radius:12px;border:1px dashed var(--line);display:grid;place-items:center;font-size:10px;color:var(--muted);overflow:hidden">—</div>
@@ -531,17 +556,8 @@ async function carregarMarcas(){
     if(cur&&cur!=='__nova__'&&[...sel.options].some(o=>o.value===cur))sel.value=cur;
     sel.onchange=()=>{if(sel.value==='__nova__'){sel.value=cur&&cur!=='__nova__'?cur:(MARCAS_LIST[0]&&MARCAS_LIST[0].slug)||'smark';abrirModalMarca()}};
   }
-  // Modal novo post — botões de marca
-  const nb=document.querySelector('#npmodal .npbrands');
-  if(nb){
-    const cur=NPBRAND;
-    nb.innerHTML=MARCAS_LIST.map(m=>'<button data-m="'+m.slug+'"'+(m.slug===cur?' class=on':'')+'>'+esc(m.nome||m.slug)+'</button>').join('');
-    if(!nb.querySelector('button.on')&&nb.querySelector('button'))nb.querySelector('button').classList.add('on');
-    nb.querySelectorAll('button').forEach(b=>b.onclick=()=>{
-      NPBRAND=b.dataset.m;
-      nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
-    });
-  }
+  // Modal novo post — lista pesquisável de marcas
+  if(typeof renderNpBrands==='function')renderNpBrands();
   // select de marca no post aberto
   const ps=document.getElementById('postmarca');
   if(ps&&typeof post==='function'&&post()){
@@ -585,8 +601,7 @@ async function salvarModalMarca(){
   msg.textContent='Marca criada ✓';msg.style.color='var(--good)';
   await carregarMarcas();
   NPBRAND=r.slug;
-  const nb=document.querySelector('#npmodal .npbrands');
-  if(nb)nb.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===r.slug));
+  renderNpBrands((document.getElementById('npsearch')||{}).value||'');
   const sel=document.getElementById('esmarca');
   if(sel&&[...sel.options].some(o=>o.value===r.slug))sel.value=r.slug;
   setTimeout(()=>{document.getElementById('mbmodal').style.display='none';toast('Marca '+r.slug+' pronta')},500);
@@ -1272,21 +1287,48 @@ async function delCard(){
   post().frames.splice(FI,1);await salvar(true);await reload(PI,Math.max(0,FI-1));toast('Card excluído');
 }
 let NPBRAND='smark';
+function renderNpBrands(filter){
+  const nb=document.getElementById('npbrands');
+  if(!nb)return;
+  const q=(filter!=null?filter:(document.getElementById('npsearch')||{}).value||'').toLowerCase().trim();
+  let list=MARCAS_LIST||[];
+  if(q)list=list.filter(m=>((m.nome||'')+' '+(m.slug||'')+' '+(m.handle||'')).toLowerCase().includes(q));
+  if(!list.length){
+    nb.innerHTML='<div class=empty>Nenhuma marca encontrada</div>';
+    return;
+  }
+  if(!list.some(m=>m.slug===NPBRAND))NPBRAND=list[0].slug;
+  nb.innerHTML=list.map(m=>{
+    const on=m.slug===NPBRAND?' on':'';
+    const acc=esc(m.acento||'#8B3CF7');
+    return '<button type=button data-m="'+esc(m.slug)+'" class="'+on.trim()+'" title="'+esc(m.handle||m.slug)+'">'
+      +'<span class=dot style="background:'+acc+'"></span>'
+      +'<span class=nm>'+esc(m.nome||m.slug)+'</span>'
+      +'<span class=hd>'+esc(m.handle||('@'+m.slug))+'</span></button>';
+  }).join('');
+  nb.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    NPBRAND=b.dataset.m;
+    nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  });
+}
 function novoPost(){
   if(!NPBRAND||!MARCAS_LIST.some(m=>m.slug===NPBRAND))NPBRAND=(MARCAS_LIST[0]&&MARCAS_LIST[0].slug)||'smark';
   const m=document.getElementById('npmodal');
   document.getElementById('nptitle').value='';
-  m.querySelectorAll('.npbrands button').forEach(b=>b.classList.toggle('on',b.dataset.m===NPBRAND));
+  const s=document.getElementById('npsearch');if(s)s.value='';
+  renderNpBrands('');
   m.style.display='flex';setTimeout(()=>document.getElementById('nptitle').focus(),50);
 }
-document.querySelectorAll('#npmodal .npbrands button').forEach(b=>b.onclick=()=>{NPBRAND=b.dataset.m;
-  document.querySelectorAll('#npmodal .npbrands button').forEach(x=>x.classList.toggle('on',x===b))});
+const _nps=document.getElementById('npsearch');
+if(_nps)_nps.oninput=()=>renderNpBrands(_nps.value);
 document.getElementById('npcancel').onclick=()=>document.getElementById('npmodal').style.display='none';
+document.getElementById('npmodal').onclick=e=>{if(e.target.id==='npmodal')e.currentTarget.style.display='none'};
 document.getElementById('npok').onclick=async()=>{
   const t=(document.getElementById('nptitle').value||'').trim()||'Novo post';
+  if(!NPBRAND){toast('Selecione uma marca');return}
   document.getElementById('npmodal').style.display='none';
   const r=await(await fetch('/novo-post',{method:'POST',headers:HJSON,body:JSON.stringify({titulo:t,slug:t,marca:NPBRAND})})).json();
-  if(r.ok){await reload(r.index,0);toast('Post criado · '+NPBRAND)}else toast(r.erro||'Erro ao criar post');
+  if(r.ok){await reload(r.index,0);toast('Post criado · '+(marcaMeta(NPBRAND).nome||NPBRAND))}else toast(r.erro||'Erro ao criar post');
 };
 // modal + botão nova marca
 const _npnm=document.getElementById('npnewmarca');if(_npnm)_npnm.onclick=abrirModalMarca;
@@ -1430,9 +1472,18 @@ carregar().then(()=>{snapshot();if(typeof setAmbientBrand==='function')setAmbien
   </div>
   <div class=eswelcome id=eswelcome>
     <h3>E aí — o que vamos criar?</h3>
-    <p>Peça copy, carrossel ou arte. Anexe uma foto de referência pelo +.</p>
+    <p>Escolha um atalho ou digite o pedido abaixo. Anexe uma foto pelo +.</p>
+    <div class=es-actions id=esactions>
+      <button type=button class=es-act data-act=unico data-n=1><b><span class=ico>◻</span> Post único</b><span>1 peça, mensagem direta</span></button>
+      <button type=button class=es-act data-act=carrossel data-n=3><b><span class=ico>▦</span> Carrossel 3</b><span>História em 3 cards</span></button>
+      <button type=button class=es-act data-act=carrossel data-n=5><b><span class=ico>▦</span> Carrossel 5</b><span>Narrativa completa</span></button>
+      <button type=button class=es-act data-act=carrossel data-n=8><b><span class=ico>▦</span> Carrossel 8</b><span>Série longa</span></button>
+      <button type=button class=es-act data-act=legenda><b><span class=ico>✎</span> Criar legenda</b><span>Texto do post + hashtags</span></button>
+      <button type=button class=es-act data-act=imagem><b><span class=ico>◎</span> Criar imagem</b><span>Só o fundo / arte</span></button>
+      <button type=button class="es-act soon" data-act=campanha disabled title="Em breve"><b><span class=ico>◈</span> Criar campanha</b><span>Em breve</span></button>
+    </div>
   </div>
-  <div class=eslog id=eslog><div class=esempty></div></div>
+  <div class=eslog id=eslog></div>
   <div class=esfoot>
     <div class=eschips id=eschips>
       <button type=button class=eschip data-p="carrossel de 3 sobre ">Carrossel 3</button>
@@ -1510,6 +1561,29 @@ carregar().then(()=>{snapshot();if(typeof setAmbientBrand==='function')setAmbien
   document.querySelectorAll('#eschips .eschip').forEach(b=>b.onclick=()=>{
     txt.value=(b.dataset.p||'')+txt.value;txt.focus();
     if((b.dataset.p||'').includes('arte')&&optFundo){optFundo.checked=true;syncFundoLab()}
+  });
+  // botões grandes de ação (ocupam o espaço em branco do welcome)
+  document.querySelectorAll('#esactions .es-act').forEach(b=>b.onclick=()=>{
+    if(b.disabled||b.classList.contains('soon')){toast('Campanha em breve');return}
+    const act=b.dataset.act;
+    const n=parseInt(b.dataset.n||'1',10)||1;
+    if(optN&&(act==='unico'||act==='carrossel'))optN.value=String(n);
+    if(act==='unico'){
+      txt.value='Crie um post único, tom direto e claro: ';
+      if(optFundo){optFundo.checked=true;syncFundoLab()}
+    }else if(act==='carrossel'){
+      txt.value='Crie um carrossel de '+n+' peças, narrativa progressiva: ';
+      if(optFundo){optFundo.checked=true;syncFundoLab()}
+    }else if(act==='legenda'){
+      txt.value='Escreva só a legenda do Instagram (2–4 frases + hashtags no fim). Não mude as headlines: ';
+      if(optFundo){optFundo.checked=false;syncFundoLab()}
+    }else if(act==='imagem'){
+      txt.value='Gere uma nova arte de fundo (sem texto na imagem): ';
+      if(optFundo){optFundo.checked=true;syncFundoLab()}
+    }
+    txt.focus();
+    // posiciona cursor no fim
+    try{const L=txt.value.length;txt.setSelectionRange(L,L)}catch(e){}
   });
   // ===== Anexar imagem de exemplo =====
   let attB64=null,attMime='image/jpeg',attPath=null;

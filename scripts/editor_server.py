@@ -221,27 +221,18 @@ def topbar(active=""):
 
 
 def config_html():
-    """Tela read-only das configurações do sistema (como ele está se comportando)."""
+    """Tela de configurações: padrões + marcas + log de publicações.
+
+    Conceitos de direção de arte ficam só no motor (_direcao.CONCEITOS) —
+    não são expostos na UI; mudança exige confirmação em fluxo admin.
+    """
     try:
         tok = json.load(open(os.path.join(VAULT, "design-system", "tokens", "tokens.json"), encoding="utf-8"))
     except Exception:
         tok = {}
-    try:
-        import _direcao
-        conceitos = list(getattr(_direcao, "CONCEITOS", {}).keys())
-    except Exception:
-        conceitos = []
-    ed = load() if os.path.isfile(DATA) else {"posts": []}
     fund = tok.get("fundacao", {})
-    marcas = tok.get("marcas", {})
     tp = tok.get("tema_padrao") or "claro"
     defsize = tok.get("editor_defaults", {}).get("size", "1080x1350")
-    sw = lambda c: f"<span style='display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:6px;background:{c};border:1px solid #333'></span>"
-    rows_p = "".join(
-        f"<tr><td>{i+1}</td><td>{p.get('titulo','')}</td><td>{p.get('slug','')}</td>"
-        f"<td>{p.get('marca','')}</td><td>{len(p.get('frames',[]))}</td></tr>"
-        for i, p in enumerate(ed.get("posts", [])))
-    chips = " ".join(f"<span class='sk-pill'>{c}</span>" for c in conceitos)
     return f"""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Configurações · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css">
@@ -256,24 +247,40 @@ tr:last-child td{{border-bottom:0}}
 .kv{{display:flex;flex-wrap:wrap;gap:10px;align-items:center}}.kv .cell{{background:var(--inset);border:1px solid var(--line);border-radius:var(--radius-md);padding:8px 12px;font-size:13px}}.kv b{{color:var(--accent-2)}}
 .ok{{color:var(--good);font-weight:600}}.err{{color:#e07070;font-weight:600}}
 .sk-input.mini,.sk-select.mini{{padding:7px 10px;font-size:13px;width:auto}}
-.mgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}}
+.mgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}}
 .mcard{{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}}
 .mcard:hover{{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));transform:translateY(-1px)}}
-.mcard .mhero{{height:72px;position:relative}}
-.mcard .top{{display:flex;gap:14px;align-items:flex-end;padding:0 16px;margin-top:-28px;position:relative;z-index:1}}
-.mlogo{{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff;flex:0 0 auto;overflow:hidden;background:var(--accent);border:3px solid var(--surface);box-shadow:0 4px 14px rgba(0,0,0,.25)}}
-.mlogo img{{width:100%;height:100%;object-fit:cover}}
-.mcard h3{{font-size:17px;margin:0 0 2px;letter-spacing:-.01em}} .mcard .slug{{color:var(--muted);font-size:12px}}
-.mbody{{padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px;flex:1}}
+.mcard .mhero{{height:64px;position:relative;flex:0 0 auto}}
+.mcard .top{{display:flex;gap:12px;align-items:center;padding:0 16px;margin-top:-26px;position:relative;z-index:1;min-width:0}}
+.mlogo{{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:20px;color:#fff;flex:0 0 52px;overflow:hidden;background:var(--accent);border:3px solid var(--surface);box-shadow:0 4px 14px rgba(0,0,0,.25)}}
+.mlogo img{{width:100%;height:100%;object-fit:contain;padding:5px;background:#fff;box-sizing:border-box}}
+.mcard .mtit{{min-width:0;flex:1;padding-top:22px}}
+.mcard h3{{font-size:16px;margin:0 0 2px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}}
+.mcard .slug{{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.mbody{{padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1;min-width:0}}
 .mswatches{{display:flex;gap:6px;align-items:center}}
 .msw{{width:22px;height:22px;border-radius:7px;border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}}
-.mmeta{{font-size:12px;color:var(--muted);line-height:1.45}}
 .macts{{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:4px}}
-.macts .sk-btn{{flex:1;justify-content:center;text-align:center}}
+.macts .sk-btn{{flex:1;justify-content:center;text-align:center;min-width:0}}
 .pill{{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10px;border:1px solid var(--line);color:var(--muted);font-weight:600}}
 .pill.ok{{border-color:color-mix(in srgb,var(--good) 50%,transparent);color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}}
 .pill.warn{{border-color:#c90;color:#c90}}
 .mpills{{display:flex;flex-wrap:wrap;gap:6px}}
+/* log de posts — sanfona + tabela */
+.plog-acc{{border:1px solid var(--line);border-radius:14px;background:var(--inset);overflow:hidden}}
+.plog-acc>summary{{cursor:pointer;padding:14px 16px;font-weight:600;font-size:14px;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;user-select:none}}
+.plog-acc>summary::-webkit-details-marker{{display:none}}
+.plog-acc>summary::after{{content:'▸';color:var(--muted);font-size:12px;transition:transform .15s}}
+.plog-acc[open]>summary::after{{transform:rotate(90deg)}}
+.plog-acc .plog-body{{padding:0 12px 14px;border-top:1px solid var(--line)}}
+.plog-table{{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}}
+.plog-table th{{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px 8px;border-bottom:1px solid var(--line)}}
+.plog-table td{{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}}
+.plog-table tr:last-child td{{border-bottom:0}}
+.plog-table .t{{font-weight:600;color:var(--text);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.plog-pager{{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;flex-wrap:wrap}}
+.plog-pager .pginfo{{font-size:12px;color:var(--muted)}}
+.plog-pager .pgbtns{{display:flex;gap:6px;align-items:center}}
 .modal{{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}}
 .modal.on{{display:flex}}
 .mbox{{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(520px,100%);max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.45)}}
@@ -310,17 +317,30 @@ tr:last-child td{{border-bottom:0}}
   </div>
 </div>
 
-<div class="sk-card"><div class=gh>Conceitos de direção de arte ({len(conceitos)})</div>{chips}</div>
-
 <div class="sk-card">
-  <div class=gh><span>Publicações &amp; tempo</span><span id=plog_count style="font-size:12px;font-weight:500;color:var(--muted)"></span></div>
-  <div class=kv style="margin-bottom:12px">
-    <div class=cell>Marca: <select class="sk-select mini" id=plog_marca><option value="">Todas</option></select></div>
-    <div class=cell>Busca: <input class="sk-input mini" id=plog_q placeholder="título…" style="width:160px"></div>
-  </div>
-  <div id=plog_stats class=kv style="margin-bottom:12px"></div>
-  <div id=plog_list style="display:flex;flex-direction:column;gap:6px"></div>
+  <details class=plog-acc id=plog_acc>
+    <summary>
+      <span>Publicações &amp; tempo <span id=plog_count style="font-weight:500;color:var(--muted);font-size:12px;margin-left:6px"></span></span>
+    </summary>
+    <div class=plog-body>
+      <div class=kv style="margin:12px 0">
+        <div class=cell>Marca: <select class="sk-select mini" id=plog_marca><option value="">Todas</option></select></div>
+        <div class=cell>Busca: <input class="sk-input mini" id=plog_q placeholder="título…" style="width:160px"></div>
+      </div>
+      <div id=plog_stats class=kv style="margin-bottom:8px"></div>
+      <div id=plog_list></div>
+      <div class=plog-pager id=plog_pager style="display:none">
+        <span class=pginfo id=plog_pginfo></span>
+        <div class=pgbtns>
+          <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=plog_prev>← Anterior</button>
+          <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=plog_next>Próxima →</button>
+        </div>
+      </div>
+    </div>
+  </details>
 </div>
+<!-- Conceitos de direção de arte: config interna do motor (_direcao.CONCEITOS).
+     Não expostos na UI — alteração só com confirmação explícita (API/admin). -->
 
 <div class="sk-card"><div class=gh>Servidor</div><div class=kv>
 <div class=cell>Porta: <b>{PORT}</b></div>
@@ -442,6 +462,7 @@ async function api(url, body){{
 document.getElementById('cf_tema').value="{tp}";
 document.getElementById('cf_size').value="{defsize}";
 document.getElementById('cf_save').onclick=async()=>{{
+  if(!confirm('Salvar os padrões do sistema?\\n\\nIsso altera tema-padrão, tamanho e rodapé para novas artes.'))return;
   const r=await api('/config-save',{{tema_padrao:document.getElementById('cf_tema').value,size:document.getElementById('cf_size').value,rodape:document.getElementById('cf_rodape').value}});
   document.getElementById('cf_msg').textContent=r.ok?'Salvo ✓':('Erro: '+(r.erro||''));
 }};
@@ -457,11 +478,11 @@ async function loadMarcas(){{
       <div class=mhero style="background:${{esc(m.gradiente||m.acento||'#333')}}"></div>
       <div class=top>
         <div class=mlogo style="background:${{esc(m.gradiente||m.acento)}}">${{
-          m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" alt="" style="object-fit:contain;padding:6px;background:#fff">`:esc(m.glyph||'?')
+          m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" alt="">`:esc(m.glyph||'?')
         }}</div>
-        <div style="padding-bottom:4px;min-width:0">
-          <h3>${{esc(m.nome)}}</h3>
-          <div class=slug>${{esc(m.handle||('@'+m.slug))}}</div>
+        <div class=mtit>
+          <h3 title="${{esc(m.nome)}}">${{esc(m.nome)}}</h3>
+          <div class=slug title="${{esc(m.handle||('@'+m.slug))}}">${{esc(m.handle||('@'+m.slug))}}</div>
         </div>
       </div>
       <div class=mbody>
@@ -475,7 +496,6 @@ async function loadMarcas(){{
           ${{m.canonica?'<span class=pill>Grupo smark</span>':'<span class=pill>Cliente</span>'}}
           ${{m.branding_book?'<span class=pill>Book</span>':''}}
         </div>
-        ${{m.mood?('<div class=mmeta>'+esc((m.mood||'').slice(0,100))+((m.mood||'').length>100?'…':'')+'</div>'):''}}
         <div class=macts>
           <button class="sk-btn sk-btn--secondary sk-btn--sm" data-edit="${{esc(m.slug)}}">Editar</button>
           <a class="sk-btn sk-btn--sm" href="/editor?novo=1&marca=${{encodeURIComponent(m.slug)}}">Novo post</a>
@@ -801,38 +821,57 @@ async function loadPostLog(){{
     renderPostLog();
   }}catch(e){{list.innerHTML='Erro ao carregar';}}
 }}
+window._PLOG_PAGE=0;
+window._PLOG_PER=10;
 function renderPostLog(){{
   const list=document.getElementById('plog_list');
+  const pager=document.getElementById('plog_pager');
   if(!list)return;
   const marca=document.getElementById('plog_marca').value;
   const q=(document.getElementById('plog_q').value||'').toLowerCase();
   let rows=window._PLOG||[];
   if(marca)rows=rows.filter(p=>p.marca===marca);
   if(q)rows=rows.filter(p=>((p.titulo||'')+' '+(p.slug||'')).toLowerCase().includes(q));
-  document.getElementById('plog_count').textContent=rows.length+' post(s)';
-  if(!rows.length){{list.innerHTML='<div style="color:var(--muted);font-size:13px">Nenhum post neste filtro.</div>';return}}
-  list.innerHTML=rows.map((p)=>{{
-    const custo=p.total_brl!=null?('R$ '+Number(p.total_brl).toFixed(2)):(p.total_usd!=null?('US$ '+Number(p.total_usd).toFixed(3)):'—');
-    const tempo=fmtMin(p.total_minutes);
-    const ativo=p.active?(' · <span style="color:var(--accent)">em edição '+fmtMin(p.active_minutes)+'</span>'):'';
-    return '<details style="border:1px solid var(--line);border-radius:12px;background:var(--inset);overflow:hidden">'
-      +'<summary style="cursor:pointer;padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;list-style:none">'
-      +'<b style="flex:1;min-width:140px">'+esc(p.titulo)+'</b>'
-      +'<span class=pill>'+esc(p.marca)+'</span>'
-      +'<span style="font-size:12px;color:var(--muted)">⏱ '+tempo+ativo+'</span>'
-      +'<span style="font-size:12px;color:var(--muted)">💰 '+custo+'</span>'
-      +'<span style="font-size:12px;color:var(--muted)">'+relTime(p.updated_at||p.created_at)+'</span>'
-      +'</summary>'
-      +'<div style="padding:0 14px 14px;font-size:12px;color:var(--muted);line-height:1.55;border-top:1px solid var(--line)">'
-      +'<div style="margin-top:10px">Criado: <b style="color:var(--text)">'+esc(p.created_at||'—')+'</b> · Atualizado: <b style="color:var(--text)">'+esc(p.updated_at||'—')+'</b></div>'
-      +'<div>Peças: '+(p.n_frames||0)+' · Textos IA: '+(p.copy_calls_total||0)+' · Imagens: '+(p.image_gens_total||0)+' · Exports: '+(p.exports_total||0)+'</div>'
-      +'<div>Ciclos: '+(p.cycles_n||0)+(p.avg_minutes!=null?(' · média '+fmtMin(p.avg_minutes)):'')+(p.last_minutes!=null?(' · último '+fmtMin(p.last_minutes)):'')+'</div>'
-      +'<div style="margin-top:8px"><a class="sk-btn sk-btn--sm" href="/editor?post='+p.idx+'">Abrir no editor</a></div>'
-      +'</div></details>';
-  }}).join('');
+  document.getElementById('plog_count').textContent='('+rows.length+')';
+  const per=window._PLOG_PER||10;
+  const pages=Math.max(1, Math.ceil(rows.length/per));
+  if(window._PLOG_PAGE>=pages) window._PLOG_PAGE=pages-1;
+  if(window._PLOG_PAGE<0) window._PLOG_PAGE=0;
+  const start=window._PLOG_PAGE*per;
+  const slice=rows.slice(start, start+per);
+  if(!rows.length){{
+    list.innerHTML='<div style="color:var(--muted);font-size:13px;padding:12px 4px">Nenhum post neste filtro.</div>';
+    if(pager)pager.style.display='none';
+    return;
+  }}
+  list.innerHTML='<table class=plog-table><thead><tr>'
+    +'<th>Título</th><th>Marca</th><th>Tempo</th><th>Custo</th><th>Quando</th><th></th>'
+    +'</tr></thead><tbody>'
+    +slice.map(p=>{{
+      const custo=p.total_brl!=null?('R$ '+Number(p.total_brl).toFixed(2)):(p.total_usd!=null?('US$ '+Number(p.total_usd).toFixed(3)):'—');
+      const tempo=fmtMin(p.total_minutes);
+      return '<tr>'
+        +'<td class=t title="'+esc(p.titulo)+'">'+esc(p.titulo||p.slug||'—')+'</td>'
+        +'<td><span class=pill>'+esc(p.marca||'—')+'</span></td>'
+        +'<td style="white-space:nowrap;color:var(--muted)">'+tempo+'</td>'
+        +'<td style="white-space:nowrap;color:var(--muted)">'+custo+'</td>'
+        +'<td style="white-space:nowrap;color:var(--muted)">'+relTime(p.updated_at||p.created_at)+'</td>'
+        +'<td><a class="sk-btn sk-btn--secondary sk-btn--sm" href="/editor?post='+p.idx+'">Abrir</a></td>'
+        +'</tr>';
+    }}).join('')
+    +'</tbody></table>';
+  if(pager){{
+    pager.style.display=rows.length>per?'flex':'none';
+    document.getElementById('plog_pginfo').textContent=
+      'Página '+(window._PLOG_PAGE+1)+' de '+pages+' · '+rows.length+' post(s) · '+per+' por página';
+    document.getElementById('plog_prev').disabled=window._PLOG_PAGE<=0;
+    document.getElementById('plog_next').disabled=window._PLOG_PAGE>=pages-1;
+  }}
 }}
-document.getElementById('plog_marca').onchange=renderPostLog;
-document.getElementById('plog_q').oninput=()=>{{clearTimeout(window._plogT);window._plogT=setTimeout(renderPostLog,180)}};
+document.getElementById('plog_marca').onchange=()=>{{window._PLOG_PAGE=0;renderPostLog()}};
+document.getElementById('plog_q').oninput=()=>{{clearTimeout(window._plogT);window._plogT=setTimeout(()=>{{window._PLOG_PAGE=0;renderPostLog()}},180)}};
+document.getElementById('plog_prev').onclick=()=>{{window._PLOG_PAGE--;renderPostLog()}};
+document.getElementById('plog_next').onclick=()=>{{window._PLOG_PAGE++;renderPostLog()}};
 loadPostLog();
 
 // deep-link

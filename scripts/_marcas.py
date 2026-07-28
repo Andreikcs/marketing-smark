@@ -193,17 +193,18 @@ SEGMENTOS = (
     ("outro", "Outro"),
 )
 
-# mood base por segmento (inglês, direção de arte)
+# mood base por segmento (pt-BR — idioma padrão da plataforma)
+# Usado na UI e como direção de arte; o motor de imagem aceita pt-BR.
 MOOD_POR_SEGMENTO = {
-    "contabilidade": "premium B2B accounting and tax advisory — deep navy and teal, clean corporate photography, geometric curves, trustworthy Contabilidade de Resultado style",
-    "telecom": "regional ISP fiber broadband brand — infrastructure at scale, warm reliable neighborhood connectivity, clean industrial-premium",
-    "varejo": "retail commerce brand — bright product photography, clean shelves, modern storefront energy, approachable premium",
-    "imobiliaria": "real estate premium brand — bright interiors, architectural photography, trust and aspiration, airy composition",
-    "saude": "healthcare clinic brand — calm clinical whites and soft blues, human care, clean medical photography",
-    "servicos": "B2B professional services brand — restrained corporate, clean desks, trustworthy premium photography",
-    "educacao": "education brand — bright hopeful learning spaces, modern campus energy, clean human photography",
-    "industria": "industrial manufacturing brand — steel, precision machinery, safety and scale, dark premium engineering",
-    "outro": "premium on-brand visual — clean, professional, restrained",
+    "contabilidade": "marca B2B de contabilidade e fiscal — navy e teal, fotografia corporativa limpa, curvas geométricas, confiança e resultado",
+    "telecom": "provedor regional de fibra — infraestrutura em escala, conexão de bairro confiável, visual industrial limpo e premium",
+    "varejo": "marca de varejo e comércio — foto de produto clara, prateleiras limpas, energia de loja moderna e acessível",
+    "imobiliaria": "marca imobiliária premium — interiores claros, fotografia arquitetônica, confiança e aspiração, composição arejada",
+    "saude": "marca de saúde e clínicas — brancos clínicos e azuis suaves, cuidado humano, fotografia médica limpa",
+    "servicos": "serviços B2B profissionais — corporativo contido, mesas limpas, fotografia premium e confiável",
+    "educacao": "marca de educação — espaços de aprendizado claros e esperançosos, energia de campus moderno",
+    "industria": "marca industrial — aço, máquinas de precisão, segurança e escala, engenharia premium em fundo escuro",
+    "outro": "visual premium da marca — limpo, profissional e contido",
 }
 
 
@@ -301,8 +302,8 @@ def gerar_texto_ia_marca(slug=None, nome="", segmento="", acento="", site=""):
     base = "".join(c for c in base if unicodedata.category(c) != "Mn")
     handle = "@" + re.sub(r"[^a-z0-9]", "", base)[:24]
     mood = MOOD_POR_SEGMENTO[seg]
-    # personaliza levemente com o nome
-    mood = f"{mood} — brand name {nome}"
+    # personaliza levemente com o nome (sempre pt-BR)
+    mood = f"{mood} — nome da marca: {nome}"
     glyph = (nome[:1] or "M").upper()
     wordmark = nome
     dicas = {
@@ -632,7 +633,7 @@ def criar(slug, nome, acento, *, acento_claro=None, handle=None, glyph=None,
         "wordmark": wordmark,
         "handle": handle,
         "endossa": bool(endossa),
-        "mood": mood or f"premium brand for {nome} — clean, professional, on-brand",
+        "mood": mood or f"visual premium da marca {nome} — limpo, profissional e alinhado à identidade",
         "_nota": "Marca de cliente — criada via scripts/nova_marca.py. Completar branding se necessário.",
     }
 
