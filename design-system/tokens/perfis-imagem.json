@@ -86,7 +86,8 @@
         "netsul",
         "sul-contabil",
         "deatec",
-        "track-brasil"
+        "track-brasil",
+        "amosim"
       ],
       "registro": "abstrato-material",
       "modelo": "google/gemini-3-pro-image",
