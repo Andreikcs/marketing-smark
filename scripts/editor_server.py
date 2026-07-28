@@ -41,18 +41,23 @@ HUB = """<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset
 <style>
 body.sk{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px}
 .wrap{max-width:820px;width:100%}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:30px}
+.hub-brand{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:8px}
+.hub-brand .hub-logo{transform-origin:left center}
+.hub-sub{color:var(--muted);font-size:14px;line-height:1.45;max-width:520px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:28px}
 a.tile{display:block;text-decoration:none;color:inherit}
 a.tile .sk-card{transition:.15s;height:100%}
 a.tile:hover .sk-card{border-color:var(--accent);transform:translateY(-2px)}
 .ic{font-size:28px;margin-bottom:12px;display:block}
-.tile b{font-size:16px;display:block;margin-bottom:5px}
+.tile b{font-size:16px;display:block;margin-bottom:5px;color:var(--text)}
 .tile p{color:var(--muted);font-size:12.5px;line-height:1.45}
 .foot{color:var(--muted);font-size:11px;margin-top:30px;text-align:center}
 </style></head><body class="sk">
 <div class=wrap>
-<div class=sk-kicker>tudo local · localhost:8765</div>
-<h1 class=sk-h1 style="font-size:52px;margin-top:8px">Grupo <span class=sk-accent>smark</span> · Sistema</h1>
+<div class=hub-brand>
+  __HUB_LOGO__
+  <div class=hub-sub>Painel local · editor, marcas e produção de conteúdo</div>
+</div>
 <div class=grid>
   <a class=tile href="/editor"><div class=sk-card><span class=ic>✎</span><b>Super Editor</b><p>Edita arte frame a frame, preview ao vivo, troca de fundo, cor, upload e regenerar por IA.</p></div></a>
   <a class=tile href="/painel"><div class=sk-card><span class=ic>▦</span><b>Painel de Conteúdo</b><p>Todas as publicações com preview de Instagram/LinkedIn e download.</p></div></a>
@@ -66,7 +71,7 @@ a.tile:hover .sk-card{border-color:var(--accent);transform:translateY(-2px)}
 </div>
 </div>
 __THEME_BOOT__
-</body></html>""".replace("__THEME_BOOT__", THEME_BOOT if "THEME_BOOT" in dir() else "")
+</body></html>"""
 
 SMARK_MARK = "M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"
 
@@ -198,7 +203,12 @@ THEME_BOOT = r"""
 </script>
 """
 
-# HUB é definido acima; injeta o boot do tema depois que THEME_BOOT existe
+# HUB: logo oficial + tema (smark_logo / THEME_BOOT já existem neste ponto)
+if "__HUB_LOGO__" in HUB:
+    HUB = HUB.replace(
+        "__HUB_LOGO__",
+        f'<div class="hub-logo">{smark_logo(52, wordmark=True, word="smark")}</div>',
+    )
 if "__THEME_BOOT__" in HUB:
     HUB = HUB.replace("__THEME_BOOT__", THEME_BOOT)
 elif THEME_BOOT not in HUB:
@@ -250,18 +260,20 @@ tr:last-child td{{border-bottom:0}}
 .mgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}}
 .mcard{{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}}
 .mcard:hover{{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));transform:translateY(-1px)}}
-.mcard .mhero{{height:64px;position:relative;flex:0 0 auto}}
-.mcard .top{{display:flex;gap:12px;align-items:center;padding:0 16px;margin-top:-26px;position:relative;z-index:1;min-width:0}}
-.mlogo{{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:20px;color:#fff;flex:0 0 52px;overflow:hidden;background:var(--accent);border:3px solid var(--surface);box-shadow:0 4px 14px rgba(0,0,0,.25)}}
+.mcard .mhero{{height:56px;position:relative;flex:0 0 auto}}
+.mcard .top{{display:flex;gap:12px;align-items:center;padding:0 16px;margin-top:-22px;position:relative;z-index:1;min-width:0}}
+.mlogo{{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:18px;color:#fff;flex:0 0 48px;overflow:hidden;background:var(--accent);border:3px solid var(--surface);box-shadow:0 4px 14px rgba(0,0,0,.2)}}
 .mlogo img{{width:100%;height:100%;object-fit:contain;padding:5px;background:#fff;box-sizing:border-box}}
-.mcard .mtit{{min-width:0;flex:1;padding-top:22px}}
-.mcard h3{{font-size:16px;margin:0 0 2px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}}
-.mcard .slug{{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-.mbody{{padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1;min-width:0}}
+.mcard .mtit{{min-width:0;flex:1;padding-top:18px;display:flex;flex-direction:column;justify-content:center;gap:1px}}
+.mcard h3{{font-size:15px;margin:0;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;color:var(--text);font-weight:700}}
+.mcard .slug{{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}}
+.mbody{{padding:12px 16px 14px;display:flex;flex-direction:column;gap:10px;flex:1;min-width:0}}
 .mswatches{{display:flex;gap:6px;align-items:center}}
-.msw{{width:22px;height:22px;border-radius:7px;border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}}
-.macts{{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:4px}}
+.msw{{width:22px;height:22px;border-radius:7px;border:1px solid var(--line);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}}
+.macts{{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:4px}}
 .macts .sk-btn{{flex:1;justify-content:center;text-align:center;min-width:0}}
+.macts .sk-btn--icon-del{{flex:0 0 auto;width:38px;padding:0;color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,var(--line))}}
+.macts .sk-btn--icon-del:hover{{background:var(--bad-soft)}}
 .pill{{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10px;border:1px solid var(--line);color:var(--muted);font-weight:600}}
 .pill.ok{{border-color:color-mix(in srgb,var(--good) 50%,transparent);color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}}
 .pill.warn{{border-color:#c90;color:#c90}}
@@ -284,12 +296,21 @@ tr:last-child td{{border-bottom:0}}
 .modal{{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}}
 .modal.on{{display:flex}}
 .mbox{{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(640px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.45)}}
-.mbox h2{{font-size:18px;margin:0 0 14px}}
-.fld{{margin-bottom:12px}} .fld label{{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}}
-.fld input,.fld textarea,.fld select{{width:100%;background:var(--inset);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit}}
+.mbox h2{{font-size:18px;margin:0 0 6px;color:var(--text)}}
+.mbox .msub{{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.4}}
+.fld{{margin-bottom:14px}} .fld label{{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}}
+.fld input,.fld textarea,.fld select{{width:100%;background:var(--field);border:1px solid var(--field-line);border-radius:12px;color:var(--text);padding:11px 13px;font-size:14px;font-family:inherit}}
+.fld input:focus,.fld textarea:focus,.fld select:focus{{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}}
 .fld textarea{{min-height:70px;resize:vertical}}
 .row2{{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
-.mbtns{{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}}
+.msec{{border:1px solid var(--line);border-radius:14px;margin:0 0 14px;overflow:hidden;background:var(--inset)}}
+.msec>summary{{cursor:pointer;padding:12px 14px;font-weight:600;font-size:13px;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none}}
+.msec>summary::-webkit-details-marker{{display:none}}
+.msec>summary::after{{content:'▸';color:var(--muted);font-size:11px}}
+.msec[open]>summary::after{{transform:rotate(90deg)}}
+.msec .msec-body{{padding:4px 14px 14px;border-top:1px solid var(--line)}}
+.mbtns{{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}}
+.mbtns .del-left{{margin-right:auto}}
 .logoprev{{width:64px;height:64px;border-radius:14px;border:1px dashed var(--line);display:grid;place-items:center;overflow:hidden;background:var(--inset);font-size:11px;color:var(--muted)}}
 .logoprev img{{width:100%;height:100%;object-fit:contain;padding:4px;box-sizing:border-box;background:#fff}}
 /* galeria de refs — estilo Claude Projects */
@@ -364,20 +385,16 @@ tr:last-child td{{border-bottom:0}}
 <!-- Conceitos de direção de arte: config interna do motor (_direcao.CONCEITOS).
      Não expostos na UI — alteração só com confirmação explícita (API/admin). -->
 
-<div class="sk-card"><div class=gh>Servidor</div><div class=kv>
-<div class=cell>Porta: <b>{PORT}</b></div>
-<div class=cell>Acesso: <b>só neste computador</b></div>
-<div class=cell>Proteção: <b class=ok>ativa</b></div>
-</div></div>
 </div>
 
 <div class=modal id=mmodal>
   <div class=mbox>
     <h2 id=mtitle>Nova marca</h2>
-    <div class=fld id=fld_slug><label>Slug (kebab-case, único)</label><input id=mf_slug placeholder="ex: netsul-fibra"></div>
-    <div class=fld><label>Nome</label><input id=mf_nome placeholder="NetSul Fibra"></div>
+    <p class=msub id=msub>Preencha o essencial. O identificador interno (slug) é gerado sozinho a partir do nome.</p>
+    <div class=fld id=fld_slug style="display:none"><label>Slug</label><input id=mf_slug readonly disabled></div>
+    <div class=fld><label>Nome da empresa</label><input id=mf_nome placeholder="Ex.: NetSul Fibra" autocomplete=organization></div>
 
-    <div class=fld><label>1 · Referências da marca</label>
+    <div class=fld><label>Referências visuais</label>
       <div class=refdrop id=mf_refdrop tabindex=0 role=button aria-label="Adicionar referências">
         <b>Arraste imagens ou clique para enviar</b>
         <span>JPG, PNG, WebP · salva na hora · até 12 por vez</span>
@@ -387,15 +404,15 @@ tr:last-child td{{border-bottom:0}}
       <div class=refcount id=mf_refcount></div>
     </div>
 
-    <div class=fld><label>2 · Cores da marca</label>
+    <div class=fld><label>Cores</label>
       <div class=row2>
-        <div class=fld style="margin:0"><label>Acento</label>
+        <div class=fld style="margin:0"><label style="font-size:11px;font-weight:500">Principal</label>
           <div style="display:flex;gap:6px;align-items:center">
             <input id=mf_acento type=color value="#1CA5B2" style="height:42px;padding:4px;flex:1">
             <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_pick_acc title="Pincel — copiar cor da tela">🖌</button>
           </div>
         </div>
-        <div class=fld style="margin:0"><label>Acento claro</label>
+        <div class=fld style="margin:0"><label style="font-size:11px;font-weight:500">Clara</label>
           <div style="display:flex;gap:6px;align-items:center">
             <input id=mf_acento_claro type=color value="#3DC4D0" style="height:42px;padding:4px;flex:1">
             <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_pick_acc2 title="Pincel — copiar cor da tela">🖌</button>
@@ -403,15 +420,15 @@ tr:last-child td{{border-bottom:0}}
         </div>
       </div>
       <div id=mf_swatches style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_extract_colors>Extrair cores das refs</button>
-        <span id=mf_colors_msg style="font-size:11px;color:var(--muted);align-self:center"></span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center">
+        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_extract_colors>Sugerir cores das fotos</button>
+        <span id=mf_colors_msg style="font-size:12px;color:var(--muted)"></span>
       </div>
     </div>
 
     <div class=row2>
-      <div class=fld><label>Handle</label><input id=mf_handle placeholder="@marca"></div>
-      <div class=fld><label>Glyph no chip/tab</label>
+      <div class=fld><label>@ no Instagram / handle</label><input id=mf_handle placeholder="@marca"></div>
+      <div class=fld><label>Símbolo no chip</label>
         <div class=glyphrow>
           <select id=mf_glyph_mode>
             <option value="auto">Automático (1ª letra)</option>
@@ -422,55 +439,59 @@ tr:last-child td{{border-bottom:0}}
         </div>
       </div>
     </div>
-    <div class=fld><label>Wordmark (chip)</label><input id=mf_wordmark placeholder="NetSul"></div>
-    <div class=fld><label>Segmento</label>
-      <select id=mf_segmento class="sk-select" style="width:100%;padding:10px 12px;border-radius:10px;background:var(--inset);border:1px solid var(--line);color:var(--text)">
-        <option value="">Selecione…</option>
-        <option value="contabilidade">Contabilidade / fiscal</option>
-        <option value="telecom">Telecom / ISP</option>
-        <option value="varejo">Varejo / e-commerce</option>
-        <option value="imobiliaria">Imobiliário</option>
-        <option value="saude">Saúde / clínicas</option>
-        <option value="servicos">Serviços B2B</option>
-        <option value="educacao">Educação</option>
-        <option value="industria">Indústria</option>
-        <option value="outro">Outro</option>
-      </select>
-    </div>
-    <div class=fld><label>Mood (direção de arte)</label>
-      <textarea id=mf_mood placeholder="Descreva o clima visual da marca…"></textarea>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_mood style="display:inline-flex;align-items:center">{ICON_IA_SM}Gerar mood</button>
-        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_all style="display:inline-flex;align-items:center">{ICON_IA_SM}Sugerir handle + glyph + mood</button>
-      </div>
-      <div id=mf_ia_dica style="font-size:11px;color:var(--muted);margin-top:6px"></div>
-    </div>
-    <div class=fld><label>Logo (marca limpa, PNG transparente ou SVG — não use foto de feed)</label>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <div class=logoprev id=mf_logoprev>sem logo</div>
-        <input type=file id=mf_logo accept="image/png,image/svg+xml,image/webp,image/jpeg" style="font-size:12px;color:var(--muted)">
-        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_logo_rm title="Remover logo">Remover logo</button>
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Na tab/chip o sistema aplica o logo em mono + padding. Foto de post vira só o glyph (letra).</div>
-    </div>
+    <div class=fld><label>Nome no chip (wordmark)</label><input id=mf_wordmark placeholder="NetSul"></div>
 
-    <div class=fld><label>Branding book</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_bb_gen>Gerar branding book</button>
-        <label class="sk-btn sk-btn--secondary sk-btn--sm" style="cursor:pointer;margin:0">
-          + Anexar páginas
-          <input type=file id=mf_bb_files accept="image/*,.pdf" multiple style="display:none">
-        </label>
-        <span id=mf_bb_status style="font-size:11px;color:var(--muted)"></span>
+    <details class=msec>
+      <summary>Mais opções</summary>
+      <div class=msec-body>
+        <div class=fld><label>Segmento</label>
+          <select id=mf_segmento>
+            <option value="">Selecione…</option>
+            <option value="contabilidade">Contabilidade / fiscal</option>
+            <option value="telecom">Telecom / ISP</option>
+            <option value="varejo">Varejo / e-commerce</option>
+            <option value="imobiliaria">Imobiliário</option>
+            <option value="saude">Saúde / clínicas</option>
+            <option value="servicos">Serviços B2B</option>
+            <option value="educacao">Educação</option>
+            <option value="industria">Indústria</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div class=fld><label>Clima visual (mood)</label>
+          <textarea id=mf_mood placeholder="Como a marca deve parecer nas artes…"></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_mood style="display:inline-flex;align-items:center">{ICON_IA_SM}Gerar mood</button>
+            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_all style="display:inline-flex;align-items:center">{ICON_IA_SM}Sugerir handle + símbolo</button>
+          </div>
+          <div id=mf_ia_dica style="font-size:11px;color:var(--muted);margin-top:6px"></div>
+        </div>
+        <div class=fld><label>Logo (PNG transparente ou SVG — não use foto de post)</label>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <div class=logoprev id=mf_logoprev>sem logo</div>
+            <input type=file id=mf_logo accept="image/png,image/svg+xml,image/webp,image/jpeg" style="font-size:12px;color:var(--muted)">
+            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_logo_rm title="Remover logo">Remover</button>
+          </div>
+        </div>
+        <div class=fld><label>Branding book</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_bb_gen>Gerar book</button>
+            <label class="sk-btn sk-btn--secondary sk-btn--sm" style="cursor:pointer;margin:0">
+              + Anexar páginas
+              <input type=file id=mf_bb_files accept="image/*,.pdf" multiple style="display:none">
+            </label>
+            <span id=mf_bb_status style="font-size:11px;color:var(--muted)"></span>
+          </div>
+        </div>
+        <div class=fld><label>Site (opcional)</label><input id=mf_site placeholder="https://cliente.com.br"></div>
       </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Gera `branding/branding-book.md` com paleta e regras, ou anexa o PDF/páginas oficiais do cliente.</div>
-    </div>
+    </details>
 
-    <div class=fld><label>Site (opcional)</label><input id=mf_site placeholder="https://cliente.com.br"></div>
     <div id=mf_msg style="font-size:13px;min-height:18px;margin:4px 0"></div>
     <div class=mbtns>
+      <button type=button class="sk-btn sk-btn--secondary sk-btn--sm del-left" id=mf_del style="display:none">Excluir marca</button>
       <button class="sk-btn sk-btn--secondary" id=mf_cancel>Cancelar</button>
-      <button class="sk-btn" id=mf_save>Salvar marca</button>
+      <button class="sk-btn" id=mf_save>Salvar</button>
     </div>
   </div>
 </div>
@@ -573,10 +594,29 @@ async function loadMarcas(){{
         <div class=macts>
           <button class="sk-btn sk-btn--secondary sk-btn--sm" data-edit="${{esc(m.slug)}}">Editar</button>
           <a class="sk-btn sk-btn--sm" href="/editor?novo=1&marca=${{encodeURIComponent(m.slug)}}">Novo post</a>
+          ${{m.canonica?'':`<button type=button class="sk-btn sk-btn--secondary sk-btn--sm sk-btn--icon-del" data-del="${{esc(m.slug)}}" title="Excluir marca">🗑</button>`}}
         </div>
       </div>
     </div>`).join('');
   g.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
+  g.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>excluirMarca(b.dataset.del));
+}}
+function slugifyNome(s){{
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'marca';
+}}
+async function excluirMarca(slug){{
+  const m=MARCAS.find(x=>x.slug===slug);
+  if(!m)return;
+  if(m.canonica){{alert('Marcas do grupo smark não podem ser excluídas.');return}}
+  const ok=confirm('Excluir a marca "'+m.nome+'"?\\n\\nIsso remove o cadastro e a pasta de branding/refs. Posts já criados no editor não são apagados automaticamente.');
+  if(!ok)return;
+  const conf=prompt('Para confirmar, digite o nome da marca:\\n'+m.nome);
+  if(conf!==m.nome){{if(conf!=null)alert('Nome não confere — nada foi apagado.');return}}
+  const r=await api('/excluir-marca',{{slug,apagar_pasta:true}});
+  if(!r.ok){{alert(r.erro||'falhou');return}}
+  if(EDIT===slug){{document.getElementById('mmodal').classList.remove('on');EDIT=null}}
+  await loadMarcas();
 }}
 
 function clearRefsPrev(){{
@@ -785,14 +825,13 @@ document.getElementById('mf_bb_files').onchange=async e=>{{
 function openNew(){{
   EDIT=null; LOGO_DATA=null; LOGO_RM=false; clearRefsPrev();
   document.getElementById('mtitle').textContent='Nova marca';
-  document.getElementById('fld_slug').style.display='';
+  document.getElementById('msub').textContent='Preencha o essencial. O identificador interno é gerado sozinho a partir do nome.';
+  document.getElementById('fld_slug').style.display='none';
   document.getElementById('mf_slug').value='';
-  document.getElementById('mf_slug').disabled=false;
   document.getElementById('mf_nome').value='';
   document.getElementById('mf_acento').value='#1CA5B2';
   document.getElementById('mf_acento_claro').value='#3DC4D0';
   document.getElementById('mf_handle').value='';
-  setGlyphUI(null); // auto vazio até digitar nome
   document.getElementById('mf_glyph_mode').value='auto';
   syncGlyphMode();
   document.getElementById('mf_wordmark').value='';
@@ -803,22 +842,23 @@ function openNew(){{
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
   document.getElementById('mf_ia_dica').textContent='';
-  document.getElementById('mf_bb_status').textContent='salve a marca p/ gerar o book';
+  document.getElementById('mf_bb_status').textContent='';
+  document.getElementById('mf_del').style.display='none';
   renderRefGrid();
   document.getElementById('mmodal').classList.add('on');
+  setTimeout(()=>document.getElementById('mf_nome').focus(),80);
 }}
 function openEdit(slug){{
   const m=MARCAS.find(x=>x.slug===slug); if(!m)return;
   EDIT=slug; LOGO_DATA=null; LOGO_RM=false; clearRefsPrev();
   document.getElementById('mtitle').textContent='Editar · '+m.nome;
-  document.getElementById('fld_slug').style.display='';
+  document.getElementById('msub').textContent='Ajuste cores, logo e referências. O código interno da marca não muda.';
+  document.getElementById('fld_slug').style.display='none';
   document.getElementById('mf_slug').value=m.slug;
-  document.getElementById('mf_slug').disabled=true;
   document.getElementById('mf_nome').value=m.nome||'';
   document.getElementById('mf_acento').value=m.acento||'#8B3CF7';
   document.getElementById('mf_acento_claro').value=m.acento_claro||m.acento||'#A472FF';
   document.getElementById('mf_handle').value=m.handle||'';
-  // glyph: se tokens tem string vazia explícita → nenhum; se ausente usa auto
   const g=m.glyph;
   if(g===''||g===null) setGlyphUI('');
   else setGlyphUI(g||'');
@@ -830,6 +870,9 @@ function openEdit(slug){{
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
   document.getElementById('mf_ia_dica').textContent='';
+  const del=document.getElementById('mf_del');
+  if(m.canonica){{del.style.display='none'}}
+  else{{del.style.display='inline-flex';del.onclick=()=>excluirMarca(slug)}}
   document.getElementById('mmodal').classList.add('on');
   loadSavedRefs(slug);
   refreshBbStatus(slug);
@@ -916,9 +959,13 @@ document.getElementById('mf_save').onclick=async()=>{{
     body.slug=EDIT;
     r=await api('/editar-marca', body);
   }}else{{
-    body.slug=document.getElementById('mf_slug').value.trim().toLowerCase();
-    if(!body.slug||!body.nome){{msg.className='err';msg.textContent='Preencha slug e nome';return}}
-    if(!body.segmento){{msg.className='err';msg.textContent='Selecione o segmento';return}}
+    if(!body.nome){{msg.className='err';msg.textContent='Informe o nome da empresa';return}}
+    // slug automático a partir do nome
+    body.slug=slugifyNome(body.nome);
+    if(!body.segmento) body.segmento='outro';
+    // handle auto se vazio
+    if(!body.handle) body.handle='@'+body.slug.replace(/-/g,'');
+    if(!body.wordmark) body.wordmark=body.nome;
     r=await api('/nova-marca', body);
   }}
   if(!r.ok){{msg.className='err';msg.textContent=r.erro||'erro';return}}
@@ -2507,6 +2554,17 @@ class H(http.server.BaseHTTPRequestHandler):
                                         "path": os.path.relpath(dest, VAULT).replace("\\", "/"),
                                         "detalhe": next((d for d in _marcas.listar_detalhes()
                                                          if d["slug"] == slug), None)})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/excluir-marca":
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                apagar = bool(req.get("apagar_pasta", True))
+                r = _marcas.excluir(slug, apagar_pasta=apagar)
+                return self._send(200, {"ok": True, **r})
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:

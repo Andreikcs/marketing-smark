@@ -259,6 +259,50 @@ def remover_ref(slug, nome):
     return removed
 
 
+def excluir(slug, *, apagar_pasta=True):
+    """Remove marca de cliente do tokens e (opcional) da pasta marcas/.
+
+    Canônicas (smark, provider-max, elever-ai) NÃO podem ser excluídas.
+    Devolve dict com o que foi removido.
+    """
+    slug = (slug or "").strip().lower()
+    if not is_slug_ok(slug):
+        raise ValueError(f"slug inválido: {slug!r}")
+    if slug in CANONICAS:
+        raise ValueError(f"marca canônica '{slug}' não pode ser excluída")
+    if not exists(slug):
+        raise ValueError(f"marca '{slug}' não existe")
+    t = _load_tokens()
+    meta = t["marcas"].pop(slug, None)
+    _save_tokens(t)
+    # tira do perfil de imagem
+    try:
+        if os.path.isfile(PERFIS):
+            with open(PERFIS, "r", encoding="utf-8") as f:
+                p = json.load(f)
+            fam = (p.get("familias") or {}).get("smark") or {}
+            marcas = list(fam.get("marcas") or [])
+            if slug in marcas:
+                fam["marcas"] = [m for m in marcas if m != slug]
+                p.setdefault("familias", {})["smark"] = fam
+                with open(PERFIS, "w", encoding="utf-8") as f:
+                    json.dump(p, f, ensure_ascii=False, indent=2)
+                    f.write("\n")
+    except Exception:
+        pass
+    pasta = os.path.join(MARCAS_DIR, slug)
+    pasta_removida = False
+    if apagar_pasta and os.path.isdir(pasta):
+        shutil.rmtree(pasta)
+        pasta_removida = True
+    return {
+        "slug": slug,
+        "meta": meta,
+        "pasta_removida": pasta_removida,
+        "dir": pasta if pasta_removida else "",
+    }
+
+
 def remover_logo(slug):
     """Remove logo e limpa brasao.principal no tokens."""
     require(slug)
