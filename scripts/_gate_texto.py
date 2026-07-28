@@ -43,19 +43,58 @@ def tesseract_disponivel():
     return bool(shutil.which("tesseract"))
 
 
+def _prep_for_ocr(png_path):
+    """Pré-processa (contraste + versão invertida) — tipografia clara em fundo escuro
+    falha no tesseract sem isso."""
+    try:
+        from PIL import Image, ImageOps, ImageEnhance
+        im = Image.open(png_path).convert("L")
+        im.thumbnail((1600, 1600))
+        im = ImageEnhance.Contrast(im).enhance(1.8)
+        paths = []
+        for i, variant in enumerate((im, ImageOps.invert(im))):
+            p = png_path + f".ocr{i}.png"
+            variant.save(p)
+            paths.append(p)
+        return paths
+    except Exception:
+        return [png_path]
+
+
 def _ocr_tesseract(png_path):
     if not tesseract_disponivel():
         return ""
+    langs = "eng"
     try:
-        r = subprocess.run(
-            ["tesseract", png_path, "stdout", "-l", "eng+por", "--psm", "11"],
-            capture_output=True, text=True, timeout=45,
-        )
-        if r.returncode != 0:
-            return ""
-        return (r.stdout or "").strip()
+        chk = subprocess.run(["tesseract", "--list-langs"], capture_output=True, timeout=5)
+        out = (chk.stdout or b"").decode("utf-8", errors="replace")
+        if "por" in out.splitlines() or "por" in out.split():
+            langs = "eng+por"
     except Exception:
-        return ""
+        pass
+    texts = []
+    paths = _prep_for_ocr(png_path)
+    try:
+        for path in paths:
+            for psm in ("6", "11"):
+                try:
+                    r = subprocess.run(
+                        ["tesseract", path, "stdout", "-l", langs, "--psm", psm],
+                        capture_output=True, timeout=35,
+                    )
+                    t = (r.stdout or b"").decode("utf-8", errors="replace").strip()
+                    if t:
+                        texts.append(t)
+                except Exception:
+                    continue
+    finally:
+        for path in paths:
+            if path != png_path and path.endswith((".ocr0.png", ".ocr1.png")):
+                try:
+                    os.remove(path)
+                except OSError:
+                    pass
+    return "\n".join(texts)
 
 
 def _achados_poluicao(texto):

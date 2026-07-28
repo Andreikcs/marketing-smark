@@ -57,7 +57,9 @@ MARKUP DA HEADLINE (obrigatório):
 - Headline curta e caixa-alta natural (o render já faz uppercase). 2 a 5 palavras por linha.
 
 CONCEITO VISUAL:
-- "conceito_visual" é uma linha CURTA em INGLÊS pro gerador de fundo (SEM texto na arte, sem logo).
+- "conceito_visual" é uma linha CURTA em INGLÊS pro gerador de fundo.
+  HARD RULE: fundo SEM texto, SEM letras, SEM palavras, SEM números, SEM logo, SEM letreiros.
+  Tipografia e logo entram só no compositor depois — nunca na imagem gerada.
 - Se o usuário pede pra MUDAR/EDITAR uma imagem existente (ex.: "a partir desse fundo",
   "troque o carro por motos", "mesma cena mas…"): descreva a MUDANÇA e o que PRESERVAR,
   em tom fotográfico — NÃO invente cena abstrata nova. Ex: "same man and dusk parking lot,
