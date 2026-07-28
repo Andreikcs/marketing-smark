@@ -87,7 +87,8 @@
         "sul-contabil",
         "deatec",
         "track-brasil",
-        "amosim"
+        "amosim",
+        "alem-do-olhar-chapeco"
       ],
       "registro": "abstrato-material",
       "modelo": "google/gemini-3-pro-image",
