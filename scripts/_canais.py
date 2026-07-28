@@ -286,14 +286,14 @@ def _expira_iso(seconds: int) -> str:
 
 def conectar_fake(state: str, username: str, nome: str = "") -> dict:
     """Conclui OAuth fake (usuário 'autorizou' no formulário local)."""
+    username = re_slug_user((username or "").strip().lstrip("@"))
+    if not username or len(username) < 2:
+        return {"ok": False, "erro": "informe o @ do Instagram Business/Creator", "keep_state": True}
+    # só consome o state depois de validar o @
     pending = _pop_pending(state)
     if not pending:
         return {"ok": False, "erro": "sessão OAuth expirada — tente Conectar de novo"}
     marca = pending["marca"]
-    username = (username or "").strip().lstrip("@")
-    if not username or len(username) < 2:
-        return {"ok": False, "erro": "informe o @ do Instagram Business/Creator"}
-    username = re_slug_user(username)
     token = {
         "connected": True,
         "modo": "fake",

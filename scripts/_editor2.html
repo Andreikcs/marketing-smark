@@ -1115,12 +1115,43 @@ $('#bsave').onclick=async()=>{if(post())post().status='salvo';await salvar(true)
 $('#bexport').onclick=(e)=>{
   document.querySelectorAll('.expmenu').forEach(m=>m.remove());
   const m=document.createElement('div');m.className='expmenu';
-  m.innerHTML='<button data-s="one">⬇ Exportar este frame (PNG)</button><button data-s="all">⬇ Exportar o carrossel todo</button>';
+  m.innerHTML='<button data-s="one">⬇ Exportar este frame (PNG)</button><button data-s="all">⬇ Exportar o carrossel todo</button><button data-s="ig">📷 Publicar no Instagram</button>';
   document.body.appendChild(m);const r=e.currentTarget.getBoundingClientRect();
   m.style.top=(r.bottom+6)+'px';m.style.right=(window.innerWidth-r.right)+'px';
-  m.onclick=ev=>{const b=ev.target.closest('button');if(!b)return;exportar($('#bexport'),b.dataset.s==='one'?FI:'all');m.remove()};
+  m.onclick=async ev=>{
+    const b=ev.target.closest('button');if(!b)return;
+    const s=b.dataset.s;m.remove();
+    if(s==='ig'){await publicarInstagram();return}
+    exportar($('#bexport'),s==='one'?FI:'all');
+  };
   setTimeout(()=>document.addEventListener('mousedown',function h(ev){if(!m.contains(ev.target)){m.remove();document.removeEventListener('mousedown',h)}}),40);
 };
+async function publicarInstagram(){
+  const p=post();if(!p){toast('Sem post ativo');return}
+  const marca=p.marca||'smark';
+  // status do canal
+  let st;try{st=await(await fetch('/canais?marca='+encodeURIComponent(marca))).json()}catch(e){toast('Falha ao checar Instagram');return}
+  const ig=(st.canais&&st.canais.instagram)||{};
+  if(!ig.conectado){
+    if(confirm('Instagram da marca "'+marca+'" não está conectado.\\n\\nAbrir Configurações para conectar?'))location.href='/config?editar='+encodeURIComponent(marca);
+    return;
+  }
+  // exporta o frame atual pra ter PNG fresco
+  toast('Preparando arte e publicando em @'+(ig.username||'…')+'…');
+  await salvar(true);
+  const exp=await(await fetch('/exportar',{method:'POST',headers:HJSON,body:JSON.stringify({post:PI,frame:FI})})).json();
+  if(!exp.ok||!(exp.feitas||[]).length){toast('Export falhou — não publiquei. '+(exp.erro||''));return}
+  const path=exp.feitas[0];
+  const cap=(p.caption||'').trim();
+  const r=await(await fetch('/canais/publicar',{method:'POST',headers:HJSON,body:JSON.stringify({
+    marca,canal:'instagram',image_path:path,caption:cap
+  })})).json();
+  if(r.ok){
+    toast((r.modo==='fake'?'✓ Simulado':'✓ Publicado')+' @'+(r.username||ig.username)+(r.aviso?(' — '+r.aviso):''));
+  }else{
+    toast('Publicação: '+(r.erro||'falhou'));
+  }
+}
 // auto-save de estado a cada 30s (mantém status rascunho até salvar final)
 setInterval(()=>{if(dirty){salvar(true);toast('Auto-salvo (rascunho)')}},30000);
 

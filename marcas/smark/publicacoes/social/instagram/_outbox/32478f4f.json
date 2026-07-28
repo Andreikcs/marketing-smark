@@ -1,0 +1,11 @@
+{
+  "id": "32478f4f",
+  "modo": "fake",
+  "username": "clinica.teste",
+  "caption": "teste smark",
+  "image_path": "",
+  "image_url": "",
+  "em": "2026-07-28T06:25:06Z",
+  "status": "queued_fake",
+  "nota": "Simulação — app real publicará de verdade quando INSTAGRAM_APP_ID estiver no .env"
+}

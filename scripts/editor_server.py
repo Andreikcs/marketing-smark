@@ -30,6 +30,7 @@ import _perfil  # noqa: E402
 import _roi  # noqa: E402
 import _marcas  # noqa: E402
 import _dna_marca  # noqa: E402
+import _canais  # noqa: E402
 
 PORT = 8765
 PAINEL = os.path.join(VAULT, "painel.html")
@@ -279,6 +280,17 @@ tr:last-child td{{border-bottom:0}}
 .pill.ok{{border-color:color-mix(in srgb,var(--good) 50%,transparent);color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}}
 .pill.warn{{border-color:#c90;color:#c90}}
 .mpills{{display:flex;flex-wrap:wrap;gap:6px}}
+.chrow{{display:flex;flex-direction:column;gap:6px;margin-top:2px}}
+.chitem{{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--inset);font-size:12px}}
+.chitem .chico{{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;flex:0 0 22px;background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);color:#fff;font-size:11px;font-weight:800}}
+.chitem .chico.li{{background:#0a66c2}}
+.chitem .chmeta{{flex:1;min-width:0;line-height:1.25}}
+.chitem .chmeta b{{display:block;color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.chitem .chmeta span{{color:var(--muted);font-size:11px}}
+.chitem .chbtn{{flex:0 0 auto;padding:5px 10px;font-size:11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-weight:600}}
+.chitem .chbtn.go{{background:var(--accent);border-color:var(--accent);color:#fff}}
+.chitem .chbtn.danger{{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,var(--line))}}
+.chbanner{{font-size:12px;color:var(--muted);padding:8px 12px;border-radius:10px;background:var(--inset);border:1px dashed var(--line);margin-bottom:12px;line-height:1.45}}
 /* log de posts — sanfona + tabela */
 .plog-acc{{border:1px solid var(--line);border-radius:14px;background:var(--inset);overflow:hidden}}
 .plog-acc>summary{{cursor:pointer;padding:14px 16px;font-weight:600;font-size:14px;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;user-select:none}}
@@ -373,10 +385,11 @@ tr:last-child td{{border-bottom:0}}
 </div>
 
 <div class="sk-card">
-  <div class=gh><span>Marcas</span><button class="sk-btn sk-btn--sm" id=bm_new>+ Nova marca</button></div>
+  <div class=gh><span>Marcas &amp; canais</span><button class="sk-btn sk-btn--sm" id=bm_new>+ Nova marca</button></div>
+  <div class=chbanner id=canais_banner>Cada cliente conecta o <b>próprio Instagram</b> (Business/Creator) para postagens automáticas. LinkedIn em breve.</div>
   <div id=mgrid class=mgrid><div style="color:var(--muted);font-size:13px">Carregando marcas…</div></div>
   <div style="margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5">
-    Novo cliente: crie a marca, confira cores e logo, depois abra o <a href="/editor">Editor</a> e gere 3 peças-piloto antes de publicar.
+    Novo cliente: crie a marca, conecte o Instagram, confira cores e logo, depois abra o <a href="/editor">Editor</a> e gere 3 peças-piloto.
   </div>
 </div>
 
@@ -718,9 +731,52 @@ document.getElementById('mf_nome').addEventListener('input',()=>{{
   if(document.getElementById('mf_glyph_mode').value==='auto') syncGlyphMode();
 }});
 
+function canalIgHtml(m){{
+  const ig=(m.canais&&m.canais.instagram)||{{}};
+  const li=(m.canais&&m.canais.linkedin)||{{}};
+  const igOk=!!ig.conectado;
+  const igLabel=igOk?('@'+(ig.username||'conectado')):'Não conectado';
+  const igBtn=igOk
+    ?`<button type=button class="chbtn danger" data-ig-off="${{esc(m.slug)}}">Desconectar</button>`
+    :`<button type=button class="chbtn go" data-ig-on="${{esc(m.slug)}}">Conectar</button>`;
+  const liLabel=li.conectado?('@'+(li.username||'ok')):'Em breve';
+  return `<div class=chrow>
+    <div class=chitem>
+      <div class=chico>IG</div>
+      <div class=chmeta><b>Instagram</b><span>${{esc(igLabel)}}${{ig.modo==='fake'?' · simulado':(igOk?' · ativo':'')}}</span></div>
+      ${{igBtn}}
+    </div>
+    <div class=chitem title="LinkedIn na próxima etapa">
+      <div class="chico li">in</div>
+      <div class=chmeta><b>LinkedIn</b><span>${{esc(liLabel)}}</span></div>
+      <button type=button class=chbtn disabled style="opacity:.5;cursor:not-allowed">Em breve</button>
+    </div>
+  </div>`;
+}}
+async function conectarIg(slug){{
+  const r=await api('/canais/conectar',{{marca:slug,canal:'instagram',return_to:'/config?editar='+encodeURIComponent(slug)}});
+  if(!r.ok){{alert(r.erro||'não foi possível iniciar a conexão');return}}
+  // abre a autenticação (fake ou Instagram real)
+  location.href=r.url;
+}}
+async function desconectarIg(slug){{
+  const m=MARCAS.find(x=>x.slug===slug);
+  const u=(m&&m.canais&&m.canais.instagram&&m.canais.instagram.username)||'';
+  if(!confirm('Desconectar Instagram'+(u?(' @'+u):'')+' da marca '+((m&&m.nome)||slug)+'?'))return;
+  const r=await api('/canais/desconectar',{{marca:slug,canal:'instagram'}});
+  if(!r.ok){{alert(r.erro||'falhou');return}}
+  await loadMarcas();
+}}
 async function loadMarcas(){{
   const r=await(await fetch('/marcas')).json();
   MARCAS=(r.ok&&r.marcas)?r.marcas:[];
+  const ban=document.getElementById('canais_banner');
+  if(ban){{
+    const modo=r.canais_modo||'fake';
+    ban.innerHTML=modo==='real'
+      ?'App Meta <b>real</b> ativo — ao clicar em Conectar abre o login oficial do Instagram.'
+      :'Modo <b>simulado</b> (app fake). Amanhã coloque <code>INSTAGRAM_APP_ID</code> e <code>INSTAGRAM_APP_SECRET</code> no <code>.env</code> e vira OAuth real. Cada cliente conecta o próprio @.';
+  }}
   const g=document.getElementById('mgrid');
   if(!MARCAS.length){{g.innerHTML='<div style="color:var(--muted)">Nenhuma marca.</div>';return}}
   g.innerHTML=MARCAS.map(m=>`
@@ -744,8 +800,10 @@ async function loadMarcas(){{
         <div class=mpills>
           <span class="pill ${{m.pronta?'ok':'warn'}}">${{m.pronta?'Pronta p/ criar':'Em setup'}}</span>
           ${{m.canonica?'<span class=pill>Grupo smark</span>':'<span class=pill>Cliente</span>'}}
+          ${{(m.canais&&m.canais.instagram&&m.canais.instagram.conectado)?'<span class="pill ok">IG ✓</span>':'<span class="pill warn">IG off</span>'}}
           ${{m.branding_book?'<span class=pill>Book</span>':''}}
         </div>
+        ${{canalIgHtml(m)}}
         <div class=macts>
           <button class="sk-btn sk-btn--secondary sk-btn--sm" data-edit="${{esc(m.slug)}}">Editar</button>
           <a class="sk-btn sk-btn--sm" href="/editor?novo=1&marca=${{encodeURIComponent(m.slug)}}">Novo post</a>
@@ -755,6 +813,8 @@ async function loadMarcas(){{
     </div>`).join('');
   g.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
   g.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>excluirMarca(b.dataset.del));
+  g.querySelectorAll('[data-ig-on]').forEach(b=>b.onclick=()=>conectarIg(b.dataset.igOn));
+  g.querySelectorAll('[data-ig-off]').forEach(b=>b.onclick=()=>desconectarIg(b.dataset.igOff));
 }}
 function slugifyNome(s){{
   return (s||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')
@@ -1309,11 +1369,23 @@ document.getElementById('mf_save').onclick=async()=>{{
   LOGO_DATA=null;
 }};
 loadMarcas();
-// deep-link /config?editar=slug
+// deep-link /config?editar=slug  + retorno OAuth canais=ok
 (function(){{
   try{{
-    const q=new URLSearchParams(location.search).get('editar');
+    const sp=new URLSearchParams(location.search);
+    const q=sp.get('editar')||sp.get('marca');
     if(q) setTimeout(()=>openEdit(q),400);
+    if(sp.get('canais')==='ok'){{
+      const m=sp.get('marca')||'';
+      setTimeout(()=>{{
+        const el=document.createElement('div');
+        el.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a3;color:#fff;padding:12px 18px;border-radius:12px;font:600 13px system-ui;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,.3)';
+        el.textContent='✓ Instagram conectado'+(m?(' · '+m):'');
+        document.body.appendChild(el);
+        setTimeout(()=>el.remove(),4200);
+        loadMarcas();
+      }},500);
+    }}
   }}catch(e){{}}
 }})();
 
@@ -2290,7 +2362,24 @@ class H(http.server.BaseHTTPRequestHandler):
 
     def _body(self):
         n = int(self.headers.get("Content-Length", 0))
-        return json.loads(self.rfile.read(n) or b"{}")
+        raw = self.rfile.read(n) if n else b""
+        if not raw:
+            return {}
+        ctype = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+        if ctype in ("application/x-www-form-urlencoded", "multipart/form-data"):
+            # OAuth fake e forms HTML
+            if ctype == "application/x-www-form-urlencoded":
+                q = urllib.parse.parse_qs(raw.decode("utf-8", errors="replace"), keep_blank_values=True)
+                return {k: (v[0] if isinstance(v, list) and len(v) == 1 else v) for k, v in q.items()}
+            return {"_raw": raw}
+        try:
+            return json.loads(raw.decode("utf-8") or "{}")
+        except json.JSONDecodeError:
+            # tenta form como fallback
+            q = urllib.parse.parse_qs(raw.decode("utf-8", errors="replace"), keep_blank_values=True)
+            if q:
+                return {k: (v[0] if isinstance(v, list) and len(v) == 1 else v) for k, v in q.items()}
+            raise
 
     def _host_ok(self):
         host = (self.headers.get("Host") or "").strip().lower()
@@ -2323,10 +2412,19 @@ class H(http.server.BaseHTTPRequestHandler):
         bare = netloc.split(":")[0].strip("[]")
         return bare in ("127.0.0.1", "localhost", "::1")
 
+    def _oauth_path(self, path=None):
+        """Callbacks OAuth (Meta redirect / form fake) não carregam X-Editor-Token."""
+        p = path or urllib.parse.urlparse(self.path).path
+        return p.startswith("/oauth/")
+
     def _post_allowed(self):
         """POST muda estado / gasta dinheiro → exige Host + Origin próprios + token."""
         if not self._host_ok():
             return False
+        path = urllib.parse.urlparse(self.path).path
+        if self._oauth_path(path):
+            # redirect do Instagram / form fake — Origin pode ser null; Host já checado
+            return True
         if not self._origin_ok():
             return False
         tok = self.headers.get("X-Editor-Token") or self.headers.get("x-editor-token") or ""
@@ -2383,9 +2481,69 @@ class H(http.server.BaseHTTPRequestHandler):
             return self._send(200, load())
         if path == "/marcas":
             try:
-                return self._send(200, {"ok": True, "marcas": _marcas.listar_detalhes()})
+                marcas = _marcas.listar_detalhes()
+                for m in marcas:
+                    try:
+                        m["canais"] = _canais.status_marca(m["slug"]).get("canais") or {}
+                    except Exception:
+                        m["canais"] = {}
+                return self._send(200, {
+                    "ok": True,
+                    "marcas": marcas,
+                    "canais_modo": _canais.modo_instagram(),
+                })
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
+        if path == "/canais":
+            try:
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                slug = (qs.get("marca") or qs.get("slug") or [""])[0].strip().lower()
+                if slug:
+                    slug = _marcas.require(slug)
+                    return self._send(200, {"ok": True, **_canais.status_marca(slug)})
+                slugs = _marcas.list_slugs()
+                return self._send(200, {
+                    "ok": True,
+                    "modo_app": _canais.modo_instagram(),
+                    "marcas": _canais.status_todas(slugs),
+                })
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+        # ── OAuth Instagram (fake + real callback) ──────────────────────────
+        if path == "/oauth/instagram/fake":
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            state = (qs.get("state") or [""])[0]
+            # lê pending só pra mostrar a marca (não consome)
+            pending = {}
+            try:
+                pth = os.path.join(VAULT, ".secrets", "oauth_pending", f"{state}.json")
+                if os.path.isfile(pth):
+                    pending = json.load(open(pth, encoding="utf-8"))
+            except Exception:
+                pending = {}
+            html = _canais.html_fake_login(state, marca=pending.get("marca") or "")
+            return self._send(200, html, MIME[".html"])
+        if path == "/oauth/instagram/callback":
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            if qs.get("error"):
+                html = _canais.html_oauth_done(
+                    False, erro=urllib.parse.unquote((qs.get("error_description") or ["negado"])[0]))
+                return self._send(200, html, MIME[".html"])
+            code = (qs.get("code") or [""])[0]
+            state = (qs.get("state") or [""])[0]
+            try:
+                r = _canais.trocar_code_real(code, state)
+            except Exception as e:
+                r = {"ok": False, "erro": str(e)}
+            if r.get("ok"):
+                html = _canais.html_oauth_done(
+                    True, marca=r.get("marca", ""), username=r.get("username", ""),
+                    return_to=r.get("return_to") or "/config")
+            else:
+                html = _canais.html_oauth_done(False, erro=r.get("erro") or "falha OAuth")
+            return self._send(200, html, MIME[".html"])
         if path == "/marca-refs":
             try:
                 qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
@@ -2467,6 +2625,80 @@ class H(http.server.BaseHTTPRequestHandler):
             req = self._body()
         except Exception as e:
             return self._send(400, {"ok": False, "erro": f"body inválido: {e}"})
+
+        # OAuth fake: form HTML → grava vínculo e redireciona
+        if path == "/oauth/instagram/fake":
+            try:
+                r = _canais.conectar_fake(
+                    req.get("state") or "",
+                    req.get("username") or "",
+                    req.get("nome") or "",
+                )
+            except Exception as e:
+                r = {"ok": False, "erro": str(e)}
+            if r.get("ok"):
+                html = _canais.html_oauth_done(
+                    True, marca=r.get("marca", ""), username=r.get("username", ""),
+                    return_to=r.get("return_to") or "/config")
+            else:
+                # reexibe formulário se o state ainda vale; senão página de erro
+                if r.get("keep_state") or "informe o @" in (r.get("erro") or ""):
+                    pending = {}
+                    st = req.get("state") or ""
+                    try:
+                        pth = os.path.join(VAULT, ".secrets", "oauth_pending", f"{st}.json")
+                        if os.path.isfile(pth):
+                            pending = json.load(open(pth, encoding="utf-8"))
+                    except Exception:
+                        pass
+                    html = _canais.html_fake_login(
+                        st, marca=pending.get("marca") or "", erro=r.get("erro") or "falhou")
+                else:
+                    html = _canais.html_oauth_done(False, erro=r.get("erro") or "falhou")
+            return self._send(200, html, MIME[".html"])
+
+        if path == "/canais/conectar":
+            try:
+                marca = _marcas.require(req.get("marca") or req.get("slug") or "")
+                canal = (req.get("canal") or "instagram").lower()
+                return_to = req.get("return_to") or f"/config?editar={marca}"
+                r = _canais.iniciar_oauth(marca, canal, return_to=return_to)
+                code = 200 if r.get("ok") else 400
+                return self._send(code, r)
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/canais/desconectar":
+            try:
+                marca = _marcas.require(req.get("marca") or req.get("slug") or "")
+                canal = (req.get("canal") or "instagram").lower()
+                r = _canais.desconectar(marca, canal)
+                return self._send(200 if r.get("ok") else 400, r)
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/canais/publicar":
+            try:
+                marca = _marcas.require(req.get("marca") or req.get("slug") or "")
+                canal = (req.get("canal") or "instagram").lower()
+                if canal != "instagram":
+                    return self._send(400, {"ok": False, "erro": "só Instagram por enquanto"})
+                r = _canais.publicar_instagram(
+                    marca,
+                    image_path=req.get("image_path") or req.get("path") or "",
+                    image_url=req.get("image_url") or "",
+                    caption=req.get("caption") or "",
+                    dry_run=bool(req.get("dry_run")),
+                )
+                return self._send(200 if r.get("ok") else 400, r)
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
 
         if path == "/preview":
             try:
