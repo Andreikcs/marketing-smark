@@ -1,6 +1,7 @@
 # Segredos — nunca versionar
 .env
 .secrets/
+.editor-token
 
 # Sistema
 .DS_Store

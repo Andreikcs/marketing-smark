@@ -414,7 +414,7 @@ input[type=range]{accent-color:var(--accent)}
       <div class=wsub>Bem-vindo 👋 Comece um projeto novo, peça pro Estúdio IA criar, ou continue de onde parou.</div>
       <div class=wcards>
         <button class=wcard data-a=novo><b>＋ Novo projeto</b><span>Um post do zero</span></button>
-        <button class=wcard data-a=ia><b>✦ Criar com Estúdio IA</b><span>Você descreve, a IA monta copy + arte</span></button>
+        <button class=wcard data-a=ia><b><span style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2l1.7 5.5L19 9l-5.3 1.5L12 16l-1.7-5.5L5 9l5.3-1.5z"/><path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg> Criar com Estúdio IA</span></b><span>Você descreve, a IA monta copy + arte</span></button>
         <button class=wcard data-a=painel><b>▦ Abrir o Painel</b><span>Ver todas as publicações</span></button>
         <button class=wcard data-a=ultimo><b>↩ Continuar o último</b><span>Retoma o projeto mais recente</span></button>
       </div>
@@ -428,7 +428,7 @@ input[type=range]{accent-color:var(--accent)}
     <div class=caphead><b>📝 Legenda do post</b><span class=capcount id=capcount></span><button class=capx id=capclose title=fechar>✕</button></div>
     <textarea id=captext placeholder="Escreva a legenda do post (com hashtags no fim)…" spellcheck=false></textarea>
     <div class=capbtns>
-      <button class="btn ai" id=capgen>✦ Gerar legenda com IA</button>
+      <button class="btn ai" id=capgen style="display:inline-flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right:6px" aria-hidden="true"><path d="M12 2l1.7 5.5L19 9l-5.3 1.5L12 16l-1.7-5.5L5 9l5.3-1.5z"/><path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>Gerar legenda com IA</button>
       <button class="btn" id=capcopy>⧉ Copiar</button>
     </div>
     <div class=mini style="margin-top:8px">A legenda é do post inteiro (o carrossel todo) — não vai na arte, é o texto que você cola ao publicar. Salva sozinho.</div>
@@ -474,6 +474,9 @@ input[type=range]{accent-color:var(--accent)}
 const $=s=>document.querySelector(s);
 const TOKEN="__EDITOR_TOKEN__";
 const HJSON={'Content-Type':'application/json','X-Editor-Token':TOKEN};
+/** Ícone IA canônico — mesmo do botão Estúdio na tela principal */
+const ICON_IA='<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="margin-right:5px;vertical-align:-2px;flex:0 0 auto" aria-hidden="true"><path d="M12 2l1.7 5.5L19 9l-5.3 1.5L12 16l-1.7-5.5L5 9l5.3-1.5z"/><path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>';
+const ICON_IA_SM=ICON_IA.replace('width="15"','width="13"').replace('height="15"','height="13"');
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let D=null, PI=0, FI=0, dirty=false, tmr=null, _lastTa=null;
 function insEmoji(e){const ta=_lastTa;if(!ta){toast('Clique num campo de texto primeiro');return}
@@ -962,7 +965,7 @@ function renderCtrl(){
     // geração por IA agora vive no ESTÚDIO IA (tom, conceito, referência) — item 19/20
     const reg=document.createElement('div');reg.style.marginTop='12px';
     // Um único caminho de geração: o Estúdio (evita dois botões fazendo a mesma coisa)
-    const rb=document.createElement('button');rb.className='btn ai';rb.innerHTML='✦ Abrir Estúdio IA';
+    const rb=document.createElement('button');rb.className='btn ai';rb.style.display='inline-flex';rb.style.alignItems='center';rb.style.justifyContent='center';rb.innerHTML=ICON_IA+'Abrir Estúdio IA';
     rb.onclick=()=>{
       const b=document.getElementById('bestudio');
       const chk=document.getElementById('esfundo');
@@ -1451,7 +1454,7 @@ carregar().then(()=>{snapshot();if(typeof setAmbientBrand==='function')setAmbien
         <button class=esplus id=esplus title="Mais opções" type=button>＋</button>
         <div class=esmenu id=esmenu>
           <button type=button data-act=anexo>📎 Anexar imagem de referência</button>
-          <button type=button data-act=arte>✦ Marcar “gerar arte”</button>
+          <button type=button data-act=arte style="display:inline-flex;align-items:center"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="margin-right:6px" aria-hidden="true"><path d="M12 2l1.7 5.5L19 9l-5.3 1.5L12 16l-1.7-5.5L5 9l5.3-1.5z"/><path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>Marcar “gerar arte”</button>
           <div class=sep></div>
           <button type=button data-act=tip>💡 Dica: descreva o que mudar na foto</button>
         </div>

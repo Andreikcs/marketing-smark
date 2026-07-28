@@ -144,6 +144,7 @@ def listar_detalhes():
             "refs_n": len(listar_refs(s)) if exists(s) else 0,
             "pronta": pronta(s),
             "canonica": s in CANONICAS,
+            "branding_book": os.path.isfile(branding_book_path(s)) if exists(s) else False,
         })
     return out
 
@@ -684,3 +685,318 @@ def copiar_logo(slug, src_path):
     t["marcas"][slug] = m
     _save_tokens(t)
     return dest
+
+
+def _rgb_to_hex(r, g, b):
+    return f"#{int(r):02X}{int(g):02X}{int(b):02X}"
+
+
+def _hex_lum(h):
+    if not _hex_ok(h):
+        return 0
+    r, g, b = int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def extrair_paleta_de_imagens(paths_or_bytes, *, n=4):
+    """Extrai cores dominantes de imagens (paths ou bytes).
+
+    Devolve lista de hex #RRGGBB ordenada por saturação/presença (acentos primeiro).
+    """
+    try:
+        from PIL import Image
+        from collections import Counter
+        import io
+    except ImportError as e:
+        raise RuntimeError("Pillow necessário para extrair paleta") from e
+
+    samples = []
+    for item in paths_or_bytes or []:
+        try:
+            if isinstance(item, (bytes, bytearray)):
+                im = Image.open(io.BytesIO(item))
+            else:
+                if not item or not os.path.isfile(str(item)):
+                    continue
+                im = Image.open(str(item))
+            im = im.convert("RGB")
+            im.thumbnail((160, 160))
+            # quantiza pra ~32 cores
+            try:
+                q = im.quantize(colors=24, method=getattr(Image, "MEDIANCUT", 0))
+            except Exception:
+                q = im.convert("P", palette=Image.ADAPTIVE, colors=24)
+            pal = q.getpalette() or []
+            counts = Counter(q.getdata())
+            for idx, cnt in counts.most_common(12):
+                if idx * 3 + 2 >= len(pal):
+                    continue
+                r, g, b = pal[idx * 3], pal[idx * 3 + 1], pal[idx * 3 + 2]
+                # ignora near-white / near-black
+                mx, mn = max(r, g, b), min(r, g, b)
+                if mx < 28 or mn > 240:
+                    continue
+                sat = (mx - mn) / max(1, mx)
+                if sat < 0.12 and 40 < (r + g + b) / 3 < 220:
+                    continue  # cinza médio
+                samples.append(((r, g, b), cnt * (1 + sat * 2)))
+        except Exception:
+            continue
+
+    if not samples:
+        return []
+
+    # agrupa cores parecidas
+    buckets = []  # [(r,g,b,weight)]
+    for (r, g, b), w in samples:
+        placed = False
+        for i, (br, bg, bb, bw) in enumerate(buckets):
+            if abs(br - r) + abs(bg - g) + abs(bb - b) < 55:
+                tot = bw + w
+                buckets[i] = (
+                    (br * bw + r * w) / tot,
+                    (bg * bw + g * w) / tot,
+                    (bb * bw + b * w) / tot,
+                    tot,
+                )
+                placed = True
+                break
+        if not placed:
+            buckets.append((float(r), float(g), float(b), float(w)))
+
+    buckets.sort(key=lambda x: -x[3])
+    out = []
+    for r, g, b, _ in buckets:
+        hx = _rgb_to_hex(round(r), round(g), round(b))
+        if hx not in out:
+            out.append(hx)
+        if len(out) >= n:
+            break
+    return out
+
+
+def extrair_paleta_marca(slug, *, n=4):
+    """Lê refs da marca e extrai acento + acento_claro sugeridos."""
+    require(slug)
+    refs = listar_refs(slug)
+    paths = []
+    for r in refs:
+        for k in ("acervo", "feed", "path", "full"):
+            p = r.get(k) if isinstance(r, dict) else None
+            if p:
+                full = p if os.path.isabs(p) else os.path.join(VAULT, p)
+                if os.path.isfile(full):
+                    paths.append(full)
+                    break
+    # também tenta pastas feed/acervo direto
+    for sub in ("referencias/acervo", "referencias/feed"):
+        d = os.path.join(MARCAS_DIR, slug, sub)
+        if os.path.isdir(d):
+            for fn in sorted(os.listdir(d)):
+                if fn.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                    paths.append(os.path.join(d, fn))
+    # dedupe
+    seen, uniq = set(), []
+    for p in paths:
+        if p not in seen:
+            seen.add(p)
+            uniq.append(p)
+    cores = extrair_paleta_de_imagens(uniq[:16], n=max(n, 3))
+    if not cores:
+        return {"acento": "", "acento_claro": "", "cores": [], "n_imgs": len(uniq)}
+    # acento = mais saturada entre as top
+    def sat(h):
+        r, g, b = int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
+        mx, mn = max(r, g, b), min(r, g, b)
+        return (mx - mn) / max(1, mx)
+
+    ranked = sorted(cores, key=lambda h: (-sat(h), -_hex_lum(h)))
+    acento = ranked[0]
+    # acento_claro = versão mais clara da mesma família ou 2ª cor
+    acento_claro = ranked[1] if len(ranked) > 1 and _hex_lum(ranked[1]) > _hex_lum(acento) else None
+    if not acento_claro:
+        r, g, b = int(acento[1:3], 16), int(acento[3:5], 16), int(acento[5:7], 16)
+        acento_claro = _rgb_to_hex(min(255, r + 40), min(255, g + 40), min(255, b + 40))
+    return {
+        "acento": acento,
+        "acento_claro": acento_claro,
+        "cores": cores,
+        "n_imgs": len(uniq),
+    }
+
+
+def aplicar_paleta(slug, acento, acento_claro=None):
+    """Atualiza acento/acento_claro/gradiente/base_escura da marca."""
+    return atualizar(
+        slug,
+        acento=acento,
+        acento_claro=acento_claro or acento,
+    )
+
+
+def branding_book_path(slug):
+    return os.path.join(MARCAS_DIR, slug, "branding", "branding-book.md")
+
+
+def branding_book_status(slug):
+    """Info se a marca tem branding book gerado/adicionado."""
+    require(slug)
+    p = branding_book_path(slug)
+    assets = os.path.join(MARCAS_DIR, slug, "branding", "branding-book")
+    n_assets = 0
+    if os.path.isdir(assets):
+        n_assets = len([f for f in os.listdir(assets)
+                        if not f.startswith(".") and os.path.isfile(os.path.join(assets, f))])
+    return {
+        "existe": os.path.isfile(p),
+        "path": os.path.relpath(p, VAULT).replace("\\", "/") if os.path.isfile(p) else "",
+        "assets_n": n_assets,
+        "assets_dir": os.path.relpath(assets, VAULT).replace("\\", "/") if os.path.isdir(assets) else "",
+    }
+
+
+def gerar_branding_book(slug, *, forcar=False):
+    """Gera/atualiza branding/branding-book.md consolidando tokens + identidade.
+
+    Se já existe e forcar=False, só devolve status.
+    """
+    require(slug)
+    m = get(slug)
+    p = branding_book_path(slug)
+    if os.path.isfile(p) and not forcar:
+        st = branding_book_status(slug)
+        st["gerado"] = False
+        st["msg"] = "já existe — use forcar para reescrever"
+        return st
+
+    nome = m.get("nome") or slug
+    acc = m.get("acento") or "#8B3CF7"
+    acc2 = m.get("acento_claro") or acc
+    base = m.get("base_escura") or _base_escura_de(acc)
+    handle = m.get("handle") or ("@" + slug.replace("-", ""))
+    mood = m.get("mood") or ""
+    wordmark = m.get("wordmark") or nome
+    glyph = m.get("logo_glyph") or nome[:1].upper()
+    seg = m.get("segmento") or ""
+    site = m.get("site") or ""
+    logo = (m.get("brasao") or {}).get("principal") or m.get("logo_file") or ""
+
+    # puxa trechos de identidade se existirem
+    id_path = os.path.join(MARCAS_DIR, slug, "branding", "identidade-visual.md")
+    extra_id = ""
+    if os.path.isfile(id_path):
+        try:
+            raw = open(id_path, encoding="utf-8").read()
+            # tira frontmatter
+            if raw.startswith("---"):
+                parts = raw.split("---", 2)
+                if len(parts) >= 3:
+                    raw = parts[2].strip()
+            extra_id = raw[:2500]
+        except OSError:
+            pass
+
+    md = f"""---
+marca: {slug}
+tipo: branding-book
+versao: 1.0
+gerado: auto
+---
+
+# Branding Book — {nome}
+
+> Documento vivo da marca no vault Smark. Fonte: `tokens.json` + branding.
+
+## Essência
+
+| Campo | Valor |
+|-------|-------|
+| Nome | {nome} |
+| Slug | `{slug}` |
+| Handle | {handle} |
+| Wordmark | {wordmark} |
+| Glyph | {glyph} |
+| Segmento | {seg or "—"} |
+| Site | {site or "—"} |
+| Logo | {logo or "— (use glyph)"} |
+
+## Paleta
+
+| Papel | Hex |
+|-------|-----|
+| Acento | `{acc}` |
+| Acento claro | `{acc2}` |
+| Base escura | `{base}` |
+| Gradiente | `{m.get("gradiente") or "—"}` |
+
+```
+■ {acc}  acento
+■ {acc2}  acento claro
+■ {base}  base escura
+```
+
+## Mood (direção de arte)
+
+{mood or "_ainda sem mood — complete em Config → Editar marca_"}
+
+## Regras de aplicação
+
+1. **Tema-padrão = claro** (fundo branco/lavanda, texto escuro, acento na palavra-chave).
+2. Escuro só sob pedido explícito.
+3. Fundo de IA **sem texto** — tipografia e logo vêm do compositor.
+4. Logo na tab/chip: preferir marca limpa (PNG com transparência ou SVG). Foto de feed **não** vira brasão.
+5. Sem jargão vazio; sem promessa de venda/faturamento no social.
+
+## Identidade visual (resumo)
+
+{extra_id or "_complete `branding/identidade-visual.md`_"}
+
+## Como usar neste sistema
+
+1. Config → Marcas → Editar → confira cores, logo e referências.
+2. Editor → selecione a marca no post → Estúdio IA gera copy + fundo na paleta.
+3. Referências em `referencias/feed` e `referencias/acervo` guiam o fundo.
+
+---
+*Gerado pelo smark studio · edite este arquivo se o cliente tiver book oficial.*
+"""
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    with open(p, "w", encoding="utf-8") as f:
+        f.write(md)
+    st = branding_book_status(slug)
+    st["gerado"] = True
+    st["msg"] = "branding book gerado"
+    return st
+
+
+def salvar_branding_book_asset(slug, raw, *, nome="page", ext=".png"):
+    """Anexa página/arquivo do branding book oficial do cliente."""
+    require(slug)
+    if not raw:
+        raise ValueError("arquivo vazio")
+    if len(raw) > 20 * 1024 * 1024:
+        raise ValueError("arquivo maior que 20 MB")
+    ext = (ext or ".png").lower()
+    if not ext.startswith("."):
+        ext = "." + ext
+    if ext not in (".png", ".jpg", ".jpeg", ".webp", ".pdf", ".svg"):
+        raise ValueError(f"extensão não suportada: {ext}")
+    dest_dir = os.path.join(MARCAS_DIR, slug, "branding", "branding-book")
+    os.makedirs(dest_dir, exist_ok=True)
+    base = re.sub(r"[^a-z0-9._-]+", "-", (nome or "page").lower()).strip("-") or "page"
+    dest = os.path.join(dest_dir, base + ext)
+    # evita sobrescrever
+    if os.path.isfile(dest):
+        i = 2
+        while os.path.isfile(os.path.join(dest_dir, f"{base}-{i}{ext}")):
+            i += 1
+        dest = os.path.join(dest_dir, f"{base}-{i}{ext}")
+    with open(dest, "wb") as f:
+        f.write(raw)
+    # garante book md
+    if not os.path.isfile(branding_book_path(slug)):
+        gerar_branding_book(slug, forcar=True)
+    return {
+        "path": os.path.relpath(dest, VAULT).replace("\\", "/"),
+        **branding_book_status(slug),
+    }

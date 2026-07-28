@@ -247,7 +247,10 @@ def _logo_badge_png(path, color, px, pad_ratio=0.14):
         if bbox:
             im = im.crop(bbox)
     # mono: usa luminância invertida como alpha, preenche com `color`
-    r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16) if color.startswith("#") and len(color) >= 7 else (255, 255, 255)
+    if (color or "").startswith("#") and len(color) >= 7:
+        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
+    else:
+        r, g, b = 255, 255, 255
     gray = ImageOps.grayscale(im.convert("RGB"))
     # pixels escuros = símbolo; claros = fundo → alpha
     # se o logo já é claro em fundo escuro, inverte

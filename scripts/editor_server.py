@@ -129,7 +129,7 @@ def cmdk():
 (function(){
   const ov=document.getElementById('cmdk'),inp=document.getElementById('cmdkin'),list=document.getElementById('cmdklist');
   const NAV=[['Painel','/painel','▦'],['Vitrine','/vitrine','▤'],['Config','/config','⚙'],['Editor','/editor','✎']];
-  const ACTS=[['Novo projeto','/editor?novo=1','＋'],['Estúdio IA','/editor?estudio=1','✦']];
+  const ACTS=[['Novo projeto','/editor?novo=1','＋'],['Estúdio IA','/editor?estudio=1','★']];
   let posts=[],items=[],idx=0,loaded=false;
   const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   async function load(){if(loaded)return;try{const d=await(await fetch('/dados')).json();posts=d.posts||[]}catch(e){}loaded=true}
@@ -334,10 +334,36 @@ tr:last-child td{{border-bottom:0}}
     <h2 id=mtitle>Nova marca</h2>
     <div class=fld id=fld_slug><label>Slug (kebab-case, único)</label><input id=mf_slug placeholder="ex: netsul-fibra"></div>
     <div class=fld><label>Nome</label><input id=mf_nome placeholder="NetSul Fibra"></div>
-    <div class=row2>
-      <div class=fld><label>Acento</label><input id=mf_acento type=color value="#E0562D" style="height:42px;padding:4px"></div>
-      <div class=fld><label>Acento claro</label><input id=mf_acento_claro type=color value="#FF7A4D" style="height:42px;padding:4px"></div>
+
+    <div class=fld><label>1 · Referências da marca</label>
+      <input type=file id=mf_refs accept="image/*" multiple style="font-size:12px;color:var(--muted)">
+      <div id=mf_refs_saved style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
+      <div id=mf_refs_prev style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Primeiro as fotos — o sistema sugere as cores a partir delas. Clique no × para excluir.</div>
     </div>
+
+    <div class=fld><label>2 · Cores da marca</label>
+      <div class=row2>
+        <div class=fld style="margin:0"><label>Acento</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input id=mf_acento type=color value="#1CA5B2" style="height:42px;padding:4px;flex:1">
+            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_pick_acc title="Pincel — copiar cor da tela">🖌</button>
+          </div>
+        </div>
+        <div class=fld style="margin:0"><label>Acento claro</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input id=mf_acento_claro type=color value="#3DC4D0" style="height:42px;padding:4px;flex:1">
+            <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_pick_acc2 title="Pincel — copiar cor da tela">🖌</button>
+          </div>
+        </div>
+      </div>
+      <div id=mf_swatches style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_extract_colors>Extrair cores das refs</button>
+        <span id=mf_colors_msg style="font-size:11px;color:var(--muted);align-self:center"></span>
+      </div>
+    </div>
+
     <div class=row2>
       <div class=fld><label>Handle</label><input id=mf_handle placeholder="@marca"></div>
       <div class=fld><label>Glyph (1–2 letras)</label><input id=mf_glyph placeholder="N" maxlength=2></div>
@@ -360,24 +386,32 @@ tr:last-child td{{border-bottom:0}}
     <div class=fld><label>Mood (direção de arte)</label>
       <textarea id=mf_mood placeholder="Descreva o clima visual da marca…"></textarea>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_mood>✦ Gerar mood com IA</button>
-        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_all>✦ Sugerir handle + glyph + mood</button>
+        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_mood style="display:inline-flex;align-items:center">{ICON_IA_SM}Gerar mood</button>
+        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_ia_all style="display:inline-flex;align-items:center">{ICON_IA_SM}Sugerir handle + glyph + mood</button>
       </div>
       <div id=mf_ia_dica style="font-size:11px;color:var(--muted);margin-top:6px"></div>
     </div>
-    <div class=fld><label>Logo</label>
+    <div class=fld><label>Logo (marca limpa, PNG transparente ou SVG — não use foto de feed)</label>
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
         <div class=logoprev id=mf_logoprev>sem logo</div>
-        <input type=file id=mf_logo accept="image/*" style="font-size:12px;color:var(--muted)">
+        <input type=file id=mf_logo accept="image/png,image/svg+xml,image/webp,image/jpeg" style="font-size:12px;color:var(--muted)">
         <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_logo_rm title="Remover logo">Remover logo</button>
       </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Na tab/chip o sistema aplica o logo em mono + padding. Foto de post vira só o glyph (letra).</div>
     </div>
-    <div class=fld><label>Referências da marca</label>
-      <input type=file id=mf_refs accept="image/*" multiple style="font-size:12px;color:var(--muted)">
-      <div id=mf_refs_saved style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
-      <div id=mf_refs_prev style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Fotos aprovadas guiam o fundo. Clique no × para excluir.</div>
+
+    <div class=fld><label>Branding book</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=mf_bb_gen>Gerar branding book</button>
+        <label class="sk-btn sk-btn--secondary sk-btn--sm" style="cursor:pointer;margin:0">
+          + Anexar páginas
+          <input type=file id=mf_bb_files accept="image/*,.pdf" multiple style="display:none">
+        </label>
+        <span id=mf_bb_status style="font-size:11px;color:var(--muted)"></span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Gera `branding/branding-book.md` com paleta e regras, ou anexa o PDF/páginas oficiais do cliente.</div>
     </div>
+
     <div class=fld><label>Site (opcional)</label><input id=mf_site placeholder="https://cliente.com.br"></div>
     <div id=mf_msg style="font-size:13px;min-height:18px;margin:4px 0"></div>
     <div class=mbtns>
@@ -391,11 +425,24 @@ tr:last-child td{{border-bottom:0}}
 const T="__EDITOR_TOKEN__";
 const H={{'Content-Type':'application/json','X-Editor-Token':T}};
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"']/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}}[c]));
+async function api(url, body){{
+  try{{
+    const r=await fetch(url,{{method:'POST',headers:H,body:JSON.stringify(body||{{}})}});
+    let j={{}};
+    try{{j=await r.json()}}catch(e){{j={{ok:false,erro:'resposta inválida ('+r.status+')'}}}}
+    if(r.status===403||j.reload){{
+      j.ok=false;
+      j.erro=(j.erro||'sessão expirada')+' — recarregue (F5)';
+    }}
+    return j;
+  }}catch(e){{
+    return {{ok:false,erro:'rede: '+(e.message||e)}};
+  }}
+}}
 document.getElementById('cf_tema').value="{tp}";
 document.getElementById('cf_size').value="{defsize}";
 document.getElementById('cf_save').onclick=async()=>{{
-  const r=await(await fetch('/config-save',{{method:'POST',headers:H,
-    body:JSON.stringify({{tema_padrao:document.getElementById('cf_tema').value,size:document.getElementById('cf_size').value,rodape:document.getElementById('cf_rodape').value}})}})).json();
+  const r=await api('/config-save',{{tema_padrao:document.getElementById('cf_tema').value,size:document.getElementById('cf_size').value,rodape:document.getElementById('cf_rodape').value}});
   document.getElementById('cf_msg').textContent=r.ok?'Salvo ✓':('Erro: '+(r.erro||''));
 }};
 
@@ -410,7 +457,7 @@ async function loadMarcas(){{
       <div class=mhero style="background:${{esc(m.gradiente||m.acento||'#333')}}"></div>
       <div class=top>
         <div class=mlogo style="background:${{esc(m.gradiente||m.acento)}}">${{
-          m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" alt="">`:esc(m.glyph||'?')
+          m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" alt="" style="object-fit:contain;padding:6px;background:#fff">`:esc(m.glyph||'?')
         }}</div>
         <div style="padding-bottom:4px;min-width:0">
           <h3>${{esc(m.nome)}}</h3>
@@ -426,6 +473,7 @@ async function loadMarcas(){{
         <div class=mpills>
           <span class="pill ${{m.pronta?'ok':'warn'}}">${{m.pronta?'Pronta p/ criar':'Em setup'}}</span>
           ${{m.canonica?'<span class=pill>Grupo smark</span>':'<span class=pill>Cliente</span>'}}
+          ${{m.branding_book?'<span class=pill>Book</span>':''}}
         </div>
         ${{m.mood?('<div class=mmeta>'+esc((m.mood||'').slice(0,100))+((m.mood||'').length>100?'…':'')+'</div>'):''}}
         <div class=macts>
@@ -441,7 +489,97 @@ function clearRefsPrev(){{
   REFS_DATA=[];
   const el=document.getElementById('mf_refs_prev'); if(el) el.innerHTML='';
   const inp=document.getElementById('mf_refs'); if(inp) inp.value='';
+  const sw=document.getElementById('mf_swatches'); if(sw) sw.innerHTML='';
+  const cm=document.getElementById('mf_colors_msg'); if(cm) cm.textContent='';
 }}
+function showSwatches(cores){{
+  const box=document.getElementById('mf_swatches');
+  if(!box)return;
+  if(!cores||!cores.length){{box.innerHTML='';return}}
+  box.innerHTML=cores.map(c=>`<button type=button title="${{esc(c)}}" data-hex="${{esc(c)}}"
+    style="width:28px;height:28px;border-radius:8px;border:2px solid var(--line);background:${{esc(c)}};cursor:pointer"></button>`).join('');
+  box.querySelectorAll('[data-hex]').forEach(b=>b.onclick=()=>{{
+    document.getElementById('mf_acento').value=b.dataset.hex;
+    document.getElementById('mf_colors_msg').textContent='Acento → '+b.dataset.hex;
+  }});
+}}
+async function pickColor(inputId){{
+  const msg=document.getElementById('mf_colors_msg');
+  if(!window.EyeDropper){{
+    if(msg)msg.textContent='Pincel nativo do seletor de cor (clique no quadrado colorido)';
+    try{{document.getElementById(inputId).click()}}catch(e){{}}
+    return;
+  }}
+  try{{
+    const ed=new EyeDropper();
+    const res=await ed.open();
+    if(res&&res.sRGBHex){{
+      document.getElementById(inputId).value=res.sRGBHex;
+      if(msg)msg.textContent='Cor copiada: '+res.sRGBHex;
+    }}
+  }}catch(e){{
+    if(msg)msg.textContent='Pincel cancelado';
+  }}
+}}
+document.getElementById('mf_pick_acc').onclick=()=>pickColor('mf_acento');
+document.getElementById('mf_pick_acc2').onclick=()=>pickColor('mf_acento_claro');
+
+async function extractColors(opts){{
+  opts=opts||{{}};
+  const msg=document.getElementById('mf_colors_msg');
+  if(msg)msg.textContent='Extraindo cores…';
+  // 1) se há refs na fila (ainda não salvas), manda dataurls
+  const body={{}};
+  if(EDIT) body.slug=EDIT;
+  if(REFS_DATA.length) body.imagens=REFS_DATA.map(x=>x.dataurl);
+  if(!body.slug&&!(body.imagens&&body.imagens.length)){{
+    if(msg)msg.textContent='Adicione referências primeiro';
+    return null;
+  }}
+  const r=await api('/marca-extrair-cores', body);
+  if(!r.ok){{if(msg)msg.textContent=r.erro||'falhou';return null}}
+  if(r.acento) document.getElementById('mf_acento').value=r.acento;
+  if(r.acento_claro) document.getElementById('mf_acento_claro').value=r.acento_claro;
+  showSwatches(r.cores||[]);
+  if(msg)msg.textContent='Sugestão de '+(r.n_imgs||0)+' img(s) — clique num swatch pra aplicar';
+  return r;
+}}
+document.getElementById('mf_extract_colors').onclick=()=>extractColors();
+
+async function refreshBbStatus(slug){{
+  const el=document.getElementById('mf_bb_status');
+  if(!el||!slug){{if(el)el.textContent='';return}}
+  try{{
+    const r=await(await fetch('/marca-branding-book?slug='+encodeURIComponent(slug))).json();
+    if(!r.ok){{el.textContent='';return}}
+    if(r.existe) el.textContent='Book ✓'+(r.assets_n?(' · '+r.assets_n+' anexo(s)'):'');
+    else el.textContent='sem book ainda';
+  }}catch(e){{el.textContent=''}}
+}}
+document.getElementById('mf_bb_gen').onclick=async()=>{{
+  const msg=document.getElementById('mf_msg');
+  if(!EDIT){{msg.className='err';msg.textContent='Salve a marca antes de gerar o book';return}}
+  const r=await api('/marca-branding-book',{{slug:EDIT,forcar:true}});
+  if(!r.ok){{msg.className='err';msg.textContent=r.erro||'falhou';return}}
+  msg.className='ok';msg.textContent=r.msg||'Book gerado';
+  refreshBbStatus(EDIT);
+}};
+document.getElementById('mf_bb_files').onchange=async e=>{{
+  const msg=document.getElementById('mf_msg');
+  if(!EDIT){{msg.className='err';msg.textContent='Salve a marca antes de anexar o book';e.target.value='';return}}
+  const files=[...(e.target.files||[])].slice(0,12);
+  if(!files.length)return;
+  msg.className='';msg.textContent='Enviando '+files.length+' arquivo(s)…';
+  for(const f of files){{
+    const dataurl=await new Promise(res=>{{const rd=new FileReader();rd.onload=()=>res(rd.result);rd.readAsDataURL(f)}});
+    const r=await api('/marca-branding-book-asset',{{slug:EDIT,dataurl,nome:f.name.replace(/\\.[^.]+$/,'')}});
+    if(!r.ok){{msg.className='err';msg.textContent=r.erro||'falhou no anexo';return}}
+  }}
+  msg.className='ok';msg.textContent='Anexos do book salvos';
+  e.target.value='';
+  refreshBbStatus(EDIT);
+}};
+
 function openNew(){{
   EDIT=null; LOGO_DATA=null; LOGO_RM=false; clearRefsPrev();
   document.getElementById('mtitle').textContent='Nova marca';
@@ -462,6 +600,7 @@ function openNew(){{
   document.getElementById('mf_msg').textContent='';
   document.getElementById('mf_ia_dica').textContent='';
   document.getElementById('mf_refs_saved').innerHTML='';
+  document.getElementById('mf_bb_status').textContent='salve a marca p/ gerar o book';
   document.getElementById('mmodal').classList.add('on');
 }}
 function openEdit(slug){{
@@ -480,12 +619,13 @@ function openEdit(slug){{
   document.getElementById('mf_mood').value=m.mood||'';
   document.getElementById('mf_segmento').value=m.segmento||'';
   document.getElementById('mf_site').value=m.site||'';
-  document.getElementById('mf_logoprev').innerHTML=m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}">`:'sem logo';
+  document.getElementById('mf_logoprev').innerHTML=m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" style="object-fit:contain;padding:4px">`:'sem logo';
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
   document.getElementById('mf_ia_dica').textContent='';
   document.getElementById('mmodal').classList.add('on');
   loadSavedRefs(slug);
+  refreshBbStatus(slug);
 }}
 async function loadSavedRefs(slug){{
   const box=document.getElementById('mf_refs_saved');
@@ -495,7 +635,6 @@ async function loadSavedRefs(slug){{
     const r=await(await fetch('/marca-refs?slug='+encodeURIComponent(slug))).json();
     if(!r.ok){{box.innerHTML='';return}}
     const refs=r.refs||[];
-    // dedupe por base (feed+acervo)
     const seen=new Set();
     const uniq=[];
     refs.forEach(x=>{{const k=x.base||x.nome;if(seen.has(k))return;seen.add(k);uniq.push(x)}});
@@ -509,7 +648,7 @@ async function loadSavedRefs(slug){{
     box.querySelectorAll('[data-del-ref]').forEach(b=>b.onclick=async(e)=>{{
       e.preventDefault();
       if(!confirm('Remover esta referência?'))return;
-      const rr=await(await fetch('/marca-ref-del',{{method:'POST',headers:H,body:JSON.stringify({{slug:EDIT,nome:b.dataset.delRef}})}})).json();
+      const rr=await api('/marca-ref-del',{{slug:EDIT,nome:b.dataset.delRef}});
       if(!rr.ok){{alert(rr.erro||'falhou');return}}
       loadSavedRefs(EDIT);
       loadMarcas();
@@ -522,15 +661,17 @@ document.getElementById('mmodal').onclick=e=>{{if(e.target.id==='mmodal')e.curre
 let LOGO_RM=false;
 document.getElementById('mf_logo').onchange=e=>{{
   const f=e.target.files&&e.target.files[0]; if(!f)return;
+  if(f.size>8*1024*1024){{alert('Logo maior que 8 MB');e.target.value='';return}}
   LOGO_RM=false;
   const rd=new FileReader();
-  rd.onload=()=>{{LOGO_DATA=rd.result;document.getElementById('mf_logoprev').innerHTML=`<img src="${{rd.result}}">`}};
+  rd.onload=()=>{{LOGO_DATA=rd.result;document.getElementById('mf_logoprev').innerHTML=`<img src="${{rd.result}}" style="object-fit:contain;padding:4px">`}};
+  rd.onerror=()=>{{alert('Não consegui ler o arquivo');LOGO_DATA=null}};
   rd.readAsDataURL(f);
 }};
 document.getElementById('mf_logo_rm').onclick=async()=>{{
   if(EDIT){{
     if(!confirm('Remover o logo desta marca?'))return;
-    const r=await(await fetch('/marca-logo-del',{{method:'POST',headers:H,body:JSON.stringify({{slug:EDIT}})}})).json();
+    const r=await api('/marca-logo-del',{{slug:EDIT}});
     if(!r.ok){{alert(r.erro||'falhou');return}}
   }}
   LOGO_DATA=null; LOGO_RM=true;
@@ -542,7 +683,9 @@ document.getElementById('mf_refs').onchange=async e=>{{
   REFS_DATA=[];
   const prev=document.getElementById('mf_refs_prev'); prev.innerHTML='';
   for(const f of files){{
-    const dataurl=await new Promise(res=>{{const rd=new FileReader();rd.onload=()=>res(rd.result);rd.readAsDataURL(f)}});
+    if(f.size>12*1024*1024){{alert(f.name+' é maior que 12 MB — pulando');continue}}
+    const dataurl=await new Promise((res,rej)=>{{const rd=new FileReader();rd.onload=()=>res(rd.result);rd.onerror=rej;rd.readAsDataURL(f)}}).catch(()=>null);
+    if(!dataurl)continue;
     const item={{nome:f.name.replace(/\\.[^.]+$/,''), dataurl}};
     REFS_DATA.push(item);
     const wrap=document.createElement('div');
@@ -555,6 +698,8 @@ document.getElementById('mf_refs').onchange=async e=>{{
     }};
     prev.appendChild(wrap);
   }}
+  // extrai cores automaticamente ao adicionar refs
+  if(REFS_DATA.length) extractColors();
 }};
 async function runIaMarca(mode){{
   const msg=document.getElementById('mf_msg');
@@ -567,19 +712,17 @@ async function runIaMarca(mode){{
     site:document.getElementById('mf_site').value.trim(),
     mode:mode||'all',
   }};
-  try{{
-    const r=await(await fetch('/marca-ia',{{method:'POST',headers:H,body:JSON.stringify(body)}})).json();
-    if(!r.ok){{msg.className='err';msg.textContent=r.erro||'falhou';return}}
-    if(r.mood) document.getElementById('mf_mood').value=r.mood;
-    if(mode==='all'){{
-      if(r.handle) document.getElementById('mf_handle').value=r.handle;
-      if(r.glyph) document.getElementById('mf_glyph').value=r.glyph;
-      if(r.wordmark) document.getElementById('mf_wordmark').value=r.wordmark;
-      if(r.segmento) document.getElementById('mf_segmento').value=r.segmento;
-    }}
-    document.getElementById('mf_ia_dica').textContent=r.dica||'';
-    msg.className='ok'; msg.textContent='Sugestões aplicadas — revise e salve';
-  }}catch(e){{msg.className='err';msg.textContent='Erro na IA'}}
+  const r=await api('/marca-ia', body);
+  if(!r.ok){{msg.className='err';msg.textContent=r.erro||'falhou';return}}
+  if(r.mood) document.getElementById('mf_mood').value=r.mood;
+  if(mode==='all'){{
+    if(r.handle) document.getElementById('mf_handle').value=r.handle;
+    if(r.glyph) document.getElementById('mf_glyph').value=r.glyph;
+    if(r.wordmark) document.getElementById('mf_wordmark').value=r.wordmark;
+    if(r.segmento) document.getElementById('mf_segmento').value=r.segmento;
+  }}
+  document.getElementById('mf_ia_dica').textContent=r.dica||'';
+  msg.className='ok'; msg.textContent='Sugestões aplicadas — revise e salve';
 }}
 document.getElementById('mf_ia_mood').onclick=()=>runIaMarca('mood');
 document.getElementById('mf_ia_all').onclick=()=>runIaMarca('all');
@@ -602,23 +745,33 @@ document.getElementById('mf_save').onclick=async()=>{{
   let r;
   if(EDIT){{
     body.slug=EDIT;
-    r=await(await fetch('/editar-marca',{{method:'POST',headers:H,body:JSON.stringify(body)}})).json();
+    r=await api('/editar-marca', body);
   }}else{{
     body.slug=document.getElementById('mf_slug').value.trim().toLowerCase();
     if(!body.slug||!body.nome){{msg.className='err';msg.textContent='Preencha slug e nome';return}}
     if(!body.segmento){{msg.className='err';msg.textContent='Selecione o segmento';return}}
-    r=await(await fetch('/nova-marca',{{method:'POST',headers:H,body:JSON.stringify(body)}})).json();
+    r=await api('/nova-marca', body);
   }}
   if(!r.ok){{msg.className='err';msg.textContent=r.erro||'erro';return}}
   const nref=(r.referencias||[]).filter(x=>x&&x.feed).length;
+  const nerr=(r.referencias||[]).filter(x=>x&&x.erro).length;
   msg.className='ok';
-  msg.textContent='Salvo ✓'+(nref?(' · '+nref+' ref(s) novas'):'');
+  msg.textContent='Salvo ✓'+(nref?(' · '+nref+' ref(s)'):'')+(nerr?(' · '+nerr+' com erro'):'')+(r.aviso_logo?(' · logo: '+r.aviso_logo):'');
+  if(!EDIT&&r.slug){{EDIT=r.slug;document.getElementById('fld_slug').style.display='';document.getElementById('mf_slug').value=r.slug;document.getElementById('mf_slug').disabled=true}}
   await loadMarcas();
-  if(EDIT) loadSavedRefs(EDIT);
+  if(EDIT){{loadSavedRefs(EDIT);refreshBbStatus(EDIT)}}
   REFS_DATA=[]; document.getElementById('mf_refs_prev').innerHTML='';
-  setTimeout(()=>document.getElementById('mmodal').classList.remove('on'),700);
+  LOGO_DATA=null;
 }};
 loadMarcas();
+// deep-link /config?editar=slug
+(function(){{
+  try{{
+    const q=new URLSearchParams(location.search).get('editar');
+    if(q) setTimeout(()=>openEdit(q),400);
+  }}catch(e){{}}
+}})();
+
 
 function fmtMin(m){{if(m==null||m===undefined)return '—';m=Number(m);if(m<60)return m.toFixed(1)+' min';return (m/60).toFixed(1)+' h'}}
 function relTime(iso){{if(!iso)return '—';const t=Date.parse(iso);if(!t)return '—';const min=Math.floor((Date.now()-t)/60000);
@@ -1144,13 +1297,40 @@ load();
 # Segurança (CSRF / DNS rebinding): o servidor é local, mas tem rotas que gastam
 # dinheiro (regerar-fundo→OpenAI) e escrevem em disco. Um site malicioso aberto no
 # navegador poderia dar POST em localhost. Defesa: Host + Origin + token de sessão.
-ALLOWED_HOSTS = {"127.0.0.1:8765", "localhost:8765"}
-TOKEN = secrets.token_hex(16)  # novo a cada boot; injetado no HTML servido
+# Token persiste em arquivo local para não quebrar abas abertas após restart.
+_TOKEN_FILE = os.path.join(VAULT, ".editor-token")
+
+
+def _load_or_make_token():
+    try:
+        if os.path.isfile(_TOKEN_FILE):
+            t = open(_TOKEN_FILE, encoding="utf-8").read().strip()
+            if re.fullmatch(r"[a-f0-9]{32}", t or ""):
+                return t
+    except OSError:
+        pass
+    t = secrets.token_hex(16)
+    try:
+        open(_TOKEN_FILE, "w", encoding="utf-8").write(t)
+    except OSError:
+        pass
+    return t
+
+
+ALLOWED_HOSTS = {f"127.0.0.1:{PORT}", f"localhost:{PORT}", f"[::1]:{PORT}"}
+TOKEN = _load_or_make_token()
 DATA = os.path.join(VAULT, "editor.json")
 UI = os.path.join(HERE, "_editor2.html")
 MIME = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
         ".webp": "image/webp", ".svg": "image/svg+xml", ".css": "text/css",
         ".js": "application/javascript", ".html": "text/html; charset=utf-8"}
+
+# Ícone IA canônico (igual botão Estúdio na tela principal do Super Editor)
+ICON_IA = ('<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" '
+           'style="margin-right:5px;vertical-align:-2px;flex:0 0 auto" aria-hidden="true">'
+           '<path d="M12 2l1.7 5.5L19 9l-5.3 1.5L12 16l-1.7-5.5L5 9l5.3-1.5z"/>'
+           '<path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>')
+ICON_IA_SM = ICON_IA.replace('width="15"', 'width="13"').replace('height="15"', 'height="13"')
 
 
 IO_LOCK = threading.RLock()      # protege leitura/escrita do editor.json (servidor multi-thread)
@@ -1414,6 +1594,20 @@ def _decode_dataurl(dataurl):
 def _logo_from_dataurl(slug, dataurl):
     """Decodifica data:image/...;base64,... e grava via _marcas.salvar_logo_bytes."""
     raw, ext = _decode_dataurl(dataurl)
+    if not raw or len(raw) < 32:
+        raise ValueError("logo vazio ou inválido")
+    # valida que é imagem real (evita gravar lixo/base64 quebrado)
+    if ext != ".svg":
+        try:
+            from PIL import Image
+            import io
+            im = Image.open(io.BytesIO(raw))
+            im.verify()
+            im = Image.open(io.BytesIO(raw))  # reabre após verify
+            if min(im.size) < 16:
+                raise ValueError("logo muito pequeno")
+        except Exception as e:
+            raise ValueError(f"arquivo de logo não é imagem válida: {e}") from e
     return _marcas.salvar_logo_bytes(slug, raw, ext=ext)
 
 
@@ -1430,6 +1624,14 @@ def _refs_from_dataurls(slug, lista):
             du, nome = item, f"ref-{i+1:02d}"
         try:
             raw, ext = _decode_dataurl(du)
+            if not raw or len(raw) < 32:
+                raise ValueError("referência vazia")
+            try:
+                from PIL import Image
+                import io
+                Image.open(io.BytesIO(raw)).verify()
+            except Exception as ve:
+                raise ValueError(f"não é imagem válida: {ve}") from ve
             out.append(_marcas.salvar_referencia_bytes(slug, raw, nome=nome, ext=ext))
         except Exception as e:
             out.append({"erro": str(e), "nome": nome})
@@ -1487,16 +1689,56 @@ class H(http.server.BaseHTTPRequestHandler):
         return json.loads(self.rfile.read(n) or b"{}")
 
     def _host_ok(self):
-        return self.headers.get("Host", "") in ALLOWED_HOSTS
+        host = (self.headers.get("Host") or "").strip().lower()
+        if host in ALLOWED_HOSTS:
+            return True
+        # aceita host sem porta explícita se for loopback
+        bare = host.split(":")[0].strip("[]")
+        return bare in ("127.0.0.1", "localhost", "::1")
+
+    def _origin_ok(self):
+        """Origin ausente = same-origin clássico; se presente, tem que ser loopback."""
+        origin = (self.headers.get("Origin") or "").strip()
+        if not origin or origin == "null":
+            # null/ausente: ainda confere Referer se houver
+            ref = (self.headers.get("Referer") or "").strip()
+            if not ref:
+                return True
+            try:
+                netloc = urllib.parse.urlparse(ref).netloc.lower()
+            except Exception:
+                return False
+            bare = netloc.split(":")[0].strip("[]")
+            return bare in ("127.0.0.1", "localhost", "::1") or netloc in ALLOWED_HOSTS
+        try:
+            netloc = urllib.parse.urlparse(origin).netloc.lower()
+        except Exception:
+            return False
+        if netloc in ALLOWED_HOSTS:
+            return True
+        bare = netloc.split(":")[0].strip("[]")
+        return bare in ("127.0.0.1", "localhost", "::1")
 
     def _post_allowed(self):
         """POST muda estado / gasta dinheiro → exige Host + Origin próprios + token."""
         if not self._host_ok():
             return False
-        origin = self.headers.get("Origin")
-        if origin and urllib.parse.urlparse(origin).netloc not in ALLOWED_HOSTS:
+        if not self._origin_ok():
             return False
-        return self.headers.get("X-Editor-Token", "") == TOKEN
+        tok = self.headers.get("X-Editor-Token") or self.headers.get("x-editor-token") or ""
+        return tok == TOKEN
+
+    def _post_block_reason(self):
+        """Detalhe do bloqueio (só p/ debug na UI — sem vazar o token)."""
+        reasons = []
+        if not self._host_ok():
+            reasons.append(f"host={self.headers.get('Host')!r}")
+        if not self._origin_ok():
+            reasons.append(f"origin={self.headers.get('Origin')!r}")
+        tok = self.headers.get("X-Editor-Token") or ""
+        if tok != TOKEN:
+            reasons.append("token" if tok else "token-ausente")
+        return " · ".join(reasons) or "desconhecido"
 
     def _serve_module(self, fp, nome):
         if not os.path.isfile(fp):
@@ -1545,6 +1787,16 @@ class H(http.server.BaseHTTPRequestHandler):
                 qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
                 slug = (qs.get("slug") or [""])[0].strip().lower()
                 return self._send(200, {"ok": True, "slug": slug, "refs": _marcas.listar_refs(slug)})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+        if path == "/marca-branding-book":
+            try:
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                slug = (qs.get("slug") or [""])[0].strip().lower()
+                st = _marcas.branding_book_status(slug)
+                return self._send(200, {"ok": True, **st})
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:
@@ -1601,7 +1853,12 @@ class H(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         path = urllib.parse.urlparse(self.path).path
         if not self._post_allowed():
-            return self._send(403, {"ok": False, "erro": "bloqueado (host/origin/token) — recarregue o editor"})
+            why = self._post_block_reason()
+            return self._send(403, {
+                "ok": False,
+                "erro": f"bloqueado ({why}) — recarregue a página (F5) e tente de novo",
+                "reload": True,
+            })
         try:
             req = self._body()
         except Exception as e:
@@ -2090,6 +2347,76 @@ class H(http.server.BaseHTTPRequestHandler):
                     return self._send(200, {"ok": True, "mood": sug["mood"], "dica": sug["dica"],
                                             "segmento": sug["segmento"]})
                 return self._send(200, {"ok": True, **sug})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-extrair-cores":
+            try:
+                slug = str(req.get("slug") or "").strip().lower()
+                imgs = req.get("imagens") or req.get("dataurls") or []
+                if imgs:
+                    blobs = []
+                    for it in imgs[:16]:
+                        du = it.get("dataurl") if isinstance(it, dict) else it
+                        if not du:
+                            continue
+                        try:
+                            raw, _ext = _decode_dataurl(du)
+                            blobs.append(raw)
+                        except Exception:
+                            continue
+                    cores = _marcas.extrair_paleta_de_imagens(blobs, n=5)
+                    if not cores:
+                        return self._send(200, {"ok": False, "erro": "não achei cores nas imagens"})
+                    # acento = mais saturada
+                    def _sat(h):
+                        r, g, b = int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
+                        mx, mn = max(r, g, b), min(r, g, b)
+                        return (mx - mn) / max(1, mx)
+                    ranked = sorted(cores, key=lambda h: -_sat(h))
+                    acento = ranked[0]
+                    acento_claro = ranked[1] if len(ranked) > 1 else acento
+                    return self._send(200, {
+                        "ok": True, "acento": acento, "acento_claro": acento_claro,
+                        "cores": cores, "n_imgs": len(blobs),
+                    })
+                if not slug:
+                    return self._send(400, {"ok": False, "erro": "informe slug ou imagens"})
+                pal = _marcas.extrair_paleta_marca(slug)
+                if not pal.get("acento"):
+                    return self._send(200, {"ok": False, "erro": "sem referências com cores úteis", **pal})
+                return self._send(200, {"ok": True, **pal})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-branding-book":
+            try:
+                slug = str(req.get("slug") or "").strip().lower()
+                if not slug:
+                    return self._send(400, {"ok": False, "erro": "slug obrigatório"})
+                forcar = bool(req.get("forcar") or req.get("force"))
+                if forcar or req.get("gerar"):
+                    st = _marcas.gerar_branding_book(slug, forcar=True)
+                else:
+                    st = _marcas.branding_book_status(slug)
+                return self._send(200, {"ok": True, **st})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-branding-book-asset":
+            try:
+                slug = str(req.get("slug") or "").strip().lower()
+                du = req.get("dataurl") or req.get("data") or ""
+                nome = str(req.get("nome") or "page")
+                raw, ext = _decode_dataurl(du)
+                st = _marcas.salvar_branding_book_asset(slug, raw, nome=nome, ext=ext)
+                return self._send(200, {"ok": True, **st})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 
