@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proposta de social media — {{CLIENTE}} · smark</title>
+<style>
+  :root{
+    --paper:#F7F5FC;--card:#FFFFFF;--ink:#17111F;--soft:#544B66;--faint:#8B8399;
+    --line:#E7E1F2;--violet:#7A2FE0;--violet-2:#8B3CF7;--violet-deep:#5B1FB0;
+    --violet-soft:#F1E9FE;--lime:#3E8E00;--lime-bg:#EDF7DE;
+    --band:#1B1230;--band-ink:#F6F2FF;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --sh:0 1px 2px rgba(23,17,31,.04),0 10px 34px rgba(90,50,160,.08);
+    --sh-lift:0 2px 4px rgba(23,17,31,.05),0 22px 54px rgba(90,50,160,.14);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:0 26px}
+  section{padding:74px 0}
+  section+section{border-top:1px solid var(--line)}
+
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--violet-2);font-weight:700}
+  h1{font-size:clamp(32px,6.4vw,54px);font-weight:860;letter-spacing:-.035em;
+    line-height:1.03;margin:16px 0 0}
+  h2{font-size:clamp(25px,4.2vw,38px);font-weight:840;letter-spacing:-.028em;
+    line-height:1.1;margin:14px 0 0}
+  h3{font-size:19px;font-weight:800;letter-spacing:-.01em;margin:0 0 8px}
+  p{margin:0 0 16px}
+  .lead{font-size:19.5px;color:var(--soft);margin-top:20px;max-width:60ch}
+  .shead{max-width:64ch;margin-bottom:38px}
+  .shead p{color:var(--soft);margin:14px 0 0}
+  .u{background:linear-gradient(transparent 62%,rgba(139,60,247,.26) 0)}
+
+  /* ---------- capa ---------- */
+  .hero{background:var(--band);color:var(--band-ink);padding:78px 0 84px;position:relative;
+    overflow:hidden;border-top:none}
+  .hero:before{content:"";position:absolute;width:620px;height:620px;right:-190px;top:-260px;
+    border-radius:50%;background:radial-gradient(circle,rgba(139,60,247,.42),transparent 68%)}
+  .hero .wrap{position:relative}
+  .hero .eyebrow{color:#C9A6FF}
+  .hero h1{color:#fff}
+  .hero .lead{color:#CFC5E4;max-width:54ch}
+  .para{display:inline-flex;align-items:center;gap:9px;margin-bottom:6px;
+    font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;
+    color:#CFC5E4;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:7px 15px}
+  .hero-meta{display:flex;gap:34px;flex-wrap:wrap;margin-top:40px;padding-top:26px;
+    border-top:1px solid rgba(255,255,255,.14)}
+  .hero-meta div span{display:block;font-family:var(--mono);font-size:10.5px;
+    letter-spacing:.14em;text-transform:uppercase;color:#9B8DB8}
+  .hero-meta div b{font-size:16px;font-weight:700;color:#fff}
+
+  /* ---------- cards genéricos ---------- */
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:28px 26px;box-shadow:var(--sh)}
+  .box p{color:var(--soft);font-size:15.5px;margin:0}
+  .ic{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;
+    background:var(--violet-soft);color:var(--violet);font-weight:800;font-size:17px;
+    margin-bottom:15px}
+
+  /* ---------- passos ---------- */
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;counter-reset:s}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;
+    box-shadow:var(--sh);position:relative}
+  .step b{display:block;font-size:15.5px;margin-bottom:6px}
+  .step span{color:var(--soft);font-size:14px;line-height:1.5;display:block}
+  .step:before{counter-increment:s;content:counter(s);position:absolute;top:-13px;left:20px;
+    width:27px;height:27px;border-radius:50%;background:var(--violet);color:#fff;
+    display:grid;place-items:center;font-family:var(--mono);font-size:12.5px;font-weight:700}
+
+  /* ---------- planos ---------- */
+  .planos{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;align-items:start}
+  .plano{background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:34px 30px 30px;box-shadow:var(--sh);position:relative;display:flex;
+    flex-direction:column;height:100%}
+  .plano.rec{border:2px solid var(--violet);box-shadow:var(--sh-lift)}
+  .tag{position:absolute;top:-13px;left:30px;background:var(--violet);color:#fff;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+    font-weight:700;padding:6px 14px;border-radius:999px}
+  .pnome{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--violet-2);font-weight:700}
+  .pqtd{font-size:27px;font-weight:850;letter-spacing:-.025em;margin:10px 0 4px}
+  .pfreq{color:var(--faint);font-size:14.5px;margin-bottom:24px}
+  .preco{display:flex;align-items:baseline;gap:7px;padding:20px 0 6px;border-top:1px solid var(--line)}
+  .preco small{font-size:16px;color:var(--faint);font-weight:600}
+  .preco b{font-size:44px;font-weight:860;letter-spacing:-.04em;line-height:1}
+  .preco em{font-style:normal;color:var(--faint);font-size:15px}
+  .unit{font-family:var(--mono);font-size:12.5px;color:var(--faint);margin-bottom:22px}
+  .inc{list-style:none;padding:0;margin:0 0 24px;flex:1}
+  .inc li{position:relative;padding-left:27px;margin-bottom:11px;font-size:15.5px;color:var(--soft)}
+  .inc li:before{content:"";position:absolute;left:0;top:8px;width:15px;height:8px;
+    border-left:2.5px solid var(--lime);border-bottom:2.5px solid var(--lime);
+    transform:rotate(-45deg)}
+  .inc li b{color:var(--ink);font-weight:700}
+  .btn{display:inline-block;text-decoration:none;font-weight:750;font-size:15.5px;
+    padding:14px 22px;border-radius:12px;text-align:center;transition:transform .12s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-p{background:var(--violet);color:#fff}
+  .btn-g{background:var(--violet-soft);color:var(--violet-deep)}
+
+  /* ---------- tabela ---------- */
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;overflow:hidden;font-size:15.5px;box-shadow:var(--sh)}
+  th,td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--line)}
+  thead th{background:var(--violet-soft);font-family:var(--mono);font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--violet-deep);font-weight:700}
+  td.c,th.c{text-align:center;width:130px}
+  tbody tr:last-child td{border-bottom:none}
+  .sim{color:var(--lime);font-weight:800}
+  .nao{color:var(--faint)}
+
+  /* ---------- prova ---------- */
+  .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .shot{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    box-shadow:var(--sh)}
+  .shot img{width:100%;display:block;aspect-ratio:1/1;object-fit:cover}
+  .shot .cap{padding:12px 15px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--faint)}
+
+  /* ---------- honestidade ---------- */
+  .honest{background:var(--band);color:var(--band-ink);border-radius:20px;padding:44px 40px}
+  .honest h2{color:#fff}
+  .honest p{color:#CFC5E4}
+  .honest .shead{margin-bottom:26px}
+  .honest ul{list-style:none;padding:0;margin:0}
+  .honest li{position:relative;padding-left:32px;margin-bottom:16px;color:#E4DCF4;font-size:16.5px}
+  .honest li:before{content:"—";position:absolute;left:0;color:#C9A6FF;font-weight:800}
+  .honest li b{color:#fff}
+
+  /* ---------- faq ---------- */
+  details{background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:18px 22px;margin-bottom:11px;box-shadow:var(--sh)}
+  summary{cursor:pointer;font-weight:750;font-size:16.5px;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary:after{content:"+";float:right;color:var(--violet-2);font-weight:800;font-size:20px;
+    line-height:1}
+  details[open] summary:after{content:"–"}
+  details p{margin:14px 0 0;color:var(--soft);font-size:15.5px}
+
+  /* ---------- fecho ---------- */
+  .close{background:linear-gradient(160deg,var(--violet-deep),#2A1348);color:#fff;text-align:center}
+  .close h2{color:#fff}
+  .close p{color:#D6C9F0;max-width:52ch;margin:18px auto 0}
+  .close .btn-p{background:#fff;color:var(--violet-deep);margin-top:32px;padding:16px 30px;
+    font-size:16.5px}
+  blockquote{margin:0;font-size:clamp(21px,3.4vw,29px);font-weight:820;letter-spacing:-.022em;
+    line-height:1.28}
+
+  footer{padding:30px 0;background:var(--band);color:#8B7FA8;font-family:var(--mono);
+    font-size:11px;letter-spacing:.11em;text-transform:uppercase}
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+  @media (max-width:880px){
+    .grid3,.grid2,.planos,.shots{grid-template-columns:1fr}
+    .steps{grid-template-columns:repeat(2,1fr)}
+    section{padding:56px 0}
+  }
+  @media print{
+    body{background:#fff}
+    section{padding:34px 0;break-inside:avoid}
+    .hero,.close,.honest{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    details{break-inside:avoid}
+    details p{display:block!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ CAPA ══════════ -->
+<section class="hero">
+  <div class="wrap">
+    <span class="para">Proposta para {{CLIENTE}}</span>
+    <span class="eyebrow">Social media · produção e publicação</span>
+    <h1>O conteúdo de vocês<br>sai da semana de alguém.</h1>
+    <p class="lead">A gente assume a produção e a publicação das redes do escritório.
+      Você aprova, a gente faz. Ninguém aí dentro precisa parar o que estava fazendo.</p>
+    <div class="hero-meta">
+      <div><span>Preparado por</span><b>smark</b></div>
+      <div><span>Serviço</span><b>Produção + publicação</b></div>
+      <div><span>Início</span><b>Em até 7 dias</b></div>
+      <div><span>Fidelidade</span><b>Nenhuma</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ HOJE ══════════ -->
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Onde vocês estão hoje</span>
+      <h2>Funciona. Mas depende de uma pessoa ter tempo.</h2>
+      <p>Hoje alguém do escritório reserva um espaço da semana, monta as artes com ajuda de
+        IA e publica. Isso já é mais do que a maioria dos escritórios faz — e o mérito é de
+        quem faz. O ponto não é a pessoa nem a ferramenta. É o que essa rotina cobra sem
+        aparecer na conta.</p>
+    </div>
+    <div class="grid3">
+      <div class="box">
+        <div class="ic">⏱</div>
+        <h3>Sai do trabalho de verdade</h3>
+        <p>Quem faz as artes foi contratado pra outra coisa. Cada hora ali é uma hora fora
+          da função — e ninguém soma essas horas no fim do mês.</p>
+      </div>
+      <div class="box">
+        <div class="ic">◎</div>
+        <h3>O padrão muda toda semana</h3>
+        <p>Cada peça sai de um jeito: outra cor, outra fonte, outro estilo. Quem vê de fora
+          não guarda a marca do escritório — guarda posts soltos.</p>
+      </div>
+      <div class="box">
+        <div class="ic">⤓</div>
+        <h3>Para na pior semana</h3>
+        <p>Fechamento, prazo de entrega, cliente em cima: é quando o conteúdo some. E é
+          exatamente quando o escritório mais deveria estar aparecendo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ COMO FUNCIONA ══════════ -->
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Como passa a funcionar</span>
+      <h2>Cinco passos. Você entra em um.</h2>
+      <p>O único momento que exige vocês é a aprovação — e ela leva minutos, do celular.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><b>Pauta do mês</b><span>A gente traz os temas: prazos, obrigações,
+        dúvidas que os clientes de vocês mais mandam.</span></div>
+      <div class="step"><b>Você aprova</b><span>Uma lista curta, uma resposta. Corta o que
+        não faz sentido, acrescenta o que quiser.</span></div>
+      <div class="step"><b>A gente produz</b><span>Arte e legenda no padrão do escritório,
+        peça por peça.</span></div>
+      <div class="step"><b>Você confere</b><span>Tudo passa por vocês antes de ir ao ar.
+        Nada é publicado sem seu ok.</span></div>
+      <div class="step"><b>A gente publica</b><span>No dia e na hora certos, toda semana,
+        sem ninguém precisar lembrar.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PLANOS ══════════ -->
+<section id="planos">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Planos</span>
+      <h2>Dois tamanhos. Escolha pelo ritmo.</h2>
+      <p>A diferença entre eles é frequência. Tudo que é serviço — pauta, legenda,
+        aprovação, publicação — está nos dois.</p>
+    </div>
+    <div class="planos">
+
+      <div class="plano">
+        <span class="pnome">Plano Presença</span>
+        <div class="pqtd">8 peças por mês</div>
+        <div class="pfreq">2 publicações por semana</div>
+        <div class="preco"><small>R$</small><b>{{P1}}</b><em>/mês</em></div>
+        <div class="unit">= R$ {{P1_UNIT}} por peça publicada</div>
+        <ul class="inc">
+          <li><b>8 artes</b> no padrão visual do escritório</li>
+          <li><b>Legenda escrita</b> para cada peça</li>
+          <li><b>Pauta mensal</b> com os temas da vez</li>
+          <li><b>Publicação agendada</b> no Instagram</li>
+          <li>1 rodada de ajuste por peça</li>
+          <li>Aprovação pelo celular, sem reunião</li>
+        </ul>
+        <a class="btn btn-g" href="#fechar">Começar com o Presença</a>
+      </div>
+
+      <div class="plano rec">
+        <span class="tag">Recomendado</span>
+        <span class="pnome">Plano Consistência</span>
+        <div class="pqtd">12 peças por mês</div>
+        <div class="pfreq">3 publicações por semana</div>
+        <div class="preco"><small>R$</small><b>{{P2}}</b><em>/mês</em></div>
+        <div class="unit">= R$ {{P2_UNIT}} por peça publicada</div>
+        <ul class="inc">
+          <li><b>12 artes</b> no padrão visual do escritório</li>
+          <li><b>Legenda escrita</b> para cada peça</li>
+          <li><b>Pauta mensal</b> com os temas da vez</li>
+          <li><b>Publicação agendada</b> no Instagram</li>
+          <li><b>1 carrossel por mês</b> — o formato que mais segura atenção</li>
+          <li><b>Calendário do setor contábil</b> — prazos e obrigações já mapeados no mês</li>
+          <li><b>Relatório mensal</b> simples: o que saiu e como performou</li>
+          <li>2 rodadas de ajuste por peça</li>
+        </ul>
+        <a class="btn btn-p" href="#fechar">Começar com o Consistência</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ COMPARATIVO ══════════ -->
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Lado a lado</span>
+      <h2>O que muda entre um e outro.</h2>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>&nbsp;</th><th class="c">Presença</th><th class="c">Consistência</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Peças por mês</td><td class="c">8</td><td class="c">12</td></tr>
+          <tr><td>Publicações por semana</td><td class="c">2</td><td class="c">3</td></tr>
+          <tr><td>Arte no padrão do escritório</td><td class="c sim">✓</td><td class="c sim">✓</td></tr>
+          <tr><td>Legenda escrita</td><td class="c sim">✓</td><td class="c sim">✓</td></tr>
+          <tr><td>Pauta mensal</td><td class="c sim">✓</td><td class="c sim">✓</td></tr>
+          <tr><td>Publicação agendada</td><td class="c sim">✓</td><td class="c sim">✓</td></tr>
+          <tr><td>Carrossel mensal</td><td class="c nao">—</td><td class="c sim">✓</td></tr>
+          <tr><td>Calendário do setor contábil</td><td class="c nao">—</td><td class="c sim">✓</td></tr>
+          <tr><td>Relatório mensal</td><td class="c nao">—</td><td class="c sim">✓</td></tr>
+          <tr><td>Rodadas de ajuste</td><td class="c">1</td><td class="c">2</td></tr>
+          <tr><td>Investimento mensal</td><td class="c"><b>R$ {{P1}}</b></td><td class="c"><b>R$ {{P2}}</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PROVA ══════════ -->
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Padrão de entrega</span>
+      <h2>Peça de escritório, não post de IA.</h2>
+      <p>O texto é escrito e montado em camada nítida — não é imagem gerada com letra torta.
+        Dá pra ler no celular, no feed, sem apertar os olhos.</p>
+    </div>
+    <div class="shots">
+      <div class="shot"><img src="{{IMG1}}" alt="Exemplo de peça"><div class="cap">feed · tema claro</div></div>
+      <div class="shot"><img src="{{IMG2}}" alt="Exemplo de peça"><div class="cap">feed · destaque</div></div>
+      <div class="shot"><img src="{{IMG3}}" alt="Exemplo de peça"><div class="cap">capa de carrossel</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ HONESTIDADE ══════════ -->
+<section>
+  <div class="wrap">
+    <div class="honest">
+      <div class="shead">
+        <span class="eyebrow" style="color:#C9A6FF">Combinado antes de começar</span>
+        <h2>O que a gente não promete.</h2>
+      </div>
+      <ul>
+        <li><b>Não prometemos venda.</b> Post não fecha contrato sozinho, e quem garante
+          isso está vendendo sonho. O que a gente garante é presença constante, no padrão,
+          sem consumir o tempo de ninguém aí dentro.</li>
+        <li><b>Não publicamos nada sem você ver.</b> Tudo passa por aprovação. Se algo não
+          pode ser dito, não vai ao ar.</li>
+        <li><b>Não prendemos ninguém.</b> Sem fidelidade e sem multa. Se em dois meses
+          vocês acharem que não vale, é só avisar.</li>
+        <li><b>As peças são de vocês.</b> Saindo ou ficando, tudo que foi produzido continua
+          sendo do escritório.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FAQ ══════════ -->
+<section>
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">Perguntas que costumam vir</span>
+      <h2>Dúvidas honestas.</h2>
+    </div>
+    <details><summary>A gente já faz internamente. Por que pagar?</summary>
+      <p>Some as horas que a pessoa gasta por semana e multiplique pelo custo dela. Na
+        maioria dos escritórios esse número passa do valor do plano — e ela volta a fazer o
+        que foi contratada pra fazer. Fora que aqui não para em semana de fechamento.</p></details>
+    <details><summary>Vocês entendem de contabilidade?</summary>
+      <p>A gente entende do calendário e da linguagem: prazos, obrigações, as dúvidas que
+        se repetem. E nada vai ao ar sem a aprovação de vocês, justamente porque quem tem a
+        palavra final sobre o conteúdo técnico é o escritório.</p></details>
+    <details><summary>Quanto tempo isso vai tomar da nossa equipe?</summary>
+      <p>Minutos por semana. Uma aprovação da pauta no início do mês e um ok nas peças. É
+        conversa de WhatsApp, não reunião.</p></details>
+    <details><summary>E se a gente não gostar de uma arte?</summary>
+      <p>Você pede o ajuste e a gente refaz. Está incluso no plano — uma rodada no Presença,
+        duas no Consistência.</p></details>
+    <details><summary>Precisamos dar acesso às nossas redes?</summary>
+      <p>Sim, para agendar as publicações. É um acesso de parceiro, que vocês tiram quando
+        quiserem, sem depender da gente.</p></details>
+    <details><summary>Dá pra aumentar o volume depois?</summary>
+      <p>Dá, a qualquer momento. Muita gente começa no Presença e sobe quando vê o feed
+        andando sozinho.</p></details>
+  </div>
+</section>
+
+<!-- ══════════ FECHO ══════════ -->
+<section class="close" id="fechar">
+  <div class="wrap">
+    <span class="eyebrow" style="color:#C6F24E">Próximo passo</span>
+    <blockquote style="margin-top:20px">Vocês aprovam.<br>
+      <span class="u">O resto é com a gente.</span></blockquote>
+    <p>Escolhendo o plano hoje, a primeira pauta chega em até 7 dias e a primeira
+      publicação sai na semana seguinte. Sem taxa de implantação.</p>
+    <a class="btn btn-p" href="#planos">Ver os planos de novo</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>smark · produção e publicação de conteúdo</span>
+    <span>proposta para {{CLIENTE}} · válida por 15 dias</span>
+  </div>
+</footer>
+
+</body>
+</html>
