@@ -223,6 +223,20 @@ input[type=range]{accent-color:var(--accent)}
 #estudio{position:fixed;right:16px;bottom:16px;width:min(440px,94vw);height:min(72vh,720px);display:none;flex-direction:column;
   background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.45);z-index:400;overflow:hidden}
 #estudio.on{display:flex}
+#estudio .es-ambient{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.95;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 0%, color-mix(in srgb, var(--esbrand, var(--accent)) 26%, transparent), transparent 62%),
+    radial-gradient(ellipse 60% 50% at 10% 90%, color-mix(in srgb, var(--esbrand2, var(--accent-2)) 14%, transparent), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 95% 60%, color-mix(in srgb, var(--esbrand, var(--accent)) 10%, transparent), transparent 65%);
+  background-size:140% 140%;
+  animation:esbgdrift 14s ease-in-out infinite}
+@keyframes esbgdrift{
+  0%{background-position:30% 0%, 0% 100%, 100% 50%}
+  50%{background-position:60% 20%, 25% 80%, 70% 40%}
+  100%{background-position:30% 0%, 0% 100%, 100% 50%}
+}
+#estudio .eshead,#estudio .eswelcome,#estudio .eslog,#estudio .esfoot{position:relative;z-index:1}
+#estudio .esmark{animation:wlogofloat 4.2s ease-in-out infinite;background:linear-gradient(135deg,var(--esbrand, #8B5CF6),var(--esbrand2, #3B82F6) 55%,var(--esbrand, #22D3EE))}
 #estudio.min{height:auto;width:min(320px,90vw)}
 #estudio.min .eslog,#estudio.min .esfoot,#estudio.min .eswelcome{display:none}
 #estudio.min .eshead{border-bottom:0;cursor:pointer}
@@ -373,8 +387,9 @@ input[type=range]{accent-color:var(--accent)}
 
   <aside class=ctrl id=ctrl></aside>
   <div id=welcome>
+    <div class=wambient aria-hidden=true></div>
     <div class=wc>
-      <div class=wicon><svg viewBox="0 0 100 100" width=34 height=34><path fill-rule=evenodd fill=#fff d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></div>
+      <div class=wicon id=wicon><svg viewBox="0 0 100 100" width=34 height=34><path fill-rule=evenodd fill=#fff d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></div>
       <h1 class=wtitle>smark<span style="color:var(--accent)">.</span> <span class=wlt>studio</span></h1>
       <div class=wsub>Bem-vindo 👋 Comece um projeto novo, peça pro Estúdio IA criar, ou continue de onde parou.</div>
       <div class=wcards>
@@ -629,7 +644,7 @@ async function reorderFrame(from,to){
   if(from===to||isNaN(from))return;const fr=post().frames;const[m]=fr.splice(from,1);fr.splice(to,0,m);
   await salvar(true);await reload(PI,to);toast('Reordenado');
 }
-function sel(pi,fi){hideWelcome();PI=pi;FI=fi;aplicarTemaMarca((D.posts[pi]||{}).marca||'smark');renderPosts();renderStrip();renderCtrl();preview();roiStartQuiet()}
+function sel(pi,fi){hideWelcome();PI=pi;FI=fi;const m=(D.posts[pi]||{}).marca||'smark';aplicarTemaMarca(m);if(typeof setAmbientBrand==='function')setAmbientBrand(m);renderPosts();renderStrip();renderCtrl();preview();roiStartQuiet()}
 async function roiStartQuiet(){
   // NÃO inicia ciclo só por abrir o post — isso inflava 26h+ de “tempo”.
   // Ciclo começa só com trabalho real (texto IA / gerar imagem / export).
@@ -1370,6 +1385,7 @@ carregar().then(()=>snapshot());
 </script>
 
 <div id=estudio>
+  <div class=es-ambient aria-hidden=true></div>
   <div class=eshead id=eshead>
     <span class=eslogo><span class=esmark><svg viewBox="0 0 100 100" width=13 height=13><path fill-rule=evenodd fill=#fff d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></span>
       <b class=esword>Estúdio</b><span class=essub>IA</span></span>
@@ -1440,10 +1456,13 @@ carregar().then(()=>snapshot());
   function openEstudio(opts){
     panel.classList.remove('min');panel.classList.add('on');
     setProv('Claude');
-    if(typeof D!=='undefined'&&D&&post()&&optMarca)optMarca.value=post().marca||'smark';
+    const marca=(typeof D!=='undefined'&&D&&post())?(post().marca||'smark'):(optMarca&&optMarca.value)||'smark';
+    if(optMarca)optMarca.value=marca;
+    if(typeof setAmbientBrand==='function')setAmbientBrand(marca);
     if(opts&&opts.fundo&&optFundo){optFundo.checked=true;syncFundoLab()}
     txt.focus();
   }
+  if(optMarca)optMarca.onchange=()=>{if(typeof setAmbientBrand==='function')setAmbientBrand(optMarca.value)};
   function syncFundoLab(){
     const lab=document.getElementById('esfundo_lab');
     if(lab)lab.classList.toggle('on',!!(optFundo&&optFundo.checked));

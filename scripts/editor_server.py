@@ -198,6 +198,12 @@ THEME_BOOT = r"""
 </script>
 """
 
+# HUB é definido acima; injeta o boot do tema depois que THEME_BOOT existe
+if "__THEME_BOOT__" in HUB:
+    HUB = HUB.replace("__THEME_BOOT__", THEME_BOOT)
+elif THEME_BOOT not in HUB:
+    HUB = HUB.replace("</body></html>", THEME_BOOT + "</body></html>")
+
 
 def topbar(active=""):
     """App shell topbar (.sk-topbar) — substitui o botão flutuante de menu em todas as telas."""
@@ -238,7 +244,8 @@ def config_html():
     chips = " ".join(f"<span class='sk-pill'>{c}</span>" for c in conceitos)
     return f"""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Configurações · smark</title>
-<link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+{HEAD_THEME}<style>
 body.sk{{padding:0}}
 .wrap{{padding:24px 30px 60px;max-width:1080px;margin:0 auto}}
 .sk-pagehead h1{{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:32px;margin:6px 0 4px}}h1 span{{color:var(--accent)}} .sub{{color:var(--muted);font-size:13px}}
@@ -687,7 +694,8 @@ def painel_html():
     """Painel de Conteúdo — novo layout: topbar + toolbar segmentada + cards .sk-post."""
     return ("""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Painel de Conteúdo · smark</title>
-<link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+__HEAD_THEME__<style>
 .wrap{padding:26px 30px 60px;max-width:1240px;margin:0 auto}
 .sk-pagehead h1{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:34px;line-height:.96;margin:6px 0 4px}
 .sk-pagehead .sub{color:var(--muted);font-size:13px}
@@ -986,14 +994,15 @@ async function dupPost(i){await fetch('/duplicar-post',{method:'POST',headers:{'
 document.getElementById('delsel').onclick=()=>del([...SEL]);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 load();
-</script></body></html>""").replace("__TOPBAR__", topbar("painel")).replace("__LOGOSTORE__", smark_logo(34, suffix="STORE"))
+</script></body></html>""").replace("__TOPBAR__", topbar("painel")).replace("__LOGOSTORE__", smark_logo(34, suffix="STORE")).replace("__HEAD_THEME__", HEAD_THEME)
 
 
 def vitrine_html():
     """Vitrine — feed Instagram, mosaico 3 colunas, ordenação e filtro de marca."""
-    return ("""<!doctype html><html lang=pt-BR data-theme="claro"><head><meta charset=utf-8>
+    return ("""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Vitrine · smark</title>
-<link rel="stylesheet" href="/design-system/dist/smark-ds.css"><style>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+__HEAD_THEME__<style>
 body.sk{padding-bottom:50px;background:var(--bg)}
 .top{text-align:center;padding:14px;font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:16px;letter-spacing:.02em;border-bottom:1px solid var(--line);background:var(--surface)}.top span{color:var(--accent)}
 .toolbar{max-width:980px;margin:14px auto 10px;padding:12px 14px;display:flex;flex-direction:column;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:16px}
@@ -1129,7 +1138,7 @@ async function load(){
   render();
 }
 load();
-</script></body></html>""").replace("__TOPBAR__", topbar("vitrine"))
+</script></body></html>""").replace("__TOPBAR__", topbar("vitrine")).replace("__HEAD_THEME__", HEAD_THEME)
 
 
 # Segurança (CSRF / DNS rebinding): o servidor é local, mas tem rotas que gastam

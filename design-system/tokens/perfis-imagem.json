@@ -84,7 +84,8 @@
         "provider-max",
         "elever-ai",
         "netsul",
-        "sul-contabil"
+        "sul-contabil",
+        "deatec"
       ],
       "registro": "abstrato-material",
       "modelo": "google/gemini-3-pro-image",
