@@ -283,15 +283,37 @@ tr:last-child td{{border-bottom:0}}
 .plog-pager .pgbtns{{display:flex;gap:6px;align-items:center}}
 .modal{{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}}
 .modal.on{{display:flex}}
-.mbox{{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(520px,100%);max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.45)}}
+.mbox{{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(640px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.45)}}
 .mbox h2{{font-size:18px;margin:0 0 14px}}
 .fld{{margin-bottom:12px}} .fld label{{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}}
-.fld input,.fld textarea{{width:100%;background:var(--inset);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit}}
+.fld input,.fld textarea,.fld select{{width:100%;background:var(--inset);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit}}
 .fld textarea{{min-height:70px;resize:vertical}}
 .row2{{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
 .mbtns{{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}}
 .logoprev{{width:64px;height:64px;border-radius:14px;border:1px dashed var(--line);display:grid;place-items:center;overflow:hidden;background:var(--inset);font-size:11px;color:var(--muted)}}
-.logoprev img{{width:100%;height:100%;object-fit:cover}}
+.logoprev img{{width:100%;height:100%;object-fit:contain;padding:4px;box-sizing:border-box;background:#fff}}
+/* galeria de refs — estilo Claude Projects */
+.refdrop{{border:1.5px dashed var(--line);border-radius:16px;padding:18px 14px;text-align:center;background:var(--inset);cursor:pointer;transition:border-color .15s,background .15s}}
+.refdrop:hover,.refdrop.drag{{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--inset))}}
+.refdrop b{{display:block;font-size:14px;color:var(--text);margin-bottom:4px}}
+.refdrop span{{font-size:12px;color:var(--muted);line-height:1.4}}
+.refgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:12px}}
+.refcard{{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;transition:border-color .15s,transform .15s}}
+.refcard:hover{{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));transform:translateY(-1px)}}
+.refcard .thumb{{aspect-ratio:4/3;background:#1a1a1e;display:grid;place-items:center;overflow:hidden}}
+.refcard .thumb img{{width:100%;height:100%;object-fit:cover;display:block}}
+.refcard .thumb .docico{{font-size:28px;opacity:.7}}
+.refcard .meta{{padding:8px 10px 10px}}
+.refcard .meta .t{{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.refcard .meta .s{{font-size:10px;color:var(--muted);margin-top:2px}}
+.refcard .x{{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:14px;cursor:pointer;line-height:24px;padding:0;opacity:0;transition:opacity .12s}}
+.refcard:hover .x{{opacity:1}}
+.refcard.pending{{opacity:.75}}
+.refcard.pending .s{{color:var(--accent)}}
+.refcount{{font-size:12px;color:var(--muted);margin-top:8px}}
+.glyphrow{{display:flex;gap:8px;align-items:center}}
+.glyphrow select{{flex:1}}
+.glyphrow input{{width:72px;flex:0 0 72px;text-align:center}}
 </style></head><body class="sk">
 {topbar("config")}
 <div class=wrap>
@@ -356,10 +378,13 @@ tr:last-child td{{border-bottom:0}}
     <div class=fld><label>Nome</label><input id=mf_nome placeholder="NetSul Fibra"></div>
 
     <div class=fld><label>1 · Referências da marca</label>
-      <input type=file id=mf_refs accept="image/*" multiple style="font-size:12px;color:var(--muted)">
-      <div id=mf_refs_saved style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
-      <div id=mf_refs_prev style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Primeiro as fotos — o sistema sugere as cores a partir delas. Clique no × para excluir.</div>
+      <div class=refdrop id=mf_refdrop tabindex=0 role=button aria-label="Adicionar referências">
+        <b>Arraste imagens ou clique para enviar</b>
+        <span>JPG, PNG, WebP · salva na hora · até 12 por vez</span>
+        <input type=file id=mf_refs accept="image/png,image/jpeg,image/webp,image/jpg" multiple style="display:none">
+      </div>
+      <div id=mf_refgrid class=refgrid></div>
+      <div class=refcount id=mf_refcount></div>
     </div>
 
     <div class=fld><label>2 · Cores da marca</label>
@@ -386,7 +411,16 @@ tr:last-child td{{border-bottom:0}}
 
     <div class=row2>
       <div class=fld><label>Handle</label><input id=mf_handle placeholder="@marca"></div>
-      <div class=fld><label>Glyph (1–2 letras)</label><input id=mf_glyph placeholder="N" maxlength=2></div>
+      <div class=fld><label>Glyph no chip/tab</label>
+        <div class=glyphrow>
+          <select id=mf_glyph_mode>
+            <option value="auto">Automático (1ª letra)</option>
+            <option value="custom">Personalizado</option>
+            <option value="none">Nenhum</option>
+          </select>
+          <input id=mf_glyph placeholder="N" maxlength=2 title="1–2 letras">
+        </div>
+      </div>
     </div>
     <div class=fld><label>Wordmark (chip)</label><input id=mf_wordmark placeholder="NetSul"></div>
     <div class=fld><label>Segmento</label>
@@ -467,7 +501,47 @@ document.getElementById('cf_save').onclick=async()=>{{
   document.getElementById('cf_msg').textContent=r.ok?'Salvo ✓':('Erro: '+(r.erro||''));
 }};
 
-let MARCAS=[], EDIT=null, LOGO_DATA=null, REFS_DATA=[];
+let MARCAS=[], EDIT=null, LOGO_DATA=null, REFS_DATA=[], REFS_SAVED=[];
+function glyphFromForm(){{
+  const mode=(document.getElementById('mf_glyph_mode')||{{}}).value||'auto';
+  if(mode==='none') return '';
+  if(mode==='custom') return (document.getElementById('mf_glyph').value||'').trim().slice(0,2);
+  // auto
+  const nome=(document.getElementById('mf_nome').value||'').trim();
+  return (nome[0]||'M').toUpperCase();
+}}
+function setGlyphUI(glyph){{
+  const modeEl=document.getElementById('mf_glyph_mode');
+  const inp=document.getElementById('mf_glyph');
+  if(!modeEl||!inp)return;
+  if(glyph===''||glyph===null||glyph===undefined){{
+    modeEl.value='none'; inp.value=''; inp.disabled=true;
+  }}else if(glyph.length<=2){{
+    // se é só 1ª letra do nome → auto
+    const nome=(document.getElementById('mf_nome').value||'').trim();
+    if(glyph.toUpperCase()===(nome[0]||'').toUpperCase() && glyph.length===1){{
+      modeEl.value='auto'; inp.value=glyph; inp.disabled=true;
+    }}else{{
+      modeEl.value='custom'; inp.value=glyph; inp.disabled=false;
+    }}
+  }}else{{
+    modeEl.value='custom'; inp.value=String(glyph).slice(0,2); inp.disabled=false;
+  }}
+}}
+function syncGlyphMode(){{
+  const mode=document.getElementById('mf_glyph_mode').value;
+  const inp=document.getElementById('mf_glyph');
+  if(mode==='none'){{inp.value='';inp.disabled=true}}
+  else if(mode==='auto'){{
+    const nome=(document.getElementById('mf_nome').value||'').trim();
+    inp.value=(nome[0]||'M').toUpperCase(); inp.disabled=true;
+  }}else{{inp.disabled=false; if(!inp.value) inp.focus()}}
+}}
+document.getElementById('mf_glyph_mode').onchange=syncGlyphMode;
+document.getElementById('mf_nome').addEventListener('input',()=>{{
+  if(document.getElementById('mf_glyph_mode').value==='auto') syncGlyphMode();
+}});
+
 async function loadMarcas(){{
   const r=await(await fetch('/marcas')).json();
   MARCAS=(r.ok&&r.marcas)?r.marcas:[];
@@ -507,7 +581,9 @@ async function loadMarcas(){{
 
 function clearRefsPrev(){{
   REFS_DATA=[];
-  const el=document.getElementById('mf_refs_prev'); if(el) el.innerHTML='';
+  REFS_SAVED=[];
+  const grid=document.getElementById('mf_refgrid'); if(grid) grid.innerHTML='';
+  const rc=document.getElementById('mf_refcount'); if(rc) rc.textContent='';
   const inp=document.getElementById('mf_refs'); if(inp) inp.value='';
   const sw=document.getElementById('mf_swatches'); if(sw) sw.innerHTML='';
   const cm=document.getElementById('mf_colors_msg'); if(cm) cm.textContent='';
@@ -521,6 +597,53 @@ function showSwatches(cores){{
   box.querySelectorAll('[data-hex]').forEach(b=>b.onclick=()=>{{
     document.getElementById('mf_acento').value=b.dataset.hex;
     document.getElementById('mf_colors_msg').textContent='Acento → '+b.dataset.hex;
+  }});
+}}
+function renderRefGrid(){{
+  const grid=document.getElementById('mf_refgrid');
+  const rc=document.getElementById('mf_refcount');
+  if(!grid)return;
+  // dedupe salvas por base
+  const seen=new Set();
+  const saved=[];
+  (REFS_SAVED||[]).forEach(x=>{{
+    const k=x.base||x.nome; if(seen.has(k))return; seen.add(k); saved.push(x);
+  }});
+  const pending=REFS_DATA||[];
+  if(!saved.length&&!pending.length){{
+    grid.innerHTML='';
+    if(rc)rc.textContent='Nenhuma referência ainda — envie fotos do feed/site do cliente.';
+    return;
+  }}
+  const cards=[];
+  saved.forEach(x=>{{
+    cards.push(`<div class=refcard data-nome="${{esc(x.nome)}}">
+      <button type=button class=x title="Excluir" data-del-ref="${{esc(x.nome)}}">×</button>
+      <div class=thumb><img src="${{esc(x.url)}}?t=${{Date.now()}}" alt="" loading=lazy></div>
+      <div class=meta><div class=t title="${{esc(x.nome)}}">${{esc((x.base||x.nome||'').slice(0,28))}}</div>
+      <div class=s>${{esc(x.kind||'ref')}} · salva</div></div></div>`);
+  }});
+  pending.forEach((x,i)=>{{
+    cards.push(`<div class="refcard pending" data-pend="${{i}}">
+      <button type=button class=x title="Tirar da fila" data-del-pend="${{i}}">×</button>
+      <div class=thumb><img src="${{esc(x.dataurl)}}" alt=""></div>
+      <div class=meta><div class=t>${{esc((x.nome||'ref').slice(0,28))}}</div>
+      <div class=s>enviando…</div></div></div>`);
+  }});
+  grid.innerHTML=cards.join('');
+  if(rc)rc.textContent=saved.length+' salva(s)'+(pending.length?(' · '+pending.length+' na fila'):'');
+  grid.querySelectorAll('[data-del-ref]').forEach(b=>b.onclick=async(e)=>{{
+    e.preventDefault(); e.stopPropagation();
+    if(!EDIT){{alert('Salve a marca antes de excluir refs');return}}
+    if(!confirm('Remover esta referência?'))return;
+    const rr=await api('/marca-ref-del',{{slug:EDIT,nome:b.dataset.delRef}});
+    if(!rr.ok){{alert(rr.erro||'falhou');return}}
+    await loadSavedRefs(EDIT);
+  }});
+  grid.querySelectorAll('[data-del-pend]').forEach(b=>b.onclick=()=>{{
+    const i=+b.dataset.delPend;
+    REFS_DATA=REFS_DATA.filter((_,idx)=>idx!==i);
+    renderRefGrid();
   }});
 }}
 async function pickColor(inputId){{
@@ -548,16 +671,24 @@ async function extractColors(opts){{
   opts=opts||{{}};
   const msg=document.getElementById('mf_colors_msg');
   if(msg)msg.textContent='Extraindo cores…';
-  // 1) se há refs na fila (ainda não salvas), manda dataurls
   const body={{}};
   if(EDIT) body.slug=EDIT;
-  if(REFS_DATA.length) body.imagens=REFS_DATA.map(x=>x.dataurl);
-  if(!body.slug&&!(body.imagens&&body.imagens.length)){{
+  // usa fila pendente + (servidor usa slug para as salvas)
+  if(REFS_DATA.length) body.imagens=REFS_DATA.map(x=>x.dataurl).filter(Boolean);
+  const nLocal=REFS_DATA.length+(REFS_SAVED||[]).length;
+  if(!body.slug&&!nLocal){{
     if(msg)msg.textContent='Adicione referências primeiro';
     return null;
   }}
+  // se tem salvas mas body.imagens vazio, slug basta; se tem ambos, backend prioriza imagens e
+  // nós também pedimos merge: força slug sempre que houver salvas
+  if(EDIT&&REFS_SAVED.length&&!body.imagens) body.slug=EDIT;
+  if(EDIT&&REFS_SAVED.length&&body.imagens) body.também_slug=true; // dica
   const r=await api('/marca-extrair-cores', body);
-  if(!r.ok){{if(msg)msg.textContent=r.erro||'falhou';return null}}
+  if(!r.ok){{
+    if(msg)msg.textContent=(r.erro||'falhou')+(r.n_imgs!=null?(' · '+r.n_imgs+' img lida(s)'):'');
+    return null;
+  }}
   if(r.acento) document.getElementById('mf_acento').value=r.acento;
   if(r.acento_claro) document.getElementById('mf_acento_claro').value=r.acento_claro;
   showSwatches(r.cores||[]);
@@ -565,6 +696,57 @@ async function extractColors(opts){{
   return r;
 }}
 document.getElementById('mf_extract_colors').onclick=()=>extractColors();
+
+/** Upload imediato de refs (não espera Salvar marca). */
+async function uploadRefFiles(fileList){{
+  const files=[...fileList].slice(0,12);
+  if(!files.length)return;
+  if(!EDIT){{
+    // marca nova: mantém na fila até criar; ao salvar envia junto
+    for(const f of files){{
+      if(f.size>12*1024*1024){{alert(f.name+' > 12 MB');continue}}
+      const dataurl=await new Promise(res=>{{const rd=new FileReader();rd.onload=()=>res(rd.result);rd.onerror=()=>res(null);rd.readAsDataURL(f)}});
+      if(!dataurl)continue;
+      REFS_DATA.push({{nome:f.name.replace(/\\.[^.]+$/,''), dataurl}});
+    }}
+    renderRefGrid();
+    if(REFS_DATA.length) extractColors();
+    return;
+  }}
+  const msg=document.getElementById('mf_msg');
+  let ok=0, err=0;
+  for(const f of files){{
+    if(f.size>12*1024*1024){{err++;continue}}
+    const dataurl=await new Promise(res=>{{const rd=new FileReader();rd.onload=()=>res(rd.result);rd.onerror=()=>res(null);rd.readAsDataURL(f)}});
+    if(!dataurl){{err++;continue}}
+    // mostra pending
+    REFS_DATA.push({{nome:f.name.replace(/\\.[^.]+$/,''), dataurl}});
+    renderRefGrid();
+    const r=await api('/marca-ref',{{slug:EDIT,nome:f.name.replace(/\\.[^.]+$/,''),dataurl}});
+    REFS_DATA=REFS_DATA.filter(x=>x.dataurl!==dataurl);
+    if(r.ok){{ok++}}else{{err++; console.warn(r.erro)}}
+  }}
+  await loadSavedRefs(EDIT);
+  if(msg){{msg.className=err&&!ok?'err':'ok'; msg.textContent=ok?('✓ '+ok+' ref(s) salva(s)'+(err?(' · '+err+' falhou'):'')):(err?'Falha ao salvar refs':'')}}
+  if(ok||REFS_SAVED.length) extractColors();
+}}
+// drop zone
+(function(){{
+  const drop=document.getElementById('mf_refdrop');
+  const inp=document.getElementById('mf_refs');
+  if(!drop||!inp)return;
+  drop.onclick=()=>inp.click();
+  drop.ondragover=e=>{{e.preventDefault();drop.classList.add('drag')}};
+  drop.ondragleave=()=>drop.classList.remove('drag');
+  drop.ondrop=e=>{{
+    e.preventDefault(); drop.classList.remove('drag');
+    if(e.dataTransfer&&e.dataTransfer.files) uploadRefFiles(e.dataTransfer.files);
+  }};
+  inp.onchange=e=>{{
+    if(e.target.files&&e.target.files.length) uploadRefFiles(e.target.files);
+    e.target.value='';
+  }};
+}})();
 
 async function refreshBbStatus(slug){{
   const el=document.getElementById('mf_bb_status');
@@ -610,7 +792,9 @@ function openNew(){{
   document.getElementById('mf_acento').value='#1CA5B2';
   document.getElementById('mf_acento_claro').value='#3DC4D0';
   document.getElementById('mf_handle').value='';
-  document.getElementById('mf_glyph').value='';
+  setGlyphUI(null); // auto vazio até digitar nome
+  document.getElementById('mf_glyph_mode').value='auto';
+  syncGlyphMode();
   document.getElementById('mf_wordmark').value='';
   document.getElementById('mf_mood').value='';
   document.getElementById('mf_segmento').value='';
@@ -619,8 +803,8 @@ function openNew(){{
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
   document.getElementById('mf_ia_dica').textContent='';
-  document.getElementById('mf_refs_saved').innerHTML='';
   document.getElementById('mf_bb_status').textContent='salve a marca p/ gerar o book';
+  renderRefGrid();
   document.getElementById('mmodal').classList.add('on');
 }}
 function openEdit(slug){{
@@ -634,12 +818,15 @@ function openEdit(slug){{
   document.getElementById('mf_acento').value=m.acento||'#8B3CF7';
   document.getElementById('mf_acento_claro').value=m.acento_claro||m.acento||'#A472FF';
   document.getElementById('mf_handle').value=m.handle||'';
-  document.getElementById('mf_glyph').value=m.glyph||'';
+  // glyph: se tokens tem string vazia explícita → nenhum; se ausente usa auto
+  const g=m.glyph;
+  if(g===''||g===null) setGlyphUI('');
+  else setGlyphUI(g||'');
   document.getElementById('mf_wordmark').value=m.wordmark||'';
   document.getElementById('mf_mood').value=m.mood||'';
   document.getElementById('mf_segmento').value=m.segmento||'';
   document.getElementById('mf_site').value=m.site||'';
-  document.getElementById('mf_logoprev').innerHTML=m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" style="object-fit:contain;padding:4px">`:'sem logo';
+  document.getElementById('mf_logoprev').innerHTML=m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}">`:'sem logo';
   document.getElementById('mf_logo').value='';
   document.getElementById('mf_msg').textContent='';
   document.getElementById('mf_ia_dica').textContent='';
@@ -648,32 +835,15 @@ function openEdit(slug){{
   refreshBbStatus(slug);
 }}
 async function loadSavedRefs(slug){{
-  const box=document.getElementById('mf_refs_saved');
-  if(!box||!slug){{if(box)box.innerHTML='';return}}
-  box.innerHTML='<span style="font-size:12px;color:var(--muted)">Carregando refs…</span>';
+  if(!slug){{REFS_SAVED=[];renderRefGrid();return}}
+  const rc=document.getElementById('mf_refcount');
+  if(rc)rc.textContent='Carregando refs…';
   try{{
     const r=await(await fetch('/marca-refs?slug='+encodeURIComponent(slug))).json();
-    if(!r.ok){{box.innerHTML='';return}}
-    const refs=r.refs||[];
-    const seen=new Set();
-    const uniq=[];
-    refs.forEach(x=>{{const k=x.base||x.nome;if(seen.has(k))return;seen.add(k);uniq.push(x)}});
-    if(!uniq.length){{box.innerHTML='<span style="font-size:12px;color:var(--muted)">Nenhuma referência salva.</span>';return}}
-    box.innerHTML=uniq.map(x=>`
-      <div class=refthumb data-nome="${{esc(x.nome)}}" style="position:relative;width:56px;height:56px">
-        <img src="${{esc(x.url)}}?t=${{Date.now()}}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block">
-        <button type=button title="Excluir" data-del-ref="${{esc(x.nome)}}"
-          style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:0;background:#c44;color:#fff;font-size:12px;cursor:pointer;line-height:20px">×</button>
-      </div>`).join('');
-    box.querySelectorAll('[data-del-ref]').forEach(b=>b.onclick=async(e)=>{{
-      e.preventDefault();
-      if(!confirm('Remover esta referência?'))return;
-      const rr=await api('/marca-ref-del',{{slug:EDIT,nome:b.dataset.delRef}});
-      if(!rr.ok){{alert(rr.erro||'falhou');return}}
-      loadSavedRefs(EDIT);
-      loadMarcas();
-    }});
-  }}catch(e){{box.innerHTML=''}}
+    if(!r.ok){{REFS_SAVED=[];renderRefGrid();return}}
+    REFS_SAVED=r.refs||[];
+    renderRefGrid();
+  }}catch(e){{REFS_SAVED=[];renderRefGrid()}}
 }}
 document.getElementById('bm_new').onclick=openNew;
 document.getElementById('mf_cancel').onclick=()=>document.getElementById('mmodal').classList.remove('on');
@@ -684,7 +854,7 @@ document.getElementById('mf_logo').onchange=e=>{{
   if(f.size>8*1024*1024){{alert('Logo maior que 8 MB');e.target.value='';return}}
   LOGO_RM=false;
   const rd=new FileReader();
-  rd.onload=()=>{{LOGO_DATA=rd.result;document.getElementById('mf_logoprev').innerHTML=`<img src="${{rd.result}}" style="object-fit:contain;padding:4px">`}};
+  rd.onload=()=>{{LOGO_DATA=rd.result;document.getElementById('mf_logoprev').innerHTML=`<img src="${{rd.result}}">`}};
   rd.onerror=()=>{{alert('Não consegui ler o arquivo');LOGO_DATA=null}};
   rd.readAsDataURL(f);
 }};
@@ -697,29 +867,6 @@ document.getElementById('mf_logo_rm').onclick=async()=>{{
   LOGO_DATA=null; LOGO_RM=true;
   document.getElementById('mf_logoprev').innerHTML='sem logo';
   document.getElementById('mf_logo').value='';
-}};
-document.getElementById('mf_refs').onchange=async e=>{{
-  const files=[...(e.target.files||[])].slice(0,12);
-  REFS_DATA=[];
-  const prev=document.getElementById('mf_refs_prev'); prev.innerHTML='';
-  for(const f of files){{
-    if(f.size>12*1024*1024){{alert(f.name+' é maior que 12 MB — pulando');continue}}
-    const dataurl=await new Promise((res,rej)=>{{const rd=new FileReader();rd.onload=()=>res(rd.result);rd.onerror=rej;rd.readAsDataURL(f)}}).catch(()=>null);
-    if(!dataurl)continue;
-    const item={{nome:f.name.replace(/\\.[^.]+$/,''), dataurl}};
-    REFS_DATA.push(item);
-    const wrap=document.createElement('div');
-    wrap.style.cssText='position:relative;width:56px;height:56px';
-    wrap.innerHTML=`<img src="${{dataurl}}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block">
-      <button type=button title="Tirar da fila" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:0;background:#c44;color:#fff;font-size:12px;cursor:pointer">×</button>`;
-    wrap.querySelector('button').onclick=()=>{{
-      REFS_DATA=REFS_DATA.filter(x=>x.dataurl!==item.dataurl);
-      wrap.remove();
-    }};
-    prev.appendChild(wrap);
-  }}
-  // extrai cores automaticamente ao adicionar refs
-  if(REFS_DATA.length) extractColors();
 }};
 async function runIaMarca(mode){{
   const msg=document.getElementById('mf_msg');
@@ -737,7 +884,7 @@ async function runIaMarca(mode){{
   if(r.mood) document.getElementById('mf_mood').value=r.mood;
   if(mode==='all'){{
     if(r.handle) document.getElementById('mf_handle').value=r.handle;
-    if(r.glyph) document.getElementById('mf_glyph').value=r.glyph;
+    if(r.glyph) setGlyphUI(r.glyph);
     if(r.wordmark) document.getElementById('mf_wordmark').value=r.wordmark;
     if(r.segmento) document.getElementById('mf_segmento').value=r.segmento;
   }}
@@ -754,13 +901,15 @@ document.getElementById('mf_save').onclick=async()=>{{
     acento:document.getElementById('mf_acento').value,
     acento_claro:document.getElementById('mf_acento_claro').value,
     handle:document.getElementById('mf_handle').value.trim(),
-    glyph:document.getElementById('mf_glyph').value.trim(),
+    glyph:glyphFromForm(),
+    glyph_explicit:true,
     wordmark:document.getElementById('mf_wordmark').value.trim(),
     mood:document.getElementById('mf_mood').value.trim(),
     site:document.getElementById('mf_site').value.trim(),
     segmento:document.getElementById('mf_segmento').value,
   }};
   if(LOGO_DATA) body.logo_dataurl=LOGO_DATA;
+  // refs pendentes (só marca nova — em edição o upload já é imediato)
   if(REFS_DATA.length) body.referencias=REFS_DATA;
   let r;
   if(EDIT){{
@@ -777,10 +926,15 @@ document.getElementById('mf_save').onclick=async()=>{{
   const nerr=(r.referencias||[]).filter(x=>x&&x.erro).length;
   msg.className='ok';
   msg.textContent='Salvo ✓'+(nref?(' · '+nref+' ref(s)'):'')+(nerr?(' · '+nerr+' com erro'):'')+(r.aviso_logo?(' · logo: '+r.aviso_logo):'');
-  if(!EDIT&&r.slug){{EDIT=r.slug;document.getElementById('fld_slug').style.display='';document.getElementById('mf_slug').value=r.slug;document.getElementById('mf_slug').disabled=true}}
+  if(!EDIT&&r.slug){{
+    EDIT=r.slug;
+    document.getElementById('fld_slug').style.display='';
+    document.getElementById('mf_slug').value=r.slug;
+    document.getElementById('mf_slug').disabled=true;
+  }}
   await loadMarcas();
-  if(EDIT){{loadSavedRefs(EDIT);refreshBbStatus(EDIT)}}
-  REFS_DATA=[]; document.getElementById('mf_refs_prev').innerHTML='';
+  REFS_DATA=[];
+  if(EDIT){{await loadSavedRefs(EDIT);refreshBbStatus(EDIT)}}
   LOGO_DATA=null;
 }};
 loadMarcas();
@@ -2253,11 +2407,15 @@ class H(http.server.BaseHTTPRequestHandler):
                 slug = str(req.get("slug", "")).strip().lower()
                 nome = str(req.get("nome", "")).strip()
                 acento = str(req.get("acento", "")).strip()
+                # glyph: key presente (mesmo "") = explícito; ausente = auto no criar
+                _glyph = req["glyph"] if "glyph" in req else None
+                if _glyph is not None:
+                    _glyph = str(_glyph).strip()[:2]
                 r = _marcas.criar(
                     slug, nome, acento,
                     acento_claro=str(req.get("acento_claro") or "") or None,
                     handle=str(req.get("handle") or "") or None,
-                    glyph=str(req.get("glyph") or "") or None,
+                    glyph=_glyph,
                     wordmark=str(req.get("wordmark") or "") or None,
                     mood=str(req.get("mood") or ""),
                 )
@@ -2311,7 +2469,12 @@ class H(http.server.BaseHTTPRequestHandler):
                 campos = {}
                 for k in ("nome", "acento", "acento_claro", "handle", "glyph",
                           "wordmark", "mood", "gradiente", "segmento", "site"):
-                    if k in req and req[k] is not None:
+                    if k not in req:
+                        continue
+                    # glyph pode ser "" (nenhum) — não tratar como ausente
+                    if k == "glyph":
+                        campos[k] = str(req[k] if req[k] is not None else "").strip()[:2]
+                    elif req[k] is not None:
                         campos[k] = req[k]
                 if "endossa" in req:
                     campos["endossa"] = bool(req["endossa"])
@@ -2344,6 +2507,30 @@ class H(http.server.BaseHTTPRequestHandler):
                                         "path": os.path.relpath(dest, VAULT).replace("\\", "/"),
                                         "detalhe": next((d for d in _marcas.listar_detalhes()
                                                          if d["slug"] == slug), None)})
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-ref":
+            # upload imediato de uma referência (não espera salvar o form da marca)
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                if not slug:
+                    return self._send(400, {"ok": False, "erro": "slug obrigatório"})
+                du = req.get("dataurl") or req.get("data") or ""
+                nome = str(req.get("nome") or "ref").strip()
+                raw, ext = _decode_dataurl(du)
+                if not raw or len(raw) < 32:
+                    return self._send(400, {"ok": False, "erro": "imagem vazia ou inválida"})
+                try:
+                    from PIL import Image
+                    import io
+                    Image.open(io.BytesIO(raw)).verify()
+                except Exception as ve:
+                    return self._send(400, {"ok": False, "erro": f"não é imagem válida: {ve}"})
+                out = _marcas.salvar_referencia_bytes(slug, raw, nome=nome, ext=ext)
+                return self._send(200, {"ok": True, **out, "refs": _marcas.listar_refs(slug)})
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:
@@ -2393,38 +2580,55 @@ class H(http.server.BaseHTTPRequestHandler):
             try:
                 slug = str(req.get("slug") or "").strip().lower()
                 imgs = req.get("imagens") or req.get("dataurls") or []
-                if imgs:
-                    blobs = []
-                    for it in imgs[:16]:
-                        du = it.get("dataurl") if isinstance(it, dict) else it
-                        if not du:
-                            continue
-                        try:
-                            raw, _ext = _decode_dataurl(du)
+                blobs = []
+                for it in (imgs or [])[:16]:
+                    du = it.get("dataurl") if isinstance(it, dict) else it
+                    if not du:
+                        continue
+                    try:
+                        raw, _ext = _decode_dataurl(du)
+                        if raw and len(raw) >= 32:
                             blobs.append(raw)
-                        except Exception:
-                            continue
-                    cores = _marcas.extrair_paleta_de_imagens(blobs, n=5)
-                    if not cores:
-                        return self._send(200, {"ok": False, "erro": "não achei cores nas imagens"})
-                    # acento = mais saturada
-                    def _sat(h):
-                        r, g, b = int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
-                        mx, mn = max(r, g, b), min(r, g, b)
-                        return (mx - mn) / max(1, mx)
-                    ranked = sorted(cores, key=lambda h: -_sat(h))
-                    acento = ranked[0]
-                    acento_claro = ranked[1] if len(ranked) > 1 else acento
+                    except Exception:
+                        continue
+                # também puxa refs salvas no disco (merge)
+                if slug and _marcas.exists(slug):
+                    pal_disk = _marcas.extrair_paleta_marca(slug)
+                else:
+                    pal_disk = {"cores": [], "n_imgs": 0, "acento": "", "acento_claro": ""}
+                cores_live = _marcas.extrair_paleta_de_imagens(blobs, n=6) if blobs else []
+                # união: live primeiro (mais recentes), depois disco
+                cores = []
+                for c in (cores_live + (pal_disk.get("cores") or [])):
+                    if c and c not in cores:
+                        cores.append(c)
+                n_imgs = len(blobs) + int(pal_disk.get("n_imgs") or 0)
+                if not cores:
+                    if n_imgs == 0:
+                        return self._send(200, {
+                            "ok": False,
+                            "erro": "sem referências — envie fotos ou abra uma marca que já tenha refs salvas",
+                            "n_imgs": 0, "cores": [],
+                        })
                     return self._send(200, {
-                        "ok": True, "acento": acento, "acento_claro": acento_claro,
-                        "cores": cores, "n_imgs": len(blobs),
+                        "ok": False,
+                        "erro": "li " + str(n_imgs) + " img(s) mas as cores são muito neutras — use o pincel 🖌",
+                        "n_imgs": n_imgs, "cores": [],
                     })
-                if not slug:
-                    return self._send(400, {"ok": False, "erro": "informe slug ou imagens"})
-                pal = _marcas.extrair_paleta_marca(slug)
-                if not pal.get("acento"):
-                    return self._send(200, {"ok": False, "erro": "sem referências com cores úteis", **pal})
-                return self._send(200, {"ok": True, **pal})
+
+                def _sat(h):
+                    r, g, b = int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
+                    mx, mn = max(r, g, b), min(r, g, b)
+                    return (mx - mn) / max(1, mx)
+
+                ranked = sorted(cores, key=lambda h: -_sat(h))
+                acento = ranked[0]
+                acento_claro = next((c for c in ranked[1:] if c != acento), ranked[0])
+                # se disco já tinha acento e live não, prefira o mais saturado
+                return self._send(200, {
+                    "ok": True, "acento": acento, "acento_claro": acento_claro,
+                    "cores": cores[:6], "n_imgs": n_imgs,
+                })
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:

@@ -140,7 +140,8 @@ def load_brands():
         brasao = m.get("brasao") or {}
         brands[slug] = {
             "name": m["nome"], "accent": m["acento"], "bright": m.get("acento_claro", m["acento"]),
-            "glyph": m.get("logo_glyph", "•"), "handle": m.get("handle", "@" + slug),
+            "glyph": m.get("logo_glyph") if m.get("logo_glyph") is not None else "•",
+            "handle": m.get("handle", "@" + slug),
             "endossa": m.get("endossa", False),
             "logo_path": m.get("logo_path", ""), "logo_svg": m.get("logo_svg", ""),
             "logo_file": brasao.get("principal") or m.get("logo_file") or "",
@@ -326,7 +327,11 @@ def glyph_html(b, color, px):
                             f'margin:auto;padding:{max(2,int(px*0.08))}px;box-sizing:content-box"/>')
             except Exception:
                 pass
-    return esc(b.get("glyph") or "•")
+    g = b.get("glyph")
+    if g is None or g == "":
+        # sem glyph: retorna vazio (tab/chip usam só logo se houver; senão some o monograma)
+        return ""
+    return esc(g)
 
 
 def wordmark_html(b):
@@ -582,8 +587,13 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     sub_h = f'<div class="sub">{render_rich(sub, tema)}</div>' if sub else ""
     cta_h = f'<div><span class="cta">{esc(cta)}</span></div>' if cta else ""
     page_h = f'<div class="page">{esc(page)}</div>' if page else ""
+    g_chip = glyph_html(b, on_acc, 50)
+    g_tab = glyph_html(b, on_acc, 46)
+    # se não há símbolo (sem logo + sem glyph), omite o avatar do chip e o ícone da tab
+    av_h = f'<div class="av">{g_chip}</div>' if g_chip else ""
+    ic_h = f'<div class="ic">{g_tab}</div>' if g_tab else ""
     chip_h = ("" if no_chip else
-              f'<div class="chip"><div class="av">{glyph_html(b, on_acc, 50)}</div>'
+              f'<div class="chip">{av_h}'
               f'<div class="hd">{wordmark_html(b)}</div><div class="ck">&#10003;</div></div>')
     # headline também com cores seguras
     grade_on = (not no_grade) and (has_img or placeholder)
@@ -592,7 +602,7 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
         body = '<div class="card"><div class="bg"></div><div class="ovx"></div></div>'
     else:
         body = (f'<div class="card"><div class="bg"></div>{grade_html}<div class="ovx"></div><div class="ov"></div>{page_h}'
-                f'<div class="tab"><div class="ic">{glyph_html(b, on_acc, 46)}</div><div class="vt">{esc(b["tab"])}</div></div>'
+                f'<div class="tab">{ic_h}<div class="vt">{esc(b["tab"])}</div></div>'
                 f'<div class="ct">{chip_h}<div class="h">{render_rich(headline, tema)}</div>{sub_h}{cta_h}</div>'
                 f'<div class="footer"><div>{esc(handle)}</div><div class="cred">{esc(rodape)}</div></div></div>')
     return PAGE % {"CSS": css, "BODY": body}, w, h

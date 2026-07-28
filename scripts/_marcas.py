@@ -133,7 +133,8 @@ def listar_detalhes():
             "acento_alternativo": m.get("acento_alternativo") or "",
             "base_escura": m.get("base_escura") or "",
             "wordmark": m.get("wordmark") or m.get("nome") or s,
-            "glyph": m.get("logo_glyph") or (m.get("nome") or s)[:1].upper(),
+            # string vazia = nenhum glyph (preservar); None/ausente → 1ª letra p/ UI
+            "glyph": m["logo_glyph"] if "logo_glyph" in m else ((m.get("nome") or s)[:1].upper()),
             "mood": m.get("mood") or "",
             "gradiente": m.get("gradiente") or "",
             "segmento": m.get("segmento") or "",
@@ -367,7 +368,8 @@ def atualizar(slug, *, nome=None, acento=None, acento_claro=None, handle=None,
         if handle:
             m["handle"] = handle
     if glyph is not None:
-        g = str(glyph).strip()[:2] or m.get("logo_glyph") or "M"
+        # string vazia = sem glyph (só logo ou nada no chip/tab)
+        g = str(glyph).strip()[:2]
         m["logo_glyph"] = g
     if wordmark is not None:
         wm = str(wordmark).strip()[:60]
@@ -613,7 +615,11 @@ def criar(slug, nome, acento, *, acento_claro=None, handle=None, glyph=None,
     handle = (handle or ("@" + slug.replace("-", ""))).strip()
     if not handle.startswith("@"):
         handle = "@" + handle
-    glyph = (glyph or nome[:1].upper() or "M")[:2]
+    # glyph="" explícito = nenhum; None/omitido = 1ª letra do nome
+    if glyph is None:
+        glyph = (nome[:1].upper() or "M")[:2]
+    else:
+        glyph = str(glyph).strip()[:2]
     wordmark = wordmark or nome
 
     acc_u = acento.upper() if acento.startswith("#") else acento
