@@ -1701,11 +1701,18 @@
           "bg_suplente": false,
           "bg_tier": "rascunho",
           "bg_publicavel": false,
-          "overlay": "branco",
+          "overlay": "none",
           "overlay_op": 1,
           "ov_ang": 150,
           "ov_pos": 0,
-          "paleta": "marca"
+          "paleta": "marca",
+          "_accOpen": false,
+          "posx": 72,
+          "zoom": 1,
+          "posy": 100,
+          "brilho": 1.1,
+          "contraste": 0.85,
+          "satur": 1
         }
       ],
       "caption": "A reforma tributária traz o chamado split payment: quando o cliente paga, o valor do imposto já é separado na hora e enviado ao governo. Na prática, muda o seu fluxo de caixa — o dinheiro do tributo não passa mais pela sua conta. Quem se organizar antes evita aperto. Quer entender o que muda no seu negócio?\n\n#reformatributaria #contabilidade #splitpayment #gestaofinanceira",
