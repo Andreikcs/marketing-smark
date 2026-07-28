@@ -307,8 +307,8 @@ input[type=range]{accent-color:var(--accent)}
     <button class="btn" style="width:auto" id=bsave>💾 Salvar</button>
   </header>
   <div id=roipanel class=roipanel>
-    <div class=roihead><span>⏱ ROI humano</span><button class=hicon id=roiclose title=fechar>✕</button></div>
-    <div class=roibody id=roibody><div class=roihint>Carregando…</div></div>
+    <div class=roihead><span>⏱ Tempo e custo</span><button class=hicon id=roiclose title=fechar>✕</button></div>
+    <div class=roibody id=roibody><div class=roihint>Abrindo resumo…</div></div>
   </div>
 
   <div id=histpanel class=histpanel hidden>
@@ -621,44 +621,58 @@ async function roiStartQuiet(){
     if(r.ok&&r.roi&&D.posts[PI])D.posts[PI].roi=r.roi;
   }catch(e){}
 }
+function fmtMinUI(m){if(m==null||m===undefined)return '—';m=Number(m);if(m<60)return m.toFixed(1)+' min';return (m/60).toFixed(1)+' h'}
+function relTimeUI(iso){if(!iso)return '';const t=Date.parse(iso);if(!t)return '';const m=Math.floor((Date.now()-t)/60000);
+  if(m<1)return 'agora';if(m<60)return m+' min';const h=Math.floor(m/60);if(h<48)return h+' h';return Math.floor(h/24)+' d'}
 async function openRoi(){
   const pan=document.getElementById('roipanel');
   pan.classList.add('on');
   const body=document.getElementById('roibody');
-  body.innerHTML='<div class=roihint>Carregando resumo…</div>';
+  body.innerHTML='<div class=roihint>Carregando…</div>';
   try{
-    const r=await(await fetch('/roi-resumo',{method:'POST',headers:HJSON,body:JSON.stringify({limit:20})})).json();
-    if(!r.ok){body.innerHTML='⚠️ '+(r.erro||'falhou');return}
+    // garante ciclo no post atual
+    if(typeof PI==='number'&&PI>=0){try{await fetch('/roi-start',{method:'POST',headers:HJSON,body:JSON.stringify({post:PI,force:false})})}catch(e){}}
+    const r=await(await fetch('/roi-resumo',{method:'POST',headers:HJSON,body:JSON.stringify({limit:40})})).json();
+    if(!r.ok){body.innerHTML='Não consegui carregar. Tente de novo.';return}
     const s=r.stats||{};
     const am=(s.avg_minutes_per_post||{}).mean;
-    const lm=(s.last_cycle_minutes||{}).mean;
-    const cu=(s.cogs_usd||{}).mean;
-    const cb=(s.cogs_brl||{}).mean;
-    let h='<div class=roistat>'
-      +'<div class=c>Min. médios (ciclos)<b>'+(am!=null?am+' min':'—')+'</b></div>'
-      +'<div class=c>Último ciclo (média)<b>'+(lm!=null?lm+' min':'—')+'</b></div>'
-      +'<div class=c>COGS médio US$<b>'+(cu!=null?('US$ '+Number(cu).toFixed(3)):'—')+'</b></div>'
-      +'<div class=c>COGS médio R$<b>'+(cb!=null?('R$ '+Number(cb).toFixed(2)):'—')+'</b></div>'
-      +'</div>';
-    if(r.estimated_hours_saved!=null){
-      h+='<div class=roihint>Proxy vs baseline '+(r.baseline_minutes||45)+' min: <b>~'+r.estimated_hours_saved+' h</b> economizadas nos ciclos com tempo registrado (ainda amostra pequena até ter 20 posts).</div>';
-    }else{
-      h+='<div class=roihint>Exporte posts (⬇) para fechar ciclos de tempo. Copy e imagem abrem o ciclo automaticamente.</div>';
+    const cb=(s.cogs_brl||{}).sum;
+    const cu=(s.cogs_usd||{}).sum;
+    // post atual em destaque
+    let cur=null;
+    if(typeof post==='function'&&post()){
+      cur=(r.posts||[]).find(x=>x.idx===PI)||null;
     }
+    let h='';
+    if(cur){
+      h+='<div class=roirow style="border-color:var(--accent);margin-bottom:12px"><div class=t>Post aberto</div><div class=m>'
+        +esc(cur.titulo)+'<br>'
+        +'Criado: '+esc(relTimeUI(cur.created_at)||'—')
+        +' · Trabalho: <b>'+fmtMinUI(cur.total_minutes)+'</b>'
+        +(cur.active?(' · <span style=color:var(--accent)>agora '+fmtMinUI(cur.active_minutes)+'</span>'):'')
+        +(cur.total_brl!=null?('<br>Custo: R$ '+Number(cur.total_brl).toFixed(2)):(cur.total_usd!=null?('<br>Custo: US$ '+Number(cur.total_usd).toFixed(3)):''))
+        +'</div></div>';
+    }
+    h+='<div class=roistat>'
+      +'<div class=c>Tempo médio<b>'+(am!=null?fmtMinUI(am):'—')+'</b></div>'
+      +'<div class=c>Custo total (amostra)<b>'+(cb!=null?('R$ '+Number(cb).toFixed(2)):(cu!=null?('US$ '+Number(cu).toFixed(2)):'—'))+'</b></div>'
+      +'</div>';
+    h+='<div class=roihint>O tempo começa ao editar/gerar e fecha quando você exporta o PNG.</div>';
     h+='<div class=roilist>';
-    (r.posts||[]).forEach(p=>{
+    const rows=(r.posts||[]).slice(0,25);
+    if(!rows.length)h+='<div class=roihint>Ainda sem histórico. Gere um texto ou imagem e exporte um post.</div>';
+    rows.forEach(p=>{
       h+='<div class=roirow><div class=t>'+esc(p.titulo)+'</div><div class=m>'
-        +esc(p.marca||'')+' · '+(p.cycles_n||0)+' ciclo(s)'
-        +(p.last_minutes!=null?(' · último '+p.last_minutes+' min'):'')
-        +(p.avg_minutes!=null?(' · média '+p.avg_minutes+' min'):'')
-        +'<br>copy×'+(p.copy_calls_total||0)+' · img×'+(p.image_gens_total||0)+' · export×'+(p.exports_total||0)
-        +(p.total_usd!=null?('<br>COGS US$ '+Number(p.total_usd).toFixed(3)+(p.total_brl!=null?(' · R$ '+Number(p.total_brl).toFixed(2)):'')):'')
-        +(p.active?' · <span style=color:var(--accent)>ciclo ativo</span>':'')
+        +esc(marcaMeta(p.marca).nome||p.marca||'')
+        +' · ⏱ '+fmtMinUI(p.total_minutes)
+        +(p.total_brl!=null?(' · R$ '+Number(p.total_brl).toFixed(2)):(p.total_usd!=null?(' · US$ '+Number(p.total_usd).toFixed(3)):''))
+        +(p.created_at?(' · criado '+relTimeUI(p.created_at)):'')
+        +(p.active?' · <span style=color:var(--accent)>ativo</span>':'')
         +'</div></div>';
     });
     h+='</div>';
     body.innerHTML=h;
-  }catch(e){body.innerHTML='⚠️ '+esc(e.message)}
+  }catch(e){body.innerHTML='Erro: '+esc(e.message||String(e))}
 }
 document.getElementById('broi').onclick=openRoi;
 document.getElementById('roiclose').onclick=()=>document.getElementById('roipanel').classList.remove('on');
@@ -684,24 +698,22 @@ function richField(label,val,onin,key){
     if(k==='b'){ev.preventDefault();wrapBI('**')}else if(k==='i'){ev.preventDefault();wrapBI('_')}}});
   // linha 1: acento / B / I
   const bar=document.createElement('div');bar.className='fmtbar';
-  [['★ acento','','realçar em roxo (exclusivo com cor)',accent],['B','b','negrito · Ctrl+B',()=>wrapBI('**')],['I','i','itálico · Ctrl+I',()=>wrapBI('_')]]
+  [['★ destaque','','Destacar palavra na cor da marca',accent],['B','b','Negrito',()=>wrapBI('**')],['I','i','Itálico',()=>wrapBI('_')]]
    .forEach(([lb,cls,tip,fn])=>{const b=document.createElement('button');b.type='button';b.className='fmtb '+cls;b.textContent=lb;b.title=tip;
      b.onmousedown=e=>e.preventDefault();b.onclick=fn;bar.appendChild(b)});
-  const hint=document.createElement('span');hint.className='fmthint';hint.textContent='Enter = quebra';bar.appendChild(hint);
+  const hint=document.createElement('span');hint.className='fmthint';hint.textContent='Enter = nova linha';bar.appendChild(hint);
   w.appendChild(bar);
   // linha 2: cor — seletor visual (hex) + presets + campo hex. Seleciona a palavra e clica.
   const bar2=document.createElement('div');bar2.className='fmtbar';let savedSel=null;
-  const col=document.createElement('input');col.type='color';col.value='#8B3CF7';col.className='fmtcol';col.title='escolher cor (visual) — aplica na seleção';
+  const brandAcc=(typeof marcaMeta==='function'&&typeof post==='function'&&post())?(marcaMeta(post().marca||'smark').acento||'#8B3CF7'):'#8B3CF7';
+  const col=document.createElement('input');col.type='color';col.value=brandAcc;col.className='fmtcol';col.title='Escolher cor';
   col.onmousedown=()=>savedSel=getSel();
-  col.oninput=()=>{const h=col.value.toUpperCase();hx.value=h;paint(h,(savedSel&&savedSel.s!==savedSel.e)?savedSel:null)};
+  col.oninput=()=>{const h=col.value.toUpperCase();paint(h,(savedSel&&savedSel.s!==savedSel.e)?savedSel:null)};
   bar2.appendChild(col);
-  [['acento','#8B3CF7'],['claro','#FFFFFF'],['escuro','#100D1C']].forEach(([nm,hex])=>{
-    const b=document.createElement('button');b.type='button';b.className='fmtchip';b.title='pintar · '+hex;
+  [['marca',brandAcc],['claro','#FFFFFF'],['escuro','#100D1C']].forEach(([nm,hex])=>{
+    const b=document.createElement('button');b.type='button';b.className='fmtchip';b.title='Pintar seleção';
     b.innerHTML='<span class=sw style="background:'+hex+'"></span>'+nm;b.onmousedown=e=>e.preventDefault();b.onclick=()=>paint(hex);bar2.appendChild(b)});
-  const hx=document.createElement('input');hx.type='text';hx.className='fmthex';hx.placeholder='#hex';hx.maxLength=7;hx.value='#8B3CF7';hx.title='cor hexadecimal — Enter aplica na seleção';
-  hx.onfocus=()=>savedSel=getSel();
-  hx.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();let h=hx.value.trim();if(!/^#?[0-9a-fA-F]{6}$/.test(h)){toast('hex inválido (ex.: #8B3CF7)');return}if(h[0]!=='#')h='#'+h;h=h.toUpperCase();col.value=h;paint(h,savedSel)}};
-  bar2.appendChild(hx);w.appendChild(bar2);
+  w.appendChild(bar2);
   w.appendChild(ta);return w;
 }
 
@@ -739,8 +751,24 @@ function renderCtrl(){
   gm.appendChild(mrow);
   const mhint=document.createElement('div');mhint.className='mini';mhint.style.marginTop='6px';
   mhint.innerHTML='<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+esc(mm.acento||'#8B3CF7')+';margin-right:6px;vertical-align:middle"></span>'
-    +esc(mm.handle||'')+(mm.logo_url?' · logo ok':'')+(mm.pronta===false?' · <b style="color:var(--warn)">setup incompleto</b>':'');
-  gm.appendChild(mhint);c.appendChild(gm);
+    +esc(mm.handle||'')+(mm.pronta===false?' · <b style="color:var(--warn)">complete o branding</b>':'');
+  gm.appendChild(mhint);
+  // Tempo do post (criado + tempo de trabalho)
+  const tbox=document.createElement('div');tbox.className='mini';tbox.style.cssText='margin-top:10px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);line-height:1.45';
+  const p=post();
+  const created=p.created_at||'';
+  const roi=p.roi||{};
+  const cycles=roi.cycles||[];
+  let totalMin=cycles.reduce((s,c)=>s+(Number(c.minutes)||0),0);
+  if(roi.active&&roi.active.started_at){const t0=Date.parse(roi.active.started_at);if(t0)totalMin+=(Date.now()-t0)/60000}
+  function rel(iso){if(!iso)return '—';const t=Date.parse(iso);if(!t)return '—';const m=Math.floor((Date.now()-t)/60000);if(m<1)return 'agora';if(m<60)return m+' min';const h=Math.floor(m/60);if(h<48)return h+' h';return Math.floor(h/24)+' d'}
+  tbox.innerHTML='<b style="color:var(--txt)">⏱ Tempo deste post</b><br>'
+    +'Criado: <b style="color:var(--txt)">'+esc(rel(created))+'</b>'
+    +(created?(' <span style="opacity:.7">('+esc(created.replace('T',' ').slice(0,16))+')</span>'):'')
+    +'<br>Trabalho registrado: <b style="color:var(--txt)">'+(totalMin? (totalMin<60?totalMin.toFixed(1)+' min':(totalMin/60).toFixed(1)+' h') : '—')+'</b>'
+    +(roi.active?' · <span style="color:var(--accent)">ciclo ativo</span>':'')
+    +'<br><span style="opacity:.75">Textos IA: '+(roi.copy_calls_total||0)+' · Imagens: '+(roi.image_gens_total||0)+' · Exports: '+(roi.exports_total||0)+'</span>';
+  gm.appendChild(tbox);c.appendChild(gm);
   // PUBLICAÇÃO (canais)
   const gp=document.createElement('div');gp.className='grp';gp.innerHTML='<h5>Publicação — canais</h5>';
   const cseg=document.createElement('div');cseg.className='seg';
@@ -753,8 +781,8 @@ function renderCtrl(){
   gp.appendChild(cseg);c.appendChild(gp);
   // TEXTO
   const g1=document.createElement('div');g1.className='grp';g1.innerHTML='<h5>Texto</h5>';
-  g1.appendChild(richField('Headline (| quebra · *acento* · **negrito** · _itálico_)',f.headline,v=>{f.headline=v;change()},'headline'));
-  g1.appendChild(richField('Apoio (sub)',f.sub,v=>{f.sub=v;change()},'sub'));
+  g1.appendChild(richField('Título principal',f.headline,v=>{f.headline=v;change()},'headline'));
+  g1.appendChild(richField('Texto de apoio',f.sub,v=>{f.sub=v;change()},'sub'));
   g1.appendChild(fld('CTA',f.cta,v=>{f.cta=v;change()},0,0,'cta'));
   const emo=document.createElement('div');emo.className='emobar';
   '👉 👇 🔥 ✅ 🚀 💡 📈 ⚡ 🎯 ❤️ 🙌 ✨ 💜 ⚽ 🏆 📱'.split(' ').forEach(e=>{const b=document.createElement('button');b.type='button';b.className='emob';b.textContent=e;b.onclick=()=>insEmoji(e);emo.appendChild(b)});
@@ -787,7 +815,7 @@ function renderCtrl(){
   palw.appendChild(palseg);
   const psw=document.createElement('div');psw.className='mini';psw.style.marginTop='6px';
   psw.innerHTML='<span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:'+esc(mmPal.acento||'#8B3CF7')+';vertical-align:middle;margin-right:6px"></span>'
-    +esc(mmPal.acento||'')+' · chip/tab/CTA/palavra *acento*';
+    +'Cor usada no selo, botões e palavras em destaque';
   palw.appendChild(psw);g1.appendChild(palw);
 
   // FUNDO
