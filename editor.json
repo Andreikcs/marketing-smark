@@ -108,7 +108,9 @@
         "copy_calls_total": 0,
         "image_gens_total": 0,
         "exports_total": 0
-      }
+      },
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13"
     },
     {
       "slug": "caz-tv",
@@ -146,7 +148,16 @@
       "status": "rascunho",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "case-destaque",
@@ -178,7 +189,16 @@
       "importado": true,
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "novo-post",
@@ -210,7 +230,16 @@
       "caption": "",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "xxxx",
@@ -243,7 +272,16 @@
       "caption": "",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "elever-crm",
@@ -276,7 +314,16 @@
       "caption": "",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "selecao-nina-teo-clara-c33c8",
@@ -385,7 +432,16 @@
       "status": "rascunho",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "elever-auto",
@@ -415,7 +471,16 @@
       "caption": "Enquanto sua equipe fecha negócio no salão, a Nina cuida das mensagens que chegam a qualquer hora. Ela responde na hora, tira dúvidas e deixa cada contato organizado pra ninguém escapar. Sua loja de carros ou motos rodando sem depender de você o tempo todo.\n\n#lojadecarros #concessionaria #motos #atendimento",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "teste-novo-modelo",
@@ -452,7 +517,16 @@
       "caption": "Imagina cada canto da sua loja com alguém de IA cuidando: um pra atender quem chega, outro pra organizar os pedidos. Na smark, cada departamento ganha o seu. Você foca em vender móvel bonito, o resto anda sozinho.\n\n#smark #lojademoveis #inteligenciaartificial #gestao",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "eloise",
@@ -513,7 +587,16 @@
       "caption": "Na Copa, quem vence é o time bem escalado. Na empresa é igual: cada departamento precisa da posição certa. A smark coloca um funcionário de IA em cada função pra o time render sem apagar incêndio. Quer ver onde encaixa? Faça o diagnóstico gratuito.\n\n#copadomundo #inteligenciaartificial #gestao #produtividade",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "novo-post-9382",
@@ -543,7 +626,16 @@
       "caption": "A Smark acessoria desenvolve funcionários de IA sob medida para a sua operação.  \n\nComente \"EU QUERO\"  e receba um diagnóstico gratuito da sua operação para entender quais funcionários podem complementar o seu time.  Ou acesse nosso site na BIO e agende com um de nossos especialistas.\n\n\n\n#smark #inteligenciaartificial #gestao #produtividade",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "selecao-nina-teo-clara-c33c8-ce452",
@@ -638,7 +730,16 @@
       "status": "salvo",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "contrata-o",
@@ -696,7 +797,16 @@
       "caption": "Com a smark, cada departamento ganha um funcionário de IA que já começa trabalhando para executar  tarefas pontuais, processos inteiros ou  funções completas. \n\nQuer saber onde isso encaixa na sua empresa? Comece pelo diagnóstico gratuito no link da bio.\n\n#smark  #inteligenciaartificial #produtividade #escala",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "titulo": "A sala de estar que vira lead",
@@ -739,7 +849,16 @@
           "n": 2,
           "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/02.png"
         }
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "lote-a-dark---provedor",
@@ -774,7 +893,16 @@
       "caption": "Todo dia um cliente manda mensagem e ninguém responde a tempo. Ele espera, cansa e vai embora calado. A Clara, funcionária de IA pra provedores, atende na hora e mantém cada conversa viva. Faça o diagnóstico gratuito e veja quantas conversas você está deixando escapar.\n\n#provedor #internet #atendimento #gestao",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "lote-b-light---provedor",
@@ -812,7 +940,16 @@
       "caption": "No provedor, atendimento parado é cliente esperando. A Clara, funcionária de IA para ISP, responde dúvidas e cuida de renovação de contrato a qualquer hora. Menos fila, menos custo de plantão. Comece pelo diagnóstico gratuito.\n\n#provedor #isp #suporte #atendimento",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "lote-a-dark---m-veis",
@@ -845,7 +982,16 @@
       "caption": "O casal escolhe o móvel, manda a dúvida e fica olhando a tela. Se ninguém responde na hora, eles fecham o app e vão pra outra loja. Com um funcionário de IA no atendimento, cada pergunta tem resposta na mesma hora, dia e noite. Menos espera, menos cliente perdido.\n\n#atendimento #inteligenciaartificial #varejo #gestao",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "crm-com-ia---loj-m-veis-c8902",
@@ -899,7 +1045,16 @@
       "caption": "Já pensou ter um funcionário de IA que atende todos seus clientes no whatsApp, captura interesse de projeto,  identifica orçamento, alinha expectativa de prazos e entrega para seu time comercial ou de projetos somente quem realmente tem potencial e interesse. Clique no botão e saiba mais.",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas",
@@ -932,7 +1087,16 @@
       "caption": "Todo dia chega gente perguntando preço, ficha técnica e condições. Um funcionário de IA responde na hora, organiza os interessados e passa pro vendedor só quem está pronto. Menos cliente perdido, mais tempo pra fechar negócio no pátio.\n\n#concessionaria #revenda #funcionariodeia #eleverai",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c8913",
@@ -965,7 +1129,16 @@
       "caption": "Na concessionária de motos, a gente perde venda no silêncio: o cliente manda mensagem e ninguém responde na hora. Um funcionário de IA atende cada contato na mesma hora, organiza e passa pro vendedor certo. Menos lead esquecido, mais tempo pra equipe fechar negócio.\n\n#motos #concessionaria #atendimento #inteligenciaartificial",
       "canais": [
         "instagram"
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "demo-bella-massa",
@@ -997,7 +1170,16 @@
           "zoom": 1.05,
           "overlay": "none"
         }
-      ]
+      ],
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13",
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "copy_calls_total": 0,
+        "image_gens_total": 0,
+        "exports_total": 0
+      }
     },
     {
       "slug": "demo-horizonte-imoveis",
@@ -1040,7 +1222,9 @@
         "copy_calls_total": 0,
         "image_gens_total": 0,
         "exports_total": 0
-      }
+      },
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13"
     },
     {
       "slug": "agencia",
@@ -1080,7 +1264,9 @@
         "copy_calls_total": 0,
         "image_gens_total": 0,
         "exports_total": 0
-      }
+      },
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13"
     },
     {
       "slug": "templates",
@@ -1121,7 +1307,9 @@
         "copy_calls_total": 0,
         "image_gens_total": 0,
         "exports_total": 0
-      }
+      },
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13"
     },
     {
       "slug": "teste-integra-a-o",
@@ -1169,7 +1357,9 @@
         "copy_calls_total": 0,
         "image_gens_total": 0,
         "exports_total": 0
-      }
+      },
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13"
     },
     {
       "slug": "teste-ai",
@@ -1209,7 +1399,9 @@
         "copy_calls_total": 0,
         "image_gens_total": 0,
         "exports_total": 0
-      }
+      },
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13"
     },
     {
       "slug": "sul-cont-bil",
@@ -1249,7 +1441,9 @@
         "copy_calls_total": 0,
         "image_gens_total": 0,
         "exports_total": 0
-      }
+      },
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13"
     },
     {
       "slug": "teste-105a",
@@ -1289,11 +1483,13 @@
         "copy_calls_total": 0,
         "image_gens_total": 0,
         "exports_total": 0
-      }
+      },
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13"
     },
     {
       "slug": "sul---x",
-      "marca": "netsul",
+      "marca": "elever-ai",
       "status": "rascunho",
       "titulo": "Split payment na reforma",
       "size": "1080x1350",
@@ -1312,7 +1508,7 @@
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/netsul/publicacoes/social/instagram/arte/sul---x/01.png",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/sul---x/01.png",
           "_v": 1,
           "bg_custo_usd": 0.04,
           "bg_custo_brl": 0.2052,
@@ -1351,7 +1547,9 @@
         "copy_calls_total": 1,
         "image_gens_total": 0,
         "exports_total": 0
-      }
+      },
+      "created_at": "2026-07-27T21:44:13",
+      "updated_at": "2026-07-27T21:44:13"
     }
   ]
 }
