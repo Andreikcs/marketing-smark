@@ -118,7 +118,7 @@ def construir_rascunho(marca, tipo="", tema="escuro", headline="", conceito=""):
     if len(conc) > 220:
         conc = conc[:220].rsplit(" ", 1)[0]
     meta = _meta_marca(marca)
-    # tom de cor sem hex (Seedream tipografa #RRGGBB)
+    # tom de cor SEM hex (Seedream tipografa #RRGGBB na arte — nunca colocar código)
     acc = (meta.get("acento") or "#8B3CF7").upper()
     if acc in ("#C6F24E", "#D6FF5C", "#B8E62E"):
         tint = "soft lime green light"
@@ -127,32 +127,37 @@ def construir_rascunho(marca, tipo="", tema="escuro", headline="", conceito=""):
     elif acc.startswith("#E") or acc.startswith("#C0") or acc.startswith("#D4"):
         tint = "soft warm brand-colored light"
     elif len(acc) == 7:
-        # hue grosso por canais
         try:
             r, g, b = int(acc[1:3], 16), int(acc[3:5], 16), int(acc[5:7], 16)
-            if g > 100 and b > 100 and abs(g - b) < 40 and r < g:
+            # marrom/mocha/nude escuro (ex. #30211D clínicas beauty)
+            if r >= g >= b and r - b >= 8 and r < 160 and g < 120:
+                tint = "soft warm mocha brown nude cocoa light"
+            elif g > 100 and b > 100 and abs(g - b) < 40 and r < g:
                 tint = "soft teal cyan brand light"
             elif r > g + 40 and r > b + 20:
                 tint = "soft warm brand-colored light"
             elif b > r + 20 and b >= g:
                 tint = "soft blue brand-colored light"
-            else:
+            elif r > 80 and b > 80 and g < min(r, b) + 30:
                 tint = "soft violet brand-colored light"
+            else:
+                tint = "soft warm neutral brand-colored light"
         except ValueError:
-            tint = "soft violet brand-colored light"
+            tint = "soft warm neutral brand-colored light"
     else:
-        tint = "soft violet brand-colored light"
+        tint = "soft warm neutral brand-colored light"
     if tema == "claro":
         base = f"bright airy background soft white and pale tint, {tint}"
     else:
         base = f"dark premium background soft haze, {tint}"
     return (
-        f"Premium brand background, {base}, clean empty lower third for headline, "
+        f"Premium brand background, {base}, clean empty lower third for overlay text later, "
         f"visual interest in upper two thirds, abstract editorial, sophisticated, "
         f"photorealistic materials. "
-        f"HARD RULE: zero text zero letters zero words zero numbers zero logos zero watermark "
-        f"zero packaging labels zero signage — pure visual only, typography added later. "
-        f"no UI. Concept: {conc}."
+        f"HARD RULE: absolute zero text — no letters, words, numbers, hex codes, price tags, "
+        f"labels, logos, watermark, packaging text, signage, UI, captions. "
+        f"Product packaging must be blank unlabeled. Pure visual only; typography is added later "
+        f"by software. Concept: {conc}."
     )
 
 

@@ -149,6 +149,12 @@ def main():
         if args.prompt_file:
             prompt = open(args.prompt_file, "r", encoding="utf-8").read().strip()
     prompt = aplicar_guard(prompt, args.paleta, not args.no_guard, marca=args.marca)
+    # cinto de segurança: Seedream imprime hex — zera qualquer #RRGGBB residual
+    try:
+        from _paleta import strip_hex_do_prompt  # noqa: E402
+        prompt = strip_hex_do_prompt(prompt)
+    except Exception:
+        pass
     env = load_env(os.path.join(VAULT, ".env"))
     chaves = carregar_chaves(env)
 
