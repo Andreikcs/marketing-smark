@@ -88,7 +88,8 @@
         "deatec",
         "track-brasil",
         "amosim",
-        "alem-do-olhar-chapeco"
+        "alem-do-olhar-chapeco",
+        "v4-company"
       ],
       "registro": "abstrato-material",
       "modelo": "google/gemini-3-pro-image",
