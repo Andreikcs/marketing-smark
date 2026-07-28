@@ -1671,7 +1671,7 @@
     },
     {
       "slug": "sul---x",
-      "marca": "sul-contabil",
+      "marca": "netsul",
       "status": "rascunho",
       "titulo": "Split payment na reforma",
       "size": "1080x1350",
@@ -1690,7 +1690,7 @@
           "hsize": 0,
           "grade": true,
           "n": 1,
-          "out": "marcas/sul-contabil/publicacoes/social/instagram/arte/sul---x/01.png",
+          "out": "marcas/netsul/publicacoes/social/instagram/arte/sul---x/01.png",
           "_v": 1,
           "bg_custo_usd": 0.04,
           "bg_custo_brl": 0.2052,
@@ -1703,8 +1703,9 @@
           "bg_publicavel": false,
           "overlay": "branco",
           "overlay_op": 1,
-          "ov_ang": 80,
-          "ov_pos": 0
+          "ov_ang": 150,
+          "ov_pos": 0,
+          "paleta": "marca"
         }
       ],
       "caption": "A reforma tributária traz o chamado split payment: quando o cliente paga, o valor do imposto já é separado na hora e enviado ao governo. Na prática, muda o seu fluxo de caixa — o dinheiro do tributo não passa mais pela sua conta. Quem se organizar antes evita aperto. Quer entender o que muda no seu negócio?\n\n#reformatributaria #contabilidade #splitpayment #gestaofinanceira",
