@@ -204,18 +204,24 @@ tr:last-child td{{border-bottom:0}}
 .kv{{display:flex;flex-wrap:wrap;gap:10px;align-items:center}}.kv .cell{{background:var(--inset);border:1px solid var(--line);border-radius:var(--radius-md);padding:8px 12px;font-size:13px}}.kv b{{color:var(--accent-2)}}
 .ok{{color:var(--good);font-weight:600}}.err{{color:#e07070;font-weight:600}}
 .sk-input.mini,.sk-select.mini{{padding:7px 10px;font-size:13px;width:auto}}
-.mgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}}
-.mcard{{background:var(--inset);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}}
-.mcard .top{{display:flex;gap:12px;align-items:center}}
-.mlogo{{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:20px;color:#fff;flex:0 0 auto;overflow:hidden;background:var(--accent)}}
+.mgrid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}}
+.mcard{{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}}
+.mcard:hover{{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));transform:translateY(-1px)}}
+.mcard .mhero{{height:72px;position:relative}}
+.mcard .top{{display:flex;gap:14px;align-items:flex-end;padding:0 16px;margin-top:-28px;position:relative;z-index:1}}
+.mlogo{{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff;flex:0 0 auto;overflow:hidden;background:var(--accent);border:3px solid var(--surface);box-shadow:0 4px 14px rgba(0,0,0,.25)}}
 .mlogo img{{width:100%;height:100%;object-fit:cover}}
-.mcard h3{{font-size:15px;margin:0}} .mcard .slug{{color:var(--muted);font-size:12px}}
+.mcard h3{{font-size:17px;margin:0 0 2px;letter-spacing:-.01em}} .mcard .slug{{color:var(--muted);font-size:12px}}
+.mbody{{padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px;flex:1}}
+.mswatches{{display:flex;gap:6px;align-items:center}}
+.msw{{width:22px;height:22px;border-radius:7px;border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}}
 .mmeta{{font-size:12px;color:var(--muted);line-height:1.45}}
-.macts{{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}}
-.sw{{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:4px;border:1px solid #333}}
-.pill{{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;border:1px solid var(--line);color:var(--muted)}}
-.pill.ok{{border-color:var(--good);color:var(--good)}}
+.macts{{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:4px}}
+.macts .sk-btn{{flex:1;justify-content:center;text-align:center}}
+.pill{{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10px;border:1px solid var(--line);color:var(--muted);font-weight:600}}
+.pill.ok{{border-color:color-mix(in srgb,var(--good) 50%,transparent);color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}}
 .pill.warn{{border-color:#c90;color:#c90}}
+.mpills{{display:flex;flex-wrap:wrap;gap:6px}}
 .modal{{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}}
 .modal.on{{display:flex}}
 .mbox{{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(520px,100%);max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.45)}}
@@ -248,8 +254,7 @@ tr:last-child td{{border-bottom:0}}
   <div class=gh><span>Marcas</span><button class="sk-btn sk-btn--sm" id=bm_new>+ Nova marca</button></div>
   <div id=mgrid class=mgrid><div style="color:var(--muted);font-size:13px">Carregando marcas…</div></div>
   <div style="margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5">
-    Cliente novo: crie a marca → revise cores/logo → no <a href="/editor">Editor</a> escolha a marca no post ou Estúdio.
-    Entrega final = <code>tier=final</code> (Gemini) após 3 pilotos aprovados.
+    Novo cliente: crie a marca, confira cores e logo, depois abra o <a href="/editor">Editor</a> e gere 3 peças-piloto antes de publicar.
   </div>
 </div>
 
@@ -327,26 +332,31 @@ async function loadMarcas(){{
   if(!MARCAS.length){{g.innerHTML='<div style="color:var(--muted)">Nenhuma marca.</div>';return}}
   g.innerHTML=MARCAS.map(m=>`
     <div class=mcard>
+      <div class=mhero style="background:${{esc(m.gradiente||m.acento||'#333')}}"></div>
       <div class=top>
-        <div class=mlogo style="background:${{m.gradiente||m.acento}}">${{
+        <div class=mlogo style="background:${{esc(m.gradiente||m.acento)}}">${{
           m.logo_url?`<img src="${{esc(m.logo_url)}}?t=${{Date.now()}}" alt="">`:esc(m.glyph||'?')
         }}</div>
-        <div>
+        <div style="padding-bottom:4px;min-width:0">
           <h3>${{esc(m.nome)}}</h3>
-          <div class=slug>${{esc(m.slug)}} · ${{esc(m.handle||'')}}</div>
+          <div class=slug>${{esc(m.handle||('@'+m.slug))}}</div>
         </div>
       </div>
-      <div class=mmeta>
-        <span class=sw style="background:${{esc(m.acento)}}"></span>${{esc(m.acento)}}
-        · <span class=sw style="background:${{esc(m.acento_claro)}}"></span>${{esc(m.acento_claro)}}
-        <br>
-        <span class="pill ${{m.pronta?'ok':'warn'}}">${{m.pronta?'pronta':'setup'}}</span>
-        ${{m.canonica?'<span class=pill>canônica</span>':''}}
-        ${{m.mood?('<div style="margin-top:6px">'+esc(m.mood.slice(0,90))+(m.mood.length>90?'…':'')+'</div>'):''}}
-      </div>
-      <div class=macts>
-        <button class="sk-btn sk-btn--secondary sk-btn--sm" data-edit="${{esc(m.slug)}}">Editar</button>
-        <a class="sk-btn sk-btn--sm" href="/editor?novo=1&marca=${{encodeURIComponent(m.slug)}}">Novo post</a>
+      <div class=mbody>
+        <div class=mswatches title="Cores da marca">
+          <span class=msw style="background:${{esc(m.acento)}}"></span>
+          <span class=msw style="background:${{esc(m.acento_claro||m.acento)}}"></span>
+          ${{m.base_escura?`<span class=msw style="background:${{esc(m.base_escura)}}"></span>`:''}}
+        </div>
+        <div class=mpills>
+          <span class="pill ${{m.pronta?'ok':'warn'}}">${{m.pronta?'Pronta p/ criar':'Em setup'}}</span>
+          ${{m.canonica?'<span class=pill>Grupo smark</span>':'<span class=pill>Cliente</span>'}}
+        </div>
+        ${{m.mood?('<div class=mmeta>'+esc((m.mood||'').slice(0,100))+((m.mood||'').length>100?'…':'')+'</div>'):''}}
+        <div class=macts>
+          <button class="sk-btn sk-btn--secondary sk-btn--sm" data-edit="${{esc(m.slug)}}">Editar</button>
+          <a class="sk-btn sk-btn--sm" href="/editor?novo=1&marca=${{encodeURIComponent(m.slug)}}">Novo post</a>
+        </div>
       </div>
     </div>`).join('');
   g.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
@@ -752,8 +762,8 @@ function render(){
     g.appendChild(c)});
   document.getElementById('count').textContent=n+' publicação'+(n===1?'':'ões');
   if(n===0){g.innerHTML='<div class="sk-empty" style="grid-column:1/-1"><div class="sk-empty-icon sk-empty-icon--muted">▦</div>'
-    +'<div class="sk-empty-title">'+((FILT||STATUSF||Q)?'Nada com esse filtro':'Nenhuma publicação ainda')+'</div>'
-    +'<div class="sk-empty-text">'+((FILT||STATUSF||Q)?'Ajuste os filtros acima.':'Crie a primeira no editor.')+'</div>'
+    +'<div class="sk-empty-title">'+((nActiveFilters()||Q)?'Nada com esse filtro':'Nenhuma publicação ainda')+'</div>'
+    +'<div class="sk-empty-text">'+((nActiveFilters()||Q)?'Ajuste ou limpe os filtros.':'Crie a primeira no editor.')+'</div>'
     +'<a class="sk-btn" href="/editor">＋ Novo post</a></div>';}
   const io=new IntersectionObserver((es)=>{es.forEach(en=>{if(en.isIntersecting){const card=en.target;io.unobserve(card);
     const host=card.querySelector('.thumbhost');const pi=+card.dataset.pi;if(host&&D.posts[pi])loadThumb(host,D.posts[pi])}})},{rootMargin:'200px'});
