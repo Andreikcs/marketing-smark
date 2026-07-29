@@ -9,17 +9,17 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "novo-post-5420",
-      "marca": "amosim",
-      "thumb": ".thumbs/amosim__novo-post-5420.jpg",
+      "slug": "elever-crm",
+      "marca": "elever-ai",
+      "thumb": ".thumbs/elever-ai__elever-crm.jpg",
       "canais": [
         "instagram"
       ],
-      "status": "rascunho",
-      "titulo": "Novo post",
+      "status": "revisao",
+      "titulo": "ELEVER CRM",
       "caption": "",
-      "arte_sha": "a0a3d2ebb17a8df572eb155767deeb73866a87428c3b25a0dc35413cd3b02e0c",
-      "created_at": "2026-07-29T03:18:17",
+      "arte_sha": "cd74d11262233f72b91b0989fd3ca09446b5f5c1b9a47913d774a56323c6ef15",
+      "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
       "aprovado_em": "",
       "aprovado_por": "",
@@ -28,67 +28,28 @@
       "frames": [
         {
           "n": 1,
-          "bg": "",
+          "_v": 3,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_uploads/3ab517f1bb.png",
           "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/amosim/publicacoes/social/instagram/arte/novo-post-5420/01.png",
-          "sub": "",
-          "tab": true,
+          "cta": "chama no acelerador",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/01.png",
+          "sub": "{#3bf748:Confira as melhores opcoes e orcamentos}",
           "chip": true,
-          "logo": true,
           "page": "",
           "tema": "claro",
+          "zoom": 1.25,
           "grade": true,
           "hsize": 0,
-          "thumb": ".thumbs/amosim__novo-post-5420.jpg",
+          "thumb": ".thumbs/elever-ai__elever-crm.jpg",
           "accent": "",
-          "bgmode": "claro",
-          "footer": true,
-          "paleta": "marca",
-          "arte_sha": "a0a3d2ebb17a8df572eb155767deeb73866a87428c3b25a0dc35413cd3b02e0c",
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "arte_src_sha": "f42e700c34816d9e6f58a9e9260ba7e1f968559feab121b5d2bfbe1a17e30fc3"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "test-sync-perf-unit",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__test-sync-perf-unit.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "teste unit",
-      "caption": "cap",
-      "arte_sha": "444864939bff491489f151b0947fe76a8ae5b79e08e5ccfaceb5a89b666f9b86",
-      "created_at": "2026-07-29T03:51:13",
-      "updated_at": "2026-07-29T20:53:37",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cta": "C",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/test-sync-perf-unit/01.png",
-          "sub": "S",
-          "page": "",
-          "tema": "claro",
-          "thumb": ".thumbs/smark__test-sync-perf-unit.jpg",
-          "arte_sha": "444864939bff491489f151b0947fe76a8ae5b79e08e5ccfaceb5a89b666f9b86",
-          "headline": "H1",
-          "arte_src_sha": "1036ffe595da071dc46bbaeb87c2a0addb79c90c0120a275fa3d7323bf033763"
+          "bg_sha": "8695abcc383c5e1c0b1f339955c0a4ac7e8a52440ecef72c313ef0c5eae34dc6",
+          "bgmode": "imagem",
+          "brilho": 0.55,
+          "overlay": "branco",
+          "arte_sha": "cd74d11262233f72b91b0989fd3ca09446b5f5c1b9a47913d774a56323c6ef15",
+          "headline": "Sistemas de IA com Velocidade ",
+          "bg_src_sha": "5771567d98557b68ce6e3bb4d001e1469c0e8b7555fa2ffadb1d8318c6a081a7",
+          "arte_src_sha": "c143b220490def0c9c868f9de6f64073a772c1e16795eaeaa6b6fcc0facf311d"
         }
       ]
     },
@@ -863,110 +824,6 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "construir-em-volta-nao-trocar",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__construir-em-volta-nao-trocar.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Construir em volta, não trocar",
-      "caption": "O problema quase nunca é o sistema inteiro. É aquela parte que falta e trava o dia a dia do time. A gente constrói em volta do que você já tem, sem começar tudo de novo. Chama pra um diagnóstico gratuito.\n\n#gestao #tecnologia #operacao #produtividade",
-      "arte_sha": "f75410aa620ce9b6aec3a9d066b7aa30c32569f978ae32f7a8885f952f0972fe",
-      "created_at": "2026-07-29T03:51:13",
-      "updated_at": "2026-07-29T20:53:37",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 1,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/construir-em-volta-nao-trocar/_regen/01-58ce96.png",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/construir-em-volta-nao-trocar/01.png",
-          "sub": "A gente resolve o que falta sem detonar o que já funciona.",
-          "chip": false,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "thumb": ".thumbs/smark__construir-em-volta-nao-trocar.jpg",
-          "bgmode": "imagem",
-          "bg_seed": 1123616133,
-          "bg_tier": "rascunho",
-          "arte_sha": "f75410aa620ce9b6aec3a9d066b7aa30c32569f978ae32f7a8885f952f0972fe",
-          "headline": "Seu sistema faz quase tudo|falta *a partezinha*",
-          "bg_modelo": "bytedance-seed/seedream-4.5",
-          "bg_usd_brl": 5.1339,
-          "bg_provider": "openrouter",
-          "bg_suplente": false,
-          "arte_src_sha": "a22ad2f3e6a9aa7e0e1a208511d1b81e019ec71ca3a599d5f0665a25b29148fb",
-          "bg_custo_brl": 0.2054,
-          "bg_custo_usd": 0.04,
-          "bg_publicavel": false
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "novo-post-9382",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__novo-post-9382.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "salvo",
-      "titulo": "Funcionários de IA por departamento",
-      "caption": "A Smark acessoria desenvolve funcionários de IA sob medida para a sua operação.  \n\nComente \"EU QUERO\"  e receba um diagnóstico gratuito da sua operação para entender quais funcionários podem complementar o seu time.  Ou acesse nosso site na BIO e agende com um de nossos especialistas.\n\n\n\n#smark #inteligenciaartificial #gestao #produtividade",
-      "arte_sha": "4eb52d30d234f7769ffa4e65d68af3c3239acea7a16abeb5640d5e5ef2e92810",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T20:53:37",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 1,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/_regen/01-022341.png",
-          "cor": "#F4F2FB",
-          "cta": "Solicite um Diagnóstico gratuito  ",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/01.png",
-          "sub": "Menos tarefas repetidas, mais tempo para decidir.",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__novo-post-9382.jpg",
-          "accent": "",
-          "bg_sha": "ab1121721fe30bcfb669617d385034a80c0e7e96a3b8ae7cd95505b8c3400870",
-          "bgmode": "imagem",
-          "arte_sha": "4eb52d30d234f7769ffa4e65d68af3c3239acea7a16abeb5640d5e5ef2e92810",
-          "headline": "Cada setor com um \n*funcionário de IA*",
-          "bg_src_sha": "6795a299e1e15096624ac8a78bef2de3eae1c69bf17ed14afba446ca885fa556",
-          "arte_src_sha": "6d1a063f07a5488d37603c44e77488c6f3c9545ff5b63689de9d828960ea83c3"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
       "slug": "novo-post-9fbf",
       "marca": "v4-company",
       "thumb": ".thumbs/v4-company__novo-post-9fbf.jpg",
@@ -1070,6 +927,49 @@
           "arte_sha": "788185eb66edee75b9b1544b078aa66c7007e769ccf9f1726619b7a01e3600e0",
           "headline": "SEU TÍT{#14238F:ULO|*AQUI.*}",
           "arte_src_sha": "73ccbf07c9cd794ce81fb2356fc8bb67387fb071cf71fe0f2d4d78bf730f228a"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "e2e-db-preserve",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Preserve",
+      "caption": "legenda e2e",
+      "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
+      "created_at": "2026-07-29T14:25:15",
+      "tentativas": 0,
+      "updated_at": "2026-07-29T19:32:55",
+      "aprovado_em": "2026-07-29T22:03:51+00:00",
+      "aprovado_por": "andreik",
+      "publicado_em": "",
+      "agendado_para": "",
+      "ultimo_comentario": "fim do teste de UI — devolvendo ao estado interno",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cta": "cta",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/e2e-db-preserve/01.png",
+          "sub": "sub",
+          "page": "",
+          "tema": "claro",
+          "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
+          "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
+          "headline": "H1 *x*",
+          "arte_src_sha": "7b39e80f530bf25ff80c88f396cd0e73603b3d8901fd1fd3142bc9b3e5a02d75"
         }
       ]
     },
@@ -2673,6 +2573,60 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
+      "slug": "construir-em-volta-nao-trocar",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__construir-em-volta-nao-trocar.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Construir em volta, não trocar",
+      "caption": "O problema quase nunca é o sistema inteiro. É aquela parte que falta e trava o dia a dia do time. A gente constrói em volta do que você já tem, sem começar tudo de novo. Chama pra um diagnóstico gratuito.\n\n#gestao #tecnologia #operacao #produtividade",
+      "arte_sha": "f75410aa620ce9b6aec3a9d066b7aa30c32569f978ae32f7a8885f952f0972fe",
+      "created_at": "2026-07-29T03:51:13",
+      "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/construir-em-volta-nao-trocar/_regen/01-58ce96.png",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/construir-em-volta-nao-trocar/01.png",
+          "sub": "A gente resolve o que falta sem detonar o que já funciona.",
+          "chip": false,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "thumb": ".thumbs/smark__construir-em-volta-nao-trocar.jpg",
+          "bgmode": "imagem",
+          "bg_seed": 1123616133,
+          "bg_tier": "rascunho",
+          "arte_sha": "f75410aa620ce9b6aec3a9d066b7aa30c32569f978ae32f7a8885f952f0972fe",
+          "headline": "Seu sistema faz quase tudo|falta *a partezinha*",
+          "bg_modelo": "bytedance-seed/seedream-4.5",
+          "bg_usd_brl": 5.1339,
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "arte_src_sha": "a22ad2f3e6a9aa7e0e1a208511d1b81e019ec71ca3a599d5f0665a25b29148fb",
+          "bg_custo_brl": 0.2054,
+          "bg_custo_usd": 0.04,
+          "bg_publicavel": false
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
       "slug": "novo-post-4566",
       "marca": "smark",
       "thumb": ".thumbs/smark__novo-post-4566.jpg",
@@ -2804,37 +2758,45 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "e2e-db-preserve",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
+      "slug": "novo-post-5420",
+      "marca": "amosim",
+      "thumb": ".thumbs/amosim__novo-post-5420.jpg",
       "canais": [
         "instagram"
       ],
-      "status": "agendado",
-      "titulo": "Preserve",
-      "caption": "legenda e2e",
-      "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
-      "created_at": "2026-07-29T14:25:15",
-      "tentativas": 0,
-      "updated_at": "2026-07-29T19:29:42",
-      "aprovado_em": "2026-07-29T22:29:23+00:00",
-      "aprovado_por": "time",
+      "status": "rascunho",
+      "titulo": "Novo post",
+      "caption": "",
+      "arte_sha": "a0a3d2ebb17a8df572eb155767deeb73866a87428c3b25a0dc35413cd3b02e0c",
+      "created_at": "2026-07-29T03:18:17",
+      "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
       "publicado_em": "",
-      "agendado_para": "2026-08-11T12:30:00+00:00",
-      "ultimo_comentario": "teste de UI ponta a ponta",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
           "bg": "",
-          "cta": "cta",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/e2e-db-preserve/01.png",
-          "sub": "sub",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/amosim/publicacoes/social/instagram/arte/novo-post-5420/01.png",
+          "sub": "",
+          "tab": true,
+          "chip": true,
+          "logo": true,
           "page": "",
           "tema": "claro",
-          "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
-          "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
-          "headline": "H1 *x*",
-          "arte_src_sha": "7b39e80f530bf25ff80c88f396cd0e73603b3d8901fd1fd3142bc9b3e5a02d75"
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/amosim__novo-post-5420.jpg",
+          "accent": "",
+          "bgmode": "claro",
+          "footer": true,
+          "paleta": "marca",
+          "arte_sha": "a0a3d2ebb17a8df572eb155767deeb73866a87428c3b25a0dc35413cd3b02e0c",
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "arte_src_sha": "f42e700c34816d9e6f58a9e9260ba7e1f968559feab121b5d2bfbe1a17e30fc3"
         }
       ]
     },
@@ -2847,16 +2809,57 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "elever-crm",
-      "marca": "elever-ai",
-      "thumb": ".thumbs/elever-ai__elever-crm.jpg",
+      "slug": "test-sync-perf-unit",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__test-sync-perf-unit.jpg",
       "canais": [
         "instagram"
       ],
       "status": "rascunho",
-      "titulo": "ELEVER CRM",
-      "caption": "",
-      "arte_sha": "cd74d11262233f72b91b0989fd3ca09446b5f5c1b9a47913d774a56323c6ef15",
+      "titulo": "teste unit",
+      "caption": "cap",
+      "arte_sha": "444864939bff491489f151b0947fe76a8ae5b79e08e5ccfaceb5a89b666f9b86",
+      "created_at": "2026-07-29T03:51:13",
+      "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cta": "C",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/test-sync-perf-unit/01.png",
+          "sub": "S",
+          "page": "",
+          "tema": "claro",
+          "thumb": ".thumbs/smark__test-sync-perf-unit.jpg",
+          "arte_sha": "444864939bff491489f151b0947fe76a8ae5b79e08e5ccfaceb5a89b666f9b86",
+          "headline": "H1",
+          "arte_src_sha": "1036ffe595da071dc46bbaeb87c2a0addb79c90c0120a275fa3d7323bf033763"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-9382",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__novo-post-9382.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Funcionários de IA por departamento",
+      "caption": "A Smark acessoria desenvolve funcionários de IA sob medida para a sua operação.  \n\nComente \"EU QUERO\"  e receba um diagnóstico gratuito da sua operação para entender quais funcionários podem complementar o seu time.  Ou acesse nosso site na BIO e agende com um de nossos especialistas.\n\n\n\n#smark #inteligenciaartificial #gestao #produtividade",
+      "arte_sha": "4eb52d30d234f7769ffa4e65d68af3c3239acea7a16abeb5640d5e5ef2e92810",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
       "aprovado_em": "",
@@ -2866,28 +2869,25 @@
       "frames": [
         {
           "n": 1,
-          "_v": 3,
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_uploads/3ab517f1bb.png",
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/_regen/01-022341.png",
           "cor": "#F4F2FB",
-          "cta": "chama no acelerador",
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/01.png",
-          "sub": "{#3bf748:Confira as melhores opcoes e orcamentos}",
+          "cta": "Solicite um Diagnóstico gratuito  ",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/01.png",
+          "sub": "Menos tarefas repetidas, mais tempo para decidir.",
           "chip": true,
           "page": "",
           "tema": "claro",
-          "zoom": 1.25,
           "grade": true,
           "hsize": 0,
-          "thumb": ".thumbs/elever-ai__elever-crm.jpg",
+          "thumb": ".thumbs/smark__novo-post-9382.jpg",
           "accent": "",
-          "bg_sha": "8695abcc383c5e1c0b1f339955c0a4ac7e8a52440ecef72c313ef0c5eae34dc6",
+          "bg_sha": "ab1121721fe30bcfb669617d385034a80c0e7e96a3b8ae7cd95505b8c3400870",
           "bgmode": "imagem",
-          "brilho": 0.55,
-          "overlay": "branco",
-          "arte_sha": "cd74d11262233f72b91b0989fd3ca09446b5f5c1b9a47913d774a56323c6ef15",
-          "headline": "Sistemas de IA com Velocidade ",
-          "bg_src_sha": "5771567d98557b68ce6e3bb4d001e1469c0e8b7555fa2ffadb1d8318c6a081a7",
-          "arte_src_sha": "c143b220490def0c9c868f9de6f64073a772c1e16795eaeaa6b6fcc0facf311d"
+          "arte_sha": "4eb52d30d234f7769ffa4e65d68af3c3239acea7a16abeb5640d5e5ef2e92810",
+          "headline": "Cada setor com um \n*funcionário de IA*",
+          "bg_src_sha": "6795a299e1e15096624ac8a78bef2de3eae1c69bf17ed14afba446ca885fa556",
+          "arte_src_sha": "6d1a063f07a5488d37603c44e77488c6f3c9545ff5b63689de9d828960ea83c3"
         }
       ]
     }

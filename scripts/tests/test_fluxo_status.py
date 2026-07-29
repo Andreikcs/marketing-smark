@@ -203,6 +203,13 @@ class _DbEspiao:
         _DbEspiao.chamadas.append({"marca": marca, "slug": slug, "para": para, **kw})
         return {"ok": True, "linhas": 1}
 
+    # guarda o espião de verdade: quem troca `aplicar_status` no meio do teste
+    # devolve por aqui, senão o teste seguinte lê uma lista de chamadas vazia
+    _espiao_real = None
+
+
+_DbEspiao._espiao_real = _DbEspiao.__dict__["aplicar_status"]
+
 
 class TestStatusNaoViajaDeCarona(unittest.TestCase):
     """O status tem que ir pro banco por conta própria.
@@ -230,6 +237,7 @@ class TestStatusNaoViajaDeCarona(unittest.TestCase):
         es._agendar_arte = lambda *a, **k: None
         self._db_antes = es._db_mod
         _DbEspiao.chamadas = []
+        _DbEspiao.aplicar_status = _DbEspiao._espiao_real
         es._db_mod = lambda: _DbEspiao
 
     def tearDown(self):
@@ -261,16 +269,28 @@ class TestStatusNaoViajaDeCarona(unittest.TestCase):
         self.assertEqual(c["agendado_para"], "", "não pediu pro banco limpar a agenda")
         self.assertEqual(c["comentario"], "muda a foto")
 
+    def test_voltar_atras_apaga_quem_aprovou(self):
+        """Aprovação vale pra peça que o cliente viu.
+
+        Se o post volta pra rascunho/ajuste/pronto e o `aprovado_por` fica lá, o
+        modal mostra "Aprovado por X" numa peça que mudou depois — mentira com
+        cara de registro.
+        """
+        self.es.mudar_status_post("amosim", "p1", "aprovado", por="cliente@amosim")
+        _DbEspiao.chamadas = []
+        r = self.es.mudar_status_post("amosim", "p1", "ajuste", comentario="troca o texto")
+        self.assertEqual(r.get("aprovado_por"), "", "arquivo guardou aprovação vencida")
+        c = _DbEspiao.chamadas[0]
+        self.assertEqual(c["aprovado_por"], "", "não pediu pro banco limpar quem aprovou")
+        self.assertEqual(c["aprovado_em"], "", "não pediu pro banco limpar a data da aprovação")
+
     def test_banco_recusando_nao_engole_o_erro(self):
         _DbEspiao.aplicar_status = staticmethod(lambda *a, **k: {"ok": False, "erro": "lock"})
-        try:
-            r = self.es.mudar_status_post("amosim", "p1", "salvo")
-            self.assertTrue(r["ok"])          # o arquivo foi gravado
-            self.assertIn("aviso", r)         # mas o usuário fica sabendo
-            self.assertIn("lock", r["aviso"])
-        finally:
-            _DbEspiao.aplicar_status = staticmethod(
-                lambda marca, slug, para, **kw: {"ok": True, "linhas": 1})
+        r = self.es.mudar_status_post("amosim", "p1", "salvo")
+        self.assertTrue(r["ok"])          # o arquivo foi gravado
+        self.assertIn("aviso", r)         # mas o usuário fica sabendo
+        self.assertIn("lock", r["aviso"])
+        # o setUp devolve o espião de verdade — não precisa desfazer aqui
 
 
 class TestFusoDasDatasDoFluxo(unittest.TestCase):

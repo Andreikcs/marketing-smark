@@ -330,7 +330,7 @@ def mudar_status(marca: str, slug: str, para: str, *, por: str = "time",
 
 def aplicar_status(marca: str, slug: str, para: str, *, por: str = "",
                    aprovado_em=None, agendado_para=None, publicado_em=None,
-                   comentario: str = "", de: str = "") -> dict:
+                   aprovado_por=None, comentario: str = "", de: str = "") -> dict:
     """Grava status + datas do fluxo direto na linha do post, e o evento junto.
 
     Por que não deixar o upsert em lote fazer isso: o lote passa por
@@ -352,9 +352,12 @@ def aplicar_status(marca: str, slug: str, para: str, *, por: str = "",
         if val is not None:
             sets.append("%s=%%s" % col)
             vals.append(val or None)     # "" limpa a data
-    if por:
+    # `por` é o autor do evento; `aprovado_por` é a coluna. None = não mexe,
+    # "" = limpa (voltou atrás, a aprovação não vale mais).
+    quem = aprovado_por if aprovado_por is not None else (por or None)
+    if quem is not None:
         sets.append("aprovado_por=%s")
-        vals.append(por[:120])
+        vals.append(quem[:120] or None)
     if para == "agendado":
         sets.append("tentativas=0")
     vals += [marca, slug]

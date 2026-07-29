@@ -2086,12 +2086,16 @@ document.getElementById('mflow_go').onclick=()=>{
 async function aplicarStatus(para,quando){
   const p=D.posts[MP];if(!p)return;
   const msg=document.getElementById('mflow_msg');
-  const r=await fetch('/post-status',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},
-    body:JSON.stringify({marca:p.marca||'smark',slug:p.slug,para:para,quando:quando||'',
-      comentario:(msg.value||'').trim(),por:'time'})});
-  let j={};try{j=await r.json()}catch(e){}
+  let j={};
+  try{const r=await fetch('/post-status',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},
+      body:JSON.stringify({marca:p.marca||'smark',slug:p.slug,para:para,quando:quando||'',
+        comentario:(msg.value||'').trim(),por:'time'})});
+      j=await r.json()}
+  catch(e){toast('Servidor não respondeu — nada foi mudado');return}
   if(!j.ok){toast(j.erro||'não deu pra mudar');return}
   p.status=para;
+  // quem aprovou vem do servidor: se ficar com o valor antigo o modal mente sobre a aprovação
+  p.aprovado_por=j.aprovado_por||'';p.aprovado_em=j.aprovado_em||'';
   if(para==='agendado')p.agendado_para=j.agendado_para||quando||'';
   if(para==='publicado'){p.publicado_em=new Date().toISOString();p.agendado_para=''}
   if(['rascunho','ajuste','salvo'].includes(para))p.agendado_para='';
@@ -2105,8 +2109,10 @@ document.getElementById('mflow_hist').onclick=async()=>{
   const log=document.getElementById('mflow_log');
   if(!log.hidden){log.hidden=true;return}
   log.hidden=false;log.innerHTML='carregando…';
-  const r=await fetch('/post-eventos?marca='+encodeURIComponent(p.marca||'smark')+'&slug='+encodeURIComponent(p.slug));
-  const j=await r.json().catch(()=>({}));
+  let j={};
+  try{const r=await fetch('/post-eventos?marca='+encodeURIComponent(p.marca||'smark')+'&slug='+encodeURIComponent(p.slug));
+      j=await r.json()}
+  catch(e){log.innerHTML='Servidor não respondeu — tente de novo.';return}
   const evs=(j&&j.eventos)||[];
   if(!evs.length){log.innerHTML=(j&&j.com_banco===false)
     ? 'Sem banco agora — o histórico aparece quando o Postgres responde.'
@@ -2974,6 +2980,9 @@ def mudar_status_post(marca, slug, para, *, por="time", comentario="",
             alvo["agendado_para"] = ""
         if para in ("rascunho", "ajuste", "salvo"):
             alvo["agendado_para"] = ""
+            # a aprovação valia pra peça que o cliente viu; voltando atrás ela não vale mais
+            alvo["aprovado_em"] = ""
+            alvo["aprovado_por"] = ""
         if comentario:
             alvo["ultimo_comentario"] = comentario[:2000]
         alvo["status"] = para
@@ -2987,10 +2996,12 @@ def mudar_status_post(marca, slug, para, *, por="time", comentario="",
     db = _db_mod()
     aviso = ""
     if db and db.disponivel() and hasattr(db, "aplicar_status"):
+        _volta = para in ("rascunho", "ajuste", "salvo")
         r = db.aplicar_status(
-            marca, slug, para, de=de, por=(por if para == "aprovado" else ""),
-            comentario=comentario,
-            aprovado_em=alvo.get("aprovado_em") if para == "aprovado" else None,
+            marca, slug, para, de=de, por=por, comentario=comentario,
+            aprovado_por=("" if _volta else (por if para == "aprovado" else None)),
+            aprovado_em=("" if _volta else
+                         (alvo.get("aprovado_em") if para == "aprovado" else None)),
             publicado_em=alvo.get("publicado_em") if para == "publicado" else None,
             agendado_para=(alvo.get("agendado_para") or "")
             if para in ("agendado", "publicado", "rascunho", "ajuste", "salvo") else None,
@@ -2998,7 +3009,9 @@ def mudar_status_post(marca, slug, para, *, por="time", comentario="",
         if not r.get("ok"):
             aviso = "gravado no arquivo, mas o banco recusou: %s" % (r.get("erro") or "post ausente")
             print("  fluxo: %s" % aviso, file=sys.stderr)
-    out = {"ok": True, "de": de, "para": para, "agendado_para": quando_iso}
+    out = {"ok": True, "de": de, "para": para, "agendado_para": quando_iso,
+           "aprovado_por": alvo.get("aprovado_por") or "",
+           "aprovado_em": alvo.get("aprovado_em") or ""}
     if aviso:
         out["aviso"] = aviso
     return out
