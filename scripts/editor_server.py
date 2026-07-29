@@ -77,10 +77,11 @@ VITRINE = os.path.join(VAULT, "lancamento.html")
 HUB = """<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>smark · Sistema</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+<style id="smark-critical">__CRITICAL_CSS__</style>
 <script>(function(){try{var t=localStorage.getItem('smark-ui-theme');if(t==='claro'||t==='escuro')document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
 <style>
 body.sk{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px}
-.wrap{max-width:820px;width:100%}
+.wrap{max-width:920px;width:100%}
 .hub-brand{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:8px}
 .hub-brand .hub-logo{transform-origin:left center}
 .hub-sub{color:var(--muted);font-size:14px;line-height:1.45;max-width:520px}
@@ -92,24 +93,39 @@ a.tile:hover .sk-card{border-color:var(--accent);transform:translateY(-2px)}
 .tile b{font-size:16px;display:block;margin-bottom:5px;color:var(--text)}
 .tile p{color:var(--muted);font-size:12.5px;line-height:1.45}
 .foot{color:var(--muted);font-size:11px;margin-top:30px;text-align:center}
+.hub-status{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 </style></head><body class="sk">
 <div class=wrap>
 <div class=hub-brand>
   __HUB_LOGO__
-  <div class=hub-sub>Painel local · editor, marcas e produção de conteúdo</div>
+  <div class=hub-sub>Studio de produção multi-marca · editor, painel e canais</div>
+  <div class=hub-status id=hubst></div>
 </div>
 <div class=grid>
   <a class=tile href="/editor"><div class=sk-card><span class=ic>✎</span><b>Super Editor</b><p>Edita arte frame a frame, preview ao vivo, troca de fundo, cor, upload e regenerar por IA.</p></div></a>
   <a class=tile href="/painel"><div class=sk-card><span class=ic>▦</span><b>Painel de Conteúdo</b><p>Todas as publicações com preview de Instagram/LinkedIn e download.</p></div></a>
   <a class=tile href="/vitrine"><div class=sk-card><span class=ic>▤</span><b>Vitrine</b><p>Galeria read-only por marca — feed pra aprovar copy e conceito.</p></div></a>
-  <a class=tile href="/config"><div class=sk-card><span class=ic>⚙</span><b>Configurações</b><p>Como o sistema está se comportando: temas, cores, degradês, conceitos e estado.</p></div></a>
-  <a class=tile href="/design-system/dist/smark-design-system.html"><div class="sk-card sk-card--brand"><span class=ic>◈</span><b style="color:#fff">Design System</b><p style="color:#ffffffcc">Catálogo vivo: tokens, botões, cards, badges e o toggle claro/escuro. Fonte visual do painel.</p></div></a>
+  <a class=tile href="/config"><div class=sk-card><span class=ic>⚙</span><b>Configurações</b><p>Marcas, Instagram, padrões e estado do studio.</p></div></a>
+  <a class=tile href="/db-status"><div class=sk-card><span class=ic>▣</span><b>Status &amp; serviços</b><p>Dashboard do Postgres, chaves de API, posts e canais.</p></div></a>
+  <a class=tile href="/design-system/dist/smark-design-system.html"><div class="sk-card sk-card--brand"><span class=ic>◈</span><b style="color:#fff">Design System</b><p style="color:#ffffffcc">Catálogo vivo: tokens, botões, cards e tema claro/escuro.</p></div></a>
 </div>
 <div class=foot style="display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap">
   <button type="button" id="btheme" title="Alternar claro/escuro">◐</button>
-  <span>Editor, Painel, Vitrine e Config · tema do sistema inteiro</span>
+  <span>Editor · Painel · Vitrine · Config · Status</span>
 </div>
 </div>
+<script>
+fetch('/db-status?json=1').then(r=>r.json()).then(d=>{
+  const el=document.getElementById('hubst'); if(!el||!d)return;
+  const pill=(ok,t)=>'<span class="sk-badge '+(ok?'sk-badge--ok':'sk-badge--err')+'">'+(ok?'●':'○')+' '+t+'</span>';
+  el.innerHTML=[
+    pill(!!d.database_url,'Postgres'),
+    pill(!!(d.chaves&&d.chaves.OPENROUTER_API_KEY),'OpenRouter'),
+    pill((d.load_ativo||0)>0, (d.load_ativo||0)+' posts'),
+    pill(true, d.source||'arquivo')
+  ].join('');
+}).catch(()=>{});
+</script>
 __THEME_BOOT__
 </body></html>"""
 
@@ -210,6 +226,66 @@ HEAD_THEME = (
     '<script>(function(){try{var t=localStorage.getItem("smark-ui-theme");'
     'if(t==="claro"||t==="escuro")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>'
 )
+
+# CSS de emergência embutido: se /design-system/dist/smark-ds.css falhar (deploy incompleto),
+# o app NÃO pode ficar sem tokens — senão thumbs absolute estouram a viewport e o hub fica branco.
+CRITICAL_CSS = """
+:root,[data-theme=escuro]{
+  --bg:#14141A;--surface:#1E1E26;--surface-2:#26262F;--inset:#191920;
+  --text:#F4F2FB;--muted:#9B97A8;--line:#2E2E38;--line-strong:#3A3A48;
+  --field:#1A1A22;--field-line:#34343F;
+  --accent:#B18BFF;--accent-2:#9A6AFF;--accent-soft:rgba(177,139,255,.22);--accent-ink:#12081F;
+  --good:#3DDC97;--warn:#F5C542;--danger:#FF6B7A;
+  --font-text:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --font-display:Inter,ui-sans-serif,system-ui,sans-serif;
+  --radius-lg:16px;--radius-md:12px;--shadow:0 8px 28px rgba(0,0,0,.28);--shadow-lg:0 16px 48px rgba(0,0,0,.4);
+}
+[data-theme=claro]{
+  --bg:#F4F2FB;--surface:#FFFFFF;--surface-2:#FAF8FE;--inset:#F3F0FB;
+  --text:#1A1528;--muted:#6B6578;--line:#E6E1F0;--line-strong:#D2CBE3;
+  --field:#FFFFFF;--field-line:#DCD5EC;
+  --accent:#8B3CF7;--accent-2:#A472FF;--accent-soft:#EFE7FF;--accent-ink:#FFFFFF;
+  --good:#0F9F6E;--warn:#C98900;--danger:#D6455D;
+  --shadow:0 6px 20px rgba(40,20,80,.08);--shadow-lg:0 14px 40px rgba(40,20,80,.12);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body.sk{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font-text);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.sk-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow)}
+.sk-card--brand{background:linear-gradient(155deg,#9A4DFF,#2A1CA8);color:#fff;border:0;box-shadow:var(--shadow-lg)}
+.sk-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:10px 16px;
+  background:var(--accent);color:var(--accent-ink);font-family:var(--font-text);font-weight:600;font-size:14px;cursor:pointer;text-decoration:none}
+.sk-btn--secondary,.sk-btn--ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--line)}
+.sk-btn--danger{background:var(--danger);color:#fff}
+.sk-btn--sm{padding:7px 11px;font-size:12px;border-radius:10px}
+.sk-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 26px;height:60px;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40;backdrop-filter:blur(12px)}
+.sk-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.sk-navlink{display:inline-flex;align-items:center;padding:8px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:13px}
+.sk-navlink.is-active,.sk-navlink:hover{background:var(--accent-soft);color:var(--text);font-weight:700}
+.sk-cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:16px}
+.sk-post{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;isolation:isolate;contain:layout paint;box-shadow:var(--shadow);transition:.15s}
+.sk-post:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+.sk-post.is-selected{border-color:var(--accent)}
+.sk-post-thumb{position:relative;aspect-ratio:4/5;overflow:hidden;isolation:isolate;
+  background:linear-gradient(160deg,#2A1CA8,var(--bg));color:rgba(255,255,255,.28)}
+.sk-post-thumb .thumbhost,.sk-post-thumb>.thumbimg{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.sk-post-thumb .thumbimg{object-fit:cover;display:block;max-width:100%;max-height:100%}
+.sk-post-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.sk-post-title{font-size:14px;font-weight:700;line-height:1.25;margin:0}
+.sk-post-meta{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.sk-post-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 12px 12px}
+.sk-post-actions.a5{grid-template-columns:repeat(5,1fr)}
+.sk-post-actions .sk-btn{width:100%;padding:8px 6px;font-size:11px}
+.sk-empty{text-align:center;padding:48px 24px;border:1px dashed var(--line);border-radius:16px;background:var(--surface)}
+.sk-h2{font-size:22px;margin:0 0 8px}
+.sk-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;background:var(--inset);color:var(--muted);border:1px solid var(--line)}
+.sk-badge--ok{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);border-color:color-mix(in srgb,var(--good) 35%,transparent)}
+.sk-badge--warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+.sk-badge--err{background:color-mix(in srgb,var(--danger) 18%,transparent);color:var(--danger);border-color:color-mix(in srgb,var(--danger) 35%,transparent)}
+"""
 THEME_BOOT = r"""
 <style>
 #btheme{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
@@ -243,7 +319,9 @@ THEME_BOOT = r"""
 </script>
 """
 
-# HUB: logo oficial + tema (smark_logo / THEME_BOOT já existem neste ponto)
+# HUB: logo oficial + tema + CSS crítico (smark_logo / THEME_BOOT já existem neste ponto)
+if "__CRITICAL_CSS__" in HUB:
+    HUB = HUB.replace("__CRITICAL_CSS__", CRITICAL_CSS)
 if "__HUB_LOGO__" in HUB:
     HUB = HUB.replace(
         "__HUB_LOGO__",
@@ -263,7 +341,8 @@ def topbar(active=""):
     return ('<div class="sk-topbar">'
             f'<a href="/" style="text-decoration:none;margin-right:6px">{smark_logo(26)}</a>'
             + lk("/painel", "Painel", "painel") + lk("/vitrine", "Vitrine", "vitrine")
-            + lk("/config", "Config", "config") + lk("/editor", "Editor", "editor")
+            + lk("/config", "Config", "config") + lk("/db-status", "Status", "status")
+            + lk("/editor", "Editor", "editor")
             + '<span class="sk-spacer"></span>'
             '<button type="button" id="btheme" title="Alternar claro/escuro" aria-label="Tema">◐</button>'
             '<a class="sk-btn sk-btn--secondary sk-btn--sm" href="/editor">✎ Abrir editor</a>'
@@ -286,6 +365,7 @@ def config_html():
     return f"""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Configurações · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+<style id="smark-critical">{CRITICAL_CSS}</style>
 {HEAD_THEME}<style>
 body.sk{{padding:0}}
 .wrap{{padding:24px 30px 60px;max-width:1080px;margin:0 auto}}
@@ -1563,13 +1643,19 @@ def painel_html():
     return ("""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Painel de Conteúdo · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+<style id="smark-critical">__CRITICAL_CSS__</style>
 __HEAD_THEME__<style>
 .wrap{padding:26px 30px 60px;max-width:1240px;margin:0 auto}
+.sk-pagehead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px;flex-wrap:wrap}
 .sk-pagehead h1{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:34px;line-height:.96;margin:6px 0 4px}
 .sk-pagehead .sub{color:var(--muted);font-size:13px}
-.thumbimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sk-pagehead-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* thumbs SEMPRE contidos no card — nunca viewport inteira */
+.sk-post{isolation:isolate;contain:layout paint;overflow:hidden}
+.sk-post-thumb{position:relative;aspect-ratio:4/5;overflow:hidden;isolation:isolate;max-height:min(70vh,520px)}
+.thumbimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .thumbhost{position:absolute;inset:0;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px}
-.thumbfr{position:absolute;top:0;left:0;border:0;transform-origin:top left;pointer-events:none;background:#000}
+.thumbfr{position:absolute;top:0;left:0;border:0;transform-origin:top left;pointer-events:none;background:#000;max-width:none}
 .chpill{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .chIG{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}.chIN{background:#0a66c2}
 .stdot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:0 0 auto}.st-s{background:var(--good)}.st-r{background:var(--warn)}
@@ -1879,7 +1965,7 @@ async function dupPost(i){await fetch('/duplicar-post',{method:'POST',headers:{'
 document.getElementById('delsel').onclick=()=>del([...SEL]);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 load();
-</script></body></html>""").replace("__TOPBAR__", topbar("painel")).replace("__LOGOSTORE__", smark_logo(34, suffix="STORE")).replace("__HEAD_THEME__", HEAD_THEME)
+</script></body></html>""").replace("__TOPBAR__", topbar("painel")).replace("__LOGOSTORE__", smark_logo(34, suffix="STORE")).replace("__HEAD_THEME__", HEAD_THEME).replace("__CRITICAL_CSS__", CRITICAL_CSS)
 
 
 def vitrine_html():
@@ -1887,6 +1973,7 @@ def vitrine_html():
     return ("""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>Vitrine · smark</title>
 <link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+<style id="smark-critical">__CRITICAL_CSS__</style>
 __HEAD_THEME__<style>
 body.sk{padding-bottom:50px;background:var(--bg)}
 .top{text-align:center;padding:14px;font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:16px;letter-spacing:.02em;border-bottom:1px solid var(--line);background:var(--surface)}.top span{color:var(--accent)}
@@ -2040,7 +2127,169 @@ async function load(){
   render();
 }
 load();
-</script></body></html>""").replace("__TOPBAR__", topbar("vitrine")).replace("__HEAD_THEME__", HEAD_THEME)
+</script></body></html>""").replace("__TOPBAR__", topbar("vitrine")).replace("__HEAD_THEME__", HEAD_THEME).replace("__CRITICAL_CSS__", CRITICAL_CSS)
+
+
+def _collect_status() -> dict:
+    """Snapshot de saúde do studio (sem secrets)."""
+    db = _db_mod()
+    out = {
+        "ok": True,
+        "database_url": bool(db and db.disponivel()),
+        "arquivo_posts": len(_read_editor_file().get("posts") or []),
+        "cache_posts": len((_MEM_CACHE or {}).get("posts") or []) if _MEM_CACHE else 0,
+        "contagens": {},
+        "load_posts": 0,
+        "load_ativo": 0,
+        "source": "arquivo",
+        "chaves": {
+            "OPENROUTER_API_KEY": bool((os.environ.get("OPENROUTER_API_KEY") or "").strip()),
+            "OPENAI_API_KEY": bool((os.environ.get("OPENAI_API_KEY") or "").strip()),
+            "GEMINI_API_KEY": bool((os.environ.get("GEMINI_API_KEY") or "").strip()),
+        },
+        "instagram_modo": "",
+        "env": {
+            "railway": bool(os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RAILWAY_PUBLIC_DOMAIN")),
+            "public_base": bool((os.environ.get("PUBLIC_BASE_URL") or "").strip()),
+            "css_ds": os.path.isfile(os.path.join(VAULT, "design-system", "dist", "smark-ds.css")),
+            "thumbs_dir": os.path.isdir(os.path.join(VAULT, ".thumbs")),
+        },
+    }
+    try:
+        out["instagram_modo"] = _canais.modo_instagram()
+    except Exception:
+        out["instagram_modo"] = "?"
+    if db and db.disponivel():
+        try:
+            out["contagens"] = db.contagens() or {}
+            out["load_posts"] = len((db.load_posts_as_editor() or {}).get("posts") or [])
+        except Exception as e:
+            out["db_erro"] = str(e)
+    live = load()
+    out["load_ativo"] = len(live.get("posts") or [])
+    out["source"] = live.get("source") or ("cache" if _MEM_CACHE else "arquivo")
+    out["thumbs_posts"] = sum(1 for p in (live.get("posts") or []) if (p.get("thumb") or "").strip())
+    # canais conectados (sem tokens)
+    try:
+        n_ig = 0
+        for slug in (_marcas.list_slugs() or [])[:40]:
+            try:
+                st = _canais.status_marca(slug).get("canais") or {}
+                ig = st.get("instagram") or {}
+                if ig.get("conectado") or ig.get("connected"):
+                    n_ig += 1
+            except Exception:
+                pass
+        out["instagram_conectados"] = n_ig
+    except Exception:
+        out["instagram_conectados"] = 0
+    return out
+
+
+def status_dashboard_html(data: dict) -> str:
+    """Dashboard visual de serviços e contagens."""
+    ct = data.get("contagens") or {}
+    ch = data.get("chaves") or {}
+    env = data.get("env") or {}
+
+    def badge(ok, label):
+        cls = "sk-badge--ok" if ok else "sk-badge--err"
+        dot = "●" if ok else "○"
+        return f'<span class="sk-badge {cls}">{dot} {label}</span>'
+
+    def card(title, value, sub="", ok=None):
+        accent = ""
+        if ok is True:
+            accent = "border-color:color-mix(in srgb,var(--good) 45%,var(--line));"
+        elif ok is False:
+            accent = "border-color:color-mix(in srgb,var(--danger) 45%,var(--line));"
+        return (
+            f'<div class="sk-card st-card" style="{accent}">'
+            f'<div class="st-k">{title}</div>'
+            f'<div class="st-v">{value}</div>'
+            f'<div class="st-s">{sub}</div></div>'
+        )
+
+    services = [
+        ("Postgres", data.get("database_url"), f"{ct.get('post', 0)} posts · {ct.get('marca', 0)} marcas"),
+        ("OpenRouter", ch.get("OPENROUTER_API_KEY"), "geração de fundo / rascunho"),
+        ("OpenAI", ch.get("OPENAI_API_KEY"), "suplente de imagem"),
+        ("Gemini", ch.get("GEMINI_API_KEY"), "tier final (se usado)"),
+        ("Design System CSS", env.get("css_ds"), "tokens e componentes"),
+        ("Thumbs", env.get("thumbs_dir"), f"{data.get('thumbs_posts', 0)} posts com preview"),
+        ("Instagram App", bool(data.get("instagram_modo")), f"modo {data.get('instagram_modo') or '—'}"),
+        ("Railway", env.get("railway"), "produção HTTPS"),
+    ]
+    svc_html = "".join(
+        f'<div class="sk-card st-svc">'
+        f'<div class="st-svc-top">{badge(ok, "online" if ok else "offline")}<b>{name}</b></div>'
+        f'<div class="st-s">{sub}</div></div>'
+        for name, ok, sub in services
+    )
+
+    html = f"""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><title>Status · smark Studio</title>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+<style id="smark-critical">{CRITICAL_CSS}</style>
+{HEAD_THEME}<style>
+.wrap{{padding:26px 30px 60px;max-width:1100px;margin:0 auto}}
+.st-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:18px 0 28px}}
+.st-card .st-k{{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}}
+.st-card .st-v{{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.1}}
+.st-card .st-s,.st-svc .st-s{{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.4}}
+.st-svc-top{{display:flex;align-items:center;gap:10px;margin-bottom:4px}}
+.st-svc-top b{{font-size:14px}}
+.st-svc{{padding:16px 18px}}
+.st-actions{{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}}
+.st-note{{font-size:12px;color:var(--muted);margin-top:22px;line-height:1.5}}
+code{{background:var(--inset);padding:1px 6px;border-radius:6px;font-size:12px}}
+</style></head><body class="sk">
+{topbar("status")}
+<div class=wrap>
+  <div class="sk-pagehead" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end">
+    <div>
+      <div class="sk-kicker" style="color:var(--accent);font-weight:700;letter-spacing:.14em;font-size:11px;text-transform:uppercase">Studio</div>
+      <h1 style="margin:6px 0 4px;font-size:30px;line-height:1">Status &amp; serviços</h1>
+      <div class=sub style="color:var(--muted);font-size:13px">Saúde do Postgres, APIs e conteúdo · fonte <code>{data.get('source') or '—'}</code></div>
+    </div>
+    <div class=st-actions>
+      <a class="sk-btn sk-btn--secondary sk-btn--sm" href="/db-status?json=1">JSON</a>
+      <a class="sk-btn sk-btn--sm" href="/painel">Abrir painel</a>
+      <button class="sk-btn sk-btn--ghost sk-btn--sm" id=btheme type=button>◐</button>
+    </div>
+  </div>
+
+  <div class=st-grid>
+    {card("Posts ativos", data.get("load_ativo") or 0, f"arquivo {data.get('arquivo_posts') or 0} · cache {data.get('cache_posts') or 0}", True if (data.get('load_ativo') or 0) > 0 else False)}
+    {card("No Postgres", ct.get("post") or 0, f"frames {ct.get('post_frame') or 0} · notas {ct.get('nota_publicacao') or 0}", bool(data.get("database_url")))}
+    {card("Marcas", ct.get("marca") or 0, "cadastro multi-marca", True if (ct.get("marca") or 0) > 0 else None)}
+    {card("Instagram", data.get("instagram_conectados") or 0, f"conexões · modo {data.get('instagram_modo') or '—'}", True if (data.get("instagram_conectados") or 0) > 0 else None)}
+    {card("Thumbs", data.get("thumbs_posts") or 0, "previews leves no Store", True if (data.get("thumbs_posts") or 0) > 0 else False)}
+    {card("Publicações log", ct.get("publicacao_log") or 0, "histórico de envios", None)}
+  </div>
+
+  <h2 style="font-size:15px;margin:0 0 12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Serviços</h2>
+  <div class=st-grid>{svc_html}</div>
+
+  <div class="sk-card">
+    <div class="st-k">Ações rápidas</div>
+    <div class=st-actions style="margin-top:12px">
+      <a class="sk-btn sk-btn--sm" href="/painel">Painel</a>
+      <a class="sk-btn sk-btn--secondary sk-btn--sm" href="/config">Config / canais</a>
+      <a class="sk-btn sk-btn--secondary sk-btn--sm" href="/editor">Editor</a>
+      <a class="sk-btn sk-btn--secondary sk-btn--sm" href="/vitrine">Vitrine</a>
+      <a class="sk-btn sk-btn--ghost sk-btn--sm" href="https://railway.com/project/f3bcc859-78c2-4435-ae51-99095dcb3559" target="_blank" rel="noopener">Railway projeto</a>
+    </div>
+    <p class=st-note>
+      JSON bruto: <a href="/db-status?json=1"><code>/db-status?json=1</code></a>.
+      Banco na web: Railway → serviço <b>Postgres</b> → aba <b>Data</b>.
+      {" <span class='sk-badge sk-badge--err'>DB erro: " + str(data.get("db_erro")) + "</span>" if data.get("db_erro") else ""}
+    </p>
+  </div>
+</div>
+{THEME_BOOT}
+</body></html>"""
+    return html
 
 
 # Segurança (CSRF / DNS rebinding): o servidor é local, mas tem rotas que gastam
@@ -2772,31 +3021,13 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/dados":
             return self._send(200, load())
         if path == "/db-status":
-            # diagnóstico front↔postgres (sem secrets)
+            # dashboard HTML (default) ou JSON (?json=1)
             try:
-                db = _db_mod()
-                out = {
-                    "ok": True,
-                    "database_url": bool(db and db.disponivel()),
-                    "arquivo_posts": len(_read_editor_file().get("posts") or []),
-                    "cache_posts": len((_MEM_CACHE or {}).get("posts") or []) if _MEM_CACHE else 0,
-                }
-                if db and db.disponivel():
-                    try:
-                        out["contagens"] = db.contagens()
-                        out["load_posts"] = len((db.load_posts_as_editor() or {}).get("posts") or [])
-                    except Exception as e:
-                        out["db_erro"] = str(e)
-                live = load()
-                out["load_ativo"] = len(live.get("posts") or [])
-                out["source"] = live.get("source") or ("cache" if _MEM_CACHE else "arquivo")
-                # chaves de API presentes? (sem expor valor) — OpenRouter é o principal
-                out["chaves"] = {
-                    "OPENROUTER_API_KEY": bool((os.environ.get("OPENROUTER_API_KEY") or "").strip()),
-                    "OPENAI_API_KEY": bool((os.environ.get("OPENAI_API_KEY") or "").strip()),
-                    "GEMINI_API_KEY": bool((os.environ.get("GEMINI_API_KEY") or "").strip()),
-                }
-                return self._send(200, out)
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                data = _collect_status()
+                if (qs.get("json") or [""])[0] in ("1", "true", "yes"):
+                    return self._send(200, data)
+                return self._send(200, status_dashboard_html(data), MIME[".html"])
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
         if path == "/marcas":
