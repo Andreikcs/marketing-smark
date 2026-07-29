@@ -2049,6 +2049,69 @@ def _db_mod():
         return None
 
 
+def _read_editor_file():
+    if os.path.isfile(DATA):
+        try:
+            return json.load(open(DATA, encoding="utf-8"))
+        except Exception as e:
+            print(f"  editor.json leitura falhou: {e}", file=sys.stderr)
+    return {"posts": [], "version": 1}
+
+
+def _write_editor_file(d):
+    payload = dict(d)
+    payload.setdefault("version", 2)
+    payload.setdefault("posts", list(d.get("posts") or []))
+    json.dump(payload, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+
+
+def sync_db_boot():
+    """Sincroniza Postgres ↔ editor.json no boot (fonte de verdade = quem tiver posts).
+
+    - DB com posts → espelha no arquivo (produção Railway)
+    - DB vazio + arquivo com posts → migra arquivo → DB
+    - ambos vazios → ok (install novo)
+    """
+    db = _db_mod()
+    if not db or not db.disponivel():
+        return {"ok": False, "motivo": "sem DATABASE_URL"}
+    try:
+        st = db.init_schema()
+        ct = db.contagens() or {}
+        file_data = _read_editor_file()
+        n_file = len(file_data.get("posts") or [])
+        n_db = int(ct.get("post") or 0)
+        if n_db > 0:
+            rebuilt = db.load_posts_as_editor()
+            posts = rebuilt.get("posts") or []
+            if posts:
+                _write_editor_file(rebuilt)
+            print(
+                f"  DB sync: postgres→arquivo  posts={len(posts)} frames={ct.get('post_frame')} marcas={ct.get('marca')}",
+                file=sys.stderr,
+            )
+            return {"ok": True, "fonte": "postgres", "posts": len(posts), "contagens": ct, "schema": st}
+        if n_file > 0:
+            ok = 0
+            for p in file_data.get("posts") or []:
+                try:
+                    if db.upsert_post(p):
+                        ok += 1
+                except Exception as e:
+                    print(f"  DB boot upsert {p.get('slug')}: {e}", file=sys.stderr)
+            ct2 = db.contagens() or {}
+            print(
+                f"  DB sync: arquivo→postgres  migrados={ok}/{n_file}  agora={ct2}",
+                file=sys.stderr,
+            )
+            return {"ok": True, "fonte": "arquivo", "migrados": ok, "contagens": ct2, "schema": st}
+        print(f"  DB sync: vazio (arquivo={n_file} db={n_db})", file=sys.stderr)
+        return {"ok": True, "fonte": "vazio", "contagens": ct, "schema": st}
+    except Exception as e:
+        print(f"  DB sync ERRO: {e}", file=sys.stderr)
+        return {"ok": False, "erro": str(e)}
+
+
 def load():
     """Carrega posts: Postgres se tiver dados; senão editor.json (backup local)."""
     with IO_LOCK:
@@ -2060,9 +2123,7 @@ def load():
                     return rebuilt
             except Exception as e:
                 print(f"  DB load aviso: {e}", file=sys.stderr)
-        if os.path.isfile(DATA):
-            return json.load(open(DATA, encoding="utf-8"))
-        return {"posts": [], "version": 1}
+        return _read_editor_file()
 
 
 def save(d):
@@ -2073,7 +2134,7 @@ def save(d):
         payload["posts"] = posts
         if "version" not in payload:
             payload["version"] = 2
-        json.dump(payload, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+        _write_editor_file(payload)
         db = _db_mod()
         if db and db.disponivel():
             try:
@@ -2591,6 +2652,27 @@ class H(http.server.BaseHTTPRequestHandler):
             return self._send(200, JOBS.get(jid, {"status": "unknown"}))
         if path == "/dados":
             return self._send(200, load())
+        if path == "/db-status":
+            # diagnóstico front↔postgres (sem secrets)
+            try:
+                db = _db_mod()
+                out = {
+                    "ok": True,
+                    "database_url": bool(db and db.disponivel()),
+                    "arquivo_posts": len(_read_editor_file().get("posts") or []),
+                }
+                if db and db.disponivel():
+                    try:
+                        out["contagens"] = db.contagens()
+                        out["load_posts"] = len((db.load_posts_as_editor() or {}).get("posts") or [])
+                    except Exception as e:
+                        out["db_erro"] = str(e)
+                live = load()
+                out["load_ativo"] = len(live.get("posts") or [])
+                out["source"] = live.get("source") or "arquivo"
+                return self._send(200, out)
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
         if path == "/marcas":
             try:
                 marcas = _marcas.listar_detalhes()
@@ -3637,15 +3719,10 @@ def main():
             print(f"AVISO: criei {DATA} vazio.", file=sys.stderr)
         except OSError:
             sys.exit(f"ERRO: {DATA} não existe e não pôde ser criado.")
-    # Postgres (produção multi-marca): schema + contagens
+    # Postgres (produção multi-marca): schema + sync arquivo↔DB
     try:
-        import _db
-        if _db.disponivel():
-            st = _db.init_schema()
-            ct = _db.contagens()
-            print(f"  DB: schema ok={st.get('ok')}  {ct}", file=sys.stderr)
-        else:
-            print("  DB: sem DATABASE_URL — usando só editor.json", file=sys.stderr)
+        sync = sync_db_boot()
+        print(f"  DB boot: {sync}", file=sys.stderr)
     except Exception as e:
         print(f"  DB: aviso {e}", file=sys.stderr)
     bind = BIND_HOST
