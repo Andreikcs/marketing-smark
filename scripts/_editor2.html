@@ -1136,15 +1136,14 @@ async function publicarInstagram(){
     if(confirm('Instagram da marca "'+marca+'" não está conectado.\\n\\nAbrir Configurações para conectar?'))location.href='/config?editar='+encodeURIComponent(marca);
     return;
   }
-  // exporta o frame atual pra ter PNG fresco
+  // O servidor compõe a arte e publica a partir do sha (URL pública do Postgres).
+  // Antes isso passava por /exportar, que grava PNG no disco — e o disco do
+  // servidor não é visível pra Meta, então a publicação real quebrava.
   toast('Preparando arte e publicando em @'+(ig.username||'…')+'…');
   await salvar(true);
-  const exp=await(await fetch('/exportar',{method:'POST',headers:HJSON,body:JSON.stringify({post:PI,frame:FI})})).json();
-  if(!exp.ok||!(exp.feitas||[]).length){toast('Export falhou — não publiquei. '+(exp.erro||''));return}
-  const path=exp.feitas[0];
   const cap=(p.caption||'').trim();
   const r=await(await fetch('/canais/publicar',{method:'POST',headers:HJSON,body:JSON.stringify({
-    marca,canal:'instagram',image_path:path,caption:cap
+    marca,canal:'instagram',post:PI,caption:cap
   })})).json();
   if(r.ok){
     toast((r.modo==='fake'?'✓ Simulado':'✓ Publicado')+' @'+(r.username||ig.username)+(r.aviso?(' — '+r.aviso):''));

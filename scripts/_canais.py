@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import secrets
 import time
 import urllib.error
@@ -703,15 +704,44 @@ def _log_publish(marca: str, canal: str, evento: dict) -> None:
         f.write(json.dumps(evento, ensure_ascii=False) + "\n")
 
 
+def base_publica() -> str:
+    """Origem HTTPS pela qual o mundo externo enxerga este servidor."""
+    base = (_env("PUBLIC_BASE_URL") or _env("RAILWAY_PUBLIC_DOMAIN") or "").strip().rstrip("/")
+    if base and not base.startswith("http"):
+        base = "https://" + base
+    return base
+
+
+def url_publica_da_arte(sha: str) -> str:
+    """URL que a Meta usa pra baixar a arte. Vazia se não dá pra montar.
+
+    É `/arte/<sha>.jpg`, servido do Postgres — nunca um caminho do vault. O
+    servidor não expõe o disco pra internet, então URL de arquivo vira 404 no
+    lado da Meta e o post falha sem explicação clara.
+    """
+    sha = (sha or "").strip().lower()
+    if not re.fullmatch(r"[0-9a-f]{16,64}", sha):
+        return ""
+    base = base_publica()
+    return f"{base}/arte/{sha}.jpg" if base else ""
+
+
 def publicar_instagram(marca: str, *,
                        image_path: str = "",
                        image_url: str = "",
+                       image_sha: str = "",
                        caption: str = "",
                        dry_run: bool = False) -> dict:
     """Publica imagem no feed Instagram da marca.
 
     Fake: grava outbox + log (sem chamar Meta).
     Real: Content Publishing API (exige image_url público HTTPS).
+
+    `image_sha` é o caminho preferido: a Meta baixa a arte de
+    `<base>/arte/<sha>.jpg`, servida pelo Postgres. O antigo `image_path`
+    montava a URL a partir de um caminho de ARQUIVO — que não existe no
+    servidor, então a Meta tomava 404 e o post falhava. Mesma doença que
+    quebrava a galeria, no segundo lugar.
     """
     import _marcas  # noqa
     try:
@@ -773,26 +803,25 @@ def publicar_instagram(marca: str, *,
     ig_user = raw.get("user_id")
     if not ig_user:
         return {"ok": False, "erro": "user_id Instagram ausente — reconecte a conta"}
-    # Meta baixa a imagem por HTTPS público — monta URL se só temos path local
-    if not image_url and abs_img and os.path.isfile(abs_img):
-        base = (
-            _env("PUBLIC_BASE_URL")
-            or _env("RAILWAY_PUBLIC_DOMAIN")
-            or ""
-        ).strip().rstrip("/")
-        if base and not base.startswith("http"):
-            base = "https://" + base
-        if base:
-            rel = os.path.relpath(abs_img, VAULT).replace("\\", "/")
-            image_url = f"{base}/{rel.lstrip('/')}"
+    # Meta baixa a imagem por HTTPS público.
+    if not image_url and image_sha:
+        image_url = url_publica_da_arte(image_sha)
     if not image_url:
         return {
             "ok": False,
             "erro": (
                 "Publicação real exige URL pública HTTPS da imagem "
-                "(Meta baixa a arte do link). Defina PUBLIC_BASE_URL no Railway "
-                "ou envie image_url."
+                "(Meta baixa a arte do link). Faltou image_sha — a arte precisa "
+                "estar no Postgres. Confira PUBLIC_BASE_URL no Railway."
             ),
+        }
+    # Nunca mandar a Meta buscar um caminho de arquivo: em produção não existe
+    # e o post falha com um 404 difícil de diagnosticar do lado de lá.
+    if "/marcas/" in image_url:
+        return {
+            "ok": False,
+            "erro": ("URL da arte aponta pra arquivo do vault (%s). A Meta não "
+                     "enxerga o disco do servidor — use image_sha." % image_url),
         }
 
     # 1) container

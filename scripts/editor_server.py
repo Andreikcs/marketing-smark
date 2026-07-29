@@ -3320,9 +3320,21 @@ class H(http.server.BaseHTTPRequestHandler):
             # "o binário está lá" e "o servidor consegue produzir a arte".
             import time as _t
             try:
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                alvo = (qs.get("slug") or [""])[0].strip()
+                post, fr = None, {"headline": "Autoteste de render",
+                                  "sub": "Ação e coração — acentos."}
+                if alvo:
+                    # peça real: mede o custo que a composição automática paga
+                    for p in (load().get("posts") or []):
+                        if p.get("slug") == alvo and (p.get("frames") or []):
+                            post, fr = p, p["frames"][0]
+                            break
+                    if post is None:
+                        return self._send(404, {"ok": False, "erro": "slug não encontrado: %s" % alvo})
                 html, w, h = compositor.compose_html(**frame_kwargs(
-                    {"headline": "Autoteste de render", "sub": "Ação e coração — acentos."},
-                    "1080x1350", for_export=True, marca="smark"))
+                    fr, (post or {}).get("size") or "1080x1350", for_export=True,
+                    marca=(post or {}).get("marca") or "smark"))
                 dst = os.path.join(tempfile.gettempdir(), "render-check-%s.png" % secrets.token_hex(3))
                 t0 = _t.time()
                 ok = compositor.render_html_to_png(html, dst, w, h, tries=1)
@@ -3583,10 +3595,28 @@ class H(http.server.BaseHTTPRequestHandler):
                 canal = (req.get("canal") or "instagram").lower()
                 if canal != "instagram":
                     return self._send(400, {"ok": False, "erro": "só Instagram por enquanto"})
+                sha = (req.get("image_sha") or "").strip().lower()
+                pi = req.get("post")
+                if not sha and isinstance(pi, int):
+                    # garante a arte na hora: publicar não pode depender de
+                    # alguém ter rodado um script antes
+                    import _arte
+                    d = load()
+                    if 0 <= pi < len(d.get("posts") or []):
+                        p = d["posts"][pi]
+                        fr = (p.get("frames") or [{}])[0]
+                        rr = _arte.garantir_arte(p, fr, origem="publicar")
+                        if not rr["ok"]:
+                            return self._send(400, {"ok": False,
+                                                    "erro": "não consegui compor a arte: " + rr["motivo"]})
+                        sha = rr["sha"]
+                        if rr["novo"]:
+                            save(d)
                 r = _canais.publicar_instagram(
                     marca,
                     image_path=req.get("image_path") or req.get("path") or "",
                     image_url=req.get("image_url") or "",
+                    image_sha=sha,
                     caption=req.get("caption") or "",
                     dry_run=bool(req.get("dry_run")),
                 )
