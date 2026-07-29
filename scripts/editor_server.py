@@ -2434,6 +2434,10 @@ _MEM_CACHE = None                 # dict editor (posts…)
 _DB_FLUSH_TIMER = None
 _DB_FLUSH_LOCK = threading.Lock()
 _DB_PENDING = None                # snapshot posts a flushar
+_ARTE_TIMER = None                # debounce da composição automática
+_ARTE_LOCK = threading.Lock()
+_ARTE_RODANDO = False             # uma passada por vez (render é caro em CPU)
+_ARTE_PEDIDO = threading.Event()  # chegou save enquanto rodava → repassa no fim
 _BLOB_CACHE = {}                  # sha -> blob; galeria pede o mesmo fundo N vezes
 
 

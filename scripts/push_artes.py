@@ -14,7 +14,12 @@ E o servidor passa a servir os dois em /bg/<sha>.jpg e /arte/<sha>.jpg — URLs
 públicas, imutáveis e cacheáveis, que funcionam igual no Mac e no Railway. A do
 final é também a URL HTTPS que o Instagram exige pra publicar.
 
-Roda no Mac (precisa do Chrome headless e dos PNGs originais):
+**Não é mais rotina.** Desde que o servidor ganhou Chromium, ele compõe a arte
+sozinho ao salvar (`_agendar_arte` no editor_server) — quem edita na tela não
+precisa rodar nada. Este script continua útil para *backfill*: subir os fundos
+originais que só existem no disco do Mac, ou reprocessar tudo depois de mudar o
+design. O render em si é o mesmo código dos dois lados (`scripts/_arte.py`), de
+propósito: o que o cliente aprova tem que ser o que vai pro Instagram.
 
   python3 scripts/push_artes.py                 # tudo que mudou
   python3 scripts/push_artes.py --only covatti  # só uma marca/slug
@@ -24,12 +29,10 @@ Roda no Mac (precisa do Chrome headless e dos PNGs originais):
 from __future__ import annotations
 
 import argparse
-import hashlib
 import io
 import json
 import os
 import sys
-import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 VAULT = os.path.dirname(HERE)
@@ -48,80 +51,12 @@ if os.environ.get("DATABASE_PUBLIC_URL") and not os.environ.get("RAILWAY_ENVIRON
     if "railway.internal" in os.environ.get("DATABASE_URL", "") or not os.environ.get("DATABASE_URL"):
         os.environ["DATABASE_URL"] = os.environ["DATABASE_PUBLIC_URL"]
 
-import compositor  # noqa: E402
 import _db  # noqa: E402
-import _marcas  # noqa: E402
 
-try:
-    from PIL import Image
-except ImportError:
-    sys.exit("ERRO: Pillow necessário (pip install Pillow)")
-
-Image.MAX_IMAGE_PIXELS = None  # os fundos de IA passam do limite padrão do Pillow
-
-BG_MAX = 1440       # lado maior do fundo web; acima disso o browser reescala à toa
-BG_Q = 85
-FINAL_Q = 92        # o final vai pro Instagram — não economiza aqui
-
-
-def sha256(b: bytes) -> str:
-    return hashlib.sha256(b).hexdigest()
-
-
-def sha_arquivo(path: str) -> str:
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def para_jpeg_web(path: str, lado_max: int, q: int) -> tuple:
-    """PNG grande → JPEG web. Devolve (bytes, w, h)."""
-    im = Image.open(path)
-    if im.mode not in ("RGB", "L"):
-        im = im.convert("RGB")
-    elif im.mode == "L":
-        im = im.convert("RGB")
-    if max(im.size) > lado_max:
-        im.thumbnail((lado_max, lado_max), Image.Resampling.LANCZOS)
-    buf = io.BytesIO()
-    im.save(buf, "JPEG", quality=q, optimize=True, progressive=True)
-    return buf.getvalue(), im.size[0], im.size[1]
-
-
-def compor_final(post: dict, fr: dict) -> tuple:
-    """Composição completa (fundo + texto + logo) no tamanho real. (html, w, h)."""
-    marca = post.get("marca") or "smark"
-    try:
-        _marcas.ensure_stub(marca)
-    except Exception:
-        pass
-    from editor_server import frame_kwargs
-    kw = frame_kwargs(fr, post.get("size") or "1080x1350", for_export=True, marca=marca)
-    return compositor.compose_html(**kw)
-
-
-def html_para_jpeg(html: str, w: int, h: int) -> tuple:
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-        png = tmp.name
-    try:
-        if not compositor.render_html_to_png(html, png, w, h):
-            raise RuntimeError("Chrome headless falhou")
-        im = Image.open(png).convert("RGB")
-        # o Chrome renderiza em 2x pra ficar nítido; o Instagram recomprime
-        # qualquer coisa acima de 1080 de largura. Reamostrar o 2x pra 1080
-        # dá uma imagem mais limpa do que deixar a Meta reduzir.
-        if im.size[0] > w:
-            im = im.resize((w, h), Image.Resampling.LANCZOS)
-        buf = io.BytesIO()
-        im.save(buf, "JPEG", quality=FINAL_Q, optimize=True, progressive=True)
-        return buf.getvalue(), im.size[0], im.size[1]
-    finally:
-        try:
-            os.unlink(png)
-        except OSError:
-            pass
+# Um renderizador só, compartilhado com o servidor — ver docstring de _arte.py.
+from _arte import (  # noqa: E402
+    BG_MAX, BG_Q, html_do_frame, html_para_jpeg, para_jpeg_web, sha256, sha_arquivo,
+)
 
 
 def main():
@@ -195,7 +130,7 @@ def main():
             if args.sem_final:
                 continue
             try:
-                html, w, h = compor_final(p, fr)
+                html, w, h = html_do_frame(p, fr)
             except Exception as e:
                 n_err += 1
                 print(f"ERR html {alvo}: {e}", file=sys.stderr)
