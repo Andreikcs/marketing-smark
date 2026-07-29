@@ -2040,14 +2040,50 @@ GEN_SEM = threading.Semaphore(2)  # no máx. 2 gerações de IA simultâneas
 JOBS = {}                         # id -> {"status": running|done|erro, "path":..., "erro":...}
 
 
+def _db_mod():
+    """Import lazy de _db (evita falha se psycopg2 ausente local)."""
+    try:
+        import _db
+        return _db
+    except Exception:
+        return None
+
+
 def load():
+    """Carrega posts: Postgres se tiver dados; senão editor.json (backup local)."""
     with IO_LOCK:
-        return json.load(open(DATA, encoding="utf-8"))
+        db = _db_mod()
+        if db and db.disponivel():
+            try:
+                rebuilt = db.load_posts_as_editor()
+                if rebuilt.get("posts"):
+                    return rebuilt
+            except Exception as e:
+                print(f"  DB load aviso: {e}", file=sys.stderr)
+        if os.path.isfile(DATA):
+            return json.load(open(DATA, encoding="utf-8"))
+        return {"posts": [], "version": 1}
 
 
 def save(d):
+    """Persiste em editor.json SEMPRE + upsert no Postgres se disponível."""
     with IO_LOCK:
-        json.dump(d, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+        posts = list(d.get("posts") or [])
+        payload = dict(d)
+        payload["posts"] = posts
+        if "version" not in payload:
+            payload["version"] = 2
+        json.dump(payload, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+        db = _db_mod()
+        if db and db.disponivel():
+            try:
+                for p in posts:
+                    try:
+                        db.upsert_post(p)
+                    except Exception as e:
+                        print(f"  DB upsert {p.get('slug')}: {e}", file=sys.stderr)
+            except Exception as e:
+                print(f"  DB save aviso: {e}", file=sys.stderr)
 
 
 def _parse_arte_meta(stdout):
@@ -3601,12 +3637,15 @@ def main():
             print(f"AVISO: criei {DATA} vazio.", file=sys.stderr)
         except OSError:
             sys.exit(f"ERRO: {DATA} não existe e não pôde ser criado.")
-    # Postgres (produção): schema canais + log de publicações
+    # Postgres (produção multi-marca): schema + contagens
     try:
         import _db
         if _db.disponivel():
             st = _db.init_schema()
-            print(f"  DB: schema ok={st.get('ok')}", file=sys.stderr)
+            ct = _db.contagens()
+            print(f"  DB: schema ok={st.get('ok')}  {ct}", file=sys.stderr)
+        else:
+            print("  DB: sem DATABASE_URL — usando só editor.json", file=sys.stderr)
     except Exception as e:
         print(f"  DB: aviso {e}", file=sys.stderr)
     bind = BIND_HOST

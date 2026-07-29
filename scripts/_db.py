@@ -141,12 +141,29 @@ def conn():
         c.close()
 
 
+_MIGRATIONS = """
+-- colunas que podem faltar se o schema foi criado em versão antiga
+ALTER TABLE publicacao_log ADD COLUMN IF NOT EXISTS post_id BIGINT REFERENCES post(id) ON DELETE SET NULL;
+ALTER TABLE post ADD COLUMN IF NOT EXISTS caption TEXT NOT NULL DEFAULT '';
+ALTER TABLE post ADD COLUMN IF NOT EXISTS canais JSONB NOT NULL DEFAULT '["instagram"]';
+ALTER TABLE post ADD COLUMN IF NOT EXISTS payload JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE post_frame ADD COLUMN IF NOT EXISTS payload JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE marca ADD COLUMN IF NOT EXISTS meta JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE marca ADD COLUMN IF NOT EXISTS gradiente TEXT NOT NULL DEFAULT '';
+ALTER TABLE marca ADD COLUMN IF NOT EXISTS papel TEXT NOT NULL DEFAULT 'cliente';
+ALTER TABLE canal_conexao ADD COLUMN IF NOT EXISTS username TEXT;
+ALTER TABLE canal_conexao ADD COLUMN IF NOT EXISTS user_id TEXT;
+ALTER TABLE canal_conexao ADD COLUMN IF NOT EXISTS conectado BOOLEAN NOT NULL DEFAULT false;
+"""
+
+
 def init_schema() -> dict:
     if not disponivel():
         return {"ok": False, "erro": "DATABASE_URL ausente"}
     with conn() as c:
         with c.cursor() as cur:
             cur.execute(_SCHEMA)
+            cur.execute(_MIGRATIONS)
     return {"ok": True, "schema": "marca,post,post_frame,canal_conexao,publicacao_log,nota_publicacao"}
 
 
