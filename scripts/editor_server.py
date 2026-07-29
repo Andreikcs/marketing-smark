@@ -1783,13 +1783,29 @@ function chIcon(c){
   if(c==='linkedin')return '<span class="chpill chIN" title=LinkedIn><svg viewBox="0 0 24 24" width=13 height=13 fill="#fff"><path d="M4.98 3.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.4 8.65 21 11 21 14v7h-4v-6.2c0-1.48-.03-3.4-2.07-3.4-2.07 0-2.39 1.62-2.39 3.29V21H9z"/></svg></span>';
   return '<span class="chpill chIG" title=Instagram><svg viewBox="0 0 24 24" width=13 height=13 fill="none" stroke="#fff" stroke-width="2.1"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.6" cy="6.4" r="1.2" fill="#fff" stroke="none"/></svg></span>';}
 async function loadThumb(host,p){
-  // Prioridade: preview COMPOSTO (fundo + legenda + logo nítidos).
-  // Thumb JPEG só como fallback (produção sem PNG de arte) — nunca como 1ª opção
-  // (era a causa de galeria borrada e sem texto na arte).
+  // 1º: arte final já composta, servida do Postgres em /arte/<sha>.jpg.
+  //     É a mesma imagem que vai pro Instagram — nítida, ~170KB, e idêntica
+  //     no Mac e no Railway. Uma tag <img> em vez de um iframe de 1080px.
+  // 2º: preview ao vivo (post recém-editado que ainda não foi pro banco).
+  // 3º: thumb JPEG antigo. 4º: placeholder. Nunca card vazio.
   try{
+    const fr0=(p.frames||[])[0]||{};
+    const asha=(p.arte_sha||fr0.arte_sha||'').trim();
+    if(asha){
+      const okImg=await new Promise(res=>{
+        const img=document.createElement('img');
+        img.className='thumbimg';
+        img.alt=(p.titulo||p.slug||'');
+        img.loading='lazy';
+        img.onload=()=>{host.innerHTML='';host.appendChild(img);res(true)};
+        img.onerror=()=>res(false);
+        img.src='/arte/'+encodeURIComponent(asha)+'.jpg';
+      });
+      if(okImg) return;
+    }
     const ok = await loadThumbPreview(host,p);
     if(ok) return;
-    const th=(p.thumb||((p.frames||[])[0]||{}).thumb||'').trim();
+    const th=(p.thumb||fr0.thumb||'').trim();
     if(th){
       const img=document.createElement('img');
       img.className='thumbimg';
@@ -2060,6 +2076,19 @@ function relTime(iso){if(!iso)return '';const t=Date.parse(iso);if(!t)return '';
 async function compose(host,fr,p){
   // vitrine: sempre preview composto nítido (texto+logo+fundo)
   try{
+    // arte final do Postgres primeiro — é a que o cliente vai ver publicada
+    const asha=((fr&&fr.arte_sha)||p.arte_sha||'').trim();
+    if(asha){
+      const ok=await new Promise(res=>{
+        const img=document.createElement('img');
+        img.alt=p.titulo||'';img.loading='lazy';
+        img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+        img.onload=()=>{host.innerHTML='';host.appendChild(img);res(true)};
+        img.onerror=()=>res(false);
+        img.src='/arte/'+encodeURIComponent(asha)+'.jpg';
+      });
+      if(ok) return;
+    }
     const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
     const html=await r.text();
     if(!r.ok || /preview erro|ValueError|traceback/i.test(html)){
@@ -2191,6 +2220,19 @@ def _collect_status() -> dict:
     out["load_ativo"] = len(live.get("posts") or [])
     out["source"] = live.get("source") or ("cache" if _MEM_CACHE else "arquivo")
     out["thumbs_posts"] = sum(1 for p in (live.get("posts") or []) if (p.get("thumb") or "").strip())
+    # artes servidas do Postgres — é o que faz a galeria funcionar em produção
+    frames = [f for p in (live.get("posts") or []) for f in (p.get("frames") or [])]
+    out["artes"] = {
+        "frames": len(frames),
+        "com_fundo": sum(1 for f in frames if (f.get("bg_sha") or "").strip()),
+        "com_final": sum(1 for f in frames if (f.get("arte_sha") or "").strip()),
+        "blobs": {},
+    }
+    if db and db.disponivel():
+        try:
+            out["artes"]["blobs"] = db.blob_stats() or {}
+        except Exception as e:
+            out["artes"]["erro"] = str(e)
     # canais conectados (sem tokens)
     try:
         n_ig = 0

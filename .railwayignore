@@ -1,0 +1,44 @@
+# O `railway up` monta o contexto ANTES do Docker, então ele precisa da própria
+# lista de exclusões — sem isso o CLI tenta subir 1.3GB de artes e leva 413.
+# Era por causa disso que o deploy exigia montar um pacote slim em /tmp na mão.
+#
+# As artes não faltam em produção: fundos e finais vivem no Postgres
+# (tabela arte_blob) e são servidos em /bg/<sha>.jpg e /arte/<sha>.jpg.
+# Ver scripts/push_artes.py.
+
+.git
+.venv
+.obsidian
+.pytest_cache
+.superpowers
+.backups
+.claude
+.DS_Store
+**/.DS_Store
+**/__pycache__
+**/*.pyc
+
+# segredos
+.env
+.editor-token
+.secrets
+
+# artes pesadas (PNG full) — Postgres serve as versões web
+marcas/**/publicacoes/**
+marcas/**/referencias/**
+
+# material que não roda em produção
+tests
+sites
+docs
+imersao-resultado
+lancamento.html
+lancamento.json
+painel.html
+controle-posts.csv
+studio-check.jpg
+hero.jpeg
+ordo-hero.jpeg
+.compositor.tmp*
+editor.json.pre-migrate.bak
+editor.json.from-db.json
