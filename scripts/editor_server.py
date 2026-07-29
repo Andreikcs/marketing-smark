@@ -2240,6 +2240,13 @@ def _collect_status() -> dict:
             out["artes"]["blobs"] = db.blob_stats() or {}
         except Exception as e:
             out["artes"]["erro"] = str(e)
+    # Sem navegador o servidor não compõe arte: nada de publicar nem agendar
+    # sozinho. Vale saber disso pelo /status, não descobrir na hora do post.
+    out["render"] = {
+        "chrome": compositor.CHROME,
+        "existe": os.path.isfile(compositor.CHROME),
+        "fontes_embutidas": len(getattr(compositor, "_FONTES", "")) > 1000,
+    }
     # canais conectados (sem tokens)
     try:
         n_ig = 0

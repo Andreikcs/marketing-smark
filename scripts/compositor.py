@@ -21,7 +21,41 @@ import sys
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _sidecar import meta_block  # noqa: E402
-CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+
+def _achar_chrome() -> str:
+    """Acha o navegador que renderiza a arte, no Mac e no Linux do Railway.
+
+    Isto era um caminho fixo do macOS. Em produção não existia navegador nenhum,
+    então o servidor não sabia compor arte: toda peça tinha que ser gerada no Mac
+    e empurrada à mão (scripts/push_artes.py). Isso também tornava agendamento
+    impossível — às 9h da manhã não tem ninguém com o notebook aberto.
+
+    O binário é o MESMO renderizador nos dois lados de propósito: o que o cliente
+    aprova precisa ser byte a byte o que vai pro Instagram.
+    """
+    from shutil import which
+    cand = [os.environ.get("CHROME_BIN", ""),
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "/Applications/Chromium.app/Contents/MacOS/Chromium"]
+    for c in cand:
+        if c and os.path.isfile(c):
+            return c
+    for nome in ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable"):
+        p = which(nome)
+        if p:
+            return p
+    # devolve o caminho do Mac mesmo assim: quem chama já trata falha de render
+    return cand[1]
+
+
+CHROME = _achar_chrome()
+
+# No container o processo roda como root (sandbox do Chrome recusa) e o /dev/shm
+# padrão do Docker tem 64 MB, o que faz o render morrer no meio em página pesada.
+# No Mac essas duas flags não se aplicam, então ficam de fora.
+_FLAGS_CONTAINER = (["--no-sandbox", "--disable-dev-shm-usage"]
+                    if (hasattr(os, "geteuid") and os.geteuid() == 0) else [])
 TOKENS = os.path.join(VAULT, "design-system", "tokens", "tokens.json")
 SMARK_TAGLINE = "TECNOLOGIA QUE DEIXA MARCOS"
 LIME = ("#C6F24E", "#D6FF5C")
@@ -514,8 +548,29 @@ def auto_hsize(text):
     return int(max(54, min((1080 - 128) / (longest * 0.52), 360 / (n * 0.92), 104)))
 
 
-CSS = """
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;700;800&display=swap');
+def _css_fontes() -> str:
+    """Anton + Archivo embutidas em base64 (design-system/assets/fontes/).
+
+    Era um `@import` do Google Fonts — dependência de rede DENTRO do render. Se o
+    Google demorasse mais que o orçamento de 4s, o Chrome desenhava com fonte de
+    fallback e a peça saía diferente da que foi aprovada. Agora o render é
+    offline e determinístico. Gerar/atualizar com scripts/vendor_fontes.py.
+    """
+    p = os.path.join(VAULT, "design-system", "assets", "fontes", "fontes.css")
+    try:
+        return open(p, encoding="utf-8").read()
+    except OSError:
+        # Sem o arquivo vendorizado, volta pro Google: feio, mas melhor que
+        # renderizar tudo em Helvetica sem avisar.
+        sys.stderr.write("[compositor] fontes.css ausente — usando Google Fonts "
+                         "(rode: python3 scripts/vendor_fontes.py)\n")
+        return ("@import url('https://fonts.googleapis.com/css2?family=Anton"
+                "&family=Archivo:wght@500;700;800&display=swap');")
+
+
+_FONTES = _css_fontes()
+
+CSS = _FONTES + """
 *{margin:0;padding:0;box-sizing:border-box;}
 body{width:%(W)spx;height:%(H)spx;overflow:hidden;}
 .card{position:relative;width:%(W)spx;height:%(H)spx;background:%(BASE)s;}
@@ -740,6 +795,7 @@ def render_html_to_png(page_html, out, w, h, tries=3):
                 pass
             try:
                 subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
+                                *_FLAGS_CONTAINER,
                                 "--force-device-scale-factor=2", f"--window-size={w},{h}",
                                 "--virtual-time-budget=4000", f"--screenshot={out_abs}",
                                 f"file://{html_path}"],
