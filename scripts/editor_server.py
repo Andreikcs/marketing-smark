@@ -2758,9 +2758,10 @@ def merge_fluxo(novos, disco):
     de uma hora atrás — foi assim que um post aprovado voltou pra "ajuste"
     sozinho. Aprovação e agenda só mudam por /post-status.
 
-    Duas exceções, e só duas, porque o editor as usa de propósito:
-      - `rascunho`: editar derruba a aprovação (a peça não é mais a que o cliente viu)
-      - `rascunho → salvo`: o botão Salvar promovendo um rascunho
+    Sem exceção: uma aba parada não sabe a diferença entre "eu editei, tira a
+    aprovação" e "eu não sei o que aconteceu depois que carreguei". Quem edita
+    de verdade chama /post-status (é o `markDraft` do editor) e aí fica evento
+    na trilha dizendo quem derrubou.
     """
     antes = {}
     for p in (disco.get("posts") or []):
@@ -2774,13 +2775,7 @@ def merge_fluxo(novos, disco):
                 p[c] = velho[c]
             else:
                 p.pop(c, None)
-        no_disco = velho.get("status") or "rascunho"
-        pedido = p.get("status") or "rascunho"
-        if pedido == no_disco:
-            continue
-        if pedido == "rascunho" or (pedido == "salvo" and no_disco == "rascunho"):
-            continue                      # as duas mudanças que o editor pode fazer sozinho
-        p["status"] = no_disco
+        p["status"] = velho.get("status") or "rascunho"
     return novos
 
 

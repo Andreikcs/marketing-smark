@@ -330,18 +330,19 @@ class TestAbaVelhaNaoDesfazAprovacao(unittest.TestCase):
                        self._disco(status="agendado", agendado_para="2026-08-03T15:00:00+00:00"))
         self.assertEqual(r["posts"][0]["agendado_para"], "2026-08-03T15:00:00+00:00")
 
-    def test_editar_ainda_derruba_a_aprovacao(self):
-        r = self.merge(self._aba(status="rascunho"), self._disco())
-        self.assertEqual(r["posts"][0]["status"], "rascunho",
-                         "editar tem que tirar a peça de aprovado")
+    def test_nenhum_status_passa_pelo_salvar(self):
+        """Nem rebaixar. A aba não sabe se editou ou se só está velha.
 
-    def test_botao_salvar_ainda_promove_rascunho(self):
-        r = self.merge(self._aba(status="salvo"), self._disco(status="rascunho"))
-        self.assertEqual(r["posts"][0]["status"], "salvo")
-
-    def test_salvo_nao_rebaixa_aprovado(self):
-        r = self.merge(self._aba(status="salvo"), self._disco(status="aprovado"))
-        self.assertEqual(r["posts"][0]["status"], "aprovado")
+        A primeira versão disto abria exceção pro `rascunho` ("editar derruba a
+        aprovação") e o furo continuou: uma aba parada em rascunho salvou e
+        apagou uma aprovação feita depois, sem ninguém ter editado nada.
+        """
+        for pedido, no_disco in (("rascunho", "aprovado"), ("salvo", "rascunho"),
+                                 ("salvo", "aprovado"), ("aprovado", "rascunho"),
+                                 ("publicado", "agendado")):
+            r = self.merge(self._aba(status=pedido), self._disco(status=no_disco))
+            self.assertEqual(r["posts"][0]["status"], no_disco,
+                             "/salvar mexeu no status: %s→%s" % (no_disco, pedido))
 
     def test_post_novo_passa_inteiro(self):
         r = self.merge({"posts": [{"marca": "smark", "slug": "novo", "status": "rascunho"}]},

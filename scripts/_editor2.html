@@ -1160,16 +1160,22 @@ function renderStatus(){
 // Editar depois de aprovado invalida a aprovação: o cliente disse sim pra UMA
 // peça, não pro slug. Sem isso dava pra trocar a arte inteira e o "aprovado"
 // continuar valendo — é o tipo de coisa que só aparece na hora da briga.
+// O /salvar não mexe em status (ver merge_fluxo no servidor): quem derruba a
+// aprovação tem que dizer isso na cara, pelo endpoint, pra ficar na trilha.
+let _REBAIXANDO=false;
 function markDraft(){
-  const p=D&&D.posts[PI];if(!p)return;
+  const p=post();if(!p)return;
   const st=p.status||'rascunho';
   if(st==='publicado')return;                 // já foi ao ar; o registro fica como está
-  if(st!=='rascunho'&&st!=='salvo'){
-    p.status='rascunho';renderStatus();
-    toast('Editar tirou este post de "'+stLabel(st)+'" — a aprovação vale pra peça que o cliente viu');
-    return;
-  }
+  if(st==='rascunho')return;                  // já é rascunho: nada a anunciar
   p.status='rascunho';renderStatus();
+  if(st!=='salvo')toast('Editar tirou este post de "'+stLabel(st)+'" — a aprovação vale pra peça que o cliente viu');
+  if(_REBAIXANDO)return;                      // uma requisição por rebaixamento, não por tecla
+  _REBAIXANDO=true;
+  fetch('/post-status',{method:'POST',headers:HJSON,
+    body:JSON.stringify({marca:p.marca||'smark',slug:p.slug,para:'rascunho',
+      comentario:'editado no editor',por:'time'})})
+    .catch(()=>{}).finally(()=>{_REBAIXANDO=false});
 }
 
 async function mudarStatus(para,quando,comentario){
@@ -1219,11 +1225,13 @@ $('#bstatus').onclick=(e)=>{
     if(!m.contains(ev.target)){m.remove();document.removeEventListener('click',h)}},0),0);
 };
 
-$('#bsave').onclick=async()=>{
+// Promover rascunho→pronto é mudança de status: vai pelo endpoint, não pelo /salvar.
+async function salvarEPromover(msg){
   const p=post();
-  // Salvar não pode rebaixar um post que já andou no fluxo.
-  if(p&&['rascunho','salvo'].includes(p.status||'rascunho'))p.status='salvo';
-  await salvar(true);renderPosts();renderStatus();toast('Salvo — finalizado ✓')};
+  if(p&&(p.status||'rascunho')==='rascunho'){await mudarStatus('salvo');renderPosts();return}
+  await salvar(true);renderPosts();renderStatus();toast(msg);
+}
+$('#bsave').onclick=()=>salvarEPromover('Salvo — finalizado ✓');
 $('#bexport').onclick=(e)=>{
   document.querySelectorAll('.expmenu').forEach(m=>m.remove());
   const m=document.createElement('div');m.className='expmenu';
@@ -1607,9 +1615,7 @@ document.addEventListener('keydown',e=>{
   const typing=/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||'');
   if(e.key==='Escape'){['fsmodal','igmodal'].forEach(id=>{const m=document.getElementById(id);if(m)m.style.display='none'});return}
   if(e.ctrlKey||e.metaKey){const k=e.key.toLowerCase();
-    if(k==='s'){e.preventDefault();const _p=post();
-      if(_p&&['rascunho','salvo'].includes(_p.status||'rascunho'))_p.status='salvo';
-      salvar(true).then(()=>{renderPosts();renderStatus();toast('Salvo ✓')});return}
+    if(k==='s'){e.preventDefault();salvarEPromover('Salvo ✓');return}
     if(k==='z'&&!e.shiftKey){e.preventDefault();doUndo();return}
     if((k==='z'&&e.shiftKey)||k==='y'){e.preventDefault();doRedo();return}
     if(k==='b'){e.preventDefault();fmtActive('**');return}

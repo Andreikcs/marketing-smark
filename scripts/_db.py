@@ -500,14 +500,9 @@ def _upsert_post_cur(cur, post: dict, marcas_ok: Optional[set] = None) -> Option
         ON CONFLICT (marca, slug) DO UPDATE SET
           titulo=EXCLUDED.titulo,
           size=EXCLUDED.size,
-          status=EXCLUDED.status,
           caption=EXCLUDED.caption,
           canais=EXCLUDED.canais,
           payload=EXCLUDED.payload,
-          agendado_para=EXCLUDED.agendado_para,
-          aprovado_em=EXCLUDED.aprovado_em,
-          aprovado_por=EXCLUDED.aprovado_por,
-          publicado_em=EXCLUDED.publicado_em,
           updated_at=NOW()
         RETURNING id
         """,
