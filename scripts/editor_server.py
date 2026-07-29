@@ -3601,6 +3601,14 @@ def main():
             print(f"AVISO: criei {DATA} vazio.", file=sys.stderr)
         except OSError:
             sys.exit(f"ERRO: {DATA} não existe e não pôde ser criado.")
+    # Postgres (produção): schema canais + log de publicações
+    try:
+        import _db
+        if _db.disponivel():
+            st = _db.init_schema()
+            print(f"  DB: schema ok={st.get('ok')}", file=sys.stderr)
+    except Exception as e:
+        print(f"  DB: aviso {e}", file=sys.stderr)
     bind = BIND_HOST
     # Railway sempre precisa escutar em 0.0.0.0
     if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RAILWAY_PUBLIC_DOMAIN"):

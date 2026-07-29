@@ -164,6 +164,30 @@ def _save_json(path: str, data: dict) -> None:
     os.replace(tmp, path)
 
 
+def _persist_canal(marca: str, canal: str, data: dict) -> None:
+    """Arquivo local + Postgres (se DATABASE_URL)."""
+    _save_json(_path_token(marca, canal), data)
+    try:
+        import _db
+        if _db.disponivel():
+            _db.canal_salvar(marca, canal, data)
+    except Exception:
+        pass
+
+
+def _load_canal(marca: str, canal: str) -> dict:
+    """Prefere Postgres em produção; fallback arquivo."""
+    try:
+        import _db
+        if _db.disponivel():
+            p = _db.canal_carregar(marca, canal)
+            if p:
+                return p
+    except Exception:
+        pass
+    return _load_json(_path_token(marca, canal))
+
+
 def _publico_de(raw: dict, canal: str) -> dict:
     """Status sem tokens — seguro pra UI."""
     if not raw or not raw.get("connected"):
@@ -198,13 +222,13 @@ def status_canal(marca: str, canal: str) -> dict:
     if canal not in CANAIS:
         return {"canal": canal, "conectado": False, "status": "desconhecido", "erro": "canal inválido"}
     if canal == "linkedin":
-        raw = _load_json(_path_token(marca, "linkedin"))
+        raw = _load_canal(marca, "linkedin")
         pub = _publico_de(raw, "linkedin")
         if not pub["conectado"]:
             pub["status"] = "em_breve"
             pub["aviso"] = "LinkedIn em breve — estrutura pronta, OAuth na próxima etapa."
         return pub
-    raw = _load_json(_path_token(marca, canal))
+    raw = _load_canal(marca, canal)
     return _publico_de(raw, canal)
 
 
@@ -228,6 +252,11 @@ def desconectar(marca: str, canal: str = "instagram") -> dict:
             os.remove(path)
         except OSError as e:
             return {"ok": False, "erro": str(e)}
+    try:
+        import _db
+        _db.canal_apagar(marca, canal)
+    except Exception:
+        pass
     return {"ok": True, "marca": marca, "canal": canal, "conectado": False}
 
 
@@ -375,7 +404,7 @@ def conectar_fake(state: str, username: str, nome: str = "") -> dict:
         "picture": "",
         "return_to": pending.get("return_to") or "/config",
     }
-    _save_json(_path_token(marca, "instagram"), token)
+    _persist_canal(marca, "instagram", token)
     return {
         "ok": True,
         "marca": marca,
@@ -606,7 +635,7 @@ def trocar_code_real(code: str, state: str) -> dict:
         "picture": picture,
         "return_to": pending.get("return_to") or "/config",
     }
-    _save_json(_path_token(marca, "instagram"), token)
+    _persist_canal(marca, "instagram", token)
     return {
         "ok": True,
         "marca": marca,
@@ -618,7 +647,7 @@ def trocar_code_real(code: str, state: str) -> dict:
 
 def token_bruto(marca: str, canal: str = "instagram") -> dict:
     """Uso interno (publish). Nunca expor na API HTTP."""
-    return _load_json(_path_token(marca, canal))
+    return _load_canal(marca, canal)
 
 
 def refresh_token_se_preciso(marca: str) -> dict:
@@ -658,7 +687,7 @@ def refresh_token_se_preciso(marca: str) -> dict:
         raw["expires_in"] = int(j.get("expires_in") or raw.get("expires_in") or 5184000)
         raw["expira_em"] = _expira_iso(raw["expires_in"])
         raw["refreshed_em"] = _now_iso()
-        _save_json(_path_token(marca, "instagram"), raw)
+        _persist_canal(marca, "instagram", raw)
         return {"ok": True, "expira_em": raw["expira_em"]}
     return {"ok": False, "erro": "refresh sem access_token", "raw": j}
 
@@ -744,12 +773,25 @@ def publicar_instagram(marca: str, *,
     ig_user = raw.get("user_id")
     if not ig_user:
         return {"ok": False, "erro": "user_id Instagram ausente — reconecte a conta"}
+    # Meta baixa a imagem por HTTPS público — monta URL se só temos path local
+    if not image_url and abs_img and os.path.isfile(abs_img):
+        base = (
+            _env("PUBLIC_BASE_URL")
+            or _env("RAILWAY_PUBLIC_DOMAIN")
+            or ""
+        ).strip().rstrip("/")
+        if base and not base.startswith("http"):
+            base = "https://" + base
+        if base:
+            rel = os.path.relpath(abs_img, VAULT).replace("\\", "/")
+            image_url = f"{base}/{rel.lstrip('/')}"
     if not image_url:
         return {
             "ok": False,
             "erro": (
                 "Publicação real exige URL pública HTTPS da imagem "
-                "(Meta baixa a arte do link). Envie image_url ou hospede o PNG."
+                "(Meta baixa a arte do link). Defina PUBLIC_BASE_URL no Railway "
+                "ou envie image_url."
             ),
         }
 
@@ -763,6 +805,12 @@ def publicar_instagram(marca: str, *,
         }, form=True)
     except Exception as e:
         _log_publish(marca, "instagram", {"acao": "erro_container", "erro": str(e)})
+        try:
+            import _db
+            _db.publicacao_log(marca, "instagram", "erro_container",
+                               image_url=image_url, caption=caption, detalhe={"erro": str(e)})
+        except Exception:
+            pass
         return {"ok": False, "erro": f"falha ao criar container: {e}"}
 
     creation_id = container.get("id")
@@ -789,12 +837,22 @@ def publicar_instagram(marca: str, *,
         "creation_id": creation_id,
         "username": raw.get("username"),
     })
+    try:
+        import _db
+        _db.publicacao_log(
+            marca, "instagram", "publicado",
+            media_id=media_id, image_path=image_path, image_url=image_url,
+            caption=caption, detalhe={"creation_id": creation_id},
+        )
+    except Exception:
+        pass
     return {
         "ok": True,
         "modo": "real",
         "media_id": media_id,
         "username": raw.get("username"),
         "creation_id": creation_id,
+        "image_url": image_url,
     }
 
 
