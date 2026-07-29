@@ -2979,13 +2979,28 @@ def mudar_status_post(marca, slug, para, *, por="time", comentario="",
         alvo["updated_at"] = _agora_iso()
         save(d)
 
+    # Escrita própria no banco, na hora. Não espera o flush em lote: aquele
+    # esbarra em lock na tabela `marca` sob dois escritores e desfaz o post pelo
+    # savepoint — e como o boot reconstrói o editor.json a partir do banco, a
+    # aprovação sumia sozinha. Ver `_db.aplicar_status`.
     db = _db_mod()
-    if db and db.disponivel():
-        try:
-            db.registrar_evento(marca, slug, de, para, por=por, comentario=comentario)
-        except Exception as e:
-            print("  fluxo: evento não registrado: %s" % e, file=sys.stderr)
-    return {"ok": True, "de": de, "para": para, "agendado_para": quando_iso}
+    aviso = ""
+    if db and db.disponivel() and hasattr(db, "aplicar_status"):
+        r = db.aplicar_status(
+            marca, slug, para, de=de, por=(por if para == "aprovado" else ""),
+            comentario=comentario,
+            aprovado_em=alvo.get("aprovado_em") if para == "aprovado" else None,
+            publicado_em=alvo.get("publicado_em") if para == "publicado" else None,
+            agendado_para=(alvo.get("agendado_para") or "")
+            if para in ("agendado", "publicado", "rascunho", "ajuste", "salvo") else None,
+        )
+        if not r.get("ok"):
+            aviso = "gravado no arquivo, mas o banco recusou: %s" % (r.get("erro") or "post ausente")
+            print("  fluxo: %s" % aviso, file=sys.stderr)
+    out = {"ok": True, "de": de, "para": para, "agendado_para": quando_iso}
+    if aviso:
+        out["aviso"] = aviso
+    return out
 
 
 def _parse_arte_meta(stdout):

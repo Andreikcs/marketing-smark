@@ -187,6 +187,92 @@ class TestMudarStatusNoArquivo(unittest.TestCase):
         self.assertTrue(self._post()["publicado_em"])
 
 
+class _DbEspiao:
+    """Banco de mentira que só anota o que foi pedido."""
+    STATUS_VALIDOS = _db.STATUS_VALIDOS
+    TRANSICOES = _db.TRANSICOES
+    transicao_ok = staticmethod(_db.transicao_ok)
+    chamadas: list = []
+
+    @staticmethod
+    def disponivel():
+        return True
+
+    @staticmethod
+    def aplicar_status(marca, slug, para, **kw):
+        _DbEspiao.chamadas.append({"marca": marca, "slug": slug, "para": para, **kw})
+        return {"ok": True, "linhas": 1}
+
+
+class TestStatusNaoViajaDeCarona(unittest.TestCase):
+    """O status tem que ir pro banco por conta própria.
+
+    O upsert em lote passa por `_ensure_marca_cur` e reescreve os frames de 48
+    posts numa transação; sob dois escritores ele estoura o statement_timeout em
+    lock da tabela `marca` e o savepoint desfaz aquele post. Como o boot
+    reconstrói o editor.json a partir do banco, a aprovação do cliente sumia no
+    dia seguinte. Este teste é o que impede a volta desse caminho.
+    """
+
+    def setUp(self):
+        import editor_server as es
+        self.es = es
+        self.tmp = tempfile.mkdtemp(prefix="fluxo-db-")
+        self._data_antes, self._cache_antes = es.DATA, es._MEM_CACHE
+        es.DATA = os.path.join(self.tmp, "editor.json")
+        with open(es.DATA, "w", encoding="utf-8") as f:
+            json.dump({"version": 2, "posts": [{
+                "marca": "amosim", "slug": "p1", "titulo": "T", "status": "rascunho",
+                "frames": [{"n": 1}]}]}, f)
+        es._MEM_CACHE = None
+        self._flush_antes, self._arte_antes = es._schedule_db_flush, es._agendar_arte
+        es._schedule_db_flush = lambda posts: None
+        es._agendar_arte = lambda *a, **k: None
+        self._db_antes = es._db_mod
+        _DbEspiao.chamadas = []
+        es._db_mod = lambda: _DbEspiao
+
+    def tearDown(self):
+        self.es.DATA, self.es._MEM_CACHE = self._data_antes, self._cache_antes
+        self.es._schedule_db_flush, self.es._agendar_arte = self._flush_antes, self._arte_antes
+        self.es._db_mod = self._db_antes
+
+    def test_aprovar_grava_no_banco_na_hora(self):
+        r = self.es.mudar_status_post("amosim", "p1", "aprovado", por="cliente@amosim")
+        self.assertTrue(r["ok"])
+        self.assertEqual(len(_DbEspiao.chamadas), 1, "aprovação não foi ao banco na hora")
+        c = _DbEspiao.chamadas[0]
+        self.assertEqual((c["marca"], c["slug"], c["para"]), ("amosim", "p1", "aprovado"))
+        self.assertEqual(c["por"], "cliente@amosim")
+        self.assertTrue(c["aprovado_em"], "foi ao banco sem a data da aprovação")
+
+    def test_agendar_leva_a_data_pro_banco(self):
+        self.es.mudar_status_post("amosim", "p1", "aprovado")
+        _DbEspiao.chamadas = []
+        self.es.mudar_status_post("amosim", "p1", "agendado", quando="2026-08-03T12:00:00-03:00")
+        self.assertEqual(_DbEspiao.chamadas[0]["agendado_para"], "2026-08-03T15:00:00+00:00")
+
+    def test_ajuste_manda_limpar_a_data_no_banco(self):
+        self.es.mudar_status_post("amosim", "p1", "aprovado")
+        self.es.mudar_status_post("amosim", "p1", "agendado", quando="2026-08-03T12:00:00Z")
+        _DbEspiao.chamadas = []
+        self.es.mudar_status_post("amosim", "p1", "ajuste", comentario="muda a foto")
+        c = _DbEspiao.chamadas[0]
+        self.assertEqual(c["agendado_para"], "", "não pediu pro banco limpar a agenda")
+        self.assertEqual(c["comentario"], "muda a foto")
+
+    def test_banco_recusando_nao_engole_o_erro(self):
+        _DbEspiao.aplicar_status = staticmethod(lambda *a, **k: {"ok": False, "erro": "lock"})
+        try:
+            r = self.es.mudar_status_post("amosim", "p1", "salvo")
+            self.assertTrue(r["ok"])          # o arquivo foi gravado
+            self.assertIn("aviso", r)         # mas o usuário fica sabendo
+            self.assertIn("lock", r["aviso"])
+        finally:
+            _DbEspiao.aplicar_status = staticmethod(
+                lambda marca, slug, para, **kw: {"ok": True, "linhas": 1})
+
+
 class TestFusoDasDatasDoFluxo(unittest.TestCase):
     """Toda data do fluxo carrega fuso.
 

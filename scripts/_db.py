@@ -328,6 +328,51 @@ def mudar_status(marca: str, slug: str, para: str, *, por: str = "time",
     return {"ok": True, "de": de, "para": para}
 
 
+def aplicar_status(marca: str, slug: str, para: str, *, por: str = "",
+                   aprovado_em=None, agendado_para=None, publicado_em=None,
+                   comentario: str = "", de: str = "") -> dict:
+    """Grava status + datas do fluxo direto na linha do post, e o evento junto.
+
+    Por que não deixar o upsert em lote fazer isso: o lote passa por
+    `_ensure_marca_cur` e reescreve os frames de 48 posts numa transação só. Sob
+    dois escritores (Mac + app no Railway) ele bate em lock na tabela `marca` e
+    o savepoint desfaz **aquele** post — em produção isso apareceu como
+    "aprovei e voltou pra Pronto no dia seguinte", porque o boot reconstrói o
+    editor.json a partir do banco. Aprovação de cliente não pode viajar de
+    carona num batch que às vezes cai.
+
+    Este UPDATE toca uma linha, uma tabela, sem índice novo. É rápido e sozinho.
+    """
+    if not disponivel():
+        return {"ok": False, "erro": "sem banco"}
+    sets = ["status=%s", "updated_at=NOW()"]
+    vals: list = [para]
+    for col, val in (("aprovado_em", aprovado_em), ("agendado_para", agendado_para),
+                     ("publicado_em", publicado_em)):
+        if val is not None:
+            sets.append("%s=%%s" % col)
+            vals.append(val or None)     # "" limpa a data
+    if por:
+        sets.append("aprovado_por=%s")
+        vals.append(por[:120])
+    if para == "agendado":
+        sets.append("tentativas=0")
+    vals += [marca, slug]
+    try:
+        with conn() as c:
+            with c.cursor() as cur:
+                cur.execute("UPDATE post SET %s WHERE marca=%%s AND slug=%%s"
+                            % ",".join(sets), vals)
+                n = cur.rowcount
+                cur.execute(
+                    "INSERT INTO post_evento (marca, slug, de, para, por, comentario) "
+                    "VALUES (%s,%s,%s,%s,%s,%s)",
+                    (marca, slug, de or "", para, por or "time", (comentario or "")[:2000]))
+        return {"ok": n > 0, "linhas": n}
+    except Exception as e:
+        return {"ok": False, "erro": str(e)}
+
+
 def registrar_evento(marca: str, slug: str, de: str, para: str, *,
                      por: str = "time", comentario: str = "") -> bool:
     """Grava a mudança na trilha, sem tocar no post.
