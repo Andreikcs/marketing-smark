@@ -243,7 +243,35 @@ def status_marca(marca: str) -> dict:
 
 
 def status_todas(marcas: list) -> dict:
-    return {m: status_marca(m) for m in marcas}
+    """Status de N marcas com UMA consulta ao banco (não N × canais).
+
+    A versão ingênua abria uma conexão por marca × canal. Com 16 marcas e o
+    Postgres atrás do proxy do Railway isso dava ~65 s — e o painel local
+    espera por essa resposta pra pintar a primeira linha.
+    """
+    marcas = list(marcas or [])
+    todos = {}
+    try:
+        import _db
+        if _db.disponivel() and hasattr(_db, "canais_todos"):
+            todos = _db.canais_todos()
+    except Exception:
+        todos = {}
+    modo = modo_instagram()
+    out = {}
+    for m in marcas:
+        canais = {}
+        for c in CANAIS:
+            raw = todos.get((m, c))
+            if raw is None:
+                raw = _load_json(_path_token(m, c))   # marca só em arquivo
+            pub = _publico_de(raw or {}, c)
+            if c == "linkedin" and not pub["conectado"]:
+                pub["status"] = "em_breve"
+                pub["aviso"] = "LinkedIn em breve — estrutura pronta, OAuth na próxima etapa."
+            canais[c] = pub
+        out[m] = {"marca": m, "modo_app": modo, "canais": canais}
+    return out
 
 
 def desconectar(marca: str, canal: str = "instagram") -> dict:

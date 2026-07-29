@@ -2398,14 +2398,12 @@ def _collect_status() -> dict:
     # canais conectados (sem tokens)
     try:
         n_ig = 0
-        for slug in (_marcas.list_slugs() or [])[:40]:
-            try:
-                st = _canais.status_marca(slug).get("canais") or {}
-                ig = st.get("instagram") or {}
-                if ig.get("conectado") or ig.get("connected"):
-                    n_ig += 1
-            except Exception:
-                pass
+        # em lote: uma consulta. Marca por marca isto fazia o /db-status
+        # estourar 60 s contra o Postgres atrás do proxy.
+        for st in (_canais.status_todas((_marcas.list_slugs() or [])[:40]) or {}).values():
+            ig = (st.get("canais") or {}).get("instagram") or {}
+            if ig.get("conectado") or ig.get("connected"):
+                n_ig += 1
         out["instagram_conectados"] = n_ig
     except Exception:
         out["instagram_conectados"] = 0
@@ -3642,11 +3640,13 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/marcas":
             try:
                 marcas = _marcas.listar_detalhes()
+                # uma consulta pra todas as marcas (era uma por marca × canal)
+                try:
+                    todos = _canais.status_todas([m["slug"] for m in marcas])
+                except Exception:
+                    todos = {}
                 for m in marcas:
-                    try:
-                        m["canais"] = _canais.status_marca(m["slug"]).get("canais") or {}
-                    except Exception:
-                        m["canais"] = {}
+                    m["canais"] = (todos.get(m["slug"]) or {}).get("canais") or {}
                 return self._send(200, {
                     "ok": True,
                     "marcas": marcas,

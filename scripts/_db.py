@@ -769,6 +769,30 @@ def canal_carregar(marca: str, canal: str = "instagram") -> dict:
         return {}
 
 
+def canais_todos() -> dict:
+    """Todos os vínculos de canal numa consulta: {(marca, canal): payload}.
+
+    O `/marcas` chamava `canal_carregar` por marca × canal — 16 marcas × 2
+    canais = 32 conexões novas ao proxy do Railway, ~2s cada. O painel local
+    levava 65 s pra pintar porque esperava por isso antes de renderizar.
+    """
+    if not disponivel():
+        return {}
+    try:
+        with conn() as c:
+            with c.cursor() as cur:
+                cur.execute("SELECT marca, canal, payload FROM canal_conexao")
+                out = {}
+                for r in cur.fetchall() or []:
+                    p = r["payload"]
+                    if isinstance(p, str):
+                        p = json.loads(p or "{}")
+                    out[(r["marca"], r["canal"])] = dict(p or {})
+                return out
+    except Exception:
+        return {}
+
+
 def canal_apagar(marca: str, canal: str = "instagram") -> None:
     if not disponivel():
         return
