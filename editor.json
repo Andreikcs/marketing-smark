@@ -17,9 +17,11 @@
           "cta": "cta",
           "sub": "sub",
           "tema": "claro",
-          "headline": "H1 *x*"
+          "headline": "H1 *x*",
+          "thumb": ".thumbs/smark__e2e-db-preserve.jpg"
         }
-      ]
+      ],
+      "thumb": ".thumbs/smark__e2e-db-preserve.jpg"
     },
     {
       "roi": {
@@ -2335,6 +2337,5 @@
       ]
     }
   ],
-  "version": 2,
-  "source": "postgres"
+  "version": 2
 }
