@@ -8,6 +8,7 @@ Schema:
   canal_conexao      — tokens OAuth Instagram/LinkedIn por marca
   publicacao_log     — histórico de publicações
   nota_publicacao    — notas .md do vault (opcional)
+  arte_blob          — bytes das imagens (fundo web + arte final), endereçados por sha256
 
 Sem DATABASE_URL: no-op (sistema usa arquivos).
 """
@@ -104,7 +105,22 @@ CREATE TABLE IF NOT EXISTS nota_publicacao (
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Imagens vivem aqui porque o deploy do Railway NÃO carrega as artes (limite de
+-- upload). Endereçadas por sha256 do conteúdo: mesmo fundo em vários posts = 1 linha,
+-- e a URL /bg/<sha>.jpg pode ser cacheada pra sempre (o conteúdo nunca muda).
+CREATE TABLE IF NOT EXISTS arte_blob (
+  sha             TEXT PRIMARY KEY,
+  kind            TEXT NOT NULL DEFAULT 'bg',
+  mime            TEXT NOT NULL DEFAULT 'image/jpeg',
+  w               INT NOT NULL DEFAULT 0,
+  h               INT NOT NULL DEFAULT 0,
+  bytes           BYTEA NOT NULL,
+  origem          TEXT NOT NULL DEFAULT '',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX IF NOT EXISTS idx_post_marca ON post (marca, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_arte_blob_kind ON arte_blob (kind, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_post_frame_post ON post_frame (post_id, n);
 CREATE INDEX IF NOT EXISTS idx_publicacao_marca ON publicacao_log (marca, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_nota_marca ON nota_publicacao (marca, canal);
@@ -389,10 +405,68 @@ def contagens() -> dict:
     with conn() as c:
         with c.cursor() as cur:
             out = {}
-            for t in ("marca", "post", "post_frame", "canal_conexao", "publicacao_log", "nota_publicacao"):
+            for t in ("marca", "post", "post_frame", "canal_conexao", "publicacao_log",
+                      "nota_publicacao", "arte_blob"):
                 cur.execute(f"SELECT COUNT(*) AS n FROM {t}")
                 out[t] = int(cur.fetchone()["n"])
             return out
+
+
+# ── arte_blob (imagens) ─────────────────────────────────────────────────────
+
+def blob_existe(shas: list) -> set:
+    """Quais desses sha já estão no banco. Evita reenviar o que não mudou."""
+    if not shas or not disponivel():
+        return set()
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute("SELECT sha FROM arte_blob WHERE sha = ANY(%s)", (list(shas),))
+            return {r["sha"] for r in cur.fetchall()}
+
+
+def blob_put(sha: str, data: bytes, kind: str = "bg", mime: str = "image/jpeg",
+             w: int = 0, h: int = 0, origem: str = "") -> bool:
+    """Grava um blob. Idempotente: sha igual = conteúdo igual, não reescreve."""
+    if not disponivel() or not data:
+        return False
+    import psycopg2
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO arte_blob (sha, kind, mime, w, h, bytes, origem)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (sha) DO NOTHING
+                """,
+                (sha, kind, mime, int(w), int(h), psycopg2.Binary(data), origem or ""),
+            )
+    return True
+
+
+def blob_get(sha: str) -> Optional[dict]:
+    """Devolve {bytes, mime, kind} ou None."""
+    if not disponivel() or not sha:
+        return None
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute("SELECT sha, kind, mime, w, h, bytes FROM arte_blob WHERE sha = %s", (sha,))
+            r = cur.fetchone()
+            if not r:
+                return None
+            return {"sha": r["sha"], "kind": r["kind"], "mime": r["mime"],
+                    "w": r["w"], "h": r["h"], "bytes": bytes(r["bytes"])}
+
+
+def blob_stats() -> dict:
+    if not disponivel():
+        return {}
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                "SELECT kind, COUNT(*) AS n, COALESCE(SUM(LENGTH(bytes)),0) AS b "
+                "FROM arte_blob GROUP BY kind"
+            )
+            return {r["kind"]: {"n": int(r["n"]), "bytes": int(r["b"])} for r in cur.fetchall()}
 
 
 # ── canais (tokens) ─────────────────────────────────────────────────────────

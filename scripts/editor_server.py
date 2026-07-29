@@ -18,6 +18,7 @@ import threading
 import socketserver
 import subprocess
 import sys
+import tempfile
 import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -2377,6 +2378,7 @@ _MEM_CACHE = None                 # dict editor (posts…)
 _DB_FLUSH_TIMER = None
 _DB_FLUSH_LOCK = threading.Lock()
 _DB_PENDING = None                # snapshot posts a flushar
+_BLOB_CACHE = {}                  # sha -> blob; galeria pede o mesmo fundo N vezes
 
 
 def _db_mod():
@@ -2727,6 +2729,55 @@ def hl(text):
     return (text or "").replace("\r", "").replace("|", "\\n").replace("\n", "\\n")
 
 
+def _resolver_fundo(fr, for_export):
+    """Onde está o fundo deste frame, na ordem que funciona nos dois ambientes.
+
+    O Mac tem os PNGs full em marcas/**/_regen/. A produção no Railway NÃO tem
+    (as artes ficam fora do deploy por causa do limite de upload), então o fundo
+    dela vem do Postgres via /bg/<sha>.jpg. Preferir o sha quando existe deixa
+    local e produção idênticos — e o JPEG web é bem mais leve que o PNG de 20MB.
+
+    Se nada resolver, cai no mesh da marca. Nunca devolve URL quebrada: era isso
+    que fazia a galeria de produção mostrar cards com texto e sem arte.
+    """
+    sha = (fr.get("bg_sha") or "").strip().lower()
+    rel = (fr.get("bg") or "").strip()
+    local = os.path.join(VAULT, rel) if rel and not os.path.isabs(rel) else rel
+    tem_local = bool(rel) and os.path.isfile(local)
+
+    if for_export:
+        if tem_local:
+            return {"bg": rel}
+        if sha:
+            cam = _blob_para_arquivo(sha)
+            if cam:
+                return {"bg": cam}
+        return {"placeholder": True}
+
+    if sha:
+        return {"bg_url": "/bg/%s.jpg" % sha}
+    if tem_local:
+        return {"bg_url": "/" + urllib.parse.quote(rel)}
+    return {"placeholder": True}
+
+
+def _blob_para_arquivo(sha):
+    """Baixa um blob do Postgres pra um arquivo temporário (export precisa de path)."""
+    import _db
+    cam = os.path.join(tempfile.gettempdir(), "smark-bg-%s.jpg" % sha[:16])
+    if os.path.isfile(cam) and os.path.getsize(cam) > 0:
+        return cam
+    try:
+        b = _db.blob_get(sha)
+    except Exception:
+        return ""
+    if not b:
+        return ""
+    with open(cam, "wb") as f:
+        f.write(b["bytes"])
+    return cam
+
+
 def frame_kwargs(fr, size, for_export, marca="smark"):
     """Traduz um frame do editor.json nos kwargs do compose_html.
     for_export=True embute a imagem (base64, render headless); False usa URL estática (preview leve).
@@ -2783,11 +2834,8 @@ def frame_kwargs(fr, size, for_export, marca="smark"):
         k["bright"] = fr.get("bright") or fr["accent"]
 
     mode = fr.get("bgmode", "imagem")
-    if mode == "imagem" and fr.get("bg"):
-        if for_export:
-            k["bg"] = fr["bg"]
-        else:
-            k["bg_url"] = "/" + urllib.parse.quote(fr["bg"])
+    if mode == "imagem" and (fr.get("bg") or fr.get("bg_sha")):
+        k.update(_resolver_fundo(fr, for_export))
     elif mode == "cor":
         k["base"] = fr.get("cor") or ""
     elif mode == "degrade":  # degradê claro TINGIDO pela marca
@@ -2912,7 +2960,7 @@ class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
 
-    def _send(self, code, body, ctype="application/json"):
+    def _send(self, code, body, ctype="application/json", cache="no-store", extra=None):
         if isinstance(body, (dict, list)):
             body = json.dumps(body, ensure_ascii=False)
         if isinstance(body, str):
@@ -2920,9 +2968,44 @@ class H(http.server.BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
+        self.send_header("Cache-Control", cache)
+        for k, v in (extra or {}).items():
+            self.send_header(k, v)
         self.end_headers()
         self.wfile.write(body)
+
+    def _serve_blob(self, path):
+        """GET /bg/<sha>.jpg e /arte/<sha>.jpg — imagens vindas do Postgres.
+
+        Público de propósito: o iframe do preview, a vitrine do cliente e o
+        Instagram (que baixa a imagem pelos servidores da Meta) precisam buscar
+        isso sem token. O sha256 no caminho já é a credencial — não dá pra
+        adivinhar, e o conteúdo é imutável, então cacheia pra sempre.
+        """
+        sha = os.path.basename(path).split(".")[0].strip().lower()
+        if not re.fullmatch(r"[0-9a-f]{16,64}", sha or ""):
+            return self._send(404, {"erro": "sha inválido"})
+        import _db
+        hit = _BLOB_CACHE.get(sha)
+        if hit is None:
+            try:
+                hit = _db.blob_get(sha)
+            except Exception as e:
+                return self._send(503, {"erro": f"blob: {e}"})
+            if not hit:
+                return self._send(404, {"erro": "não encontrado"})
+            if len(_BLOB_CACHE) > 60:
+                _BLOB_CACHE.clear()
+            _BLOB_CACHE[sha] = hit
+        etag = '"%s"' % sha
+        if (self.headers.get("If-None-Match") or "") == etag:
+            self.send_response(304)
+            self.send_header("ETag", etag)
+            self.end_headers()
+            return
+        return self._send(200, hit["bytes"], hit["mime"] or "image/jpeg",
+                          cache="public, max-age=31536000, immutable",
+                          extra={"ETag": etag, "Access-Control-Allow-Origin": "*"})
 
     def _body(self):
         n = int(self.headers.get("Content-Length", 0))
@@ -3032,6 +3115,8 @@ class H(http.server.BaseHTTPRequestHandler):
         path = urllib.parse.urlparse(self.path).path
         if not self._host_ok():  # bloqueia DNS rebinding
             return self._send(403, {"erro": "host não permitido"})
+        if path.startswith("/bg/") or path.startswith("/arte/"):
+            return self._serve_blob(path)
         if path in ("/", "/menu"):
             return self._send(200, HUB, MIME[".html"])
         if path == "/editor":
