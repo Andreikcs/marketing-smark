@@ -162,7 +162,7 @@ python3 scripts/migrate_to_db.py            # com DATABASE_PUBLIC_URL
 4. **Logos** provider-max / elever-ai / covatti sem arquivo de brasão.
 5. ~~**Publish Instagram** depende de URL pública HTTPS da arte~~ — a URL existe: `/arte/<sha>.jpg`. Falta ligar no fluxo de publish.
 6. **App Review Meta** pendente para clientes externos.
-7. **Sem:** agendamento, portal de aprovação do cliente, worker de publish.
+7. **Sem:** ~~fluxo de aprovação~~ (**FEITO**, ver 6-ter), portal do cliente, worker de publish (a fila já existe: `/agenda` e `_db.posts_vencidos()`).
 8. ~~**Deploy frágil**~~ — **RESOLVIDO** com `.railwayignore`; `railway up` da raiz funciona.
 9. **Local 8765** às vezes lento no boot (sync PG público).
 
@@ -228,6 +228,64 @@ Ocupação: ~14 MB no Postgres (vindos de 152 MB de PNG).
 
 ---
 
+## 6-ter. Fluxo de aprovação (2026-07-29, tarde) — ligado ponta a ponta
+
+Antes: `_db.py` já tinha vocabulário, tabela `post_evento` e colunas de agenda,
+**sem uma única referência** no `editor_server.py`. Código morto. Agora está
+ligado, com 39 testes em `scripts/tests/test_fluxo_status.py`.
+
+### A máquina
+
+`rascunho → salvo → revisao → (ajuste) → aprovado → agendado → publicado`, mais
+`erro`. `salvo` entrou na máquina porque ~40 posts do vault já tinham esse valor.
+Os botões saem de `TRANSICOES` — o que não pode acontecer não aparece na tela.
+
+### Onde mexe
+
+- **Servidor:** `mudar_status_post()`, `POST /post-status`, `GET /post-eventos`,
+  `GET /agenda` (fila com `vencido`), `merge_fluxo()`.
+- **Painel:** pilha de status no card, bloco "Situação" no modal do post
+  (`#mflow`), agendar com data/hora, "ver histórico", filtro por status.
+- **Editor:** pílula `#bstatus` com menu, e editar derruba a aprovação.
+
+### As cinco armadilhas que apareceram (todas com teste)
+
+1. **`CREATE INDEX` antes do `ALTER TABLE`** — em banco que já existe, a tabela
+   não é recriada, o índice sobre coluna inexistente falha e **aborta o lote
+   todo**, inclusive os ALTERs. A migração parecia rodar e não aplicava nada.
+2. **`_agora_iso()` sombreado** — havia um homônimo devolvendo hora local **sem
+   fuso**; `/agenda` comparava réguas diferentes e errava por 3 h. Virou
+   `_agora_utc()`.
+3. **Aprovação sumindo no boot** — o batch upsert (48 posts numa transação)
+   levava lock timeout, o savepoint desfazia o post, e como o boot reconstrói o
+   `editor.json` a partir do banco, o "aprovado" voltava pra "Pronto" no dia
+   seguinte. Hoje quem grava status é `_db.aplicar_status()`: uma linha, uma
+   tabela, síncrono, com 3 tentativas e `lock_timeout` de 4 s. Se o banco recusar,
+   a resposta traz `aviso` e a tela diz "só no arquivo — o banco recusou".
+4. **Aba velha desfazendo aprovação** — `/salvar` manda o `editor.json` inteiro
+   a partir do `D` que a aba carregou. Uma aba parada devolvia todos os posts ao
+   estado de uma hora atrás. Agora `merge_fluxo()` **ignora status e campos de
+   fluxo** vindos do `/salvar`, sem exceção; quem edita de verdade chama
+   `/post-status` (é o `markDraft` do editor) e fica evento na trilha.
+5. **Batch mandando 48 posts a cada tecla** — `normaliza()` reestampa
+   `updated_at` em todos os posts a cada save, então tudo parecia alterado. O
+   flush agora manda só o que mudou de conteúdo (`_so_o_que_mudou`, hash sem
+   `status`/`updated_at`), o boot já marca o snapshot como enviado, e o
+   `_ensure_marca_cur` faz `SELECT` antes de escrever. Medido: 48 → 2 posts por
+   flush, sem lock timeout.
+
+### O que ficou sabido e não foi mexido
+
+- `normaliza()` estampa `updated_at` em **todos** os posts a cada save, então o
+  "Mais recentes" do painel ordena por nada — todos os cards dizem "agora".
+  Consertar muda ordenação visível; é decisão de produto.
+- 4 erros de console pré-existentes no editor (`<circle> attribute r: "7/"` etc.)
+  — bug de template em SVG, cosmético.
+- Contenção residual no Postgres vem de **dois escritores** (Mac + app no
+  Railway) na mesma base. As defesas acima absorvem; a causa segue de pé.
+
+---
+
 ## 7. Plano de ação (apresentado; **NÃO implementado** — aguarda aprovação)
 
 Documento de intenção do usuário: fluxo ponta a ponta sem erro + agenda + vitrine para cliente.
@@ -240,9 +298,10 @@ Documento de intenção do usuário: fluxo ponta a ponta sem erro + agenda + vit
 - CI e2e
 
 ### Fase 1 — Operação interna (4–6 d)
-- Status workflow: rascunho → revisão → aprovado → agendado → publicado
-- Publish IG estável + log
-- Painel por status/marca
+- ~~Status workflow: rascunho → revisão → aprovado → agendado → publicado~~ **FEITO 2026-07-29** (seção 6-ter)
+- ~~Painel por status/marca~~ **FEITO** (pílula no card + filtro por status)
+- Publish IG estável + log — **falta**; a fila já existe em `/agenda` e
+  `_db.posts_vencidos()`, falta o worker que consome
 
 ### Fase 2 — Portal cliente / vitrine (6–9 d)
 - Link mágico por marca `/c/<token>`
@@ -290,6 +349,11 @@ Documento de intenção do usuário: fluxo ponta a ponta sem erro + agenda + vit
 4. Após mudar posts/artes: `python3 scripts/regen_thumbs_hq.py` e redeploy slim com `.thumbs/`.
 5. Dados sagrados: não apagar `editor.json` sem backup; não `DELETE` em massa no PG.
 6. Se usuário pedir portal/agenda: revalidar plano da seção 7 e **esperar aprovação explícita** se ainda não houver.
+7. **Status de post só muda por `POST /post-status`.** Não escreva `status`,
+   `agendado_para`, `aprovado_em/por` ou `publicado_em` por `/salvar` nem pelo
+   batch — `merge_fluxo()` e o `_upsert_post_cur` os ignoram de propósito
+   (seção 6-ter, armadilhas 3 e 4). Quem burlar isso reabre a perda silenciosa
+   de aprovação.
 
 ### Comandos de saúde rápida
 
@@ -297,6 +361,8 @@ Documento de intenção do usuário: fluxo ponta a ponta sem erro + agenda + vit
 curl -sS https://smark-studio-production.up.railway.app/db-status?json=1 | python3 -m json.tool
 curl -sS https://smark-studio-production.up.railway.app/dados | python3 -c "import sys,json;d=json.load(sys.stdin);print(len(d['posts']), sum(1 for p in d['posts'] if p.get('thumb')))"
 python3 scripts/tests/test_e2e_preview_flow.py
+python3 -m pytest scripts/tests/ -q            # 74 testes, ~55 s
+curl -sS localhost:8765/agenda | python3 -m json.tool     # fila de agendados
 ```
 
 ---

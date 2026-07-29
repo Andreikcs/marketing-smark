@@ -16,3 +16,8 @@ __pycache__/
 
 # artefatos do Playwright MCP (screenshots/logs de verificação)
 .playwright-mcp/
+
+# temporários do compositor: um arquivo por passada de arte, 2-26 MB cada.
+# Estavam sendo commitados pelo autosave (41 MB em 10 arquivos) — o repo crescia
+# a cada arte gerada.
+.compositor.tmp.*
