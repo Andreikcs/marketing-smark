@@ -156,15 +156,75 @@ python3 scripts/migrate_to_db.py            # com DATABASE_PUBLIC_URL
 
 ## 6. Problemas ainda abertos
 
-1. **Produção sem artes full** — estúdio em Railway não tem `_regen/*.png`; só thumbs/preview mesh.
-2. **Storage externo** (R2/S3) não implementado — necessário para imagem nítida em prod e publish IG.
-3. **1 PNG missing:** `construir-em-volta-nao-trocar`.
+1. ~~**Produção sem artes full**~~ — **RESOLVIDO** (2026-07-29), ver seção 6-bis.
+2. ~~**Storage externo**~~ — **RESOLVIDO** via `arte_blob` no Postgres.
+3. ~~**1 PNG missing:** `construir-em-volta-nao-trocar`~~ — degrada pro mesh da marca, sem card vazio. O PNG original segue perdido.
 4. **Logos** provider-max / elever-ai / covatti sem arquivo de brasão.
-5. **Publish Instagram** codificado mas depende de URL pública HTTPS da arte.
+5. ~~**Publish Instagram** depende de URL pública HTTPS da arte~~ — a URL existe: `/arte/<sha>.jpg`. Falta ligar no fluxo de publish.
 6. **App Review Meta** pendente para clientes externos.
 7. **Sem:** agendamento, portal de aprovação do cliente, worker de publish.
-8. **Deploy frágil:** `railway up` da raiz estoura limite; processo manual de pacote slim.
+8. ~~**Deploy frágil**~~ — **RESOLVIDO** com `.railwayignore`; `railway up` da raiz funciona.
 9. **Local 8765** às vezes lento no boot (sync PG público).
+
+---
+
+## 6-bis. Artes no Postgres (2026-07-29) — como a galeria funciona hoje
+
+### O bug que existia
+
+`editor_server.py` montava o fundo do preview como caminho de arquivo:
+`background-image:url(/marcas/.../\_regen/01-xxxx.png)`. Esses PNGs **não vão pro
+Railway** (`.dockerignore` corta `marcas/**/publicacoes/**` por causa do limite de
+upload). Em produção davam 404 — mas o `/preview` respondia **200**, então o
+fallback da galeria nunca disparava. Resultado: cards com texto e moldura, sem arte.
+Parecia perda de dados; não era. Nenhum post foi perdido em momento algum.
+
+### A solução
+
+Imagem virou dado do banco, endereçada por conteúdo:
+
+```
+Mac (masters full PNG em marcas/**/_regen/)
+      │  python3 scripts/push_artes.py
+      ▼
+Postgres · tabela arte_blob (sha256 → bytes)
+      ├─ kind='bg'    JPEG web  máx 1440px q85   (fundo)
+      └─ kind='final' JPEG 1080x1350 q92         (a arte que vai pro Instagram)
+      ▼
+GET /bg/<sha>.jpg   ·   GET /arte/<sha>.jpg
+   públicos (a Meta baixa a imagem pelos servidores dela),
+   Cache-Control immutable + ETag + cache em memória
+```
+
+Os frames ganharam 4 campos, que viajam no `payload` JSONB e sobrevivem ao
+round-trip do banco: `bg_sha`, `bg_src_sha`, `arte_sha`, `arte_src_sha`
+(os `_src_sha` são chave de cache — sem mudança, não recomprime nem re-renderiza).
+
+### Ordem de resolução do fundo (`_resolver_fundo`)
+
+`bg_sha` → arquivo local → **mesh da marca**. Nunca URL quebrada. É essa última
+regra que impede o bug de voltar.
+
+### Ordem da galeria/vitrine
+
+`arte_sha` (`<img>` ~170KB) → preview ao vivo (post recém-editado) → thumb JPEG →
+placeholder. Trocar o iframe de 1080px por uma `<img>` deixou a galeria bem mais
+rápida e nítida.
+
+### Rotina de trabalho
+
+```bash
+# depois de gerar/editar artes no Mac:
+python3 scripts/push_artes.py            # só o que mudou
+python3 scripts/push_artes.py --only <marca-ou-slug>
+python3 scripts/push_artes.py --dry-run  # o que faria
+railway up --detach                      # da RAIZ; .railwayignore cuida do peso
+```
+
+`scripts/tests/test_artes_blob.py` trava a regressão: varre o `editor.json`
+inteiro e falha se qualquer frame apontar pra arquivo que não existe.
+
+Ocupação: ~14 MB no Postgres (vindos de 152 MB de PNG).
 
 ---
 

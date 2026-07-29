@@ -1,0 +1,39 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - link "smark." [ref=f1e3] [cursor=pointer]:
+      - /url: /
+    - link "Painel" [ref=f1e9] [cursor=pointer]:
+      - /url: /painel
+    - link "Vitrine" [ref=f1e10] [cursor=pointer]:
+      - /url: /vitrine
+    - link "Config" [ref=f1e11] [cursor=pointer]:
+      - /url: /config
+    - link "Status" [ref=f1e12] [cursor=pointer]:
+      - /url: /db-status
+    - link "Editor" [ref=f1e13] [cursor=pointer]:
+      - /url: /editor
+    - button "Mudar para tema claro" [ref=f1e14] [cursor=pointer]: ◑
+    - link "✎ Abrir editor" [ref=f1e15] [cursor=pointer]:
+      - /url: /editor
+  - button "Buscar ⌘K" [ref=f1e16] [cursor=pointer]:
+    - text: Buscar
+    - generic [ref=f1e17]: ⌘K
+  - generic [ref=f1e18]:
+    - generic [ref=f1e19]:
+      - generic [ref=f1e21]:
+        - generic [ref=f1e25]: smark.
+        - generic [ref=f1e26]: STORE
+      - generic [ref=f1e27]:
+        - button "🗑 Excluir selecionados" [ref=f1e28] [cursor=pointer]
+        - link "＋ Novo post" [ref=f1e29] [cursor=pointer]:
+          - /url: /editor
+    - generic [ref=f1e31]:
+      - textbox "Buscar título ou marca…" [ref=f1e32]
+      - combobox "Layout" [ref=f1e33]:
+        - option "Cards" [selected]
+        - option "Mosaico · 3 colunas"
+      - combobox "Ordem" [ref=f1e34]:
+        - option "Mais recentes" [selected]
+        - option "Mais antigos"
+        - option "A–Z"
+      - button "Filtros" [ref=f1e35] [cursor=pointer]
