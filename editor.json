@@ -1,15 +1,17 @@
 {
   "posts": [
     {
+      "size": "1080x1350",
       "slug": "e2e-db-preserve",
       "marca": "smark",
-      "titulo": "Preserve",
-      "caption": "legenda e2e",
-      "size": "1080x1350",
-      "status": "rascunho",
+      "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
       "canais": [
         "instagram"
       ],
+      "status": "rascunho",
+      "titulo": "Preserve",
+      "caption": "legenda e2e",
+      "arte_sha": "6f46557aeadba95776e73d0bdde444d6b004ac371a4bf9cab76a1e6cb7c80929",
       "frames": [
         {
           "n": 1,
@@ -17,14 +19,12 @@
           "cta": "cta",
           "sub": "sub",
           "tema": "claro",
-          "headline": "H1 *x*",
           "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
           "arte_sha": "6f46557aeadba95776e73d0bdde444d6b004ac371a4bf9cab76a1e6cb7c80929",
+          "headline": "H1 *x*",
           "arte_src_sha": "1a386b1bfc26f056e226ceb03ea2598855abe5fca57ba0c0989b888c3c990528"
         }
-      ],
-      "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
-      "arte_sha": "6f46557aeadba95776e73d0bdde444d6b004ac371a4bf9cab76a1e6cb7c80929"
+      ]
     },
     {
       "roi": {
@@ -44,6 +44,7 @@
       "status": "salvo",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "5702a8667ec30c77417b162cc0bf0efd277d8fd8f16cd0fda9078fc9c2dc8159",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -62,17 +63,16 @@
           "hsize": 0,
           "thumb": ".thumbs/elever-ai__novo-post.jpg",
           "accent": "",
+          "bg_sha": "81a95cdf5298343924ed9d8c3445763c8d2b4a150384ea62dfb2eb91789e1ba2",
           "bgmode": "imagem",
           "overlay": "branco",
-          "headline": "CRM DE IA |para {#8b3cf7:lojas de móveis}",
-          "overlay_op": 1,
-          "bg_sha": "81a95cdf5298343924ed9d8c3445763c8d2b4a150384ea62dfb2eb91789e1ba2",
-          "bg_src_sha": "bf5c8ffb68e4266f40536590aa9eae23b8a7968c64eb948ee3e97a21ff317528",
           "arte_sha": "5702a8667ec30c77417b162cc0bf0efd277d8fd8f16cd0fda9078fc9c2dc8159",
+          "headline": "CRM DE IA |para {#8b3cf7:lojas de móveis}",
+          "bg_src_sha": "bf5c8ffb68e4266f40536590aa9eae23b8a7968c64eb948ee3e97a21ff317528",
+          "overlay_op": 1,
           "arte_src_sha": "88351e9c609c3b6e5a6c23ba6640b7873895cee27ad475db2214c3c93514550f"
         }
-      ],
-      "arte_sha": "5702a8667ec30c77417b162cc0bf0efd277d8fd8f16cd0fda9078fc9c2dc8159"
+      ]
     },
     {
       "roi": {
@@ -92,6 +92,7 @@
       "status": "rascunho",
       "titulo": "XXXx",
       "caption": "",
+      "arte_sha": "fe0167d67c5343144bfedf437537d99e0bea605965249bae70cfd7f0b86560ba",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -111,17 +112,16 @@
           "hsize": 0,
           "thumb": ".thumbs/smark__xxxx.jpg",
           "accent": "",
+          "bg_sha": "78ef013bf37770c026c5617c91065b642c159a45e47a4b1d5e4a51c1d90d87a7",
           "bgmode": "imagem",
           "overlay": "branco",
+          "arte_sha": "fe0167d67c5343144bfedf437537d99e0bea605965249bae70cfd7f0b86560ba",
           "contexto": "grandes lendas do futebol comerando ajuse para ficar somente os dois jogadores ",
           "headline": "SEU TÍTULO|*AQUI.*",
-          "bg_sha": "78ef013bf37770c026c5617c91065b642c159a45e47a4b1d5e4a51c1d90d87a7",
           "bg_src_sha": "ce85208a1c8bf6d5b5c0cfb78bec57430f3eba5cf66022e2eae61ca9b4457485",
-          "arte_sha": "fe0167d67c5343144bfedf437537d99e0bea605965249bae70cfd7f0b86560ba",
           "arte_src_sha": "0a88d1f02f242354e2cd70e9434411702ec888add8b9645d896f6b864c5c4c86"
         }
-      ],
-      "arte_sha": "fe0167d67c5343144bfedf437537d99e0bea605965249bae70cfd7f0b86560ba"
+      ]
     },
     {
       "roi": {
@@ -141,6 +141,7 @@
       "status": "rascunho",
       "titulo": "ELEVER CRM",
       "caption": "",
+      "arte_sha": "f5cd873e0841e19706e62c86ab1bc53de7b200a979cbf1abdf08d9d9e3a36c93",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -160,17 +161,16 @@
           "hsize": 0,
           "thumb": ".thumbs/elever-ai__elever-crm.jpg",
           "accent": "",
+          "bg_sha": "8695abcc383c5e1c0b1f339955c0a4ac7e8a52440ecef72c313ef0c5eae34dc6",
           "bgmode": "imagem",
           "brilho": 0.55,
           "overlay": "branco",
-          "headline": "Sistemas de IA com Velocidade ",
-          "bg_sha": "8695abcc383c5e1c0b1f339955c0a4ac7e8a52440ecef72c313ef0c5eae34dc6",
-          "bg_src_sha": "5771567d98557b68ce6e3bb4d001e1469c0e8b7555fa2ffadb1d8318c6a081a7",
           "arte_sha": "f5cd873e0841e19706e62c86ab1bc53de7b200a979cbf1abdf08d9d9e3a36c93",
+          "headline": "Sistemas de IA com Velocidade ",
+          "bg_src_sha": "5771567d98557b68ce6e3bb4d001e1469c0e8b7555fa2ffadb1d8318c6a081a7",
           "arte_src_sha": "5b85bc02496b0a9a6091038453346b9c66fb5034a526bbef12c8e46b5d72366a"
         }
-      ],
-      "arte_sha": "f5cd873e0841e19706e62c86ab1bc53de7b200a979cbf1abdf08d9d9e3a36c93"
+      ]
     },
     {
       "roi": {
@@ -190,6 +190,7 @@
       "status": "rascunho",
       "titulo": "teste unit",
       "caption": "cap",
+      "arte_sha": "18d81871698b31acb4b00f077b8774c58098fa461781ccd23f535a854bbb2146",
       "created_at": "2026-07-29T03:51:13",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -202,12 +203,11 @@
           "page": "",
           "tema": "claro",
           "thumb": ".thumbs/smark__test-sync-perf-unit.jpg",
-          "headline": "H1",
           "arte_sha": "18d81871698b31acb4b00f077b8774c58098fa461781ccd23f535a854bbb2146",
+          "headline": "H1",
           "arte_src_sha": "22cc02a46c78a75b8a8ec3911c186fc3711e657fefe8d6fd8c4c6643b83ebc3c"
         }
-      ],
-      "arte_sha": "18d81871698b31acb4b00f077b8774c58098fa461781ccd23f535a854bbb2146"
+      ]
     },
     {
       "roi": {
@@ -227,6 +227,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d",
       "created_at": "2026-07-29T02:55:08",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -249,12 +250,442 @@
           "bgmode": "claro",
           "footer": true,
           "paleta": "marca",
-          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d",
+          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "b6337f48be86b7dc9af65ab249bf67bffa35ecb0fa1ec4c95355897694cbd37e"
         }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-586b",
+      "marca": "alem-do-olhar-chapeco",
+      "thumb": ".thumbs/alem-do-olhar-chapeco__novo-post-586b.jpg",
+      "canais": [
+        "instagram"
       ],
-      "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d"
+      "status": "rascunho",
+      "titulo": "Novo post",
+      "caption": "",
+      "arte_sha": "ad490ef985c1f36161e11e843c5b79cf46c1e17bb82d92dfbeb211808aaadaad",
+      "created_at": "2026-07-28T02:55:59",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/alem-do-olhar-chapeco/publicacoes/social/instagram/arte/novo-post-586b/01.png",
+          "sub": "",
+          "tab": true,
+          "chip": true,
+          "logo": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/alem-do-olhar-chapeco__novo-post-586b.jpg",
+          "accent": "",
+          "bgmode": "claro",
+          "footer": true,
+          "paleta": "marca",
+          "arte_sha": "ad490ef985c1f36161e11e843c5b79cf46c1e17bb82d92dfbeb211808aaadaad",
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "arte_src_sha": "29ff133dd8dda23c2faa66a69f656943b905162c03a402c9600b2c8ec692e5cc"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "teste-ai",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__teste-ai.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Teste AI",
+      "caption": "",
+      "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-ai/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/smark__teste-ai.jpg",
+          "accent": "",
+          "bgmode": "claro",
+          "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d",
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "arte_src_sha": "b6337f48be86b7dc9af65ab249bf67bffa35ecb0fa1ec4c95355897694cbd37e"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "agencia",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__agencia.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Agencia",
+      "caption": "",
+      "arte_sha": "17e4d15e8dcd625cb362b3fb94055f01982354a1c180cd51553f6875112a3b4d",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "zsfsdfsd",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/agencia/01.png",
+          "sub": "fsdgsdgsdfgdgdf",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/smark__agencia.jpg",
+          "accent": "",
+          "bgmode": "claro",
+          "arte_sha": "17e4d15e8dcd625cb362b3fb94055f01982354a1c180cd51553f6875112a3b4d",
+          "headline": "SEU TÍTULO|*gdgsdfgdfgdf.*",
+          "arte_src_sha": "fd97a62ea0d12457f1ed67e37cc3c163afafbe45ac0eae9a0c0d3c508f893e46"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "demo-bella-massa",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__demo-bella-massa.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "DEMO agência · Restaurante (Bella Massa)",
+      "caption": "Massa fresca todo dia, do jeito da nonna. 🍝\n\nReserva pelo link. Bella Massa — cozinha italiana de bairro.\n\n#restauranteitaliano #massafresca #gastronomia",
+      "arte_sha": "2bde393f1cb4dfa64d405eb6cb0adedcac281a8b158ed7a5b5734bdffbe9435b",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 4,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/_teste-agentes-claro/bg.png",
+          "cor": "",
+          "cta": "RESERVE SUA MESA →",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/demo-bella-massa/01.png",
+          "sub": "Do jeito da nonna — feita de manhã, servida no almoço. Reserva pelo link.",
+          "chip": false,
+          "page": "",
+          "tema": "claro",
+          "zoom": 1.05,
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/smark__demo-bella-massa.jpg",
+          "accent": "#E0562D",
+          "bg_sha": "8af282ee6ce75f54d0afa881342a665e36db90a965090b202027393ca4a1f934",
+          "bgmode": "imagem",
+          "overlay": "none",
+          "arte_sha": "2bde393f1cb4dfa64d405eb6cb0adedcac281a8b158ed7a5b5734bdffbe9435b",
+          "headline": "{#E0562D:Massa fresca\n}todo dia.\n",
+          "bg_src_sha": "133081244d5f87366251b8a8daf4de96a701358f49f299fa2ba73ecfc583a82f",
+          "arte_src_sha": "2adec9cdb200d0438433b201c85bc9915a082dfb37fef8537419605385b64ad1"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas",
+      "marca": "elever-ai",
+      "thumb": ".thumbs/elever-ai__lote-a-dark---concession-rias-revendas-e-lojas-multimarcas.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Concessionária com funcionário de IA",
+      "caption": "Todo dia chega gente perguntando preço, ficha técnica e condições. Um funcionário de IA responde na hora, organiza os interessados e passa pro vendedor só quem está pronto. Menos cliente perdido, mais tempo pra fechar negócio no pátio.\n\n#concessionaria #revenda #funcionariodeia #eleverai",
+      "arte_sha": "efb40457f03c0010bbd174e3cb4d5c5f9f04bb411d5ff53f0b3b7a22d7fe0ccd",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 3,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/_regen/01-7fb9d9.png",
+          "cor": "#F4F2FB",
+          "cta": "Toque no botão abaixo.",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/01.png",
+          "sub": "{#C1A4EA:Um funcionário de IA que responde \nantes que o comprador vá pra outra loja.👇}",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/elever-ai__lote-a-dark---concession-rias-revendas-e-lojas-multimarcas.jpg",
+          "accent": "",
+          "bg_sha": "f100212e969ec20d38311b4dc3112094628d4008f3356da60d9397327da2a64f",
+          "bgmode": "imagem",
+          "ov_pos": 0,
+          "paleta": "secundario",
+          "overlay": "roxo",
+          "arte_sha": "efb40457f03c0010bbd174e3cb4d5c5f9f04bb411d5ff53f0b3b7a22d7fe0ccd",
+          "headline": "{#100D1C:Quantos carros você deixa \nde vender sem perceber?}",
+          "bg_src_sha": "b1cc25d7640f08cf5b00fe2d72f6803c7d36f0e413a275c55aa45d938d9a1917",
+          "overlay_op": 1,
+          "arte_src_sha": "0783be59883a3b6e3eaf9abb00969fb144d11bc674af224c4dc0adb2d67b38f1"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "templates",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__templates.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Templates",
+      "caption": "",
+      "arte_sha": "4c6d32d32fee6ade73bde850ff372857b0a2607eab7f793ce2fbcd9e9b017dc2",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/templates/01.png",
+          "sub": "gsdgd",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/smark__templates.jpg",
+          "accent": "",
+          "bgmode": "claro",
+          "paleta": "lima",
+          "arte_sha": "4c6d32d32fee6ade73bde850ff372857b0a2607eab7f793ce2fbcd9e9b017dc2",
+          "headline": "sdgd",
+          "arte_src_sha": "cb66837fcd3bf5b12cd23c6e2cb3e870939dec133152aadbfb090b4f39e673bb"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "elever-auto",
+      "marca": "elever-ai",
+      "thumb": ".thumbs/elever-ai__elever-auto.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Elever Auto no Piloto Automático",
+      "caption": "Enquanto sua equipe fecha negócio no salão, a Nina cuida das mensagens que chegam a qualquer hora. Ela responde na hora, tira dúvidas e deixa cada contato organizado pra ninguém escapar. Sua loja de carros ou motos rodando sem depender de você o tempo todo.\n\n#lojadecarros #concessionaria #motos #atendimento",
+      "arte_sha": "9442f1eebf43bb143e48ceb0de3e958374cba3e86eb26814d84d598a7a4c163c",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/_regen/01-34c6fc.png",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/01.png",
+          "sub": "A Nina atende, responde, anota e organiza todos os contatos por você.🏆",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/elever-ai__elever-auto.jpg",
+          "accent": "",
+          "bg_sha": "91436db40138a991eee391264247a8b9be48da4a6edc0e7ba0701b6e40003b88",
+          "bgmode": "imagem",
+          "arte_sha": "9442f1eebf43bb143e48ceb0de3e958374cba3e86eb26814d84d598a7a4c163c",
+          "headline": "Sua loja de carros ou motos|no *piloto automático*",
+          "bg_src_sha": "8800343b466d440aedd797e00886d731aca7b2b9a4e322442ae6b3a04de3abf3",
+          "arte_src_sha": "f96bc3bb656119d04259f661f91e551ed50c14f31742ecdf7211a64d20bca4ea"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-d658",
+      "marca": "deatec",
+      "thumb": ".thumbs/deatec__novo-post-d658.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "TechWine 2026 — brinde à tecnologia",
+      "caption": "O TechWine 2026 juntou quem faz tecnologia acontecer aqui na região. Uma noite pra conversar, aprender e brindar as parcerias que a gente constrói todo dia. Obrigado a todo mundo que esteve com a gente.\n\n#Deatec #TechWine2026 #Chapecó #ACATE",
+      "arte_sha": "8a7a1cf83ad2b158a3dfb3b8260ca491b2c1eff8dc0f933cb8590e35cdfe1ca1",
+      "created_at": "2026-07-28T00:17:13",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/deatec/publicacoes/social/instagram/arte/novo-post-d658/_regen/01-f1ae90.png",
+          "cor": "#F4F2FB",
+          "cta": "seja um associado",
+          "out": "marcas/deatec/publicacoes/social/instagram/arte/novo-post-d658/01.png",
+          "sub": "{#FFFFFF:Uma noite incrível que reuniu mentes brilhantes \npara comemorar.}",
+          "chip": false,
+          "page": "",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/deatec__novo-post-d658.jpg",
+          "accent": "",
+          "bg_sha": "822d6175b46bb69ec5bb19d15ae5cf23b73410a9cc29d0d61af389f71dc36d43",
+          "bgmode": "imagem",
+          "ov_ang": 190,
+          "ov_pos": 50,
+          "paleta": "secundario",
+          "bg_tier": "final",
+          "overlay": "branco",
+          "arte_sha": "8a7a1cf83ad2b158a3dfb3b8260ca491b2c1eff8dc0f933cb8590e35cdfe1ca1",
+          "headline": "TechWine 2026|foi um *{#C6EB0F:brinde}*|à tecnologia",
+          "bg_modelo": "google/gemini-3-pro-image",
+          "bg_src_sha": "9dcaa25d43f8d27323e7624a52175e2fd6777a627f435cdfb95d353c24b5364f",
+          "bg_usd_brl": 5.12546,
+          "overlay_op": 1,
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "arte_src_sha": "0e9610b5993fdf2d4cd9a0f8a483d43bb5d0e447a551a63a3d7dbf251b4d4d91",
+          "bg_custo_brl": 1.2451,
+          "bg_custo_usd": 0.242924,
+          "bg_publicavel": true
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "lote-a-dark---provedor",
+      "marca": "provider-max",
+      "thumb": ".thumbs/provider-max__lote-a-dark---provedor.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Clientes que ssomem sem aviso",
+      "caption": "Todo dia um cliente manda mensagem e ninguém responde a tempo. Ele espera, cansa e vai embora calado. A Clara, funcionária de IA pra provedores, atende na hora e mantém cada conversa viva. Faça o diagnóstico gratuito e veja quantas conversas você está deixando escapar.\n\n#provedor #internet #atendimento #gestao",
+      "arte_sha": "e448057676e6d2e449527bd7385972827fa3189ff4b1ebc0d7edf081548fc374",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 2,
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/lote-a-dark---provedor/_regen/01-40d3cf.png",
+          "cor": "#F4F2FB",
+          "cta": "Toque no botão abaixo",
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-a-dark---provedor/01.png",
+          "sub": "{#FFFFFF:Clara, a funcionária de IA que faz upgrade de plano e renegocia fidelidade antes do seu cliente cancelar. 👇}",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/provider-max__lote-a-dark---provedor.jpg",
+          "accent": "",
+          "bg_sha": "5cb48d4b3c6e4fad7c4052dff900f17fd384668908b1107e39cdbfb4f8601fdd",
+          "bgmode": "imagem",
+          "ov_ang": 175,
+          "ov_pos": 28,
+          "paleta": "roxo",
+          "overlay": "roxo",
+          "arte_sha": "e448057676e6d2e449527bd7385972827fa3189ff4b1ebc0d7edf081548fc374",
+          "headline": "{#FFFFFF:Upgrade e renovação \nno automático  24/7.}",
+          "bg_src_sha": "1525e91a66db03353eedece4144e06985994bdefa46eb5b656ec47e96117db1d",
+          "overlay_op": 0.9,
+          "arte_src_sha": "5b87541819c5023b10e82f5eaa308de86c3de508e86ac2fb711e34e8f94c4e54"
+        }
+      ]
     },
     {
       "roi": {
@@ -274,6 +705,7 @@
       "status": "rascunho",
       "titulo": "Lançamento hidratante — pele macia no inverno",
       "caption": "O inverno resseca a pele e você sente a diferença todo dia. Por isso lançamos nosso novo hidratante, feito pra manter sua pele macia mesmo no frio. Passe a mão e sinta a diferença. Vem conhecer.\n\n#cuidadocomapele #hidratante #peleMacia #inverno",
+      "arte_sha": "e1cb47909723c2ed47c95cf3b454bd7f213f2a173dbda6916c128105b4c3a81a",
       "created_at": "2026-07-28T02:47:00",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -294,223 +726,26 @@
           "hsize": 0,
           "thumb": ".thumbs/alem-do-olhar-chapeco__novo-post-e794.jpg",
           "accent": "",
+          "bg_sha": "2eea3523453755c31879f951ba11f08cd252ec532ea2943c9c4713c355c08d93",
           "bgmode": "imagem",
           "footer": true,
           "paleta": "secundario",
           "bg_seed": 683750702,
           "bg_tier": "rascunho",
+          "arte_sha": "e1cb47909723c2ed47c95cf3b454bd7f213f2a173dbda6916c128105b4c3a81a",
           "headline": "Pele *macia*|mesmo no inverno",
           "bg_modelo": "bytedance-seed/seedream-4.5",
+          "bg_src_sha": "2ad88d07119f953bf310de5355984e7d5d0167640408ae7eec986176e280c78d",
           "bg_usd_brl": 5.1286,
           "bg_provider": "openrouter",
           "bg_suplente": false,
+          "arte_src_sha": "4734f8d7e06117f63c438ce5bdadc00f0f814ff3819edaa5a34904ed446a2417",
           "bg_custo_brl": 0.2051,
           "bg_custo_usd": 0.04,
           "bg_publicavel": false,
-          "bg_gate_falhou": true,
-          "bg_sha": "2eea3523453755c31879f951ba11f08cd252ec532ea2943c9c4713c355c08d93",
-          "bg_src_sha": "2ad88d07119f953bf310de5355984e7d5d0167640408ae7eec986176e280c78d",
-          "arte_sha": "e1cb47909723c2ed47c95cf3b454bd7f213f2a173dbda6916c128105b4c3a81a",
-          "arte_src_sha": "4734f8d7e06117f63c438ce5bdadc00f0f814ff3819edaa5a34904ed446a2417"
+          "bg_gate_falhou": true
         }
-      ],
-      "arte_sha": "e1cb47909723c2ed47c95cf3b454bd7f213f2a173dbda6916c128105b4c3a81a"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "agencia",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__agencia.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Agencia",
-      "caption": "",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "zsfsdfsd",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/agencia/01.png",
-          "sub": "fsdgsdgsdfgdgdf",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__agencia.jpg",
-          "accent": "",
-          "bgmode": "claro",
-          "headline": "SEU TÍTULO|*gdgsdfgdfgdf.*",
-          "arte_sha": "17e4d15e8dcd625cb362b3fb94055f01982354a1c180cd51553f6875112a3b4d",
-          "arte_src_sha": "fd97a62ea0d12457f1ed67e37cc3c163afafbe45ac0eae9a0c0d3c508f893e46"
-        }
-      ],
-      "arte_sha": "17e4d15e8dcd625cb362b3fb94055f01982354a1c180cd51553f6875112a3b4d"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "demo-bella-massa",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__demo-bella-massa.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "DEMO agência · Restaurante (Bella Massa)",
-      "caption": "Massa fresca todo dia, do jeito da nonna. 🍝\n\nReserva pelo link. Bella Massa — cozinha italiana de bairro.\n\n#restauranteitaliano #massafresca #gastronomia",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 4,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/_teste-agentes-claro/bg.png",
-          "cor": "",
-          "cta": "RESERVE SUA MESA →",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/demo-bella-massa/01.png",
-          "sub": "Do jeito da nonna — feita de manhã, servida no almoço. Reserva pelo link.",
-          "chip": false,
-          "page": "",
-          "tema": "claro",
-          "zoom": 1.05,
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__demo-bella-massa.jpg",
-          "accent": "#E0562D",
-          "bgmode": "imagem",
-          "overlay": "none",
-          "headline": "{#E0562D:Massa fresca\n}todo dia.\n",
-          "bg_sha": "8af282ee6ce75f54d0afa881342a665e36db90a965090b202027393ca4a1f934",
-          "bg_src_sha": "133081244d5f87366251b8a8daf4de96a701358f49f299fa2ba73ecfc583a82f",
-          "arte_sha": "2bde393f1cb4dfa64d405eb6cb0adedcac281a8b158ed7a5b5734bdffbe9435b",
-          "arte_src_sha": "2adec9cdb200d0438433b201c85bc9915a082dfb37fef8537419605385b64ad1"
-        }
-      ],
-      "arte_sha": "2bde393f1cb4dfa64d405eb6cb0adedcac281a8b158ed7a5b5734bdffbe9435b"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "elever-auto",
-      "marca": "elever-ai",
-      "thumb": ".thumbs/elever-ai__elever-auto.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "salvo",
-      "titulo": "Elever Auto no Piloto Automático",
-      "caption": "Enquanto sua equipe fecha negócio no salão, a Nina cuida das mensagens que chegam a qualquer hora. Ela responde na hora, tira dúvidas e deixa cada contato organizado pra ninguém escapar. Sua loja de carros ou motos rodando sem depender de você o tempo todo.\n\n#lojadecarros #concessionaria #motos #atendimento",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 1,
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/_regen/01-34c6fc.png",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/01.png",
-          "sub": "A Nina atende, responde, anota e organiza todos os contatos por você.🏆",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/elever-ai__elever-auto.jpg",
-          "accent": "",
-          "bgmode": "imagem",
-          "headline": "Sua loja de carros ou motos|no *piloto automático*",
-          "bg_sha": "91436db40138a991eee391264247a8b9be48da4a6edc0e7ba0701b6e40003b88",
-          "bg_src_sha": "8800343b466d440aedd797e00886d731aca7b2b9a4e322442ae6b3a04de3abf3",
-          "arte_sha": "9442f1eebf43bb143e48ceb0de3e958374cba3e86eb26814d84d598a7a4c163c",
-          "arte_src_sha": "f96bc3bb656119d04259f661f91e551ed50c14f31742ecdf7211a64d20bca4ea"
-        }
-      ],
-      "arte_sha": "9442f1eebf43bb143e48ceb0de3e958374cba3e86eb26814d84d598a7a4c163c"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "novo-post-d658",
-      "marca": "deatec",
-      "thumb": ".thumbs/deatec__novo-post-d658.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "salvo",
-      "titulo": "TechWine 2026 — brinde à tecnologia",
-      "caption": "O TechWine 2026 juntou quem faz tecnologia acontecer aqui na região. Uma noite pra conversar, aprender e brindar as parcerias que a gente constrói todo dia. Obrigado a todo mundo que esteve com a gente.\n\n#Deatec #TechWine2026 #Chapecó #ACATE",
-      "created_at": "2026-07-28T00:17:13",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 1,
-          "bg": "marcas/deatec/publicacoes/social/instagram/arte/novo-post-d658/_regen/01-f1ae90.png",
-          "cor": "#F4F2FB",
-          "cta": "seja um associado",
-          "out": "marcas/deatec/publicacoes/social/instagram/arte/novo-post-d658/01.png",
-          "sub": "{#FFFFFF:Uma noite incrível que reuniu mentes brilhantes \npara comemorar.}",
-          "chip": false,
-          "page": "",
-          "tema": "escuro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/deatec__novo-post-d658.jpg",
-          "accent": "",
-          "bgmode": "imagem",
-          "ov_ang": 190,
-          "ov_pos": 50,
-          "paleta": "secundario",
-          "bg_tier": "final",
-          "overlay": "branco",
-          "headline": "TechWine 2026|foi um *{#C6EB0F:brinde}*|à tecnologia",
-          "bg_modelo": "google/gemini-3-pro-image",
-          "bg_usd_brl": 5.12546,
-          "overlay_op": 1,
-          "bg_provider": "openrouter",
-          "bg_suplente": false,
-          "bg_custo_brl": 1.2451,
-          "bg_custo_usd": 0.242924,
-          "bg_publicavel": true,
-          "bg_sha": "822d6175b46bb69ec5bb19d15ae5cf23b73410a9cc29d0d61af389f71dc36d43",
-          "bg_src_sha": "9dcaa25d43f8d27323e7624a52175e2fd6777a627f435cdfb95d353c24b5364f",
-          "arte_sha": "8a7a1cf83ad2b158a3dfb3b8260ca491b2c1eff8dc0f933cb8590e35cdfe1ca1",
-          "arte_src_sha": "0e9610b5993fdf2d4cd9a0f8a483d43bb5d0e447a551a63a3d7dbf251b4d4d91"
-        }
-      ],
-      "arte_sha": "8a7a1cf83ad2b158a3dfb3b8260ca491b2c1eff8dc0f933cb8590e35cdfe1ca1"
+      ]
     },
     {
       "roi": {
@@ -531,6 +766,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "ebe7cd8504a0722404e7f688de6a884dadb252844f84cb44487cc9f9122a8e50",
       "created_at": "2026-07-28T00:54:38",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -549,12 +785,126 @@
           "thumb": ".thumbs/deatec__novo-post-513c.jpg",
           "accent": "",
           "bgmode": "claro",
-          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_sha": "ebe7cd8504a0722404e7f688de6a884dadb252844f84cb44487cc9f9122a8e50",
+          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "43245cd6dfba6f5dd22e19051f531aa393c5001a65966f1c363dcf1b1642c85a"
         }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "crm-com-ia-para-loja-de-moveis",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__crm-com-ia-para-loja-de-moveis.jpg",
+      "canais": [
+        "instagram"
       ],
-      "arte_sha": "ebe7cd8504a0722404e7f688de6a884dadb252844f84cb44487cc9f9122a8e50"
+      "status": "rascunho",
+      "titulo": "A sala de estar que vira lead",
+      "caption": "A sala de estar integrada com a cozinha é o cartão de visitas do imóvel: transmite espaço, aconchego e movimenta as redes. Só que atenção sozinha não vira nada. A Nina, funcionária de IA da smark, recebe cada pessoa que chega, responde na hora e guarda tudo no lugar certo. Assim o interesse pela foto bonita não esfria no caminho.\n\n#lojademoveis #moveisplanejados #atendimento #gestao",
+      "arte_sha": "c02d187a6c4449160cd7453bd82a086e5f1a7f1a5b03b7331762c8d9d18922c1",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/_regen/01-20cfa8.png",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/01.png",
+          "sub": "O living rende as fotos mais desejadas. Cada visita que chega vira cliente organizado.",
+          "chip": false,
+          "page": "01/02",
+          "tema": "claro",
+          "grade": true,
+          "thumb": ".thumbs/smark__crm-com-ia-para-loja-de-moveis.jpg",
+          "bg_sha": "cc22d98b738b2c83bcf006432bd5c1265b9b942d5db3347eca3d3726f40fab7e",
+          "bgmode": "imagem",
+          "arte_sha": "c02d187a6c4449160cd7453bd82a086e5f1a7f1a5b03b7331762c8d9d18922c1",
+          "headline": "A SALA DE ESTAR|CHAMA. A *NINA* ATENDE",
+          "bg_src_sha": "0e82f6df2c0b7635f060bbf653de906016a1cee3c374444f6190b66b444699fb",
+          "arte_src_sha": "782406d61b7bd3af0e624c3df2e202b1957a828d2c23467f460e39f0d1488ebd"
+        },
+        {
+          "n": 2,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/02.png",
+          "sub": "",
+          "chip": false,
+          "page": "02/02",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "arte_sha": "2a334e8af85ee7af082e73de70ea49eac8e4ce13895719875a8d7786d9e8831f",
+          "headline": "NOVO|*CARD.*",
+          "arte_src_sha": "ea3b2170313492a75b3dc1980a4b69b97bc9e1883b2ee567e3a59925139364f1"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "caz-tv",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__caz-tv.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "CAZé tv",
+      "caption": "",
+      "arte_sha": "16fd0872fb5265c641218629919f69552f1f53439e5947dbdcd4e7168c132ac3",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 4,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/_regen/01-71f94a.png",
+          "cor": "#4419e1",
+          "cta": "Clique e saiba mais",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/01.png",
+          "sub": "**{#e8e8e8:Suspeiras de te}**",
+          "chip": true,
+          "page": "",
+          "posx": 29,
+          "posy": 33,
+          "tema": "claro",
+          "grade": true,
+          "hsize": 95,
+          "thumb": ".thumbs/smark__caz-tv.jpg",
+          "accent": "",
+          "bg_sha": "3fdf11b34535f5c8853702071f5f90ca5c5fa6eb931abf1402eca3fbdc87d29c",
+          "bgmode": "imagem",
+          "handle": "fdfdd",
+          "rodape": "fdfdfd",
+          "overlay": "todo-roxo",
+          "arte_sha": "16fd0872fb5265c641218629919f69552f1f53439e5947dbdcd4e7168c132ac3",
+          "contexto": "Esse está correto e bem embasado. A McKinsey reporta que 62% estão pelo menos experimentando agentes, e 23% já escalam sistemas agênticos em algum lugar. Mais preciso ainda: 23% dos respondentes dizem que suas organizações estão escalando um sistema de IA agêntica, e outros 39% dizem ter começado a experimentar agentes de IA (23% + 39% = 62%). Pode usar com segurança.",
+          "headline": "{#efe9f7:Cazemiro fora da copa 2027?  }",
+          "contraste": 0.45,
+          "bg_src_sha": "e076de072a81104a8d54b4a47fb06d4edf5c99571fad6aad58fce585a3177316",
+          "overlay_op": 0,
+          "arte_src_sha": "b07e6a67c5e6a931c2dd65b43389e9f6d7254f5f3bf44b939d795512676af17d"
+        }
+      ]
     },
     {
       "roi": {
@@ -574,6 +924,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "fff5ea50bba761f4efe92fa9cae124bedbf31d9b63080483a4deaec7e85f5737",
       "created_at": "2026-07-28T01:16:33",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -593,12 +944,11 @@
           "accent": "",
           "bgmode": "imagem",
           "paleta": "marca",
-          "headline": "SEU TÍT{#14238F:ULO|*AQUI.*}",
           "arte_sha": "fff5ea50bba761f4efe92fa9cae124bedbf31d9b63080483a4deaec7e85f5737",
+          "headline": "SEU TÍT{#14238F:ULO|*AQUI.*}",
           "arte_src_sha": "b171e4f2debf044cb4b3d27b0d921a825fa6cd7409cf018ff3e6ceb0336acf09"
         }
-      ],
-      "arte_sha": "fff5ea50bba761f4efe92fa9cae124bedbf31d9b63080483a4deaec7e85f5737"
+      ]
     },
     {
       "roi": {
@@ -618,6 +968,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "4af50aeb04352aceb2c29250a3afef75b954047e1f7fea73cc53e303421d97ee",
       "created_at": "2026-07-28T01:36:52",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -640,12 +991,11 @@
           "bgmode": "claro",
           "footer": true,
           "paleta": "marca",
-          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_sha": "4af50aeb04352aceb2c29250a3afef75b954047e1f7fea73cc53e303421d97ee",
+          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "6ee813c4e0790b7c4ab4443c874835c6e3f4c53a793002b95fa69c393daab616"
         }
-      ],
-      "arte_sha": "4af50aeb04352aceb2c29250a3afef75b954047e1f7fea73cc53e303421d97ee"
+      ]
     },
     {
       "roi": {
@@ -665,6 +1015,7 @@
       "status": "rascunho",
       "titulo": "Sul Contábil",
       "caption": "",
+      "arte_sha": "2e8800850faaf1c36e9e69cc99c736997e963c91a730aed3a2ac1439b5334a28",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -683,12 +1034,11 @@
           "thumb": ".thumbs/sul-contabil__sul-cont-bil.jpg",
           "accent": "",
           "bgmode": "claro",
-          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_sha": "2e8800850faaf1c36e9e69cc99c736997e963c91a730aed3a2ac1439b5334a28",
+          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "be4cd906c3328407f592ee192f2df5a8cdae62f7c6adcc57bd2c3384893781d6"
         }
-      ],
-      "arte_sha": "2e8800850faaf1c36e9e69cc99c736997e963c91a730aed3a2ac1439b5334a28"
+      ]
     },
     {
       "roi": {
@@ -708,6 +1058,7 @@
       "status": "rascunho",
       "titulo": "Teste",
       "caption": "",
+      "arte_sha": "040c2e805de602c168cfa4a8c241712321ea68b3d8a31d94fddd80c2841ce836",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -726,12 +1077,11 @@
           "thumb": ".thumbs/netsul__teste-105a.jpg",
           "accent": "",
           "bgmode": "claro",
-          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_sha": "040c2e805de602c168cfa4a8c241712321ea68b3d8a31d94fddd80c2841ce836",
+          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "4bcd1c6df71b8b47012104d8d8e57cf3885886afa7d5cff25ce8ec0e02f9d222"
         }
-      ],
-      "arte_sha": "040c2e805de602c168cfa4a8c241712321ea68b3d8a31d94fddd80c2841ce836"
+      ]
     },
     {
       "roi": {
@@ -751,6 +1101,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "3bae6f12292c66ee9a880be3b186f854a99cbf059372dc732529ba3691687c08",
       "created_at": "2026-07-29T03:18:17",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -774,13 +1125,12 @@
           "footer": false,
           "paleta": "secundario",
           "overlay": "branco",
+          "arte_sha": "3bae6f12292c66ee9a880be3b186f854a99cbf059372dc732529ba3691687c08",
           "headline": "lokookoko SEU {#100D1C:TÍTULO}|*AQUI.*",
           "overlay_op": 0.2,
-          "arte_sha": "3bae6f12292c66ee9a880be3b186f854a99cbf059372dc732529ba3691687c08",
           "arte_src_sha": "7efda5b0d482997e370dc9a4202caeb68ac40bade1582531e206fbdd347a68e4"
         }
-      ],
-      "arte_sha": "3bae6f12292c66ee9a880be3b186f854a99cbf059372dc732529ba3691687c08"
+      ]
     },
     {
       "roi": {
@@ -800,6 +1150,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "e19cfbdcf908a490475536fbbf9eda8ddbede3f8cb0de1f4722b1bbb177c4f0b",
       "created_at": "2026-07-29T03:18:17",
       "updated_at": "2026-07-29T03:47:02",
       "frames": [
@@ -823,13 +1174,12 @@
           "footer": false,
           "paleta": "secundario",
           "overlay": "branco",
+          "arte_sha": "e19cfbdcf908a490475536fbbf9eda8ddbede3f8cb0de1f4722b1bbb177c4f0b",
           "headline": "lokookoko SEU {#100D1C:TÍTULO}|*AQUI.*",
           "overlay_op": 0.2,
-          "arte_sha": "e19cfbdcf908a490475536fbbf9eda8ddbede3f8cb0de1f4722b1bbb177c4f0b",
           "arte_src_sha": "b40620ce66c4aed9d16cf024a035a3e63b8b7f10df7c1e80119e613b5e5a7d5f"
         }
-      ],
-      "arte_sha": "e19cfbdcf908a490475536fbbf9eda8ddbede3f8cb0de1f4722b1bbb177c4f0b"
+      ]
     },
     {
       "roi": {
@@ -849,6 +1199,7 @@
       "status": "rascunho",
       "titulo": "Virou decisão de gestão — post 2/5",
       "caption": "Quando um movimento sai do grupo dos \"inovadores\" e vira maioria, ele deixa de ser aposta e passa a ser gestão.\n\nOs números de Stanford, McKinsey e Harvard/BCG mostram a mesma coisa por ângulos diferentes: IA na operação não é mais tendência distante — é decisão que empresas sérias já estão tomando.\n\nE repare no ponto que quase ninguém comenta: nenhum desses estudos fala em substituir pessoas. Todos falam em fazer o mesmo time produzir mais e melhor.\n\nA pergunta, então, não é mais \"devo usar IA?\". É \"por onde eu começo?\".\n\nSalva esse post — e quando quiser responder essa pergunta pra sua empresa, o diagnóstico gratuito está no link da bio. 👇\n\n#inteligenciaartificial #gestaoempresarial #produtividade #IAparaempresas #pmesbrasil #tecnologia",
+      "arte_sha": "f9d6989741405eb7227b2b16c6a9479529e01fc5a10f5afa436261149c9a1ac9",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -868,12 +1219,12 @@
           "hsize": 0,
           "thumb": ".thumbs/smark__mercado-virou-a-chave.jpg",
           "accent": "",
+          "bg_sha": "87c659ceb06d288e65830095eb2808ca2e93e3dc05c9f52a704d0987acaea3ba",
           "bgmode": "imagem",
           "overlay": "none",
-          "headline": "{#8B3CF7:78% das empresas\n}\n",
-          "bg_sha": "87c659ceb06d288e65830095eb2808ca2e93e3dc05c9f52a704d0987acaea3ba",
-          "bg_src_sha": "6b633dd6b7254e867e552a6737d2329519a0142c3b30a91109fbf6ff06577a2b",
           "arte_sha": "f9d6989741405eb7227b2b16c6a9479529e01fc5a10f5afa436261149c9a1ac9",
+          "headline": "{#8B3CF7:78% das empresas\n}\n",
+          "bg_src_sha": "6b633dd6b7254e867e552a6737d2329519a0142c3b30a91109fbf6ff06577a2b",
           "arte_src_sha": "65c3a3986697db2b352c7b0528ad81f235346fc4ae60c8d863fdcb2bfaceab56"
         },
         {
@@ -890,13 +1241,13 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
+          "bg_sha": "9c5831ebc528b181da60915635c9db35ac41b2250fb927434ea2f6f49df46056",
           "bgmode": "imagem",
           "handle": "@andreik.schneider",
           "rodape": "@énois",
-          "headline": "*+40% das empresas*",
-          "bg_sha": "9c5831ebc528b181da60915635c9db35ac41b2250fb927434ea2f6f49df46056",
-          "bg_src_sha": "9a64c81ddcdd96a4a7ef6c4253a1875a0581152b13504c4a4e45faf1067e3ce5",
           "arte_sha": "19f1f5c524aef82b0a9881bde154de9144e0567732d6d01054981501188531ef",
+          "headline": "*+40% das empresas*",
+          "bg_src_sha": "9a64c81ddcdd96a4a7ef6c4253a1875a0581152b13504c4a4e45faf1067e3ce5",
           "arte_src_sha": "0aa13d82786e91e39d468511a1926661e75c54bd8f90c5bfb0d74cc4c66c581c"
         },
         {
@@ -912,11 +1263,11 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
-          "bgmode": "imagem",
-          "headline": "NINGUÉM FALA EM|*SUBSTITUIR GENTE.*",
           "bg_sha": "d613bb6ccf88c20083bb3fbed291c7e94aec5057501d7383e550e87b5cacb258",
-          "bg_src_sha": "9838a4f5b331b4451f0e8f2dc7add3c525cd85ab5047b0ff32d54c81acfe969e",
+          "bgmode": "imagem",
           "arte_sha": "f394a9c24790d3a56e644330157b2655dfacd90b97622b2c21e22f5c4480122a",
+          "headline": "NINGUÉM FALA EM|*SUBSTITUIR GENTE.*",
+          "bg_src_sha": "9838a4f5b331b4451f0e8f2dc7add3c525cd85ab5047b0ff32d54c81acfe969e",
           "arte_src_sha": "2250252e05c0e26505cceb0664c3a91d00c15b396019bd64017a62f9ff27bf58"
         },
         {
@@ -932,11 +1283,11 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
-          "bgmode": "imagem",
-          "headline": "ONDE A IA SE|*PAGARIA* PRIMEIRO?",
           "bg_sha": "d613bb6ccf88c20083bb3fbed291c7e94aec5057501d7383e550e87b5cacb258",
-          "bg_src_sha": "9838a4f5b331b4451f0e8f2dc7add3c525cd85ab5047b0ff32d54c81acfe969e",
+          "bgmode": "imagem",
           "arte_sha": "7c3d17caa079ce0628ff3c17d0de6012da61ddae57c549af1d78d1c3ce61fead",
+          "headline": "ONDE A IA SE|*PAGARIA* PRIMEIRO?",
+          "bg_src_sha": "9838a4f5b331b4451f0e8f2dc7add3c525cd85ab5047b0ff32d54c81acfe969e",
           "arte_src_sha": "c6c8968f955b18dac283da56376ea3ef7872118a65af5cc6c144ead7afd90752"
         },
         {
@@ -953,59 +1304,11 @@
           "hsize": 0,
           "accent": "",
           "bgmode": "imagem",
-          "headline": "NOVO|*CARD.*",
           "arte_sha": "2bf12f6a486ff8e58e21f660541ddcf110eef9cedcbdb2911458f8e18548b3a1",
+          "headline": "NOVO|*CARD.*",
           "arte_src_sha": "37c924ff8b385dffb19e484d8113cc99a4cc8e0f7aa7c7f9a2dc2df3230184ca"
         }
-      ],
-      "arte_sha": "f9d6989741405eb7227b2b16c6a9479529e01fc5a10f5afa436261149c9a1ac9"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "novo-post-586b",
-      "marca": "alem-do-olhar-chapeco",
-      "thumb": ".thumbs/alem-do-olhar-chapeco__novo-post-586b.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Novo post",
-      "caption": "",
-      "created_at": "2026-07-28T02:55:59",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/alem-do-olhar-chapeco/publicacoes/social/instagram/arte/novo-post-586b/01.png",
-          "sub": "",
-          "tab": true,
-          "chip": true,
-          "logo": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/alem-do-olhar-chapeco__novo-post-586b.jpg",
-          "accent": "",
-          "bgmode": "claro",
-          "footer": true,
-          "paleta": "marca",
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "arte_sha": "ad490ef985c1f36161e11e843c5b79cf46c1e17bb82d92dfbeb211808aaadaad",
-          "arte_src_sha": "29ff133dd8dda23c2faa66a69f656943b905162c03a402c9600b2c8ec692e5cc"
-        }
-      ],
-      "arte_sha": "ad490ef985c1f36161e11e843c5b79cf46c1e17bb82d92dfbeb211808aaadaad"
+      ]
     },
     {
       "roi": {
@@ -1025,6 +1328,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d",
       "created_at": "2026-07-29T03:34:23",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -1047,12 +1351,11 @@
           "bgmode": "claro",
           "footer": true,
           "paleta": "marca",
-          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d",
+          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "b6337f48be86b7dc9af65ab249bf67bffa35ecb0fa1ec4c95355897694cbd37e"
         }
-      ],
-      "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d"
+      ]
     },
     {
       "roi": {
@@ -1072,6 +1375,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "10103a65784759890497a12f6a0ab6e82d3ac20ee8b7d73007cb8b45b69fd0c6",
       "created_at": "2026-07-29T03:34:23",
       "updated_at": "2026-07-29T03:47:02",
       "frames": [
@@ -1094,113 +1398,11 @@
           "bgmode": "claro",
           "footer": true,
           "paleta": "marca",
-          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_sha": "10103a65784759890497a12f6a0ab6e82d3ac20ee8b7d73007cb8b45b69fd0c6",
+          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "38b25b36ef5f464053961fa8acc32b96c4cad5da3900220d7d86bd450aaed305"
         }
-      ],
-      "arte_sha": "10103a65784759890497a12f6a0ab6e82d3ac20ee8b7d73007cb8b45b69fd0c6"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "lote-a-dark---provedor",
-      "marca": "provider-max",
-      "thumb": ".thumbs/provider-max__lote-a-dark---provedor.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "salvo",
-      "titulo": "Clientes que ssomem sem aviso",
-      "caption": "Todo dia um cliente manda mensagem e ninguém responde a tempo. Ele espera, cansa e vai embora calado. A Clara, funcionária de IA pra provedores, atende na hora e mantém cada conversa viva. Faça o diagnóstico gratuito e veja quantas conversas você está deixando escapar.\n\n#provedor #internet #atendimento #gestao",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 2,
-          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/lote-a-dark---provedor/_regen/01-40d3cf.png",
-          "cor": "#F4F2FB",
-          "cta": "Toque no botão abaixo",
-          "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-a-dark---provedor/01.png",
-          "sub": "{#FFFFFF:Clara, a funcionária de IA que faz upgrade de plano e renegocia fidelidade antes do seu cliente cancelar. 👇}",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/provider-max__lote-a-dark---provedor.jpg",
-          "accent": "",
-          "bgmode": "imagem",
-          "ov_ang": 175,
-          "ov_pos": 28,
-          "paleta": "roxo",
-          "overlay": "roxo",
-          "headline": "{#FFFFFF:Upgrade e renovação \nno automático  24/7.}",
-          "overlay_op": 0.9,
-          "bg_sha": "5cb48d4b3c6e4fad7c4052dff900f17fd384668908b1107e39cdbfb4f8601fdd",
-          "bg_src_sha": "1525e91a66db03353eedece4144e06985994bdefa46eb5b656ec47e96117db1d",
-          "arte_sha": "e448057676e6d2e449527bd7385972827fa3189ff4b1ebc0d7edf081548fc374",
-          "arte_src_sha": "5b87541819c5023b10e82f5eaa308de86c3de508e86ac2fb711e34e8f94c4e54"
-        }
-      ],
-      "arte_sha": "e448057676e6d2e449527bd7385972827fa3189ff4b1ebc0d7edf081548fc374"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas",
-      "marca": "elever-ai",
-      "thumb": ".thumbs/elever-ai__lote-a-dark---concession-rias-revendas-e-lojas-multimarcas.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "salvo",
-      "titulo": "Concessionária com funcionário de IA",
-      "caption": "Todo dia chega gente perguntando preço, ficha técnica e condições. Um funcionário de IA responde na hora, organiza os interessados e passa pro vendedor só quem está pronto. Menos cliente perdido, mais tempo pra fechar negócio no pátio.\n\n#concessionaria #revenda #funcionariodeia #eleverai",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 3,
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/_regen/01-7fb9d9.png",
-          "cor": "#F4F2FB",
-          "cta": "Toque no botão abaixo.",
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/01.png",
-          "sub": "{#C1A4EA:Um funcionário de IA que responde \nantes que o comprador vá pra outra loja.👇}",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/elever-ai__lote-a-dark---concession-rias-revendas-e-lojas-multimarcas.jpg",
-          "accent": "",
-          "bgmode": "imagem",
-          "ov_pos": 0,
-          "paleta": "secundario",
-          "overlay": "roxo",
-          "headline": "{#100D1C:Quantos carros você deixa \nde vender sem perceber?}",
-          "overlay_op": 1,
-          "bg_sha": "f100212e969ec20d38311b4dc3112094628d4008f3356da60d9397327da2a64f",
-          "bg_src_sha": "b1cc25d7640f08cf5b00fe2d72f6803c7d36f0e413a275c55aa45d938d9a1917",
-          "arte_sha": "efb40457f03c0010bbd174e3cb4d5c5f9f04bb411d5ff53f0b3b7a22d7fe0ccd",
-          "arte_src_sha": "0783be59883a3b6e3eaf9abb00969fb144d11bc674af224c4dc0adb2d67b38f1"
-        }
-      ],
-      "arte_sha": "efb40457f03c0010bbd174e3cb4d5c5f9f04bb411d5ff53f0b3b7a22d7fe0ccd"
+      ]
     },
     {
       "roi": {
@@ -1220,6 +1422,7 @@
       "status": "rascunho",
       "titulo": "DEMO agência · Imobiliária (Horizonte)",
       "caption": "O apê que cabe no seu plano — e na sua vista. 🌆\n\n3 lançamentos com condições de pré-obra. Fale com a Horizonte.\n\n#imoveis #lancamento #apartamento",
+      "arte_sha": "5d33c6f8c424cf8d1c2178b0f3c0227e1d0d2c3da890e6a41acb222bb461eaf5",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -1239,164 +1442,15 @@
           "hsize": 0,
           "thumb": ".thumbs/smark__demo-horizonte-imoveis.jpg",
           "accent": "#3B82F6",
+          "bg_sha": "87c659ceb06d288e65830095eb2808ca2e93e3dc05c9f52a704d0987acaea3ba",
           "bgmode": "imagem",
           "overlay": "none",
-          "headline": "{#3B82F6:A vista que\n}você merece.\n",
-          "bg_sha": "87c659ceb06d288e65830095eb2808ca2e93e3dc05c9f52a704d0987acaea3ba",
-          "bg_src_sha": "6b633dd6b7254e867e552a6737d2329519a0142c3b30a91109fbf6ff06577a2b",
           "arte_sha": "5d33c6f8c424cf8d1c2178b0f3c0227e1d0d2c3da890e6a41acb222bb461eaf5",
+          "headline": "{#3B82F6:A vista que\n}você merece.\n",
+          "bg_src_sha": "6b633dd6b7254e867e552a6737d2329519a0142c3b30a91109fbf6ff06577a2b",
           "arte_src_sha": "b10dfcfe177a1f274ed828c66ec7fe8c98d3cde13fb0b4387ad72f1794d8334e"
         }
-      ],
-      "arte_sha": "5d33c6f8c424cf8d1c2178b0f3c0227e1d0d2c3da890e6a41acb222bb461eaf5"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "teste-ai",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__teste-ai.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Teste AI",
-      "caption": "",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-ai/01.png",
-          "sub": "",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__teste-ai.jpg",
-          "accent": "",
-          "bgmode": "claro",
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d",
-          "arte_src_sha": "b6337f48be86b7dc9af65ab249bf67bffa35ecb0fa1ec4c95355897694cbd37e"
-        }
-      ],
-      "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "crm-com-ia-para-loja-de-moveis",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__crm-com-ia-para-loja-de-moveis.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "A sala de estar que vira lead",
-      "caption": "A sala de estar integrada com a cozinha é o cartão de visitas do imóvel: transmite espaço, aconchego e movimenta as redes. Só que atenção sozinha não vira nada. A Nina, funcionária de IA da smark, recebe cada pessoa que chega, responde na hora e guarda tudo no lugar certo. Assim o interesse pela foto bonita não esfria no caminho.\n\n#lojademoveis #moveisplanejados #atendimento #gestao",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 1,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/_regen/01-20cfa8.png",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/01.png",
-          "sub": "O living rende as fotos mais desejadas. Cada visita que chega vira cliente organizado.",
-          "chip": false,
-          "page": "01/02",
-          "tema": "claro",
-          "grade": true,
-          "thumb": ".thumbs/smark__crm-com-ia-para-loja-de-moveis.jpg",
-          "bgmode": "imagem",
-          "headline": "A SALA DE ESTAR|CHAMA. A *NINA* ATENDE",
-          "bg_sha": "cc22d98b738b2c83bcf006432bd5c1265b9b942d5db3347eca3d3726f40fab7e",
-          "bg_src_sha": "0e82f6df2c0b7635f060bbf653de906016a1cee3c374444f6190b66b444699fb",
-          "arte_sha": "c02d187a6c4449160cd7453bd82a086e5f1a7f1a5b03b7331762c8d9d18922c1",
-          "arte_src_sha": "782406d61b7bd3af0e624c3df2e202b1957a828d2c23467f460e39f0d1488ebd"
-        },
-        {
-          "n": 2,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/02.png",
-          "sub": "",
-          "chip": false,
-          "page": "02/02",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "accent": "",
-          "bgmode": "claro",
-          "headline": "NOVO|*CARD.*",
-          "arte_sha": "2a334e8af85ee7af082e73de70ea49eac8e4ce13895719875a8d7786d9e8831f",
-          "arte_src_sha": "ea3b2170313492a75b3dc1980a4b69b97bc9e1883b2ee567e3a59925139364f1"
-        }
-      ],
-      "arte_sha": "c02d187a6c4449160cd7453bd82a086e5f1a7f1a5b03b7331762c8d9d18922c1"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "templates",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__templates.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Templates",
-      "caption": "",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/templates/01.png",
-          "sub": "gsdgd",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__templates.jpg",
-          "accent": "",
-          "bgmode": "claro",
-          "paleta": "lima",
-          "headline": "sdgd",
-          "arte_sha": "4c6d32d32fee6ade73bde850ff372857b0a2607eab7f793ce2fbcd9e9b017dc2",
-          "arte_src_sha": "cb66837fcd3bf5b12cd23c6e2cb3e870939dec133152aadbfb090b4f39e673bb"
-        }
-      ],
-      "arte_sha": "4c6d32d32fee6ade73bde850ff372857b0a2607eab7f793ce2fbcd9e9b017dc2"
+      ]
     },
     {
       "roi": {
@@ -1416,6 +1470,7 @@
       "status": "rascunho",
       "titulo": "Case destaque (post 4/5 — PENDENTE dado real)",
       "caption": "Prova não é a smark dizendo que funciona. É o cliente mostrando o que mudou.\n\n[1-2 frases com o número principal do case.]\n\nO que essa empresa fez, a sua também pode fazer — e começa entendendo onde a IA se pagaria primeiro. Diagnóstico gratuito, link na bio. 👇\n\n#resultado #cases #produtividade #IAparaempresas #roi",
+      "arte_sha": "30bbac369ce7fa52da446047c99caf364b6f7ec9e08c083fb7d889e110e62e54",
       "importado": true,
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
@@ -1431,20 +1486,19 @@
           "tema": "claro",
           "grade": true,
           "thumb": ".thumbs/smark__case-destaque.jpg",
+          "bg_sha": "696ea72c2468056e209ba8d8f168edd1b8be4a7c89d1fc02de7214e6498fbb3d",
           "bgmode": "imagem",
           "bg_seed": 159063493,
+          "arte_sha": "30bbac369ce7fa52da446047c99caf364b6f7ec9e08c083fb7d889e110e62e54",
           "headline": "CASE DESTAQUE (POST 4/5 — PENDENTE DADO REAL)",
           "bg_modelo": "google/gemini-3-pro-image",
+          "bg_src_sha": "f6af706039d0fe1106378f292bf80bc424cd781c2611d26cf61eaa8d4621eec7",
           "bg_provider": "openrouter",
           "bg_suplente": false,
-          "bg_custo_usd": 0.242958,
-          "bg_sha": "696ea72c2468056e209ba8d8f168edd1b8be4a7c89d1fc02de7214e6498fbb3d",
-          "bg_src_sha": "f6af706039d0fe1106378f292bf80bc424cd781c2611d26cf61eaa8d4621eec7",
-          "arte_sha": "30bbac369ce7fa52da446047c99caf364b6f7ec9e08c083fb7d889e110e62e54",
-          "arte_src_sha": "815a4d3aa7e85b6df5833fbd174a646eddde67759cd4177d5d15a053dd961bf9"
+          "arte_src_sha": "815a4d3aa7e85b6df5833fbd174a646eddde67759cd4177d5d15a053dd961bf9",
+          "bg_custo_usd": 0.242958
         }
-      ],
-      "arte_sha": "30bbac369ce7fa52da446047c99caf364b6f7ec9e08c083fb7d889e110e62e54"
+      ]
     },
     {
       "roi": {
@@ -1464,6 +1518,7 @@
       "status": "rascunho",
       "titulo": "A seleção — post 3/5 (cópia)",
       "caption": "Apresentando a seleção da smark. 👋\n\nNão são robôs de \"aperte 1\". São funções inteiras da sua empresa, cobertas por IA que trabalha na mão do seu time — não no lugar dele.\n\nQual dessas áreas mais dói na sua operação hoje? Comenta. 👇\n\n#IAparaempresas #prevendas #prospeccao #relacionamento #pmesbrasil",
+      "arte_sha": "95cc12194b4e2bd233e797ec2ec6864564e6206a4db4255c3d134f14b0b902ca",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -1482,13 +1537,13 @@
           "hsize": 0,
           "thumb": ".thumbs/smark__selecao-nina-teo-clara-c33c8.jpg",
           "accent": "",
+          "bg_sha": "a5f6e940efdcd360f2158c6eb7c74a885d1d1ea87c0767117639c6b34e1771b7",
           "bgmode": "imagem",
           "overlay": "roxo",
+          "arte_sha": "95cc12194b4e2bd233e797ec2ec6864564e6206a4db4255c3d134f14b0b902ca",
           "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
           "headline": "A SMARK SELECIONOU|3 PROFISSIONAIS PaRA|*SUA EMPRESA.*",
-          "bg_sha": "a5f6e940efdcd360f2158c6eb7c74a885d1d1ea87c0767117639c6b34e1771b7",
           "bg_src_sha": "541484db86ae401ffd00becc5b590997597348b60a32f734fe8dc099c9ea68db",
-          "arte_sha": "95cc12194b4e2bd233e797ec2ec6864564e6206a4db4255c3d134f14b0b902ca",
           "arte_src_sha": "9f367a896adae77cba5f9c6a875eeeef83f65bd6c30334c888333f779aa2fc0a"
         },
         {
@@ -1504,13 +1559,13 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
+          "bg_sha": "c5a2b92a2febd2dbe5e7c9cc5ebf87b012d6a890249ee14b52cc8fd73e2580db",
           "bgmode": "imagem",
           "overlay": "roxo",
+          "arte_sha": "246a84952aa518179632c356bef11f8d2f5d96ef324d851f1099ee4e756fd9b8",
           "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n",
           "headline": "*NINA |{#FFFFFF:MEIO CAMPO}*",
-          "bg_sha": "c5a2b92a2febd2dbe5e7c9cc5ebf87b012d6a890249ee14b52cc8fd73e2580db",
           "bg_src_sha": "2c6bbe352684b642294c7e0856c71181decf23d216f2bea47ad731b8b37a1148",
-          "arte_sha": "246a84952aa518179632c356bef11f8d2f5d96ef324d851f1099ee4e756fd9b8",
           "arte_src_sha": "c69352d57da981c4f997db0684ad1b6725b6cba6e1a63255913e18f232783bbc"
         },
         {
@@ -1528,14 +1583,14 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
+          "bg_sha": "60aae91b9811c05e5d73df22d6dc5ee6f928ae2ce747d1dfdb76ad085bf79ba0",
           "bgmode": "imagem",
           "overlay": "roxo",
+          "arte_sha": "74ec3b31cfde47e99c072b0eff32b0e2d384142e6f10bda2fbb496f53666ca2b",
           "contexto": "\"o Téo, um caçador/atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
           "headline": "*TÉO |{#FFFFFF:ATACANTE}*",
-          "overlay_op": 0.85,
-          "bg_sha": "60aae91b9811c05e5d73df22d6dc5ee6f928ae2ce747d1dfdb76ad085bf79ba0",
           "bg_src_sha": "eb6aade167e982ef3681a2e0e4fd21baa6c6a1d446da540f0777a9c0ce1da01e",
-          "arte_sha": "74ec3b31cfde47e99c072b0eff32b0e2d384142e6f10bda2fbb496f53666ca2b",
+          "overlay_op": 0.85,
           "arte_src_sha": "a21c17319806d799699da1da48cfe213af39050610e2fda3e65adba4f204e865"
         },
         {
@@ -1554,14 +1609,14 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
+          "bg_sha": "f386009438a463f84764db3d9ba2b02d3e8b745d29d66e5a413cbf5b5f95d26f",
           "bgmode": "imagem",
           "overlay": "none",
+          "arte_sha": "f16b4e1d5e991492904421ede2d78e077a266a923cc01e858cb44d058dfe41e3",
           "contexto": "\"a Clara, é quem salva a patrica atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
           "headline": "*Clara* \nZAGA",
-          "overlay_op": 0,
-          "bg_sha": "f386009438a463f84764db3d9ba2b02d3e8b745d29d66e5a413cbf5b5f95d26f",
           "bg_src_sha": "9a0eefb89eb950560e0a51bcda1c54f02e11286041449cc4b4be5ea2d348c46f",
-          "arte_sha": "f16b4e1d5e991492904421ede2d78e077a266a923cc01e858cb44d058dfe41e3",
+          "overlay_op": 0,
           "arte_src_sha": "ae83917b406ba8ce70e586338e5f7e7f8ebe6f23da539750687248cce071687c"
         },
         {
@@ -1577,15 +1632,14 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
-          "bgmode": "imagem",
-          "headline": "NINA, TÉO|E *CLARA.*",
           "bg_sha": "920ec33d623a6c18efb9068b2d4237cf2d80b497fe5ec014a460ec5cdbd3f0bd",
-          "bg_src_sha": "3449910ef631b8f79bd426993f386f514018cbb0d4e7a847a63755e93a2bbbf4",
+          "bgmode": "imagem",
           "arte_sha": "27bb047ab8837dcaae2dd290491ae16cd39df73c59f3220ead80023194dfa413",
+          "headline": "NINA, TÉO|E *CLARA.*",
+          "bg_src_sha": "3449910ef631b8f79bd426993f386f514018cbb0d4e7a847a63755e93a2bbbf4",
           "arte_src_sha": "6eff27d4c09e43b8ed180fb7c54095a570c0779022cbda274f30a075735cdf34"
         }
-      ],
-      "arte_sha": "95cc12194b4e2bd233e797ec2ec6864564e6206a4db4255c3d134f14b0b902ca"
+      ]
     },
     {
       "roi": {
@@ -1605,6 +1659,7 @@
       "status": "salvo",
       "titulo": "CRM com IA - Lojá Móveis (cópia)",
       "caption": "Já pensou ter um funcionário de IA que atende todos seus clientes no whatsApp, captura interesse de projeto,  identifica orçamento, alinha expectativa de prazos e entrega para seu time comercial ou de projetos somente quem realmente tem potencial e interesse. Clique no botão e saiba mais.",
+      "arte_sha": "a02e5d5576616ac1cbc75991a5bc50c55ac2519cc2baf88432c0e9d8dcde9a61",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -1623,15 +1678,15 @@
           "hsize": 0,
           "thumb": ".thumbs/elever-ai__crm-com-ia---loj-m-veis-c8902.jpg",
           "accent": "",
+          "bg_sha": "ccd03c7e4416073d303b859dea850b9bb581e378a168855f75eead210fbcfbca",
           "bgmode": "imagem",
           "ov_ang": 180,
           "ov_pos": 48,
           "overlay": "branco",
-          "headline": "CRM com IA + \nFuncionário \n{#8B3CF7:whatsapp }",
-          "overlay_op": 0.2,
-          "bg_sha": "ccd03c7e4416073d303b859dea850b9bb581e378a168855f75eead210fbcfbca",
-          "bg_src_sha": "f60e1eade9ada5140c79ca3639dbddcb6ff22c785142c503e712a0dd02d241a7",
           "arte_sha": "a02e5d5576616ac1cbc75991a5bc50c55ac2519cc2baf88432c0e9d8dcde9a61",
+          "headline": "CRM com IA + \nFuncionário \n{#8B3CF7:whatsapp }",
+          "bg_src_sha": "f60e1eade9ada5140c79ca3639dbddcb6ff22c785142c503e712a0dd02d241a7",
+          "overlay_op": 0.2,
           "arte_src_sha": "869c7195c47d76771d072390c43a1769c6f278b3112b30746b46e78a4f59b18b"
         },
         {
@@ -1647,19 +1702,18 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
+          "bg_sha": "ccd03c7e4416073d303b859dea850b9bb581e378a168855f75eead210fbcfbca",
           "bgmode": "imagem",
           "ov_ang": 180,
           "ov_pos": 48,
           "overlay": "branco",
-          "headline": "Clientes sem respostas \n= projetos perdidos.",
-          "overlay_op": 0.2,
-          "bg_sha": "ccd03c7e4416073d303b859dea850b9bb581e378a168855f75eead210fbcfbca",
-          "bg_src_sha": "f60e1eade9ada5140c79ca3639dbddcb6ff22c785142c503e712a0dd02d241a7",
           "arte_sha": "f4364b91fc30459d0d2c1186ca07751e3a9dbedad1ad1d629bedadfb05dbdeee",
+          "headline": "Clientes sem respostas \n= projetos perdidos.",
+          "bg_src_sha": "f60e1eade9ada5140c79ca3639dbddcb6ff22c785142c503e712a0dd02d241a7",
+          "overlay_op": 0.2,
           "arte_src_sha": "ac2b23b07da5f33ad2f12268051e57d26a100cddf91d9f3da970bf9ba3bfb1b7"
         }
-      ],
-      "arte_sha": "a02e5d5576616ac1cbc75991a5bc50c55ac2519cc2baf88432c0e9d8dcde9a61"
+      ]
     },
     {
       "roi": {
@@ -1679,6 +1733,7 @@
       "status": "rascunho",
       "titulo": "Concessionária de motos com funcionário de IA",
       "caption": "Na concessionária de motos, a gente perde venda no silêncio: o cliente manda mensagem e ninguém responde na hora. Um funcionário de IA atende cada contato na mesma hora, organiza e passa pro vendedor certo. Menos lead esquecido, mais tempo pra equipe fechar negócio.\n\n#motos #concessionaria #atendimento #inteligenciaartificial",
+      "arte_sha": "8f9b4f7022b98ac6bdf2b15af5543bd53b5c848f6d03f28b10aa8b5f755c5dc9",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -1697,18 +1752,17 @@
           "hsize": 0,
           "thumb": ".thumbs/elever-ai__lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c8913.jpg",
           "accent": "",
+          "bg_sha": "f100212e969ec20d38311b4dc3112094628d4008f3356da60d9397327da2a64f",
           "bgmode": "imagem",
           "ov_pos": 0,
           "overlay": "branco",
-          "headline": "Quantas motos você|deixa de *atender* sem ver?",
-          "overlay_op": 1,
-          "bg_sha": "f100212e969ec20d38311b4dc3112094628d4008f3356da60d9397327da2a64f",
-          "bg_src_sha": "b1cc25d7640f08cf5b00fe2d72f6803c7d36f0e413a275c55aa45d938d9a1917",
           "arte_sha": "8f9b4f7022b98ac6bdf2b15af5543bd53b5c848f6d03f28b10aa8b5f755c5dc9",
+          "headline": "Quantas motos você|deixa de *atender* sem ver?",
+          "bg_src_sha": "b1cc25d7640f08cf5b00fe2d72f6803c7d36f0e413a275c55aa45d938d9a1917",
+          "overlay_op": 1,
           "arte_src_sha": "54fab3a78aaa14ab01f658b7ba14ab0fd8502c7d33d7765088435b67699e150e"
         }
-      ],
-      "arte_sha": "8f9b4f7022b98ac6bdf2b15af5543bd53b5c848f6d03f28b10aa8b5f755c5dc9"
+      ]
     },
     {
       "roi": {
@@ -1728,6 +1782,7 @@
       "status": "rascunho",
       "titulo": "Internet rápida de verdade",
       "caption": "Ninguém aguenta ficar esperando a tela carregar. Com a provider-max, a conexão fica firme o dia inteiro — pra trabalhar, estudar e relaxar sem interrupção. Quer saber onde sua rede pode melhorar? Comece pelo diagnóstico gratuito.\n\n#provedor #internetfibra #conexao #provedordeinternet",
+      "arte_sha": "92907968c85bbedb7bd41368f96e0ce7fe5e1639cf2b3b4eca2deebaa9e6cdff",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -1746,22 +1801,21 @@
           "hsize": 0,
           "thumb": ".thumbs/provider-max__teste-integra-a-o.jpg",
           "accent": "",
+          "bg_sha": "25f22a6c2d7873ee065f1a3a673b391fdcc7bf88356486495f726bd128f73cc1",
           "bgmode": "imagem",
           "bg_tier": "final",
           "overlay": "branco",
+          "arte_sha": "92907968c85bbedb7bd41368f96e0ce7fe5e1639cf2b3b4eca2deebaa9e6cdff",
           "headline": "Internet que|*não trava* nunca",
           "bg_modelo": "google/gemini-3-pro-image",
+          "bg_src_sha": "b6236ed058f145e304589dba6ce0516f3fc355dfbdad5c9bde4ad196ed18b0ad",
           "bg_provider": "openrouter",
           "bg_suplente": false,
+          "arte_src_sha": "319e8811f6e0b673f68e4f08a965032c3a7f5c03667c7fc824b640e07634bd7b",
           "bg_custo_usd": 0.242806,
-          "bg_publicavel": true,
-          "bg_sha": "25f22a6c2d7873ee065f1a3a673b391fdcc7bf88356486495f726bd128f73cc1",
-          "bg_src_sha": "b6236ed058f145e304589dba6ce0516f3fc355dfbdad5c9bde4ad196ed18b0ad",
-          "arte_sha": "92907968c85bbedb7bd41368f96e0ce7fe5e1639cf2b3b4eca2deebaa9e6cdff",
-          "arte_src_sha": "319e8811f6e0b673f68e4f08a965032c3a7f5c03667c7fc824b640e07634bd7b"
+          "bg_publicavel": true
         }
-      ],
-      "arte_sha": "92907968c85bbedb7bd41368f96e0ce7fe5e1639cf2b3b4eca2deebaa9e6cdff"
+      ]
     },
     {
       "roi": {
@@ -1781,6 +1835,7 @@
       "status": "rascunho",
       "titulo": "Copa do Mundo: cada posição no time certo",
       "caption": "Na Copa, quem vence é o time bem escalado. Na empresa é igual: cada departamento precisa da posição certa. A smark coloca um funcionário de IA em cada função pra o time render sem apagar incêndio. Quer ver onde encaixa? Faça o diagnóstico gratuito.\n\n#copadomundo #inteligenciaartificial #gestao #produtividade",
+      "arte_sha": "5f9a47a4cae858287d9d734b65c3a4d830d891df06a4b33d04579021e30911ba",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -1799,14 +1854,14 @@
           "hsize": 0,
           "thumb": ".thumbs/smark__eloise.jpg",
           "accent": "",
+          "bg_sha": "aaec7ca7abd247125824b15fc2c092166cc00249a484c8cb52f047ce8b59ce57",
           "bgmode": "imagem",
           "ov_ang": 0,
           "overlay": "branco",
-          "headline": "TIME BOM GANHA|COM *{#FFFFFF:ESCALAÇÃO*}",
-          "overlay_op": 0.55,
-          "bg_sha": "aaec7ca7abd247125824b15fc2c092166cc00249a484c8cb52f047ce8b59ce57",
-          "bg_src_sha": "20c00d1ce83c5db162bcb36c9dfc49d8eadd23ff56527dfd88f1d04f950f3382",
           "arte_sha": "5f9a47a4cae858287d9d734b65c3a4d830d891df06a4b33d04579021e30911ba",
+          "headline": "TIME BOM GANHA|COM *{#FFFFFF:ESCALAÇÃO*}",
+          "bg_src_sha": "20c00d1ce83c5db162bcb36c9dfc49d8eadd23ff56527dfd88f1d04f950f3382",
+          "overlay_op": 0.55,
           "arte_src_sha": "107c961918fc87e0e215456e02046ccf36bcc69c9e3144c74accd8dec5b1f73b"
         },
         {
@@ -1820,11 +1875,11 @@
           "page": "02/03",
           "tema": "claro",
           "grade": true,
-          "bgmode": "imagem",
-          "headline": "SUA EMPRESA|TAMBÉM É UM *TIME*",
           "bg_sha": "d278ae58a8b997f2580106e64a3fb72782fc9de1eed8c8c851097556d7fdd3eb",
-          "bg_src_sha": "2eb92652307f3772c3d0e78d1e4409e1a12bd874fc3ed8e193108643af1f4006",
+          "bgmode": "imagem",
           "arte_sha": "1262fdade4878d6cae9d98b028d9bbb3e184f62ab5b1bc45fc6782e1580fc644",
+          "headline": "SUA EMPRESA|TAMBÉM É UM *TIME*",
+          "bg_src_sha": "2eb92652307f3772c3d0e78d1e4409e1a12bd874fc3ed8e193108643af1f4006",
           "arte_src_sha": "5f985bdb04c58ac31a2bbfc785f3c5db434e4aa6b1c8addbd91cbabd69dd3e8c"
         },
         {
@@ -1838,15 +1893,14 @@
           "page": "03/03",
           "tema": "claro",
           "grade": true,
-          "bgmode": "imagem",
-          "headline": "MONTE A SUA|*ESCALAÇÃO* DE IA",
           "bg_sha": "93a21107b4c03da0c3b667cc7abe52998704e91e3a87dfd501ca6c2526dd8bf9",
-          "bg_src_sha": "5769b8995ad7b5a6e3c5473413422235c178f31bc5cac340cf8a0c5bb55a5eab",
+          "bgmode": "imagem",
           "arte_sha": "76b8d08deebc55020279f4b5312401c122b9f19a7cb1f187ae5f61ae37097b3f",
+          "headline": "MONTE A SUA|*ESCALAÇÃO* DE IA",
+          "bg_src_sha": "5769b8995ad7b5a6e3c5473413422235c178f31bc5cac340cf8a0c5bb55a5eab",
           "arte_src_sha": "19e371189f9fb84ab6ec30d32294c41689e7d16bae93092c1954a9948d968efa"
         }
-      ],
-      "arte_sha": "5f9a47a4cae858287d9d734b65c3a4d830d891df06a4b33d04579021e30911ba"
+      ]
     },
     {
       "roi": {
@@ -1866,6 +1920,7 @@
       "status": "salvo",
       "titulo": "Funcionários de IA por departamento",
       "caption": "A Smark acessoria desenvolve funcionários de IA sob medida para a sua operação.  \n\nComente \"EU QUERO\"  e receba um diagnóstico gratuito da sua operação para entender quais funcionários podem complementar o seu time.  Ou acesse nosso site na BIO e agende com um de nossos especialistas.\n\n\n\n#smark #inteligenciaartificial #gestao #produtividade",
+      "arte_sha": "ba1014475df1803d3b413e16c157e00443205ad6619ef63b97b5976d9afd2d0e",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -1884,15 +1939,14 @@
           "hsize": 0,
           "thumb": ".thumbs/smark__novo-post-9382.jpg",
           "accent": "",
-          "bgmode": "imagem",
-          "headline": "Cada setor com um \n*funcionário de IA*",
           "bg_sha": "ab1121721fe30bcfb669617d385034a80c0e7e96a3b8ae7cd95505b8c3400870",
-          "bg_src_sha": "6795a299e1e15096624ac8a78bef2de3eae1c69bf17ed14afba446ca885fa556",
+          "bgmode": "imagem",
           "arte_sha": "ba1014475df1803d3b413e16c157e00443205ad6619ef63b97b5976d9afd2d0e",
+          "headline": "Cada setor com um \n*funcionário de IA*",
+          "bg_src_sha": "6795a299e1e15096624ac8a78bef2de3eae1c69bf17ed14afba446ca885fa556",
           "arte_src_sha": "40bb5084ceafa55db2933a113dd4eb7f54b1833ba2e7afa4b3b457a891c80d27"
         }
-      ],
-      "arte_sha": "ba1014475df1803d3b413e16c157e00443205ad6619ef63b97b5976d9afd2d0e"
+      ]
     },
     {
       "roi": {
@@ -1912,6 +1966,7 @@
       "status": "salvo",
       "titulo": "A seleção — post 3/5 (cópia) (cópia)",
       "caption": "A smark acessoria treina e coloca profissionais de IA para jogarem no seu time. \nMas você é o treinador, e quem define quem faz cada lance. Quem ataca, quem resolve e como o time vai jogar. \n\nComente time de IA para um diagnóstico gratuito da sua operação e ver quem você pode escalar.",
+      "arte_sha": "a4be4514f0462b3e556262b4d079bdbda442f9b42e53f941a5299bbedd64760d",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -1930,13 +1985,13 @@
           "hsize": 0,
           "thumb": ".thumbs/smark__selecao-nina-teo-clara-c33c8-ce452.jpg",
           "accent": "",
+          "bg_sha": "a5f6e940efdcd360f2158c6eb7c74a885d1d1ea87c0767117639c6b34e1771b7",
           "bgmode": "imagem",
           "overlay": "roxo",
+          "arte_sha": "a4be4514f0462b3e556262b4d079bdbda442f9b42e53f941a5299bbedd64760d",
           "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
           "headline": "A SMARK SELECIONOU|3 PROFISSIONAIS PaRA|*SUA EMPRESA.*",
-          "bg_sha": "a5f6e940efdcd360f2158c6eb7c74a885d1d1ea87c0767117639c6b34e1771b7",
           "bg_src_sha": "541484db86ae401ffd00becc5b590997597348b60a32f734fe8dc099c9ea68db",
-          "arte_sha": "a4be4514f0462b3e556262b4d079bdbda442f9b42e53f941a5299bbedd64760d",
           "arte_src_sha": "9e9006efb5ce8907755286cd1a08d32776cb3ebcc0c823f51114837704decb9f"
         },
         {
@@ -1953,13 +2008,13 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
+          "bg_sha": "c5a2b92a2febd2dbe5e7c9cc5ebf87b012d6a890249ee14b52cc8fd73e2580db",
           "bgmode": "imagem",
           "overlay": "roxo",
+          "arte_sha": "bc3c2dbd6477494b1e80d57480dd6c2b761b20ffeef531f89a7b20fbea5592d1",
           "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n",
           "headline": "*NINA |{#FFFFFF:MEIO CAMPO}* - Pré vendas",
-          "bg_sha": "c5a2b92a2febd2dbe5e7c9cc5ebf87b012d6a890249ee14b52cc8fd73e2580db",
           "bg_src_sha": "2c6bbe352684b642294c7e0856c71181decf23d216f2bea47ad731b8b37a1148",
-          "arte_sha": "bc3c2dbd6477494b1e80d57480dd6c2b761b20ffeef531f89a7b20fbea5592d1",
           "arte_src_sha": "0f2890cebb909cc363efe672f1a9f6e89156e9e926aee8d86fc31eb8b5da5d18"
         },
         {
@@ -1978,14 +2033,14 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
+          "bg_sha": "60aae91b9811c05e5d73df22d6dc5ee6f928ae2ce747d1dfdb76ad085bf79ba0",
           "bgmode": "imagem",
           "overlay": "roxo",
+          "arte_sha": "4f4dea06931aba1ada5b1193237e5bccd57eae3a1eeab630d03c53f28824d825",
           "contexto": "\"o Téo, um caçador/atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
           "headline": "*TÉO |{#FFFFFF:ATACANTE}* - prospecção",
-          "overlay_op": 0.85,
-          "bg_sha": "60aae91b9811c05e5d73df22d6dc5ee6f928ae2ce747d1dfdb76ad085bf79ba0",
           "bg_src_sha": "eb6aade167e982ef3681a2e0e4fd21baa6c6a1d446da540f0777a9c0ce1da01e",
-          "arte_sha": "4f4dea06931aba1ada5b1193237e5bccd57eae3a1eeab630d03c53f28824d825",
+          "overlay_op": 0.85,
           "arte_src_sha": "4b85fab4a3619c7358d305e757f4ec811276398415a7291e53e7675a1c08682d"
         },
         {
@@ -2004,18 +2059,17 @@
           "grade": true,
           "hsize": 0,
           "accent": "",
+          "bg_sha": "1302a9793c9c735eab51841187230e343c09c040387f550d8444bb99a60aa3ce",
           "bgmode": "imagem",
           "overlay": "roxo",
+          "arte_sha": "9ee6889e50b6ff65a3c6d70e2570907918831fb956b09da29201e79278989228",
           "contexto": "\"a Clara, é quem salva a patrica atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
           "headline": "*CLARA*|ZAGA - Relacionamento e Receita",
-          "overlay_op": 0.85,
-          "bg_sha": "1302a9793c9c735eab51841187230e343c09c040387f550d8444bb99a60aa3ce",
           "bg_src_sha": "7ae358ac3e4b6b79ae9484e889019fddac0566d58b7821e3a76199454560cef5",
-          "arte_sha": "9ee6889e50b6ff65a3c6d70e2570907918831fb956b09da29201e79278989228",
+          "overlay_op": 0.85,
           "arte_src_sha": "d57ef6d0d6a809572f697be208bf7effa9997d513f9b04230a1aaf1fb18eebdd"
         }
-      ],
-      "arte_sha": "a4be4514f0462b3e556262b4d079bdbda442f9b42e53f941a5299bbedd64760d"
+      ]
     },
     {
       "roi": {
@@ -2035,6 +2089,7 @@
       "status": "rascunho",
       "titulo": "Loja de móveis com funcionário de IA",
       "caption": "Imagina cada canto da sua loja com alguém de IA cuidando: um pra atender quem chega, outro pra organizar os pedidos. Na smark, cada departamento ganha o seu. Você foca em vender móvel bonito, o resto anda sozinho.\n\n#smark #lojademoveis #inteligenciaartificial #gestao",
+      "arte_sha": "d74eca7f9eb9f65196fa02ae95fc765ec0a2cec0c209977a1bd7df53ea2d0f05",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -2055,20 +2110,19 @@
           "hsize": 0,
           "thumb": ".thumbs/smark__teste-novo-modelo.jpg",
           "accent": "",
+          "bg_sha": "21c10e9a4afdd6bac7231c5370069dc4fcb6e7110697438271c9c5c4681cc355",
           "bgmode": "escuro",
           "ov_ang": 165,
           "ov_pos": 24,
           "overlay": "roxo",
           "_accOpen": true,
-          "headline": "Sua loja de móveis|com um *funcionário de IA*",
-          "overlay_op": 0,
-          "bg_sha": "21c10e9a4afdd6bac7231c5370069dc4fcb6e7110697438271c9c5c4681cc355",
-          "bg_src_sha": "7c13f8afbfcd372a8dd5f3a9c01ff9c0a7d57997f356637085a1c9adf5c94fb2",
           "arte_sha": "d74eca7f9eb9f65196fa02ae95fc765ec0a2cec0c209977a1bd7df53ea2d0f05",
+          "headline": "Sua loja de móveis|com um *funcionário de IA*",
+          "bg_src_sha": "7c13f8afbfcd372a8dd5f3a9c01ff9c0a7d57997f356637085a1c9adf5c94fb2",
+          "overlay_op": 0,
           "arte_src_sha": "aacbf0894328c683f564b135551f40d2855e6a3190fcc847a160f04281e6165b"
         }
-      ],
-      "arte_sha": "d74eca7f9eb9f65196fa02ae95fc765ec0a2cec0c209977a1bd7df53ea2d0f05"
+      ]
     },
     {
       "roi": {
@@ -2088,6 +2142,7 @@
       "status": "rascunho",
       "titulo": "Contratação sem dor de cabeça",
       "caption": "Com a smark, cada departamento ganha um funcionário de IA que já começa trabalhando para executar  tarefas pontuais, processos inteiros ou  funções completas. \n\nQuer saber onde isso encaixa na sua empresa? Comece pelo diagnóstico gratuito no link da bio.\n\n#smark  #inteligenciaartificial #produtividade #escala",
+      "arte_sha": "fa7c6885a1ccd7a89c0d0d9a71c6dc1126ef49171fa950d4f90a69f77fb7cbc4",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -2106,11 +2161,11 @@
           "hsize": 0,
           "thumb": ".thumbs/smark__contrata-o.jpg",
           "accent": "",
-          "bgmode": "imagem",
-          "headline": "Contratar é|*difícil e demorado*",
           "bg_sha": "7c4ff145e1a3c2a230a8a00a572cb7cffd65b24e9c8186be646b7bf6bf9b1d6a",
-          "bg_src_sha": "b41642237ebc6fa7f06259a35068ad7fe178be1fff564368ebe4ab533406eaf1",
+          "bgmode": "imagem",
           "arte_sha": "fa7c6885a1ccd7a89c0d0d9a71c6dc1126ef49171fa950d4f90a69f77fb7cbc4",
+          "headline": "Contratar é|*difícil e demorado*",
+          "bg_src_sha": "b41642237ebc6fa7f06259a35068ad7fe178be1fff564368ebe4ab533406eaf1",
           "arte_src_sha": "5170b225e7dd1a793def8cf394d67371e5ac3f40a58351dcf371b582b6ea212c"
         },
         {
@@ -2124,11 +2179,11 @@
           "page": "02/03",
           "tema": "claro",
           "grade": true,
-          "bgmode": "imagem",
-          "headline": "E se cada área|tivesse um *funcionário de IA*?",
           "bg_sha": "de825c185618f753009c0f8b07d08b7eed36992bd40944206075c1c109372602",
-          "bg_src_sha": "4ddc65eda7cb1f6bc0f5f93aaac4f5000a684fea18f4d328553860a01342f8d4",
+          "bgmode": "imagem",
           "arte_sha": "3c3c2259630a5cc372c48988cb0caac5551a83255edaae19aeefaed7317027b4",
+          "headline": "E se cada área|tivesse um *funcionário de IA*?",
+          "bg_src_sha": "4ddc65eda7cb1f6bc0f5f93aaac4f5000a684fea18f4d328553860a01342f8d4",
           "arte_src_sha": "45b4d566ed43d3a71ba3af71e3ff0dfbef3ef89343278d5e3ccb7f74b8a9dc41"
         },
         {
@@ -2142,15 +2197,14 @@
           "page": "03/03",
           "tema": "claro",
           "grade": true,
-          "bgmode": "imagem",
-          "headline": "Comece pelo|*diagnóstico gratuito*",
           "bg_sha": "cc868bb6c254231b85bec499c351f8a06028eea1a86e79361176abb9cfad7ed0",
-          "bg_src_sha": "62ac65834eba07e864b26ee796688543b3bd476b1e7e12174a581e3407932272",
+          "bgmode": "imagem",
           "arte_sha": "fb32745a0b10c787241d6dfbf5c0536a43dee2852ee23ab3845d9d00e3e6f0db",
+          "headline": "Comece pelo|*diagnóstico gratuito*",
+          "bg_src_sha": "62ac65834eba07e864b26ee796688543b3bd476b1e7e12174a581e3407932272",
           "arte_src_sha": "2b023b8264a8250ffd4ce8370d6979cb2e41709400895df59acdf7f6b16107f0"
         }
-      ],
-      "arte_sha": "fa7c6885a1ccd7a89c0d0d9a71c6dc1126ef49171fa950d4f90a69f77fb7cbc4"
+      ]
     },
     {
       "roi": {
@@ -2170,6 +2224,7 @@
       "status": "rascunho",
       "titulo": "Entenda o que a V4 faz",
       "caption": "Você não precisa de promessa. Precisa de clareza sobre o que está sendo feito no seu marketing. A gente mostra cada passo, com método e acompanhamento de perto. Chama pra um diagnóstico gratuito.\n\n#v4company #marketing #gestao #assessoria",
+      "arte_sha": "213099988c76d73fbd2e6c2f38153dd4eae2d20827882dfe394219e7cfeca852",
       "created_at": "2026-07-28T03:07:46",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -2192,28 +2247,27 @@
           "hsize": 0,
           "thumb": ".thumbs/v4-company__novo-post-9fbf.jpg",
           "accent": "",
+          "bg_sha": "c33c9c59e8982d20805f2c25229b138c09d2762f2aa5bd7821f5bfcae35e1752",
           "bgmode": "imagem",
           "footer": false,
           "paleta": "marca",
           "bg_tier": "final",
           "overlay": "acento",
           "_accOpen": true,
+          "arte_sha": "213099988c76d73fbd2e6c2f38153dd4eae2d20827882dfe394219e7cfeca852",
           "headline": "Entenda o que|a *V4* faz",
           "bg_modelo": "google/gemini-3-pro-image",
+          "bg_src_sha": "f1b5210d858ed43733cd01c56ba644be4c696084e595a39038c600e98fefba44",
           "bg_usd_brl": 5.1285,
           "overlay_op": 0.7,
           "bg_provider": "openrouter",
           "bg_suplente": false,
+          "arte_src_sha": "74962b3d2ef09b0061ea8095b6347e34d16dab8cd5cace855324ef08990be4d9",
           "bg_custo_brl": 1.2449,
           "bg_custo_usd": 0.24275,
-          "bg_publicavel": true,
-          "bg_sha": "c33c9c59e8982d20805f2c25229b138c09d2762f2aa5bd7821f5bfcae35e1752",
-          "bg_src_sha": "f1b5210d858ed43733cd01c56ba644be4c696084e595a39038c600e98fefba44",
-          "arte_sha": "213099988c76d73fbd2e6c2f38153dd4eae2d20827882dfe394219e7cfeca852",
-          "arte_src_sha": "74962b3d2ef09b0061ea8095b6347e34d16dab8cd5cace855324ef08990be4d9"
+          "bg_publicavel": true
         }
-      ],
-      "arte_sha": "213099988c76d73fbd2e6c2f38153dd4eae2d20827882dfe394219e7cfeca852"
+      ]
     },
     {
       "roi": {
@@ -2233,6 +2287,7 @@
       "status": "salvo",
       "titulo": "Suporte que não dorme para provedores",
       "caption": "No provedor, atendimento parado é cliente esperando. A Clara, funcionária de IA para ISP, responde dúvidas e cuida de renovação de contrato a qualquer hora. Menos fila, menos custo de plantão. Comece pelo diagnóstico gratuito.\n\n#provedor #isp #suporte #atendimento",
+      "arte_sha": "500d9bb35438fa13f58e35cb63ec3c481df998e848f03db7b7b68ce65dbf0e9b",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -2254,20 +2309,19 @@
           "satur": 1.35,
           "thumb": ".thumbs/provider-max__lote-b-light---provedor.jpg",
           "accent": "",
+          "bg_sha": "2344ac36bccda9efc213407eeeb49935cc1b005a28615320736cd3f0d62e965c",
           "bgmode": "imagem",
           "brilho": 1,
           "overlay": "todo-branco",
           "_accOpen": true,
+          "arte_sha": "500d9bb35438fa13f58e35cb63ec3c481df998e848f03db7b7b68ce65dbf0e9b",
           "headline": "Clara, a funcionária \nde IA para o seu provedor.",
           "contraste": 1.25,
-          "overlay_op": 0.6,
-          "bg_sha": "2344ac36bccda9efc213407eeeb49935cc1b005a28615320736cd3f0d62e965c",
           "bg_src_sha": "4e0717f9a18193408d605a8458c5d53d0a3eeef991c414d724a32d28fc460975",
-          "arte_sha": "500d9bb35438fa13f58e35cb63ec3c481df998e848f03db7b7b68ce65dbf0e9b",
+          "overlay_op": 0.6,
           "arte_src_sha": "3445b1cf4a5b07df5bafec8233981b4d242df43df17e592852959b634a4ef019"
         }
-      ],
-      "arte_sha": "500d9bb35438fa13f58e35cb63ec3c481df998e848f03db7b7b68ce65dbf0e9b"
+      ]
     },
     {
       "roi": {
@@ -2287,6 +2341,7 @@
       "status": "salvo",
       "titulo": "Cliente esperando resposta",
       "caption": "O casal escolhe o móvel, manda a dúvida e fica olhando a tela. Se ninguém responde na hora, eles fecham o app e vão pra outra loja. Com um funcionário de IA no atendimento, cada pergunta tem resposta na mesma hora, dia e noite. Menos espera, menos cliente perdido.\n\n#atendimento #inteligenciaartificial #varejo #gestao",
+      "arte_sha": "8609a46dfd8021144b9a3c72f1d61ce7fec46681923e891c9bbc7267f6d0ea01",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -2305,18 +2360,17 @@
           "hsize": 0,
           "thumb": ".thumbs/elever-ai__lote-a-dark---m-veis.jpg",
           "accent": "",
+          "bg_sha": "0197c1c58dea9d152805103c52eae083c542420b7e4b2f65bab8614f8beaf599",
           "bgmode": "imagem",
           "ov_ang": 195,
           "overlay": "branco",
-          "headline": "Quantos orçamentos \nvocê perde sem saber?",
-          "overlay_op": 1,
-          "bg_sha": "0197c1c58dea9d152805103c52eae083c542420b7e4b2f65bab8614f8beaf599",
-          "bg_src_sha": "2e15b2dda9548cabf52dde7720023921cc2c15a7f657e5d1e2784dd419129e9e",
           "arte_sha": "8609a46dfd8021144b9a3c72f1d61ce7fec46681923e891c9bbc7267f6d0ea01",
+          "headline": "Quantos orçamentos \nvocê perde sem saber?",
+          "bg_src_sha": "2e15b2dda9548cabf52dde7720023921cc2c15a7f657e5d1e2784dd419129e9e",
+          "overlay_op": 1,
           "arte_src_sha": "7ff6b143f109edbacd760f37b9ef6d68652527a2186f33154823eb2e89cfd950"
         }
-      ],
-      "arte_sha": "8609a46dfd8021144b9a3c72f1d61ce7fec46681923e891c9bbc7267f6d0ea01"
+      ]
     },
     {
       "roi": {
@@ -2336,6 +2390,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d",
       "created_at": "2026-07-29T02:55:16",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -2358,12 +2413,11 @@
           "bgmode": "claro",
           "footer": true,
           "paleta": "marca",
-          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d",
+          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "b6337f48be86b7dc9af65ab249bf67bffa35ecb0fa1ec4c95355897694cbd37e"
         }
-      ],
-      "arte_sha": "52456da9cfce0249c752fcfec7ed177848aee1ed18428251c5ae3d365b35768d"
+      ]
     },
     {
       "roi": {
@@ -2392,6 +2446,7 @@
       "status": "rascunho",
       "titulo": "Split payment na reforma",
       "caption": "A reforma tributária traz o chamado split payment: quando o cliente paga, o valor do imposto já é separado na hora e enviado ao governo. Na prática, muda o seu fluxo de caixa — o dinheiro do tributo não passa mais pela sua conta. Quem se organizar antes evita aperto. Quer entender o que muda no seu negócio?\n\n#reformatributaria #contabilidade #splitpayment #gestaofinanceira",
+      "arte_sha": "093584655e888b9e7c64fd2cdb92c794074197fd459058ee9d69c879e19b628c",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -2414,6 +2469,7 @@
           "satur": 1,
           "thumb": ".thumbs/smark__sul---x.jpg",
           "accent": "",
+          "bg_sha": "8b0d641d5e7098cbdc3aedda9eaeffdf8b4b63335e10f55b20939d01fda8e781",
           "bgmode": "imagem",
           "brilho": 1.1,
           "ov_ang": 150,
@@ -2423,23 +2479,21 @@
           "bg_tier": "rascunho",
           "overlay": "none",
           "_accOpen": false,
+          "arte_sha": "093584655e888b9e7c64fd2cdb92c794074197fd459058ee9d69c879e19b628c",
           "headline": "Reforma vai *reter*|o imposto na hora|do pagamento",
           "bg_modelo": "bytedance-seed/seedream-4.5",
           "contraste": 0.85,
+          "bg_src_sha": "1041b9c9a1f495d7d43c19bdc33e8aebba8eaf6a910ee3e0fdfaf3a451c06e3e",
           "bg_usd_brl": 5.1293,
           "overlay_op": 1,
           "bg_provider": "openrouter",
           "bg_suplente": false,
+          "arte_src_sha": "c865db97765cee8fe14677afdb369915f0e8abe81b3ea2b67f582b9a728a1660",
           "bg_custo_brl": 0.2052,
           "bg_custo_usd": 0.04,
-          "bg_publicavel": false,
-          "bg_sha": "8b0d641d5e7098cbdc3aedda9eaeffdf8b4b63335e10f55b20939d01fda8e781",
-          "bg_src_sha": "1041b9c9a1f495d7d43c19bdc33e8aebba8eaf6a910ee3e0fdfaf3a451c06e3e",
-          "arte_sha": "093584655e888b9e7c64fd2cdb92c794074197fd459058ee9d69c879e19b628c",
-          "arte_src_sha": "c865db97765cee8fe14677afdb369915f0e8abe81b3ea2b67f582b9a728a1660"
+          "bg_publicavel": false
         }
-      ],
-      "arte_sha": "093584655e888b9e7c64fd2cdb92c794074197fd459058ee9d69c879e19b628c"
+      ]
     },
     {
       "roi": {
@@ -2459,6 +2513,7 @@
       "status": "rascunho",
       "titulo": "Construir em volta, não trocar",
       "caption": "O problema quase nunca é o sistema inteiro. É aquela parte que falta e trava o dia a dia do time. A gente constrói em volta do que você já tem, sem começar tudo de novo. Chama pra um diagnóstico gratuito.\n\n#gestao #tecnologia #operacao #produtividade",
+      "arte_sha": "4c530f026bbb24b914b5c6793d4c9bc9acd7d66cffd9b4ebd741e0e1f460a58d",
       "created_at": "2026-07-29T03:51:13",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -2477,73 +2532,18 @@
           "bgmode": "imagem",
           "bg_seed": 1123616133,
           "bg_tier": "rascunho",
+          "arte_sha": "4c530f026bbb24b914b5c6793d4c9bc9acd7d66cffd9b4ebd741e0e1f460a58d",
           "headline": "Seu sistema faz quase tudo|falta *a partezinha*",
           "bg_modelo": "bytedance-seed/seedream-4.5",
           "bg_usd_brl": 5.1339,
           "bg_provider": "openrouter",
           "bg_suplente": false,
+          "arte_src_sha": "13a90a6f75a60a9858db62bb0b688a0505aec4c99fa452ea351b2458c9404211",
           "bg_custo_brl": 0.2054,
           "bg_custo_usd": 0.04,
-          "bg_publicavel": false,
-          "arte_sha": "4c530f026bbb24b914b5c6793d4c9bc9acd7d66cffd9b4ebd741e0e1f460a58d",
-          "arte_src_sha": "13a90a6f75a60a9858db62bb0b688a0505aec4c99fa452ea351b2458c9404211"
+          "bg_publicavel": false
         }
-      ],
-      "arte_sha": "4c530f026bbb24b914b5c6793d4c9bc9acd7d66cffd9b4ebd741e0e1f460a58d"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "caz-tv",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__caz-tv.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "CAZé tv",
-      "caption": "",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 4,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/_regen/01-71f94a.png",
-          "cor": "#4419e1",
-          "cta": "Clique e saiba mais",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/01.png",
-          "sub": "**{#e8e8e8:Suspeiras de te}**",
-          "chip": true,
-          "page": "",
-          "posx": 29,
-          "posy": 33,
-          "tema": "claro",
-          "grade": true,
-          "hsize": 95,
-          "thumb": ".thumbs/smark__caz-tv.jpg",
-          "accent": "",
-          "bgmode": "imagem",
-          "handle": "fdfdd",
-          "rodape": "fdfdfd",
-          "overlay": "todo-roxo",
-          "contexto": "Esse está correto e bem embasado. A McKinsey reporta que 62% estão pelo menos experimentando agentes, e 23% já escalam sistemas agênticos em algum lugar. Mais preciso ainda: 23% dos respondentes dizem que suas organizações estão escalando um sistema de IA agêntica, e outros 39% dizem ter começado a experimentar agentes de IA (23% + 39% = 62%). Pode usar com segurança.",
-          "headline": "{#efe9f7:Cazemiro fora da copa 2027?  }",
-          "contraste": 0.45,
-          "overlay_op": 0,
-          "bg_sha": "3fdf11b34535f5c8853702071f5f90ca5c5fa6eb931abf1402eca3fbdc87d29c",
-          "bg_src_sha": "e076de072a81104a8d54b4a47fb06d4edf5c99571fad6aad58fce585a3177316",
-          "arte_sha": "16fd0872fb5265c641218629919f69552f1f53439e5947dbdcd4e7168c132ac3",
-          "arte_src_sha": "b07e6a67c5e6a931c2dd65b43389e9f6d7254f5f3bf44b939d795512676af17d"
-        }
-      ],
-      "arte_sha": "16fd0872fb5265c641218629919f69552f1f53439e5947dbdcd4e7168c132ac3"
+      ]
     },
     {
       "roi": {
@@ -2563,6 +2563,7 @@
       "status": "rascunho",
       "titulo": "Novo post",
       "caption": "",
+      "arte_sha": "39cfb8870e3d666b05ead4a8000f3c8ad8f0c8e314ea61fa0e105dd5838e28f2",
       "created_at": "2026-07-29T03:18:17",
       "updated_at": "2026-07-29T00:53:28",
       "frames": [
@@ -2585,13 +2586,13 @@
           "bgmode": "claro",
           "footer": true,
           "paleta": "marca",
-          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_sha": "39cfb8870e3d666b05ead4a8000f3c8ad8f0c8e314ea61fa0e105dd5838e28f2",
+          "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "8a73b7468cef78f37dbe21f31a6d22b6542191a1abdd20e273b84a276db52846"
         }
-      ],
-      "arte_sha": "39cfb8870e3d666b05ead4a8000f3c8ad8f0c8e314ea61fa0e105dd5838e28f2"
+      ]
     }
   ],
-  "version": 2
+  "version": 2,
+  "source": "postgres"
 }

@@ -1792,16 +1792,21 @@ async function loadThumb(host,p){
     const fr0=(p.frames||[])[0]||{};
     const asha=(p.arte_sha||fr0.arte_sha||'').trim();
     if(asha){
+      const img=document.createElement('img');
+      img.className='thumbimg';
+      img.alt=(p.titulo||p.slug||'');
+      img.decoding='async';
+      // NÃO usar loading=lazy aqui: a img ainda está fora do DOM, e o navegador
+      // adia imagem lazy até ela entrar na viewport — o que nunca acontece com
+      // um elemento solto. onload não dispara e a Promise trava pra sempre.
+      // Quem faz o lazy já é o IntersectionObserver que chamou esta função.
       const okImg=await new Promise(res=>{
-        const img=document.createElement('img');
-        img.className='thumbimg';
-        img.alt=(p.titulo||p.slug||'');
-        img.loading='lazy';
-        img.onload=()=>{host.innerHTML='';host.appendChild(img);res(true)};
-        img.onerror=()=>res(false);
+        const t=setTimeout(()=>res(false),8000);  // nunca deixa o card preso no esqueleto
+        img.onload=()=>{clearTimeout(t);res(true)};
+        img.onerror=()=>{clearTimeout(t);res(false)};
         img.src='/arte/'+encodeURIComponent(asha)+'.jpg';
       });
-      if(okImg) return;
+      if(okImg){host.innerHTML='';host.appendChild(img);return;}
     }
     const ok = await loadThumbPreview(host,p);
     if(ok) return;
@@ -2079,15 +2084,17 @@ async function compose(host,fr,p){
     // arte final do Postgres primeiro — é a que o cliente vai ver publicada
     const asha=((fr&&fr.arte_sha)||p.arte_sha||'').trim();
     if(asha){
+      const img=document.createElement('img');
+      img.alt=p.titulo||'';img.decoding='async';
+      img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+      // sem loading=lazy: img fora do DOM com lazy nunca carrega e trava a Promise
       const ok=await new Promise(res=>{
-        const img=document.createElement('img');
-        img.alt=p.titulo||'';img.loading='lazy';
-        img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
-        img.onload=()=>{host.innerHTML='';host.appendChild(img);res(true)};
-        img.onerror=()=>res(false);
+        const t=setTimeout(()=>res(false),8000);
+        img.onload=()=>{clearTimeout(t);res(true)};
+        img.onerror=()=>{clearTimeout(t);res(false)};
         img.src='/arte/'+encodeURIComponent(asha)+'.jpg';
       });
-      if(ok) return;
+      if(ok){host.innerHTML='';host.appendChild(img);return;}
     }
     const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
     const html=await r.text();
