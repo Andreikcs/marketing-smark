@@ -1696,6 +1696,23 @@ function chIcon(c){
   return '<span class="chpill chIG" title=Instagram><svg viewBox="0 0 24 24" width=13 height=13 fill="none" stroke="#fff" stroke-width="2.1"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.6" cy="6.4" r="1.2" fill="#fff" stroke="none"/></svg></span>';}
 async function loadThumb(host,p){
   try{
+    // 1) thumb JPEG leve (produção Railway — sem arte/ full)
+    const th=(p.thumb||((p.frames||[])[0]||{}).thumb||'').trim();
+    if(th){
+      const img=document.createElement('img');
+      img.className='thumbimg';
+      img.alt=(p.titulo||p.slug||'');
+      img.loading='lazy';
+      img.src='/'+th.replace(/^\/+/,'')+'?v=1';
+      img.onerror=()=>{img.remove();loadThumbPreview(host,p)};
+      host.innerHTML='';host.appendChild(img);
+      return;
+    }
+    await loadThumbPreview(host,p);
+  }catch(e){host.textContent='sem arte'}
+}
+async function loadThumbPreview(host,p){
+  try{
     const fr=(p.frames||[])[0];if(!fr){host.innerHTML='sem arte';return}
     const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
     const html=await r.text();
@@ -1933,6 +1950,23 @@ function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':
 function relTime(iso){if(!iso)return '';const t=Date.parse(iso);if(!t)return '';const m=Math.floor((Date.now()-t)/60000);
   if(m<1)return 'agora';if(m<60)return m+' min';const h=Math.floor(m/60);if(h<48)return h+' h';return Math.floor(h/24)+' d'}
 async function compose(host,fr,p){
+  try{
+    const th=(p.thumb||(fr&&fr.thumb)||'').trim();
+    if(th){
+      host.innerHTML='';
+      const img=document.createElement('img');
+      img.src='/'+th.replace(/^\/+/,'')+'?v=1';
+      img.alt=p.titulo||'';
+      img.loading='lazy';
+      img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+      img.onerror=()=>{img.remove();composePreview(host,fr,p)};
+      host.appendChild(img);
+      return;
+    }
+    await composePreview(host,fr,p);
+  }catch(e){host.textContent=''}
+}
+async function composePreview(host,fr,p){
   try{
     const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
     const html=await r.text();const s=(host.clientWidth||200)/1080;
