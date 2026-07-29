@@ -187,6 +187,29 @@ class TestMudarStatusNoArquivo(unittest.TestCase):
         self.assertTrue(self._post()["publicado_em"])
 
 
+class TestFusoDasDatasDoFluxo(unittest.TestCase):
+    """Toda data do fluxo carrega fuso.
+
+    Existia um `_agora_iso()` no editor_server devolvendo hora local SEM fuso.
+    Com ele, `aprovado_em` ficava numa régua e `agendado_para` em outra — e o
+    "já venceu?" da fila errava por 3 horas.
+    """
+
+    def test_agora_utc_tem_fuso(self):
+        import editor_server as es
+        s = es._agora_utc()
+        self.assertTrue(s.endswith("+00:00"), "hora do fluxo sem fuso: %s" % s)
+        d = __import__("datetime").datetime.fromisoformat(s)
+        self.assertIsNotNone(d.tzinfo)
+
+    def test_aprovado_em_e_comparavel_com_agendado_para(self):
+        import datetime as _dt
+        import editor_server as es
+        a = _dt.datetime.fromisoformat(es._agora_utc())
+        b = _dt.datetime.fromisoformat(es._norm_quando("2026-08-03T12:00:00-03:00"))
+        self.assertLess(a, b)   # se um dos dois fosse ingênuo, isto explodiria
+
+
 class TestNormalizacaoDeData(unittest.TestCase):
     def setUp(self):
         import editor_server as es

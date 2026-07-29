@@ -15,12 +15,16 @@
       "canais": [
         "instagram"
       ],
-      "status": "rascunho",
+      "status": "aprovado",
       "titulo": "Preserve",
       "caption": "legenda e2e",
       "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
       "created_at": "2026-07-29T14:25:15",
-      "updated_at": "2026-07-29T20:53:37",
+      "updated_at": "2026-07-29T19:03:51",
+      "aprovado_em": "2026-07-29T22:03:51+00:00",
+      "aprovado_por": "andreik",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -35,11 +39,7 @@
           "headline": "H1 *x*",
           "arte_src_sha": "7b39e80f530bf25ff80c88f396cd0e73603b3d8901fd1fd3142bc9b3e5a02d75"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -62,6 +62,10 @@
       "arte_sha": "d6bbd0cc3924c5e07664ce37e025fb7d7b0696483551ea926c0e46424cc494ca",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -87,11 +91,7 @@
           "overlay_op": 1,
           "arte_src_sha": "124ba59d5da3606efc56dfddca6fe052fda4bda90c2d8699cb0da67d89a608f5"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -114,6 +114,10 @@
       "arte_sha": "eb65ccf0a749f7188140f70096e08af700f18e385906c7cc87494f0e92cf2f21",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -140,11 +144,7 @@
           "bg_src_sha": "ce85208a1c8bf6d5b5c0cfb78bec57430f3eba5cf66022e2eae61ca9b4457485",
           "arte_src_sha": "f03853c8f088a06ff9bd5e1cff33a3ef6130b31f9b5eecd12118c37020388194"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -167,6 +167,10 @@
       "arte_sha": "cd74d11262233f72b91b0989fd3ca09446b5f5c1b9a47913d774a56323c6ef15",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -193,11 +197,7 @@
           "bg_src_sha": "5771567d98557b68ce6e3bb4d001e1469c0e8b7555fa2ffadb1d8318c6a081a7",
           "arte_src_sha": "c143b220490def0c9c868f9de6f64073a772c1e16795eaeaa6b6fcc0facf311d"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -220,6 +220,10 @@
       "arte_sha": "444864939bff491489f151b0947fe76a8ae5b79e08e5ccfaceb5a89b666f9b86",
       "created_at": "2026-07-29T03:51:13",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -234,11 +238,7 @@
           "headline": "H1",
           "arte_src_sha": "1036ffe595da071dc46bbaeb87c2a0addb79c90c0120a275fa3d7323bf033763"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -261,6 +261,10 @@
       "arte_sha": "420eeed66ffa91debd8a226693b7bcff98f22a24613fd624977cf8d87f547d0b",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -292,11 +296,7 @@
           "overlay_op": 0,
           "arte_src_sha": "8781ca630187b56b0fe8d70b896bc9411a1b4c7ebeffb97f1dacb1601c02bdcd"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -319,6 +319,10 @@
       "arte_sha": "b3ce60d7f185bab46a829e19fafeac6f875c2cd66f902ee5bcbd8cb0a6581bca",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -339,11 +343,7 @@
           "headline": "SEU TÍTULO|*gdgsdfgdfgdf.*",
           "arte_src_sha": "9eca171421f515b524c52325078062cd2794f39832199fd899885df1c3d35345"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -366,6 +366,10 @@
       "arte_sha": "19c2a3c31a58713f13ba5bd3a0c73d540d213b77d9252e23e5d87dd7ed95ed20",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -391,11 +395,7 @@
           "bg_src_sha": "133081244d5f87366251b8a8daf4de96a701358f49f299fa2ba73ecfc583a82f",
           "arte_src_sha": "83d517ed2d3d4d68088a8420859b9211c9a0f98e6c13dd152930a2c8888eb138"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -418,6 +418,10 @@
       "arte_sha": "6f69125975b5d8beb8b976e65c1169b814a7acbe27aa1af40ebd4f9de1a63053",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -445,11 +449,7 @@
           "overlay_op": 1,
           "arte_src_sha": "55f9d87906aa3e9973bde90e76df2e302ed3af0826b476cea2334e08f0587be3"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -472,6 +472,10 @@
       "arte_sha": "6390b04075d7b3f94bca59d0bce62e6462fdc99428cd1c746f4f453d6dbf1f65",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -493,11 +497,7 @@
           "headline": "sdgd",
           "arte_src_sha": "b25a23a0c9d2804c898632aa8ebef06a3d1d1845008af34a96a961c9c056aa05"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -520,6 +520,10 @@
       "arte_sha": "1a71279de5876c3a745b10c3eba145ef95e1d388c0849c4cf11d95bdc22f41ad",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -543,11 +547,7 @@
           "bg_src_sha": "8800343b466d440aedd797e00886d731aca7b2b9a4e322442ae6b3a04de3abf3",
           "arte_src_sha": "804a6eb6b74760b1eef3eee8bbfe09b6c3337be55a34a9f646a11dc7a79f56e7"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -570,6 +570,10 @@
       "arte_sha": "bffef0d817993df5204f8ca18d2b3101a66a7fe3904e3ede459a4fe8dcb43d66",
       "created_at": "2026-07-28T00:17:13",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -606,11 +610,7 @@
           "bg_custo_usd": 0.242924,
           "bg_publicavel": true
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -633,6 +633,10 @@
       "arte_sha": "12325d7bc9df081711a93664f9b14ec6f2981fafef63b285a5626bb7b23d44c3",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -661,11 +665,7 @@
           "overlay_op": 0.9,
           "arte_src_sha": "df947f1b2e840094fa2cb9367d0edcc85d5e0501d4942b94c147f95c5870a874"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -689,6 +689,10 @@
       "arte_sha": "8a711855e996e05c515f4ecbd497ec58f55998d4eb63bd253612fcf5e21e8253",
       "created_at": "2026-07-28T00:54:38",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -709,11 +713,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "e77f4edac59c0d1ccdd5a387c500b07968036290012b19f1c8daaa26d8aa4eb1"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -736,6 +736,10 @@
       "arte_sha": "0a0f7aa7189c391d48c3d0059a2f35bff0d03fcfbccc0e56e7fd242aca8766ba",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -766,11 +770,7 @@
           "overlay_op": 0,
           "arte_src_sha": "a11cbc3191e3e871401fe7ee5c71bf01cfcc9720e41a5cad6e1039f1f9b8a6b2"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -793,6 +793,10 @@
       "arte_sha": "ff26bef306adaffbba9417d085c9f675df8872495905363874d1bdc39f76559b",
       "created_at": "2026-07-28T03:07:46",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -833,11 +837,7 @@
           "bg_custo_usd": 0.24275,
           "bg_publicavel": true
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -860,6 +860,10 @@
       "arte_sha": "788185eb66edee75b9b1544b078aa66c7007e769ccf9f1726619b7a01e3600e0",
       "created_at": "2026-07-28T01:16:33",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -881,11 +885,7 @@
           "headline": "SEU TÍT{#14238F:ULO|*AQUI.*}",
           "arte_src_sha": "73ccbf07c9cd794ce81fb2356fc8bb67387fb071cf71fe0f2d4d78bf730f228a"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -908,6 +908,10 @@
       "arte_sha": "7707bbda3fd8cb1891b77e39372fde4c33a57c2b8a2c3786fff3290c28c86b57",
       "created_at": "2026-07-28T01:36:52",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -932,11 +936,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "a8a4f59560617f806239c73878460d33f9b186a5ee0665d018694ec5b9bca793"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -959,6 +959,10 @@
       "arte_sha": "b21f12b081a59e499d4fafe594b0579557409ed53c5c334fea941e70164b0e84",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -979,11 +983,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "94b8bc64260c1ba74109fa91fb0d45f98b05eb852e558d6009ad526c535731b2"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1006,6 +1006,10 @@
       "arte_sha": "013f7119c9cb350c54fa178d5ee8cd9c42ea58f609196d59c5f1c892b745a3d4",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1026,11 +1030,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "3d7b8d076bec10f6fa1508797d8c2df7ffe5611571fcffa228851b5b74799e7d"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1053,6 +1053,10 @@
       "arte_sha": "088aeac736f6c59f13edf5f733a7735915cbb0f304ceee1868497daca15d9b14",
       "created_at": "2026-07-29T03:18:17",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1079,11 +1083,7 @@
           "overlay_op": 0.2,
           "arte_src_sha": "7353e73e88d05653cbe229c0d99473f2fc26f0e4566dc3442e9ac8295c980b05"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1106,6 +1106,10 @@
       "arte_sha": "fd66d6e967d71041396e1dc16666594eda5b69c9f4b1ad564d9b3c8ee9e0cb1b",
       "created_at": "2026-07-29T03:18:17",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1132,11 +1136,7 @@
           "overlay_op": 0.2,
           "arte_src_sha": "a6b0e0bf23c52ac42d8abdb72acf8c2b71384712272fbf6c287e5fb676575c70"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1159,6 +1159,10 @@
       "arte_sha": "ed05e3c103704cfcce9b8056273896b3fe8bf5bc79ab68ac9c63e00eaabf5b3a",
       "created_at": "2026-07-29T03:34:23",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1183,11 +1187,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "ad0400788a4d2a2bccffefb925b00c880a9fd060393527e632df4a72672693c1"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1210,6 +1210,10 @@
       "arte_sha": "095a0a9f38343ab8d69b65f36671078c5af6ba8b003d85fe6f80397a0a5e08ad",
       "created_at": "2026-07-29T03:34:23",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1234,11 +1238,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "7dffe40d93849b9910bf73d5138aa5c5163c48a9e199c344125ed229c9d1130e"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1261,6 +1261,10 @@
       "arte_sha": "5911e7dc655197716fc6889dee828222b343371b4cd9b96b8cc2c2e2d9044c54",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1291,11 +1295,7 @@
           "bg_custo_usd": 0.242806,
           "bg_publicavel": true
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1317,6 +1317,10 @@
       "arte_sha": "14e9116c4f0d04d91152b79ac61f406ca45c1b7c5171c9bb061bb0f6f8b72981",
       "created_at": "2026-07-29T20:01:27",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1354,11 +1358,7 @@
           "bg_custo_usd": 0.04,
           "bg_publicavel": false
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1381,6 +1381,10 @@
       "arte_sha": "c87c9d9eaa4cc065f254ee973153f98e446d4ad7f965fc9f2f59a72a6c902770",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1406,11 +1410,7 @@
           "bg_src_sha": "6b633dd6b7254e867e552a6737d2329519a0142c3b30a91109fbf6ff06577a2b",
           "arte_src_sha": "ed8474c4978263a2567270a55158224ab4fcaab9d377c6f6375716387953df8f"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1434,6 +1434,10 @@
       "importado": true,
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1458,11 +1462,7 @@
           "arte_src_sha": "eee53ea3b496b094fa7c7fcece15024abaccda602fd1f1fa5b01f4be83405818",
           "bg_custo_usd": 0.242958
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1485,6 +1485,10 @@
       "arte_sha": "d08735c00e654870237ac3fe66cc092c86add7c7322f93a7f2058aa3f2793bdd",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1603,11 +1607,7 @@
           "bg_src_sha": "3449910ef631b8f79bd426993f386f514018cbb0d4e7a847a63755e93a2bbbf4",
           "arte_src_sha": "02da0f11c65058924691a5552d863e780f6658fee2af100110d5d8cdb769b970"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1630,6 +1630,10 @@
       "arte_sha": "3aa122dfbe639641b42861d7da3f8202d7af14447c52cc78774e549af37025a5",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1692,11 +1696,7 @@
           "bg_src_sha": "5769b8995ad7b5a6e3c5473413422235c178f31bc5cac340cf8a0c5bb55a5eab",
           "arte_src_sha": "55a3e698d7453f59e438f986fb8546508f30dc681d6adbbd096a2f8a34b68234"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1719,6 +1719,10 @@
       "arte_sha": "0fd3f2b773873a80adb21faa27f08fbfd5ec712394f0730a38de0597c003c716",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1778,11 +1782,7 @@
           "bg_src_sha": "62ac65834eba07e864b26ee796688543b3bd476b1e7e12174a581e3407932272",
           "arte_src_sha": "7a624dfd4cc5c3976aac826f791ec7d1b0b7272a0def92d4c471b9b946012ca6"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1804,6 +1804,10 @@
       "arte_sha": "af545d20032d0cfc93caa03a2ab5d8baef5c4f0119894b87e283f1b437a870f3",
       "created_at": "2026-07-29T14:25:15",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1817,11 +1821,7 @@
           "headline": "A arte se compõe *sozinha*",
           "arte_src_sha": "deedfb25405002fb762d2fb6fb9dae7802601f12196e8044e36faf4cb784badf"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1844,6 +1844,10 @@
       "arte_sha": "c6d39a4f7da6dee2306352bbdaba01bf58b72b4d732de947a845c1c245687ada",
       "created_at": "2026-07-28T02:47:00",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1881,11 +1885,60 @@
           "bg_publicavel": false,
           "bg_gate_falhou": true
         }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "lote-a-dark---m-veis",
+      "marca": "elever-ai",
+      "thumb": ".thumbs/elever-ai__lote-a-dark---m-veis.jpg",
+      "canais": [
+        "instagram"
       ],
-      "agendado_para": "",
+      "status": "salvo",
+      "titulo": "Cliente esperando resposta",
+      "caption": "O casal escolhe o móvel, manda a dúvida e fica olhando a tela. Se ninguém responde na hora, eles fecham o app e vão pra outra loja. Com um funcionário de IA no atendimento, cada pergunta tem resposta na mesma hora, dia e noite. Menos espera, menos cliente perdido.\n\n#atendimento #inteligenciaartificial #varejo #gestao",
+      "arte_sha": "15c3e394fc42831078e7a8b916e75ba09ab7fa690366d5cae22f2c2af814a752",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T20:53:37",
       "aprovado_em": "",
+      "aprovado_por": "",
       "publicado_em": "",
-      "aprovado_por": ""
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 2,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---m-veis/_regen/01-d3bb74.png",
+          "cor": "#F4F2FB",
+          "cta": "Toque no botão abaixo.",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---m-veis/01.png",
+          "sub": "Loja sem resposta rápida perde a venda em silêncio. 👇",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/elever-ai__lote-a-dark---m-veis.jpg",
+          "accent": "",
+          "bg_sha": "0197c1c58dea9d152805103c52eae083c542420b7e4b2f65bab8614f8beaf599",
+          "bgmode": "imagem",
+          "ov_ang": 195,
+          "overlay": "branco",
+          "arte_sha": "15c3e394fc42831078e7a8b916e75ba09ab7fa690366d5cae22f2c2af814a752",
+          "headline": "Quantos orçamentos \nvocê perde sem saber?",
+          "bg_src_sha": "2e15b2dda9548cabf52dde7720023921cc2c15a7f657e5d1e2784dd419129e9e",
+          "overlay_op": 1,
+          "arte_src_sha": "b7de6fdeeabbc4cc70cde4454b1394dffa65ce8b192cf308fc911d999f6ab4ba"
+        }
+      ]
     },
     {
       "roi": {
@@ -1908,6 +1961,10 @@
       "arte_sha": "ed05e3c103704cfcce9b8056273896b3fe8bf5bc79ab68ac9c63e00eaabf5b3a",
       "created_at": "2026-07-29T02:55:08",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1932,11 +1989,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "ad0400788a4d2a2bccffefb925b00c880a9fd060393527e632df4a72672693c1"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -1959,6 +2012,10 @@
       "arte_sha": "8d8799f63504c547aa1f6f6455e7f0bd5d642d3b34da9632b05bcd0c49b73da3",
       "created_at": "2026-07-28T02:55:59",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -1983,11 +2040,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "48fb1ee46026f21f3f509821718ff4091a3c200cbffc0fa35424d15803471b36"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2010,6 +2063,10 @@
       "arte_sha": "ed05e3c103704cfcce9b8056273896b3fe8bf5bc79ab68ac9c63e00eaabf5b3a",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2030,11 +2087,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "ad0400788a4d2a2bccffefb925b00c880a9fd060393527e632df4a72672693c1"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2057,6 +2110,10 @@
       "arte_sha": "0b5385d116c1598c6317e5aba13af3ac4ea67691697e1dd659f107118481bb4e",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2108,11 +2165,7 @@
           "overlay_op": 0.2,
           "arte_src_sha": "003cb25b41f38f3380aee4bcfe3272ad7f9d816e4ee40285164c1b4d605bfdd3"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2135,6 +2188,10 @@
       "arte_sha": "cffdc1a2a2263d148c7fbe0d846e6d2203ac36f64979b44e0c5a0eaddc60ca59",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2173,11 +2230,7 @@
           "headline": "NOVO|*CARD.*",
           "arte_src_sha": "12e87cd8c46e9da8e4ef7003972116abcaaff03e2e190cfceb7d45bc531a1547"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2200,6 +2253,10 @@
       "arte_sha": "25f59c0cdfae2a1f3456f886690f8399f0a855b872a5c6132e7f43f520a9b8f9",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2300,11 +2357,7 @@
           "overlay_op": 0.85,
           "arte_src_sha": "2be09c9678868a4fb1fd80f98064fd5ec1a1609446b9e8c94e4f7a0ce5677029"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2327,6 +2380,10 @@
       "arte_sha": "07e03bf5e4d6c47354134ff1a8fa226a5a69b1bace8b4af9ee055831cce99466",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2358,64 +2415,7 @@
           "overlay_op": 0.6,
           "arte_src_sha": "be2a3f342009794a44c55054ba22e5d510ee0e07644ddcda4f564c889a6f93dd"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "lote-a-dark---m-veis",
-      "marca": "elever-ai",
-      "thumb": ".thumbs/elever-ai__lote-a-dark---m-veis.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "salvo",
-      "titulo": "Cliente esperando resposta",
-      "caption": "O casal escolhe o móvel, manda a dúvida e fica olhando a tela. Se ninguém responde na hora, eles fecham o app e vão pra outra loja. Com um funcionário de IA no atendimento, cada pergunta tem resposta na mesma hora, dia e noite. Menos espera, menos cliente perdido.\n\n#atendimento #inteligenciaartificial #varejo #gestao",
-      "arte_sha": "15c3e394fc42831078e7a8b916e75ba09ab7fa690366d5cae22f2c2af814a752",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T20:53:37",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 2,
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---m-veis/_regen/01-d3bb74.png",
-          "cor": "#F4F2FB",
-          "cta": "Toque no botão abaixo.",
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---m-veis/01.png",
-          "sub": "Loja sem resposta rápida perde a venda em silêncio. 👇",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/elever-ai__lote-a-dark---m-veis.jpg",
-          "accent": "",
-          "bg_sha": "0197c1c58dea9d152805103c52eae083c542420b7e4b2f65bab8614f8beaf599",
-          "bgmode": "imagem",
-          "ov_ang": 195,
-          "overlay": "branco",
-          "arte_sha": "15c3e394fc42831078e7a8b916e75ba09ab7fa690366d5cae22f2c2af814a752",
-          "headline": "Quantos orçamentos \nvocê perde sem saber?",
-          "bg_src_sha": "2e15b2dda9548cabf52dde7720023921cc2c15a7f657e5d1e2784dd419129e9e",
-          "overlay_op": 1,
-          "arte_src_sha": "b7de6fdeeabbc4cc70cde4454b1394dffa65ce8b192cf308fc911d999f6ab4ba"
-        }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2438,6 +2438,10 @@
       "arte_sha": "3da48bd246c16b5206e9d9c1b27367d4de6a2b3d9db7dac9006165829f65db8b",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2544,11 +2548,7 @@
           "headline": "NOVO|*CARD.*",
           "arte_src_sha": "6f46b6314bf6027e7ac92db168cb5b79b02ca2eb46d942e10833efafa4617a49"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2571,6 +2571,10 @@
       "arte_sha": "9bf3b9268e8951f61e8b71cdda07c66d43a6c4e4faf3321b08bb643bdaf0a96d",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2597,11 +2601,7 @@
           "overlay_op": 1,
           "arte_src_sha": "0efab7d89515fed1b4e2873ce3c8ed3a45f1f51545e29d50a7dd348441459e75"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2624,6 +2624,10 @@
       "arte_sha": "ed05e3c103704cfcce9b8056273896b3fe8bf5bc79ab68ac9c63e00eaabf5b3a",
       "created_at": "2026-07-29T02:55:16",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2648,11 +2652,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "ad0400788a4d2a2bccffefb925b00c880a9fd060393527e632df4a72672693c1"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2684,6 +2684,10 @@
       "arte_sha": "a4ff19848f3ed04dba5f7981f226de25cc71eddcffd4872a0af55fbd46e174f8",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2728,11 +2732,7 @@
           "bg_custo_usd": 0.04,
           "bg_publicavel": false
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2755,6 +2755,10 @@
       "arte_sha": "f75410aa620ce9b6aec3a9d066b7aa30c32569f978ae32f7a8885f952f0972fe",
       "created_at": "2026-07-29T03:51:13",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2782,11 +2786,7 @@
           "bg_custo_usd": 0.04,
           "bg_publicavel": false
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2809,6 +2809,10 @@
       "arte_sha": "4eb52d30d234f7769ffa4e65d68af3c3239acea7a16abeb5640d5e5ef2e92810",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2832,11 +2836,7 @@
           "bg_src_sha": "6795a299e1e15096624ac8a78bef2de3eae1c69bf17ed14afba446ca885fa556",
           "arte_src_sha": "6d1a063f07a5488d37603c44e77488c6f3c9545ff5b63689de9d828960ea83c3"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     },
     {
       "roi": {
@@ -2859,6 +2859,10 @@
       "arte_sha": "a0a3d2ebb17a8df572eb155767deeb73866a87428c3b25a0dc35413cd3b02e0c",
       "created_at": "2026-07-29T03:18:17",
       "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
       "frames": [
         {
           "n": 1,
@@ -2883,11 +2887,7 @@
           "headline": "SEU TÍTULO|*AQUI.*",
           "arte_src_sha": "f42e700c34816d9e6f58a9e9260ba7e1f968559feab121b5d2bfbe1a17e30fc3"
         }
-      ],
-      "agendado_para": "",
-      "aprovado_em": "",
-      "publicado_em": "",
-      "aprovado_por": ""
+      ]
     }
   ],
   "version": 2,

@@ -2918,7 +2918,14 @@ def _norm_quando(v):
     return dt.astimezone(datetime.timezone.utc).isoformat(timespec="seconds")
 
 
-def _agora_iso():
+def _agora_utc():
+    """Agora com fuso explícito.
+
+    Existe separado do `_agora_iso()` lá embaixo — aquele devolve hora local SEM
+    fuso e é o que `normaliza()` grava em created_at/updated_at desde sempre.
+    Misturar os dois é o que fazia "já venceu?" errar por 3 horas: comparava
+    15:00+00:00 com 19:01 local como se fossem a mesma régua.
+    """
     return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
 
 
@@ -2959,10 +2966,10 @@ def mudar_status_post(marca, slug, para, *, por="time", comentario="",
             alvo["agendado_para"] = quando_iso
             alvo["tentativas"] = 0
         if para == "aprovado":
-            alvo["aprovado_em"] = _agora_iso()
+            alvo["aprovado_em"] = _agora_utc()
             alvo["aprovado_por"] = (por or "")[:120]
         if para == "publicado":
-            alvo["publicado_em"] = _agora_iso()
+            alvo["publicado_em"] = _agora_utc()
             alvo["agendado_para"] = ""
         if para in ("rascunho", "ajuste", "salvo"):
             alvo["agendado_para"] = ""
@@ -3763,14 +3770,23 @@ class H(http.server.BaseHTTPRequestHandler):
             # o que está na fila pra sair, e o que já venceu
             d = load()
             fila = []
-            agora = _agora_iso()
+            agora = _agora_utc()
             for p in d.get("posts") or []:
                 if (p.get("status") or "") != "agendado":
                     continue
                 q = p.get("agendado_para") or ""
+                # Comparação em datetime, não em string: as duas pontas têm fuso,
+                # mas "+00:00" e "Z" ordenam diferente como texto.
+                venceu = False
+                if q:
+                    try:
+                        venceu = (datetime.datetime.fromisoformat(q.replace("Z", "+00:00"))
+                                  <= datetime.datetime.now(datetime.timezone.utc))
+                    except Exception:
+                        venceu = False
                 fila.append({"marca": p.get("marca") or "smark", "slug": p.get("slug") or "",
                              "titulo": p.get("titulo") or "", "quando": q,
-                             "vencido": bool(q and q <= agora)})
+                             "vencido": venceu})
             fila.sort(key=lambda x: x["quando"] or "9")
             return self._send(200, {"ok": True, "agora": agora, "fila": fila})
 
