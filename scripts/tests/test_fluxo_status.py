@@ -393,6 +393,21 @@ class TestFlushSoDoQueMudou(unittest.TestCase):
         self.es._esquecer([self.p])
         self.assertEqual(len(self.es._so_o_que_mudou([self.p])), 1)
 
+    def test_updated_at_novo_nao_conta_como_mudanca(self):
+        """`normaliza()` reestampa `updated_at` nos 48 posts a cada save.
+
+        Enquanto isso entrava no hash, todo save mandava o editor.json inteiro
+        pro banco — o filtro existia e não filtrava nada.
+        """
+        self.es._so_o_que_mudou([dict(self.p, updated_at="2026-07-29T10:00:00")])
+        igual = dict(self.p, updated_at="2026-07-29T23:59:59")
+        self.assertEqual(self.es._so_o_que_mudou([igual]), [])
+
+    def test_boot_nao_reenvia_o_que_veio_do_banco(self):
+        """Marcar o snapshot do boot como já enviado é o que evita o batch de 48."""
+        self.es._so_o_que_mudou([self.p])          # é o que o sync_db_boot faz
+        self.assertEqual(self.es._so_o_que_mudou([self.p]), [])
+
     def test_post_sem_slug_fica_de_fora(self):
         self.assertEqual(self.es._so_o_que_mudou([{"marca": "smark", "titulo": "sem slug"}]), [])
 

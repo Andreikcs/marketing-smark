@@ -2650,9 +2650,17 @@ def _schedule_db_flush(posts):
 _DB_ENVIADO: dict = {}     # (marca, slug) -> hash do que já foi pro banco
 
 
+_FORA_DA_IMPRESSAO = set(_CAMPOS_FLUXO) | {"status", "updated_at"}
+
+
 def _impressao(p) -> str:
-    """Hash do post ignorando o que só a `aplicar_status` escreve."""
-    limpo = {k: v for k, v in p.items() if k not in _CAMPOS_FLUXO and k != "status"}
+    """Hash do conteúdo do post.
+
+    Fora do hash: o que só a `aplicar_status` escreve, e o `updated_at` — o
+    `normaliza()` estampa a hora em TODOS os posts a cada save, então enquanto
+    ele entrava no hash os 48 pareciam alterados e o filtro não filtrava nada.
+    """
+    limpo = {k: v for k, v in p.items() if k not in _FORA_DA_IMPRESSAO}
     return hashlib.sha1(
         json.dumps(limpo, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
     ).hexdigest()
@@ -2737,6 +2745,11 @@ def sync_db_boot():
             if posts:
                 _write_editor_file(rebuilt)
                 _MEM_CACHE = rebuilt
+                # O arquivo ACABOU de sair do banco: os dois estão iguais. Sem
+                # isto o primeiro save do dia manda os 48 posts de volta numa
+                # transação só, e é justo esse batch que trava a linha que a
+                # `aplicar_status` precisa — a aprovação ficava só no arquivo.
+                _so_o_que_mudou(posts)
             print(
                 f"  DB sync: postgres→arquivo  posts={len(posts)} frames={ct.get('post_frame')} marcas={ct.get('marca')}",
                 file=sys.stderr,
