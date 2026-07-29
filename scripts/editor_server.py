@@ -23,6 +23,36 @@ import urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))
 VAULT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
+
+
+def _load_dotenv():
+    """Carrega .env do vault (LaunchAgent/local não herda chaves do shell).
+
+    Ambiente (Railway) tem precedência: setdefault não sobrescreve.
+    """
+    path = os.path.join(VAULT, ".env")
+    if not os.path.isfile(path):
+        return
+    try:
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                k, v = k.strip(), v.strip().strip('"').strip("'")
+                if k:
+                    os.environ.setdefault(k, v)
+        # local: preferir proxy público do Postgres se URL interna
+        pub = (os.environ.get("DATABASE_PUBLIC_URL") or "").strip()
+        url = (os.environ.get("DATABASE_URL") or "").strip()
+        if pub and (not url or "railway.internal" in url) and not os.environ.get("RAILWAY_ENVIRONMENT"):
+            os.environ["DATABASE_URL"] = pub
+    except OSError as e:
+        print(f"  .env: aviso {e}", file=sys.stderr)
+
+
+_load_dotenv()
 import compositor  # noqa: E402
 import estudio  # noqa: E402  (cérebro do chat: copy + conceito visual)
 import _acervo  # noqa: E402
