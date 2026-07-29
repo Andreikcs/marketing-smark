@@ -2604,6 +2604,113 @@ def save(d):
         _MEM_CACHE = payload
     # fora do lock de I/O de request: flush async
     _schedule_db_flush(posts)
+    _agendar_arte()
+
+
+def _agendar_arte(delay=2.5):
+    """Agenda a composição das artes em background (debounce).
+
+    Isto é o que faz o `push_artes.py` deixar de ser rotina: quem edita na tela
+    não precisa rodar nada pra peça existir em produção. Fica atrás de um
+    debounce porque o editor auto-salva a cada 30s e a cada tecla — sem isso a
+    gente renderizaria a mesma arte dezenas de vezes.
+    """
+    global _ARTE_TIMER
+    with _ARTE_LOCK:
+        if _ARTE_TIMER is not None:
+            try:
+                _ARTE_TIMER.cancel()
+            except Exception:
+                pass
+        t = threading.Timer(delay, _rodar_arte)
+        t.daemon = True
+        _ARTE_TIMER = t
+        t.start()
+
+
+def _rodar_arte():
+    """Compõe o que mudou e grava no Postgres. Roda sozinho, fora do request.
+
+    Só re-renderiza frame cujo HTML mudou (ver _arte.garantir_arte): compor custa
+    ~2s de CPU por peça, então passar por 63 frames sem cache seria inaceitável.
+    """
+    global _ARTE_RODANDO
+    with _ARTE_LOCK:
+        if _ARTE_RODANDO:
+            # já tem uma passada em andamento; ela pega as mudanças no fim
+            _ARTE_PEDIDO.set()
+            return
+        _ARTE_RODANDO = True
+    try:
+        while True:
+            _ARTE_PEDIDO.clear()
+            try:
+                _passada_arte()
+            except Exception as e:
+                print("  arte: passada falhou: %s" % e, file=sys.stderr)
+            if not _ARTE_PEDIDO.is_set():
+                break
+    finally:
+        with _ARTE_LOCK:
+            _ARTE_RODANDO = False
+
+
+def _passada_arte():
+    import _arte
+    db = _db_mod()
+    if not db or not db.disponivel():
+        return  # sem banco não há onde guardar a arte; o disco local já basta
+    with IO_LOCK:
+        d = _clone_editor(load())
+    posts = d.get("posts") or []
+
+    mudou, renderizados, erros = False, 0, []
+    for p in posts:
+        for fr in (p.get("frames") or []):
+            antes = fr.get("arte_sha")
+            r = _arte.garantir_arte(p, fr, origem="editor")
+            if r["ok"] and r["novo"]:
+                renderizados += 1
+            elif not r["ok"]:
+                erros.append("%s/%s: %s" % (p.get("marca"), p.get("slug"), r["motivo"]))
+            if fr.get("arte_sha") != antes:
+                mudou = True
+        frames = p.get("frames") or []
+        capa = (frames[0].get("arte_sha") if frames else "") or ""
+        if capa and p.get("arte_sha") != capa:
+            p["arte_sha"] = capa
+            mudou = True
+
+    if not mudou:
+        return
+    # Reaplica os sha por (marca, slug) no estado ATUAL: enquanto a gente
+    # renderizava, o usuário pode ter salvo outra coisa. Só encostamos nos
+    # campos de arte, nunca no conteúdo que ele editou.
+    with IO_LOCK:
+        atual = load()
+        idx = {(p.get("marca"), p.get("slug")): p for p in (atual.get("posts") or [])}
+        for p in posts:
+            alvo = idx.get((p.get("marca"), p.get("slug")))
+            if not alvo:
+                continue
+            fa, fb = p.get("frames") or [], alvo.get("frames") or []
+            for i, fr in enumerate(fa):
+                if i < len(fb) and fr.get("arte_sha"):
+                    fb[i]["arte_sha"] = fr["arte_sha"]
+                    fb[i]["arte_src_sha"] = fr.get("arte_src_sha", "")
+            if p.get("arte_sha"):
+                alvo["arte_sha"] = p["arte_sha"]
+        _write_editor_file(atual)
+        global _MEM_CACHE
+        _MEM_CACHE = atual
+        snapshot = list(atual.get("posts") or [])
+    try:
+        db.upsert_posts_batch(snapshot)
+    except Exception as e:
+        print("  arte: upsert falhou: %s" % e, file=sys.stderr)
+    print("  arte: %d renderizada(s)%s" % (
+        renderizados, (", %d erro(s): %s" % (len(erros), erros[:3])) if erros else ""),
+        file=sys.stderr)
 
 
 def _parse_arte_meta(stdout):
@@ -3204,6 +3311,32 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(200, status_dashboard_html(data), MIME[".html"])
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
+        if path == "/render-check":
+            # Autoteste: compõe uma peça de verdade e mede. É a diferença entre
+            # "o binário está lá" e "o servidor consegue produzir a arte".
+            import time as _t
+            try:
+                html, w, h = compositor.compose_html(**frame_kwargs(
+                    {"headline": "Autoteste de render", "sub": "Ação e coração — acentos."},
+                    "1080x1350", for_export=True, marca="smark"))
+                dst = os.path.join(tempfile.gettempdir(), "render-check-%s.png" % secrets.token_hex(3))
+                t0 = _t.time()
+                ok = compositor.render_html_to_png(html, dst, w, h, tries=1)
+                dt = round(_t.time() - t0, 2)
+                tam = os.path.getsize(dst) if ok and os.path.exists(dst) else 0
+                try:
+                    os.remove(dst)
+                except OSError:
+                    pass
+                return self._send(200 if ok else 503, {
+                    "ok": ok, "segundos": dt, "bytes": tam,
+                    "chrome": compositor.CHROME,
+                    "fontes_embutidas": len(getattr(compositor, "_FONTES", "")) > 1000,
+                    "erro": "" if ok else "Chrome não produziu PNG — servidor não compõe arte",
+                })
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
         if path == "/marcas":
             try:
                 marcas = _marcas.listar_detalhes()
