@@ -2649,7 +2649,9 @@ def _schedule_db_flush(posts):
 
 _DB_ENVIADO: dict = {}     # (marca, slug) -> hash do que já foi pro banco
 
-
+# campos que só a `aplicar_status` escreve (ver merge_fluxo)
+_CAMPOS_FLUXO = ("agendado_para", "aprovado_em", "aprovado_por", "publicado_em",
+                 "ultimo_comentario")
 _FORA_DA_IMPRESSAO = set(_CAMPOS_FLUXO) | {"status", "updated_at"}
 
 
@@ -2799,10 +2801,6 @@ def load():
                 print(f"  DB load aviso: {e}", file=sys.stderr)
         _MEM_CACHE = file_data
         return _clone_editor(file_data)
-
-
-_CAMPOS_FLUXO = ("agendado_para", "aprovado_em", "aprovado_por", "publicado_em",
-                 "ultimo_comentario")
 
 
 def merge_fluxo(novos, disco):
