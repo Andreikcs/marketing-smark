@@ -1,0 +1,205 @@
+#!/usr/bin/env python3
+"""Regressão do fluxo de aprovação (rascunho → … → publicado).
+
+O que está sendo protegido aqui não é o caminho feliz — é o contrário dele:
+
+  - não existe atalho de rascunho pro ar (o cliente não pode ser surpreendido)
+  - editar um post aprovado tira a aprovação (ela vale pra peça que ele viu)
+  - post que volta pra ajuste sai da fila de agendados na mesma hora
+  - `salvo`, o status que 40+ posts do vault já têm, continua dentro da máquina
+  - a data agendada vira UTC, venha ela de que fuso vier
+
+Roda sem banco: o status mora no editor.json e a validação é pura.
+
+Rodar: python3 scripts/tests/test_fluxo_status.py
+"""
+from __future__ import annotations
+
+import json
+import os
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+SCRIPTS = HERE.parent
+sys.path.insert(0, str(SCRIPTS))
+
+import _db  # noqa: E402
+
+
+class _FluxoSemBanco:
+    """O vocabulário do fluxo, sem nenhuma conexão. Teste não fala com o Postgres."""
+    STATUS_VALIDOS = _db.STATUS_VALIDOS
+    STATUS_LABEL = _db.STATUS_LABEL
+    TRANSICOES = _db.TRANSICOES
+    transicao_ok = staticmethod(_db.transicao_ok)
+
+    @staticmethod
+    def disponivel():
+        return False
+
+
+class TestMaquinaDeEstados(unittest.TestCase):
+    def test_todo_destino_e_um_status_valido(self):
+        for de, destinos in _db.TRANSICOES.items():
+            self.assertIn(de, _db.STATUS_VALIDOS, "estado órfão: %s" % de)
+            for para in destinos:
+                self.assertIn(para, _db.STATUS_VALIDOS,
+                              "%s aponta pra status inexistente: %s" % (de, para))
+
+    def test_todo_status_tem_rotulo_e_saida_definida(self):
+        for s in _db.STATUS_VALIDOS:
+            self.assertIn(s, _db.STATUS_LABEL, "status sem rótulo de tela: %s" % s)
+            self.assertIn(s, _db.TRANSICOES, "status sem transições declaradas: %s" % s)
+
+    def test_nao_existe_atalho_de_rascunho_pro_ar(self):
+        """A regra que dá segurança ao cliente. Se cair, alguém publicou sem aval."""
+        for de in ("rascunho", "salvo", "revisao", "ajuste"):
+            self.assertFalse(_db.transicao_ok(de, "publicado"),
+                             "%s → publicado não pode existir" % de)
+            self.assertFalse(_db.transicao_ok(de, "agendado"),
+                             "%s → agendado não pode existir" % de)
+
+    def test_so_agenda_quem_esta_aprovado(self):
+        entram = [de for de in _db.STATUS_VALIDOS if _db.transicao_ok(de, "agendado")]
+        self.assertEqual(sorted(entram), ["aprovado", "erro"])
+
+    def test_publicado_e_fim_de_linha(self):
+        self.assertEqual(_db.proximos("publicado"), ())
+
+    def test_salvo_esta_no_fluxo(self):
+        """40+ posts do vault têm status 'salvo'. Fora da máquina, travariam."""
+        self.assertIn("salvo", _db.STATUS_VALIDOS)
+        self.assertTrue(_db.transicao_ok("salvo", "revisao"))
+        self.assertTrue(_db.transicao_ok("rascunho", "salvo"))
+
+    def test_status_desconhecido_nao_anda(self):
+        self.assertFalse(_db.transicao_ok("inventado", "aprovado"))
+        self.assertEqual(_db.proximos("inventado"), ())
+
+
+class TestMudarStatusNoArquivo(unittest.TestCase):
+    """O editor.json é quem manda no status — o banco recebe pelo upsert."""
+
+    def setUp(self):
+        import editor_server as es
+        self.es = es
+        self.tmp = tempfile.mkdtemp(prefix="fluxo-")
+        self._data_antes = es.DATA
+        self._cache_antes = es._MEM_CACHE
+        es.DATA = os.path.join(self.tmp, "editor.json")
+        es._MEM_CACHE = None
+        self._escrever([{
+            "marca": "smark", "slug": "post-teste", "titulo": "Teste",
+            "status": "rascunho", "frames": [{"n": 1, "headline": "oi"}],
+        }])
+        # O editor_server lê o .env no import, então sem isto o teste escreveria
+        # 'post-teste' no Postgres de PRODUÇÃO — e ainda mandaria renderizar arte.
+        self._flush_antes, self._arte_antes = es._schedule_db_flush, es._agendar_arte
+        es._schedule_db_flush = lambda posts: None
+        es._agendar_arte = lambda *a, **k: None
+        # a trilha é opcional (o fluxo funciona sem banco); aqui ela fica off
+        self._db_mod_antes = es._db_mod
+        es._db_mod = lambda: _FluxoSemBanco
+
+    def tearDown(self):
+        self.es.DATA = self._data_antes
+        self.es._MEM_CACHE = self._cache_antes
+        self.es._db_mod = self._db_mod_antes
+        self.es._schedule_db_flush = self._flush_antes
+        self.es._agendar_arte = self._arte_antes
+
+    def _escrever(self, posts):
+        with open(self.es.DATA, "w", encoding="utf-8") as f:
+            json.dump({"version": 2, "posts": posts}, f)
+        self.es._MEM_CACHE = None
+
+    def _post(self):
+        with open(self.es.DATA, encoding="utf-8") as f:
+            return json.load(f)["posts"][0]
+
+    def _ir(self, para, **kw):
+        return self.es.mudar_status_post("smark", "post-teste", para, **kw)
+
+    def test_caminho_completo_ate_publicado(self):
+        self.assertTrue(self._ir("salvo")["ok"])
+        self.assertTrue(self._ir("revisao")["ok"])
+        r = self._ir("aprovado", por="cliente@amosim")
+        self.assertTrue(r["ok"])
+        p = self._post()
+        self.assertEqual(p["status"], "aprovado")
+        self.assertEqual(p["aprovado_por"], "cliente@amosim")
+        self.assertTrue(p["aprovado_em"], "aprovação sem data não serve de prova")
+
+    def test_transicao_proibida_e_recusada_com_motivo(self):
+        r = self._ir("publicado")
+        self.assertFalse(r["ok"])
+        self.assertIn("rascunho", r["erro"])
+        self.assertEqual(self._post()["status"], "rascunho", "recusou mas mexeu no post")
+
+    def test_agendar_exige_data(self):
+        self._ir("aprovado")
+        r = self._ir("agendado")
+        self.assertFalse(r["ok"])
+        self.assertEqual(self._post()["status"], "aprovado")
+
+    def test_agenda_vira_utc_venha_de_onde_vier(self):
+        self._ir("aprovado")
+        r = self._ir("agendado", quando="2026-08-03T12:00:00-03:00")
+        self.assertTrue(r["ok"], r.get("erro"))
+        self.assertEqual(self._post()["agendado_para"], "2026-08-03T15:00:00+00:00")
+
+    def test_voltar_pra_ajuste_tira_da_fila(self):
+        """Um post que o cliente mandou mudar não pode sair no ar às 9h."""
+        self._ir("aprovado")
+        self._ir("agendado", quando="2026-08-03T12:00:00+00:00")
+        self.assertTrue(self._post()["agendado_para"])
+        r = self._ir("ajuste", comentario="trocar a foto")
+        self.assertTrue(r["ok"])
+        p = self._post()
+        self.assertEqual(p["status"], "ajuste")
+        self.assertEqual(p["agendado_para"], "", "continuou agendado depois do ajuste")
+        self.assertEqual(p["ultimo_comentario"], "trocar a foto")
+
+    def test_post_sem_arte_nao_vai_pro_cliente(self):
+        self._escrever([{"marca": "smark", "slug": "post-teste", "titulo": "Vazio",
+                         "status": "rascunho", "frames": []}])
+        r = self._ir("revisao")
+        self.assertFalse(r["ok"])
+        self.assertIn("arte", r["erro"])
+
+    def test_post_inexistente_nao_explode(self):
+        r = self.es.mudar_status_post("smark", "nao-existe", "salvo")
+        self.assertFalse(r["ok"])
+        self.assertIn("não encontrado", r["erro"])
+
+    def test_mesmo_status_e_no_op(self):
+        r = self._ir("rascunho")
+        self.assertTrue(r["ok"])
+        self.assertTrue(r.get("sem_mudanca"))
+
+    def test_forcar_ignora_a_maquina(self):
+        """Escotilha de emergência — existe, mas só quem pede explicitamente usa."""
+        r = self._ir("publicado", forcar=True)
+        self.assertTrue(r["ok"])
+        self.assertTrue(self._post()["publicado_em"])
+
+
+class TestNormalizacaoDeData(unittest.TestCase):
+    def setUp(self):
+        import editor_server as es
+        self.n = es._norm_quando
+
+    def test_lixo_vira_vazio(self):
+        for ruim in ("", "amanhã", "2026-13-45", "quinta que vem", None):
+            self.assertEqual(self.n(ruim), "", "aceitou data inválida: %r" % ruim)
+
+    def test_z_e_offset_dao_no_mesmo(self):
+        self.assertEqual(self.n("2026-08-03T15:00:00Z"),
+                         self.n("2026-08-03T12:00:00-03:00"))
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

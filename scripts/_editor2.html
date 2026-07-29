@@ -111,6 +111,26 @@ input[type=range]{width:100%;accent-color:var(--rox)}
 .mini{font-size:11px;color:var(--sub)}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1c1729;border:1px solid var(--rox);padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;z-index:99}
 #toast.on{opacity:1}
+/* pill de situação no cabeçalho — mesma paleta do painel */
+.stpill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;cursor:pointer;
+  font-size:11px;font-weight:600;line-height:1.6;white-space:nowrap;border:1px solid var(--line);background:transparent}
+.stpill:before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex:0 0 auto}
+.stpill:hover{border-color:var(--rox)}
+.stp-rascunho{color:var(--sub)}
+.stp-salvo{color:var(--txt)}
+.stp-revisao{color:#4C9AFF;border-color:rgba(76,154,255,.4)}
+.stp-ajuste{color:var(--warn);border-color:rgba(245,197,66,.45)}
+.stp-aprovado{color:var(--ok);border-color:rgba(61,220,151,.45)}
+.stp-agendado{color:var(--rox);border-color:var(--rox)}
+.stp-publicado{color:var(--ok);border-color:var(--ok)}
+.stp-erro{color:var(--danger);border-color:rgba(255,107,122,.45)}
+/* menu do fluxo */
+.stmenu{position:absolute;z-index:120;background:var(--pan);border:1px solid var(--line);border-radius:10px;
+  padding:6px;display:flex;flex-direction:column;gap:2px;box-shadow:0 10px 30px rgba(0,0,0,.45);min-width:190px}
+.stmenu button{border:0;background:transparent;color:var(--txt);text-align:left;padding:8px 10px;border-radius:7px;
+  font-size:12.5px;cursor:pointer;font-family:inherit}
+.stmenu button:hover{background:var(--surface-2,#1b1729);color:var(--rox)}
+.stmenu .hint{font-size:11px;color:var(--sub);padding:6px 10px}
 .bgthumb{width:100%;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--line);margin-bottom:8px;background:#000}
 .fmtbar{display:flex;gap:4px;margin-bottom:5px}
 .fmtb{border:1px solid var(--line);background:#15121e;color:var(--sub);border-radius:6px;padding:3px 9px;font-size:12px;cursor:pointer}
@@ -377,6 +397,7 @@ input[type=range]{accent-color:var(--accent)}
     <a href="/editor" class="hnav on">Editor</a>
     <span class=sp></span>
     <span id=autosave class=autosave><span class="stdot ok"></span> salvo</span>
+    <button type=button class=stpill id=bstatus title="situação deste post no fluxo">Rascunho</button>
     <button class=hicon id=broi title="ROI humano — tempo e custo dos posts"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><circle cx=12 cy=12 r=9/><path d="M12 7v5l3 2"/></svg></button>
     <button class=hicon id=bhist title="Histórico de versões deste post"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg></button>
     <button class=hicon id=bexport title="exportar PNG (este frame ou o carrossel)"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></button>
@@ -639,7 +660,8 @@ function renderPosts(){
   const shown=q?list:list.slice(0,10);
   shown.forEach(({p,i})=>{
     const d=document.createElement('div');d.className='pitem'+(i===PI?' on':'');
-    const st=(p.status==='salvo')?'<span class=stb style="color:var(--ok)">● salvo</span>':'<span class=stb style="color:var(--warn)">● rascunho</span>';
+    const _s=p.status||'rascunho';
+    const st='<span class="stb stp-'+_s+'" style="border:0;padding:0">● '+(typeof stLabel==='function'?stLabel(_s):_s)+'</span>';
     const cb=document.createElement('input');cb.type='checkbox';cb.className='cb';cb.checked=SEL.has(i);
     cb.onclick=e=>{e.stopPropagation();cb.checked?SEL.add(i):SEL.delete(i)};
     const txt=document.createElement('div');txt.className='ptxt';
@@ -647,6 +669,7 @@ function renderPosts(){
     d.appendChild(cb);d.appendChild(txt);d.onclick=()=>sel(i,0);el.appendChild(d);
   });
   const vm=$('#vermais');if(vm)vm.textContent=q?('ver todas ('+list.length+') no Painel →'):(D.posts.length>10?('mostrando 10 de '+D.posts.length+' · ver todas →'):'ver no Painel →');
+  renderStatus();
 }
 async function dupPost(){
   const p=JSON.parse(JSON.stringify(post()));p.titulo=(p.titulo||'')+' (cópia)';
@@ -687,7 +710,7 @@ async function reorderFrame(from,to){
   if(from===to||isNaN(from))return;const fr=post().frames;const[m]=fr.splice(from,1);fr.splice(to,0,m);
   await salvar(true);await reload(PI,to);toast('Reordenado');
 }
-function sel(pi,fi){hideWelcome();PI=pi;FI=fi;const m=(D.posts[pi]||{}).marca||'smark';aplicarTemaMarca(m);if(typeof setAmbientBrand==='function')setAmbientBrand(m);renderPosts();renderStrip();renderCtrl();preview();roiStartQuiet()}
+function sel(pi,fi){hideWelcome();PI=pi;FI=fi;const m=(D.posts[pi]||{}).marca||'smark';aplicarTemaMarca(m);if(typeof setAmbientBrand==='function')setAmbientBrand(m);renderPosts();renderStrip();renderCtrl();renderStatus();preview();roiStartQuiet()}
 async function roiStartQuiet(){
   // NÃO inicia ciclo só por abrir o post — isso inflava 26h+ de “tempo”.
   // Ciclo começa só com trabalho real (texto IA / gerar imagem / export).
@@ -1110,8 +1133,90 @@ async function salvar(silent){
   await fetch('/salvar',{method:'POST',headers:HJSON,body:JSON.stringify({dados:D})});
   lastSave=new Date();dirty=false;clearTimeout(autoT);updateSaveStatus();if(!silent)toast('Salvo');
 }
-function markDraft(){if(D&&D.posts[PI])D.posts[PI].status='rascunho'}
-$('#bsave').onclick=async()=>{if(post())post().status='salvo';await salvar(true);renderPosts();toast('Salvo — finalizado ✓')};
+// ── fluxo de aprovação ───────────────────────────────────────────────────────
+// Espelho de _db.py. Se mudar lá, muda aqui.
+const ST_LABEL={rascunho:'Rascunho',salvo:'Pronto',revisao:'Em revisão',ajuste:'Pedido de ajuste',
+  aprovado:'Aprovado',agendado:'Agendado',publicado:'Publicado',erro:'Falhou'};
+const ST_NEXT={rascunho:['salvo','revisao','aprovado'],salvo:['revisao','aprovado','rascunho'],
+  revisao:['aprovado','ajuste','rascunho'],ajuste:['revisao','salvo','rascunho'],
+  aprovado:['agendado','publicado','rascunho','ajuste'],
+  agendado:['publicado','aprovado','erro','ajuste'],erro:['agendado','aprovado','rascunho'],publicado:[]};
+const ST_VERBO={salvo:'Marcar pronto',revisao:'Enviar pro cliente',aprovado:'Aprovar',
+  ajuste:'Pedir ajuste',agendado:'Agendar…',publicado:'Marcar publicado',
+  rascunho:'Voltar pra rascunho',erro:'Marcar falha'};
+function stLabel(s){return ST_LABEL[s||'rascunho']||s}
+
+function renderStatus(){
+  const b=$('#bstatus');if(!b)return;
+  const p=post();if(!p){b.hidden=true;return}
+  b.hidden=false;const st=p.status||'rascunho';
+  b.className='stpill stp-'+st;
+  b.textContent=stLabel(st)+(st==='agendado'&&p.agendado_para?(' · '+new Date(p.agendado_para).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})):'');
+}
+
+// Editar depois de aprovado invalida a aprovação: o cliente disse sim pra UMA
+// peça, não pro slug. Sem isso dava pra trocar a arte inteira e o "aprovado"
+// continuar valendo — é o tipo de coisa que só aparece na hora da briga.
+function markDraft(){
+  const p=D&&D.posts[PI];if(!p)return;
+  const st=p.status||'rascunho';
+  if(st==='publicado')return;                 // já foi ao ar; o registro fica como está
+  if(st!=='rascunho'&&st!=='salvo'){
+    p.status='rascunho';renderStatus();
+    toast('Editar tirou este post de "'+stLabel(st)+'" — a aprovação vale pra peça que o cliente viu');
+    return;
+  }
+  p.status='rascunho';renderStatus();
+}
+
+async function mudarStatus(para,quando,comentario){
+  const p=post();if(!p)return false;
+  await salvar(true);                          // o servidor decide sobre o post JÁ salvo
+  const r=await fetch('/post-status',{method:'POST',headers:HJSON,
+    body:JSON.stringify({marca:p.marca||'smark',slug:p.slug,para:para,quando:quando||'',
+      comentario:comentario||'',por:'time'})});
+  let j={};try{j=await r.json()}catch(e){}
+  if(!j.ok){toast(j.erro||'não deu pra mudar a situação');return false}
+  p.status=para;
+  if(para==='agendado')p.agendado_para=j.agendado_para||quando||'';
+  if(['rascunho','ajuste','salvo'].includes(para))p.agendado_para='';
+  renderStatus();renderPosts();toast(stLabel(para)+' ✓');
+  return true;
+}
+
+$('#bstatus').onclick=(e)=>{
+  document.querySelectorAll('.stmenu').forEach(m=>m.remove());
+  const p=post();if(!p)return;
+  const nx=ST_NEXT[p.status||'rascunho']||[];
+  const m=document.createElement('div');m.className='stmenu';
+  m.innerHTML=nx.length?nx.map(s=>'<button data-s="'+s+'">'+(ST_VERBO[s]||stLabel(s))+'</button>').join('')
+    :'<div class=hint>Publicado — duplique o post pra refazer.</div>';
+  document.body.appendChild(m);
+  const r=e.currentTarget.getBoundingClientRect();
+  m.style.top=(r.bottom+6)+'px';m.style.left=Math.max(8,r.left-40)+'px';
+  m.onclick=async ev=>{
+    const b=ev.target.closest('button');if(!b)return;const s=b.dataset.s;m.remove();
+    if(s==='agendado'){
+      const d=new Date(Date.now()+3600000);d.setMinutes(0,0,0);
+      const sug=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16).replace('T',' ');
+      const v=prompt('Sai quando? (AAAA-MM-DD HH:MM)',sug);
+      if(!v)return;
+      const dt=new Date(v.replace(' ','T'));
+      if(isNaN(dt)){toast('Data não entendida');return}
+      await mudarStatus('agendado',dt.toISOString());return;
+    }
+    const msg=(s==='ajuste')?(prompt('O que precisa mudar? (fica no histórico)','')||''):'';
+    await mudarStatus(s,'',msg);
+  };
+  setTimeout(()=>document.addEventListener('click',function h(ev){
+    if(!m.contains(ev.target)){m.remove();document.removeEventListener('click',h)}},0),0);
+};
+
+$('#bsave').onclick=async()=>{
+  const p=post();
+  // Salvar não pode rebaixar um post que já andou no fluxo.
+  if(p&&['rascunho','salvo'].includes(p.status||'rascunho'))p.status='salvo';
+  await salvar(true);renderPosts();renderStatus();toast('Salvo — finalizado ✓')};
 $('#bexport').onclick=(e)=>{
   document.querySelectorAll('.expmenu').forEach(m=>m.remove());
   const m=document.createElement('div');m.className='expmenu';
@@ -1495,7 +1600,9 @@ document.addEventListener('keydown',e=>{
   const typing=/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||'');
   if(e.key==='Escape'){['fsmodal','igmodal'].forEach(id=>{const m=document.getElementById(id);if(m)m.style.display='none'});return}
   if(e.ctrlKey||e.metaKey){const k=e.key.toLowerCase();
-    if(k==='s'){e.preventDefault();if(post())post().status='salvo';salvar(true).then(()=>{renderPosts();toast('Salvo ✓')});return}
+    if(k==='s'){e.preventDefault();const _p=post();
+      if(_p&&['rascunho','salvo'].includes(_p.status||'rascunho'))_p.status='salvo';
+      salvar(true).then(()=>{renderPosts();renderStatus();toast('Salvo ✓')});return}
     if(k==='z'&&!e.shiftKey){e.preventDefault();doUndo();return}
     if((k==='z'&&e.shiftKey)||k==='y'){e.preventDefault();doRedo();return}
     if(k==='b'){e.preventDefault();fmtActive('**');return}

@@ -1696,6 +1696,10 @@ __HEAD_THEME__<style>
 .flx-log{max-height:150px;overflow:auto;font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:5px;
   border-top:1px dashed var(--line);padding-top:8px}
 .flx-log b{color:var(--text);font-weight:600}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface,#1c1729);
+  border:1px solid var(--accent);padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;
+  transition:.2s;pointer-events:none;z-index:99}
+#toast.on{opacity:1}
 .sk-post-meta{gap:7px}
 .sk-post-actions.a5{grid-template-columns:repeat(5,1fr)}
 /* modal estilo Instagram (item 9) */
@@ -1826,6 +1830,12 @@ const ST_VERBO={salvo:'Marcar pronto',revisao:'Enviar pro cliente',aprovado:'Apr
   ajuste:'Pedir ajuste',agendado:'Agendar',publicado:'Marcar publicado',
   rascunho:'Voltar pra rascunho',erro:'Marcar falha'};
 const ST_PRIM={salvo:1,revisao:1,aprovado:1,agendado:1};
+// O painel chamava toast() no download sem nunca ter definido — dava
+// ReferenceError e o aviso não aparecia. Definido aqui, uma vez.
+function toast(m){let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}
+  t.textContent=m;t.classList.add('on');clearTimeout(t._h);
+  t._h=setTimeout(()=>t.classList.remove('on'),2600)}
 function stLabel(s){return ST_LABEL[s||'rascunho']||s}
 function stPill(s){s=s||'rascunho';return '<span class="stpill stp-'+s+'">'+stLabel(s)+'</span>'}
 function fmtQuando(iso){if(!iso)return '';const d=new Date(iso);if(isNaN(d))return '';
