@@ -72,11 +72,22 @@ def _env(key: str, default: str = "") -> str:
     return default
 
 
+def _norm_redirect(uri: str) -> str:
+    """Mesma string no authorize e no exchange (Meta é pedante)."""
+    u = (uri or "").strip()
+    if len(u) > 8 and u.endswith("/"):
+        u = u.rstrip("/")
+    return u
+
+
 def ig_app_config() -> dict:
     """Credenciais do app Meta (uma app da smark; clientes só autorizam).
 
     Em Railway, se INSTAGRAM_REDIRECT_URI não estiver setado, monta a partir
     de RAILWAY_PUBLIC_DOMAIN (HTTPS) — evita o erro clássico de redirect 127.0.0.1.
+
+    Instagram Login: client_id = Instagram App ID; secret = Instagram App Secret
+    (Business login settings) — não misturar com IDs/secrets de outro app.
     """
     redirect = (
         _env("INSTAGRAM_REDIRECT_URI")
@@ -100,9 +111,9 @@ def ig_app_config() -> dict:
         or _env("META_IG_APP_ID")
     )
     return {
-        "app_id": app_id,
-        "app_secret": _env("INSTAGRAM_APP_SECRET") or _env("META_IG_APP_SECRET"),
-        "redirect_uri": redirect,
+        "app_id": str(app_id or "").strip(),
+        "app_secret": (_env("INSTAGRAM_APP_SECRET") or _env("META_IG_APP_SECRET") or "").strip(),
+        "redirect_uri": _norm_redirect(redirect),
     }
 
 
@@ -287,16 +298,19 @@ def iniciar_oauth(marca: str, canal: str = "instagram",
     cfg = ig_app_config()
     if not cfg["app_id"] or not cfg["redirect_uri"]:
         return {"ok": False, "erro": "INSTAGRAM_APP_ID / REDIRECT_URI ausentes no ambiente"}
-    # URL Meta — só params oficiais (enable_fb_login/force_reauth quebram em alguns apps)
+    # URL Meta — só params oficiais. redirect_uri idêntico no exchange (salvo no pending).
+    redirect = cfg["redirect_uri"]
     params = {
-        "client_id": str(cfg["app_id"]).strip(),
-        "redirect_uri": cfg["redirect_uri"].strip(),
+        "client_id": cfg["app_id"],
+        "redirect_uri": redirect,
         "response_type": "code",
         "scope": ",".join(IG_SCOPES),
         "state": state,
     }
     meta_url = IG_AUTHORIZE + "?" + urllib.parse.urlencode(params)
     pending["meta_url"] = meta_url
+    pending["redirect_uri"] = redirect
+    pending["app_id"] = cfg["app_id"]
     _save_pending(state, pending)
     # página intermediária com branding Smark (Meta controla a tela do Instagram)
     bridge = (
@@ -416,21 +430,44 @@ def trocar_code_real(code: str, state: str) -> dict:
     """Callback real: code → tokens long-lived + perfil."""
     pending = _pop_pending(state)
     if not pending:
-        return {"ok": False, "erro": "sessão OAuth expirada — tente Conectar de novo"}
+        return {"ok": False, "erro": "sessão OAuth expirada — tente Conectar de novo (não recarregue a URL do callback)"}
     marca = pending["marca"]
     cfg = ig_app_config()
+    # CRÍTICO: o redirect_uri do exchange DEVE ser byte-a-byte o do authorize
+    redirect = _norm_redirect(pending.get("redirect_uri") or cfg["redirect_uri"])
+    app_id = str(pending.get("app_id") or cfg["app_id"]).strip()
+    secret = cfg["app_secret"]
     code = (code or "").strip()
     if code.endswith("#_"):
         code = code[:-2]
+    # Meta às vezes devolve code com espaços
+    code = code.replace(" ", "+")
 
-    # 1) short-lived
-    short = _http_json("POST", IG_TOKEN, {
-        "client_id": cfg["app_id"],
-        "client_secret": cfg["app_secret"],
-        "grant_type": "authorization_code",
-        "redirect_uri": cfg["redirect_uri"],
-        "code": code,
-    }, form=True)
+    # 1) short-lived — mesmos client_id + redirect_uri do authorize
+    try:
+        short = _http_json("POST", IG_TOKEN, {
+            "client_id": app_id,
+            "client_secret": secret,
+            "grant_type": "authorization_code",
+            "redirect_uri": redirect,
+            "code": code,
+        }, form=True)
+    except RuntimeError as e:
+        err = str(e)
+        # dica acionável se for o erro clássico de redirect/secret
+        if "redirect_uri" in err.lower() or "verification code" in err.lower():
+            return {
+                "ok": False,
+                "erro": (
+                    f"{err}\n\n"
+                    f"redirect usado: {redirect}\n"
+                    f"client_id: {app_id}\n"
+                    "Confira na Meta (Business login): URI idêntica (sem barra no final) e "
+                    "Instagram App Secret (não só o secret do Facebook se forem diferentes). "
+                    "Não recarregue a página do callback — o code é de uso único."
+                ),
+            }
+        return {"ok": False, "erro": err}
     # resposta pode vir como {data:[{access_token,user_id,...}]} ou flat
     if isinstance(short.get("data"), list) and short["data"]:
         short = short["data"][0]
