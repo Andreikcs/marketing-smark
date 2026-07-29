@@ -227,6 +227,111 @@ def init_schema() -> dict:
     return {"ok": True, "schema": "marca,post,post_frame,canal_conexao,publicacao_log,nota_publicacao"}
 
 
+# ── fluxo de aprovação ────────────────────────────────────────────────────────
+#
+# Um post caminha assim:
+#
+#   rascunho ──enviar──► revisao ──cliente aprova──► aprovado ──marca data──► agendado
+#                          ▲  │                         │                        │
+#            (time edita)   │  └──cliente pede ajuste──► ajuste                   │
+#                          └──────────────────────────────┘                       │
+#                                                    publicado ◄──worker/manual───┘
+#
+# A regra que dá segurança ao cliente: **só sai de `aprovado` pra `agendado` ou
+# `publicado`**. Não existe caminho de rascunho direto pro ar.
+STATUS_VALIDOS = ("rascunho", "revisao", "ajuste", "aprovado", "agendado",
+                  "publicado", "erro")
+
+TRANSICOES = {
+    "rascunho":  ("revisao", "aprovado"),      # aprovado = a própria smark assina
+    "revisao":   ("aprovado", "ajuste", "rascunho"),
+    "ajuste":    ("revisao", "rascunho"),
+    "aprovado":  ("agendado", "publicado", "rascunho", "ajuste"),
+    "agendado":  ("publicado", "aprovado", "erro", "ajuste"),
+    "erro":      ("agendado", "aprovado", "rascunho"),
+    "publicado": (),                            # fim de linha; duplicar pra refazer
+}
+
+
+def transicao_ok(de: str, para: str) -> bool:
+    de = (de or "rascunho").strip() or "rascunho"
+    return para in TRANSICOES.get(de, ())
+
+
+def mudar_status(marca: str, slug: str, para: str, *, por: str = "time",
+                 comentario: str = "", agendado_para=None, forcar: bool = False) -> dict:
+    """Muda o status de um post respeitando as transições e registrando quem foi."""
+    para = (para or "").strip()
+    if para not in STATUS_VALIDOS:
+        return {"ok": False, "erro": "status inválido: %s" % para}
+    if not disponivel():
+        return {"ok": False, "erro": "sem banco"}
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute("SELECT status FROM post WHERE marca=%s AND slug=%s", (marca, slug))
+            row = cur.fetchone()
+            if not row:
+                return {"ok": False, "erro": "post não encontrado"}
+            de = row[0] if not isinstance(row, dict) else row["status"]
+            de = de or "rascunho"
+            if de == para:
+                return {"ok": True, "de": de, "para": para, "sem_mudanca": True}
+            if not forcar and not transicao_ok(de, para):
+                return {"ok": False, "erro": "transição não permitida: %s → %s" % (de, para),
+                        "de": de}
+            sets = ["status=%s", "updated_at=NOW()"]
+            vals = [para]
+            if para == "aprovado":
+                sets += ["aprovado_em=NOW()", "aprovado_por=%s"]
+                vals.append(por or "")
+            if para == "agendado":
+                if not agendado_para:
+                    return {"ok": False, "erro": "agendar exige data/hora"}
+                sets.append("agendado_para=%s")
+                vals.append(agendado_para)
+                sets.append("tentativas=0")
+            if para == "publicado":
+                sets += ["publicado_em=NOW()", "agendado_para=NULL"]
+            if para in ("rascunho", "ajuste"):
+                sets.append("agendado_para=NULL")
+            vals += [marca, slug]
+            cur.execute("UPDATE post SET %s WHERE marca=%%s AND slug=%%s" % ",".join(sets), vals)
+            cur.execute(
+                "INSERT INTO post_evento (marca, slug, de, para, por, comentario) "
+                "VALUES (%s,%s,%s,%s,%s,%s)",
+                (marca, slug, de, para, por or "", (comentario or "")[:2000]))
+    return {"ok": True, "de": de, "para": para}
+
+
+def eventos_do_post(marca: str, slug: str, limite: int = 50) -> list:
+    if not disponivel():
+        return []
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                "SELECT de, para, por, comentario, created_at FROM post_evento "
+                "WHERE marca=%s AND slug=%s ORDER BY created_at DESC LIMIT %s",
+                (marca, slug, int(limite)))
+            return [dict(r) for r in cur.fetchall()]
+
+
+def posts_vencidos(agora=None, limite: int = 20) -> list:
+    """Posts agendados cuja hora chegou. É o que o worker publica.
+
+    Só devolve `agendado` — um post que voltou pra ajuste some da fila sozinho.
+    """
+    if not disponivel():
+        return []
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                "SELECT marca, slug, titulo, caption, payload, agendado_para, tentativas "
+                "FROM post WHERE status='agendado' AND agendado_para IS NOT NULL "
+                "AND agendado_para <= COALESCE(%s, NOW()) "
+                "ORDER BY agendado_para ASC LIMIT %s", (agora, int(limite)))
+            return [dict(r) for r in cur.fetchall()]
+
+
 def _ensure_marca_cur(cur, slug: str, meta: Optional[dict] = None) -> None:
     if not slug:
         return
