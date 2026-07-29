@@ -10,23 +10,21 @@
 **/__pycache__
 **/*.pyc
 **/.DS_Store
-# referências pesadas (não usadas no preview do Store)
-marcas/**/referencias/acervo/**
-marcas/**/referencias/feed/**
-marcas/**/referencias/inbox/**
-# artes: manter _regen (fundos dos posts). Outros PNG de export final
-# fora de _regen ficam de fora via rsync no deploy slim; no build git
-# o contexto inclui _regen + exports se versionados (ok se <500MB).
-# NÃO ignore marcas/**/publicacoes/**/arte/** — sem isso o Store em
-# produção fica sem thumbs ("sem arte").
+.venv
 tests
 sites
+docs
 imersao-resultado
 studio-check.jpg
 hero.jpeg
 ordo-hero.jpeg
 .compositor.tmp*
-docs
-.venv
 editor.json.pre-migrate.bak
 editor.json.from-db.json
+# artes pesadas — Store usa .thumbs/*.jpg (leves) embutidos no deploy
+marcas/**/publicacoes/**
+marcas/**/referencias/**
+# branding (logos) fica — precisa para compositor
+!marcas/*/branding/
+!marcas/*/branding/**
+!marcas/*/README.md
