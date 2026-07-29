@@ -346,8 +346,9 @@ def load_posts_as_editor() -> dict:
             ids = [r["id"] for r in rows]
             # 1 query de frames p/ todos os posts (evita N+1 — era a lentidão do /dados)
             cur.execute(
-                "SELECT post_id, payload, n FROM post_frame WHERE post_id = ANY(%s) ORDER BY post_id, n",
-                (ids,),
+                "SELECT post_id, payload, n FROM post_frame "
+                "WHERE post_id IN %s ORDER BY post_id, n",
+                (tuple(ids),),
             )
             frs_all = cur.fetchall() or []
             by_post: dict = {}
