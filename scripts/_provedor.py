@@ -28,9 +28,7 @@ MAGIC_JPEG = b"\xff\xd8\xff"
 def para_png(raw):
     """Garante PNG na saída. Passa direto se já for; converte se for JPEG.
 
-    Sem dependência nova: usa `sips`, que vem no macOS. Se não der pra converter,
-    devolve os bytes originais e avisa — melhor uma arte com extensão errada do
-    que nenhuma arte.
+    Preferência: Pillow (funciona no Railway/Linux). Fallback: sips no macOS.
     """
     if not raw or raw.startswith(MAGIC_PNG):
         return raw
@@ -38,6 +36,19 @@ def para_png(raw):
         print("AVISO: formato de imagem não reconhecido; gravando como veio",
               file=sys.stderr)
         return raw
+    # 1) Pillow (produção Linux + local)
+    try:
+        from io import BytesIO
+        from PIL import Image
+        im = Image.open(BytesIO(raw))
+        if im.mode not in ("RGB", "RGBA"):
+            im = im.convert("RGBA")
+        buf = BytesIO()
+        im.save(buf, format="PNG")
+        return buf.getvalue()
+    except Exception:
+        pass
+    # 2) sips (macOS)
     try:
         d = tempfile.mkdtemp(prefix="smark-img-")
         src, dst = os.path.join(d, "i.jpg"), os.path.join(d, "o.png")

@@ -2038,6 +2038,11 @@ ICON_IA_SM = ICON_IA.replace('width="15"', 'width="13"').replace('height="15"', 
 IO_LOCK = threading.RLock()      # protege leitura/escrita do editor.json (servidor multi-thread)
 GEN_SEM = threading.Semaphore(2)  # no máx. 2 gerações de IA simultâneas
 JOBS = {}                         # id -> {"status": running|done|erro, "path":..., "erro":...}
+# cache em memória: /dados e saves não podem depender de round-trip no Postgres
+_MEM_CACHE = None                 # dict editor (posts…)
+_DB_FLUSH_TIMER = None
+_DB_FLUSH_LOCK = threading.Lock()
+_DB_PENDING = None                # snapshot posts a flushar
 
 
 def _db_mod():
@@ -2065,6 +2070,47 @@ def _write_editor_file(d):
     json.dump(payload, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
 
+def _clone_editor(d):
+    # deepcopy barato via json (posts só tem JSON-serializável)
+    return json.loads(json.dumps(d, ensure_ascii=False))
+
+
+def _schedule_db_flush(posts):
+    """Agenda upsert batch em background (debounce 1.2s). Nunca bloqueia /salvar."""
+    global _DB_FLUSH_TIMER, _DB_PENDING
+    db = _db_mod()
+    if not db or not db.disponivel():
+        return
+    with _DB_FLUSH_LOCK:
+        _DB_PENDING = list(posts or [])
+        if _DB_FLUSH_TIMER is not None:
+            try:
+                _DB_FLUSH_TIMER.cancel()
+            except Exception:
+                pass
+        t = threading.Timer(1.2, _run_db_flush)
+        t.daemon = True
+        _DB_FLUSH_TIMER = t
+        t.start()
+
+
+def _run_db_flush():
+    global _DB_PENDING
+    with _DB_FLUSH_LOCK:
+        posts = _DB_PENDING
+        _DB_PENDING = None
+    if not posts:
+        return
+    db = _db_mod()
+    if not db or not db.disponivel():
+        return
+    try:
+        r = db.upsert_posts_batch(posts)
+        print(f"  DB flush async: {r}", file=sys.stderr)
+    except Exception as e:
+        print(f"  DB flush ERRO: {e}", file=sys.stderr)
+
+
 def sync_db_boot():
     """Sincroniza Postgres ↔ editor.json no boot (fonte de verdade = quem tiver posts).
 
@@ -2072,9 +2118,12 @@ def sync_db_boot():
     - DB vazio + arquivo com posts → migra arquivo → DB
     - ambos vazios → ok (install novo)
     """
+    global _MEM_CACHE
     db = _db_mod()
     if not db or not db.disponivel():
-        return {"ok": False, "motivo": "sem DATABASE_URL"}
+        data = _read_editor_file()
+        _MEM_CACHE = data
+        return {"ok": False, "motivo": "sem DATABASE_URL", "posts": len(data.get("posts") or [])}
     try:
         st = db.init_schema()
         ct = db.contagens() or {}
@@ -2086,48 +2135,61 @@ def sync_db_boot():
             posts = rebuilt.get("posts") or []
             if posts:
                 _write_editor_file(rebuilt)
+                _MEM_CACHE = rebuilt
             print(
                 f"  DB sync: postgres→arquivo  posts={len(posts)} frames={ct.get('post_frame')} marcas={ct.get('marca')}",
                 file=sys.stderr,
             )
             return {"ok": True, "fonte": "postgres", "posts": len(posts), "contagens": ct, "schema": st}
         if n_file > 0:
-            ok = 0
-            for p in file_data.get("posts") or []:
-                try:
-                    if db.upsert_post(p):
-                        ok += 1
-                except Exception as e:
-                    print(f"  DB boot upsert {p.get('slug')}: {e}", file=sys.stderr)
+            r = db.upsert_posts_batch(file_data.get("posts") or [])
             ct2 = db.contagens() or {}
+            _MEM_CACHE = file_data
             print(
-                f"  DB sync: arquivo→postgres  migrados={ok}/{n_file}  agora={ct2}",
+                f"  DB sync: arquivo→postgres  batch={r}  agora={ct2}",
                 file=sys.stderr,
             )
-            return {"ok": True, "fonte": "arquivo", "migrados": ok, "contagens": ct2, "schema": st}
+            return {"ok": True, "fonte": "arquivo", "migrados": r.get("n"), "contagens": ct2, "schema": st}
+        _MEM_CACHE = file_data
         print(f"  DB sync: vazio (arquivo={n_file} db={n_db})", file=sys.stderr)
         return {"ok": True, "fonte": "vazio", "contagens": ct, "schema": st}
     except Exception as e:
         print(f"  DB sync ERRO: {e}", file=sys.stderr)
+        _MEM_CACHE = _read_editor_file()
         return {"ok": False, "erro": str(e)}
 
 
 def load():
-    """Carrega posts: Postgres se tiver dados; senão editor.json (backup local)."""
+    """Carrega posts: cache em memória → arquivo → Postgres (só se cache vazio)."""
+    global _MEM_CACHE
     with IO_LOCK:
+        if _MEM_CACHE and (_MEM_CACHE.get("posts") is not None):
+            return _clone_editor(_MEM_CACHE)
+        file_data = _read_editor_file()
+        if file_data.get("posts"):
+            _MEM_CACHE = file_data
+            return _clone_editor(file_data)
+        # último recurso: Postgres (boot falhou ou volume efêmero vazio)
         db = _db_mod()
         if db and db.disponivel():
             try:
                 rebuilt = db.load_posts_as_editor()
                 if rebuilt.get("posts"):
-                    return rebuilt
+                    _MEM_CACHE = rebuilt
+                    try:
+                        _write_editor_file(rebuilt)
+                    except OSError:
+                        pass
+                    return _clone_editor(rebuilt)
             except Exception as e:
                 print(f"  DB load aviso: {e}", file=sys.stderr)
-        return _read_editor_file()
+        _MEM_CACHE = file_data
+        return _clone_editor(file_data)
 
 
 def save(d):
-    """Persiste em editor.json SEMPRE + upsert no Postgres se disponível."""
+    """Persiste em editor.json + cache na hora; Postgres em background (não bloqueia)."""
+    global _MEM_CACHE
     with IO_LOCK:
         posts = list(d.get("posts") or [])
         payload = dict(d)
@@ -2135,16 +2197,9 @@ def save(d):
         if "version" not in payload:
             payload["version"] = 2
         _write_editor_file(payload)
-        db = _db_mod()
-        if db and db.disponivel():
-            try:
-                for p in posts:
-                    try:
-                        db.upsert_post(p)
-                    except Exception as e:
-                        print(f"  DB upsert {p.get('slug')}: {e}", file=sys.stderr)
-            except Exception as e:
-                print(f"  DB save aviso: {e}", file=sys.stderr)
+        _MEM_CACHE = payload
+    # fora do lock de I/O de request: flush async
+    _schedule_db_flush(posts)
 
 
 def _parse_arte_meta(stdout):
@@ -2660,6 +2715,7 @@ class H(http.server.BaseHTTPRequestHandler):
                     "ok": True,
                     "database_url": bool(db and db.disponivel()),
                     "arquivo_posts": len(_read_editor_file().get("posts") or []),
+                    "cache_posts": len((_MEM_CACHE or {}).get("posts") or []) if _MEM_CACHE else 0,
                 }
                 if db and db.disponivel():
                     try:
@@ -2669,7 +2725,13 @@ class H(http.server.BaseHTTPRequestHandler):
                         out["db_erro"] = str(e)
                 live = load()
                 out["load_ativo"] = len(live.get("posts") or [])
-                out["source"] = live.get("source") or "arquivo"
+                out["source"] = live.get("source") or ("cache" if _MEM_CACHE else "arquivo")
+                # chaves de API presentes? (sem expor valor) — OpenRouter é o principal
+                out["chaves"] = {
+                    "OPENROUTER_API_KEY": bool((os.environ.get("OPENROUTER_API_KEY") or "").strip()),
+                    "OPENAI_API_KEY": bool((os.environ.get("OPENAI_API_KEY") or "").strip()),
+                    "GEMINI_API_KEY": bool((os.environ.get("GEMINI_API_KEY") or "").strip()),
+                }
                 return self._send(200, out)
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})

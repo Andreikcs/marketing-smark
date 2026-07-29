@@ -126,11 +126,19 @@ def disponivel() -> bool:
     return bool(database_url())
 
 
+_SCHEMA_OK = False
+
+
 @contextmanager
 def conn():
     import psycopg2
-    from psycopg2.extras import RealDictCursor, Json
-    c = psycopg2.connect(database_url(), cursor_factory=RealDictCursor)
+    from psycopg2.extras import RealDictCursor
+    c = psycopg2.connect(
+        database_url(),
+        cursor_factory=RealDictCursor,
+        connect_timeout=8,
+        options="-c statement_timeout=30000",
+    )
     try:
         yield c
         c.commit()
@@ -158,128 +166,173 @@ ALTER TABLE canal_conexao ADD COLUMN IF NOT EXISTS conectado BOOLEAN NOT NULL DE
 
 
 def init_schema() -> dict:
+    global _SCHEMA_OK
     if not disponivel():
         return {"ok": False, "erro": "DATABASE_URL ausente"}
+    if _SCHEMA_OK:
+        return {"ok": True, "schema": "cached"}
     with conn() as c:
         with c.cursor() as cur:
             cur.execute(_SCHEMA)
             cur.execute(_MIGRATIONS)
+    _SCHEMA_OK = True
     return {"ok": True, "schema": "marca,post,post_frame,canal_conexao,publicacao_log,nota_publicacao"}
+
+
+def _ensure_marca_cur(cur, slug: str, meta: Optional[dict] = None) -> None:
+    if not slug:
+        return
+    meta = meta or {}
+    cur.execute(
+        """
+        INSERT INTO marca (slug, nome, handle, acento, acento_claro, base_escura,
+                          wordmark, glyph, segmento, site, papel, gradiente, meta, updated_at)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,NOW())
+        ON CONFLICT (slug) DO UPDATE SET
+          nome=COALESCE(NULLIF(EXCLUDED.nome,''), marca.nome),
+          handle=COALESCE(NULLIF(EXCLUDED.handle,''), marca.handle),
+          acento=COALESCE(NULLIF(EXCLUDED.acento,''), marca.acento),
+          acento_claro=COALESCE(NULLIF(EXCLUDED.acento_claro,''), marca.acento_claro),
+          base_escura=COALESCE(NULLIF(EXCLUDED.base_escura,''), marca.base_escura),
+          wordmark=COALESCE(NULLIF(EXCLUDED.wordmark,''), marca.wordmark),
+          glyph=COALESCE(NULLIF(EXCLUDED.glyph,''), marca.glyph),
+          segmento=COALESCE(NULLIF(EXCLUDED.segmento,''), marca.segmento),
+          site=COALESCE(NULLIF(EXCLUDED.site,''), marca.site),
+          papel=COALESCE(NULLIF(EXCLUDED.papel,''), marca.papel),
+          gradiente=COALESCE(NULLIF(EXCLUDED.gradiente,''), marca.gradiente),
+          meta=marca.meta || EXCLUDED.meta,
+          updated_at=NOW()
+        """,
+        (
+            slug,
+            meta.get("nome") or slug,
+            meta.get("handle") or ("@" + slug.replace("-", "")),
+            meta.get("acento") or "",
+            meta.get("acento_claro") or "",
+            meta.get("base_escura") or "",
+            meta.get("wordmark") or "",
+            str(meta.get("glyph") if meta.get("glyph") is not None else "")[:8],
+            meta.get("segmento") or "",
+            meta.get("site") or "",
+            meta.get("papel") or "cliente",
+            meta.get("gradiente") or "",
+            json.dumps(meta, ensure_ascii=False),
+        ),
+    )
 
 
 def ensure_marca(slug: str, meta: Optional[dict] = None) -> None:
     if not disponivel() or not slug:
         return
-    meta = meta or {}
     with conn() as c:
         with c.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO marca (slug, nome, handle, acento, acento_claro, base_escura,
-                                  wordmark, glyph, segmento, site, papel, gradiente, meta, updated_at)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,NOW())
-                ON CONFLICT (slug) DO UPDATE SET
-                  nome=COALESCE(NULLIF(EXCLUDED.nome,''), marca.nome),
-                  handle=COALESCE(NULLIF(EXCLUDED.handle,''), marca.handle),
-                  acento=COALESCE(NULLIF(EXCLUDED.acento,''), marca.acento),
-                  acento_claro=COALESCE(NULLIF(EXCLUDED.acento_claro,''), marca.acento_claro),
-                  base_escura=COALESCE(NULLIF(EXCLUDED.base_escura,''), marca.base_escura),
-                  wordmark=COALESCE(NULLIF(EXCLUDED.wordmark,''), marca.wordmark),
-                  glyph=COALESCE(NULLIF(EXCLUDED.glyph,''), marca.glyph),
-                  segmento=COALESCE(NULLIF(EXCLUDED.segmento,''), marca.segmento),
-                  site=COALESCE(NULLIF(EXCLUDED.site,''), marca.site),
-                  papel=COALESCE(NULLIF(EXCLUDED.papel,''), marca.papel),
-                  gradiente=COALESCE(NULLIF(EXCLUDED.gradiente,''), marca.gradiente),
-                  meta=marca.meta || EXCLUDED.meta,
-                  updated_at=NOW()
-                """,
-                (
-                    slug,
-                    meta.get("nome") or slug,
-                    meta.get("handle") or ("@" + slug.replace("-", "")),
-                    meta.get("acento") or "",
-                    meta.get("acento_claro") or "",
-                    meta.get("base_escura") or "",
-                    meta.get("wordmark") or "",
-                    str(meta.get("glyph") if meta.get("glyph") is not None else "")[:8],
-                    meta.get("segmento") or "",
-                    meta.get("site") or "",
-                    meta.get("papel") or "cliente",
-                    meta.get("gradiente") or "",
-                    json.dumps(meta, ensure_ascii=False),
-                ),
-            )
+            _ensure_marca_cur(cur, slug, meta)
 
 
-def upsert_post(post: dict) -> Optional[int]:
-    """Insere/atualiza post + frames. Devolve post_id."""
-    if not disponivel():
-        return None
+def _upsert_post_cur(cur, post: dict, marcas_ok: Optional[set] = None) -> Optional[int]:
     marca = (post.get("marca") or "smark").strip()
     slug = (post.get("slug") or "").strip()
     if not slug:
         return None
-    ensure_marca(marca)
+    if marcas_ok is None or marca not in marcas_ok:
+        _ensure_marca_cur(cur, marca)
+        if marcas_ok is not None:
+            marcas_ok.add(marca)
     frames = post.get("frames") or []
     canais = post.get("canais") or ["instagram"]
     payload = {k: v for k, v in post.items() if k not in ("frames",)}
+    cur.execute(
+        """
+        INSERT INTO post (marca, slug, titulo, size, status, caption, canais, payload, updated_at)
+        VALUES (%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,NOW())
+        ON CONFLICT (marca, slug) DO UPDATE SET
+          titulo=EXCLUDED.titulo,
+          size=EXCLUDED.size,
+          status=EXCLUDED.status,
+          caption=EXCLUDED.caption,
+          canais=EXCLUDED.canais,
+          payload=EXCLUDED.payload,
+          updated_at=NOW()
+        RETURNING id
+        """,
+        (
+            marca,
+            slug,
+            post.get("titulo") or slug,
+            post.get("size") or "1080x1350",
+            post.get("status") or "rascunho",
+            post.get("caption") or "",
+            json.dumps(canais, ensure_ascii=False),
+            json.dumps(payload, ensure_ascii=False),
+        ),
+    )
+    row = cur.fetchone()
+    post_id = int(row["id"])
+    cur.execute("DELETE FROM post_frame WHERE post_id=%s", (post_id,))
+    for i, fr in enumerate(frames):
+        n = int(fr.get("n") or (i + 1))
+        cur.execute(
+            """
+            INSERT INTO post_frame (post_id, n, headline, sub, cta, tema, bg, bgmode, payload)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb)
+            """,
+            (
+                post_id,
+                n,
+                fr.get("headline") or "",
+                fr.get("sub") or "",
+                fr.get("cta") or "",
+                fr.get("tema") or "claro",
+                fr.get("bg") or "",
+                fr.get("bgmode") or fr.get("tema") or "claro",
+                json.dumps(fr, ensure_ascii=False),
+            ),
+        )
+    return post_id
+
+
+def upsert_post(post: dict) -> Optional[int]:
+    """Insere/atualiza 1 post + frames. Devolve post_id."""
+    if not disponivel():
+        return None
     with conn() as c:
         with c.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO post (marca, slug, titulo, size, status, caption, canais, payload, updated_at)
-                VALUES (%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,NOW())
-                ON CONFLICT (marca, slug) DO UPDATE SET
-                  titulo=EXCLUDED.titulo,
-                  size=EXCLUDED.size,
-                  status=EXCLUDED.status,
-                  caption=EXCLUDED.caption,
-                  canais=EXCLUDED.canais,
-                  payload=EXCLUDED.payload,
-                  updated_at=NOW()
-                RETURNING id
-                """,
-                (
-                    marca,
-                    slug,
-                    post.get("titulo") or slug,
-                    post.get("size") or "1080x1350",
-                    post.get("status") or "rascunho",
-                    post.get("caption") or "",
-                    json.dumps(canais, ensure_ascii=False),
-                    json.dumps(payload, ensure_ascii=False),
-                ),
-            )
-            row = cur.fetchone()
-            post_id = int(row["id"])
-            # replace frames
-            cur.execute("DELETE FROM post_frame WHERE post_id=%s", (post_id,))
-            for i, fr in enumerate(frames):
-                n = int(fr.get("n") or (i + 1))
-                cur.execute(
-                    """
-                    INSERT INTO post_frame (post_id, n, headline, sub, cta, tema, bg, bgmode, payload)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb)
-                    """,
-                    (
-                        post_id,
-                        n,
-                        fr.get("headline") or "",
-                        fr.get("sub") or "",
-                        fr.get("cta") or "",
-                        fr.get("tema") or "claro",
-                        fr.get("bg") or "",
-                        fr.get("bgmode") or fr.get("tema") or "claro",
-                        json.dumps(fr, ensure_ascii=False),
-                    ),
-                )
-            return post_id
+            return _upsert_post_cur(cur, post)
+
+
+def upsert_posts_batch(posts: list) -> dict:
+    """Upsert de N posts numa única conexão/transação (rápido)."""
+    import sys
+    if not disponivel():
+        return {"ok": False, "erro": "sem DB", "n": 0}
+    if not posts:
+        return {"ok": True, "n": 0}
+    ok = 0
+    err = 0
+    marcas_ok: set = set()
+    with conn() as c:
+        with c.cursor() as cur:
+            for p in posts:
+                try:
+                    cur.execute("SAVEPOINT sp_post")
+                    if _upsert_post_cur(cur, p, marcas_ok):
+                        ok += 1
+                    cur.execute("RELEASE SAVEPOINT sp_post")
+                except Exception as e:
+                    err += 1
+                    try:
+                        cur.execute("ROLLBACK TO SAVEPOINT sp_post")
+                    except Exception:
+                        pass
+                    print(f"  DB batch upsert {p.get('slug')}: {e}", file=sys.stderr)
+    return {"ok": err == 0, "n": ok, "erros": err}
 
 
 def load_posts_as_editor() -> dict:
     """Reconstrói editor.json a partir do DB (fonte canônica em produção)."""
     if not disponivel():
         return {"posts": []}
+    # schema só na 1ª vez do processo
     init_schema()
     with conn() as c:
         with c.cursor() as cur:
@@ -288,24 +341,33 @@ def load_posts_as_editor() -> dict:
                 "FROM post ORDER BY updated_at DESC"
             )
             rows = cur.fetchall() or []
+            if not rows:
+                return {"posts": [], "version": 2, "source": "postgres"}
+            ids = [r["id"] for r in rows]
+            # 1 query de frames p/ todos os posts (evita N+1 — era a lentidão do /dados)
+            cur.execute(
+                "SELECT post_id, payload, n FROM post_frame WHERE post_id = ANY(%s) ORDER BY post_id, n",
+                (ids,),
+            )
+            frs_all = cur.fetchall() or []
+            by_post: dict = {}
+            for f in frs_all:
+                pl = f["payload"]
+                if isinstance(pl, str):
+                    pl = json.loads(pl)
+                by_post.setdefault(f["post_id"], []).append(
+                    pl if isinstance(pl, dict) else {"n": f["n"]}
+                )
             posts = []
             for r in rows:
-                cur.execute(
-                    "SELECT payload, n FROM post_frame WHERE post_id=%s ORDER BY n",
-                    (r["id"],),
-                )
-                frs = cur.fetchall() or []
-                frames = []
-                for f in frs:
-                    pl = f["payload"]
-                    if isinstance(pl, str):
-                        pl = json.loads(pl)
-                    frames.append(pl if isinstance(pl, dict) else {"n": f["n"]})
                 p = r["payload"]
                 if isinstance(p, str):
                     p = json.loads(p)
                 if not isinstance(p, dict):
                     p = {}
+                canais = r["canais"]
+                if isinstance(canais, str):
+                    canais = json.loads(canais or "[]")
                 p.update({
                     "marca": r["marca"],
                     "slug": r["slug"],
@@ -313,8 +375,8 @@ def load_posts_as_editor() -> dict:
                     "size": r["size"],
                     "status": r["status"],
                     "caption": r["caption"] or p.get("caption") or "",
-                    "canais": r["canais"] if isinstance(r["canais"], list) else json.loads(r["canais"] or "[]"),
-                    "frames": frames,
+                    "canais": canais if isinstance(canais, list) else ["instagram"],
+                    "frames": by_post.get(r["id"]) or [],
                 })
                 posts.append(p)
             return {"posts": posts, "version": 2, "source": "postgres"}
