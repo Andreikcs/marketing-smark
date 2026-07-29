@@ -239,13 +239,32 @@ def init_schema() -> dict:
 #
 # A regra que dá segurança ao cliente: **só sai de `aprovado` pra `agendado` ou
 # `publicado`**. Não existe caminho de rascunho direto pro ar.
-STATUS_VALIDOS = ("rascunho", "revisao", "ajuste", "aprovado", "agendado",
+#
+# `salvo` é o estado que o editor já usava antes deste fluxo existir ("terminei
+# de montar a peça", botão Salvar) e vale pra maioria dos 48 posts do vault. Ele
+# entra aqui como etapa interna — sem isso todo post existente começaria fora da
+# máquina de estados e nenhuma transição seria permitida.
+STATUS_VALIDOS = ("rascunho", "salvo", "revisao", "ajuste", "aprovado", "agendado",
                   "publicado", "erro")
 
+# Rótulos de tela. Ficam aqui pra que servidor, painel e worker falem a mesma
+# língua — em pt-BR, do jeito que o cliente entende.
+STATUS_LABEL = {
+    "rascunho":  "Rascunho",
+    "salvo":     "Pronto",
+    "revisao":   "Em revisão",
+    "ajuste":    "Pedido de ajuste",
+    "aprovado":  "Aprovado",
+    "agendado":  "Agendado",
+    "publicado": "Publicado",
+    "erro":      "Falhou",
+}
+
 TRANSICOES = {
-    "rascunho":  ("revisao", "aprovado"),      # aprovado = a própria smark assina
+    "rascunho":  ("salvo", "revisao", "aprovado"),   # aprovado = a própria smark assina
+    "salvo":     ("revisao", "aprovado", "rascunho"),
     "revisao":   ("aprovado", "ajuste", "rascunho"),
-    "ajuste":    ("revisao", "rascunho"),
+    "ajuste":    ("revisao", "salvo", "rascunho"),
     "aprovado":  ("agendado", "publicado", "rascunho", "ajuste"),
     "agendado":  ("publicado", "aprovado", "erro", "ajuste"),
     "erro":      ("agendado", "aprovado", "rascunho"),
@@ -256,6 +275,11 @@ TRANSICOES = {
 def transicao_ok(de: str, para: str) -> bool:
     de = (de or "rascunho").strip() or "rascunho"
     return para in TRANSICOES.get(de, ())
+
+
+def proximos(de: str) -> tuple:
+    """Pra onde este post pode ir. A UI monta os botões a partir disto."""
+    return TRANSICOES.get((de or "rascunho").strip() or "rascunho", ())
 
 
 def mudar_status(marca: str, slug: str, para: str, *, por: str = "time",
@@ -301,6 +325,28 @@ def mudar_status(marca: str, slug: str, para: str, *, por: str = "time",
                 "VALUES (%s,%s,%s,%s,%s,%s)",
                 (marca, slug, de, para, por or "", (comentario or "")[:2000]))
     return {"ok": True, "de": de, "para": para}
+
+
+def registrar_evento(marca: str, slug: str, de: str, para: str, *,
+                     por: str = "time", comentario: str = "") -> bool:
+    """Grava a mudança na trilha, sem tocar no post.
+
+    Existe separado de `mudar_status` porque no Mac quem manda no status é o
+    `editor.json` — o banco recebe o post inteiro pelo upsert. A trilha, essa
+    sim, só existe aqui: é o que responde "quem aprovou e quando".
+    """
+    if not disponivel():
+        return False
+    try:
+        with conn() as c:
+            with c.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO post_evento (marca, slug, de, para, por, comentario) "
+                    "VALUES (%s,%s,%s,%s,%s,%s)",
+                    (marca, slug, de or "", para, por or "", (comentario or "")[:2000]))
+        return True
+    except Exception:
+        return False
 
 
 def eventos_do_post(marca: str, slug: str, limite: int = 50) -> list:
@@ -394,10 +440,14 @@ def _upsert_post_cur(cur, post: dict, marcas_ok: Optional[set] = None) -> Option
     frames = post.get("frames") or []
     canais = post.get("canais") or ["instagram"]
     payload = {k: v for k, v in post.items() if k not in ("frames",)}
+    # As datas do fluxo viajam no payload (JSONB) e também em colunas próprias.
+    # A duplicação é de propósito: o worker de agenda pergunta "o que vence
+    # agora?" por índice — dentro do JSONB isso seria varredura de tabela.
     cur.execute(
         """
-        INSERT INTO post (marca, slug, titulo, size, status, caption, canais, payload, updated_at)
-        VALUES (%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,NOW())
+        INSERT INTO post (marca, slug, titulo, size, status, caption, canais, payload,
+                          agendado_para, aprovado_em, aprovado_por, publicado_em, updated_at)
+        VALUES (%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s,%s,%s,%s,NOW())
         ON CONFLICT (marca, slug) DO UPDATE SET
           titulo=EXCLUDED.titulo,
           size=EXCLUDED.size,
@@ -405,6 +455,10 @@ def _upsert_post_cur(cur, post: dict, marcas_ok: Optional[set] = None) -> Option
           caption=EXCLUDED.caption,
           canais=EXCLUDED.canais,
           payload=EXCLUDED.payload,
+          agendado_para=EXCLUDED.agendado_para,
+          aprovado_em=EXCLUDED.aprovado_em,
+          aprovado_por=EXCLUDED.aprovado_por,
+          publicado_em=EXCLUDED.publicado_em,
           updated_at=NOW()
         RETURNING id
         """,
@@ -417,6 +471,10 @@ def _upsert_post_cur(cur, post: dict, marcas_ok: Optional[set] = None) -> Option
             post.get("caption") or "",
             json.dumps(canais, ensure_ascii=False),
             json.dumps(payload, ensure_ascii=False),
+            post.get("agendado_para") or None,
+            post.get("aprovado_em") or None,
+            post.get("aprovado_por") or "",
+            post.get("publicado_em") or None,
         ),
     )
     row = cur.fetchone()
@@ -490,7 +548,8 @@ def load_posts_as_editor() -> dict:
     with conn() as c:
         with c.cursor() as cur:
             cur.execute(
-                "SELECT id, payload, marca, slug, titulo, size, status, caption, canais "
+                "SELECT id, payload, marca, slug, titulo, size, status, caption, canais, "
+                "agendado_para, aprovado_em, aprovado_por, publicado_em "
                 "FROM post ORDER BY updated_at DESC"
             )
             rows = cur.fetchall() or []
@@ -532,6 +591,13 @@ def load_posts_as_editor() -> dict:
                     "canais": canais if isinstance(canais, list) else ["instagram"],
                     "frames": by_post.get(r["id"]) or [],
                 })
+                # Coluna manda sobre payload: quem publica é o worker, e ele só
+                # carimba a coluna. Se o payload vencesse, a data de publicação
+                # sumiria no primeiro save vindo do editor.
+                for _c in ("agendado_para", "aprovado_em", "publicado_em"):
+                    _v = r.get(_c)
+                    p[_c] = _v.isoformat() if hasattr(_v, "isoformat") else (_v or "")
+                p["aprovado_por"] = r.get("aprovado_por") or ""
                 posts.append(p)
             return {"posts": posts, "version": 2, "source": "postgres"}
 

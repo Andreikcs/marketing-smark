@@ -7,6 +7,7 @@ Preview ao vivo (mesmo HTML/CSS do compositor) + export do PNG final + upload de
 Rodar:  python3 scripts/editor_server.py   →   http://localhost:8765
 """
 import base64
+import datetime
 import glob
 import hashlib
 import http.server
@@ -1660,6 +1661,41 @@ __HEAD_THEME__<style>
 .chpill{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .chIG{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}.chIN{background:#0a66c2}
 .stdot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:0 0 auto}.st-s{background:var(--good)}.st-r{background:var(--warn)}
+/* fluxo: rascunho → revisão → aprovado → agendado → publicado.
+   A cor é o atalho: quente = ainda com o time, frio = já com o cliente,
+   verde = liberado, roxo = tem hora marcada. */
+.stpill{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;
+  font-size:11px;font-weight:600;line-height:1.6;white-space:nowrap;border:1px solid transparent}
+.stpill:before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex:0 0 auto}
+.stp-rascunho{color:var(--muted);border-color:var(--line-strong)}
+.stp-salvo{color:var(--text);border-color:var(--line-strong)}
+.stp-revisao{color:#4C9AFF;border-color:rgba(76,154,255,.4);background:rgba(76,154,255,.10)}
+.stp-ajuste{color:var(--warn);border-color:rgba(245,197,66,.45);background:rgba(245,197,66,.12)}
+.stp-aprovado{color:var(--good);border-color:rgba(61,220,151,.45);background:rgba(61,220,151,.12)}
+.stp-agendado{color:var(--accent);border-color:var(--accent-soft);background:var(--accent-soft)}
+.stp-publicado{color:var(--good);border-color:var(--good);background:transparent}
+.stp-erro{color:var(--danger);border-color:rgba(255,107,122,.45);background:rgba(255,107,122,.12)}
+/* bloco de fluxo dentro do modal */
+.flx{padding:10px 14px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:9px}
+.flx-row{display:flex;align-items:center;gap:8px}
+.flx-lb{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.flx-hist{background:none;border:0;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline}
+.flx-hist:hover{color:var(--text)}
+.flx-acts{display:flex;flex-wrap:wrap;gap:6px}
+.flx-acts button{padding:6px 11px;border-radius:8px;border:1px solid var(--line-strong);background:transparent;
+  color:var(--text);font-size:12px;font-weight:600;cursor:pointer}
+.flx-acts button:hover{border-color:var(--accent);color:var(--accent)}
+.flx-acts button.prim{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.flx-acts button.prim:hover{opacity:.9;color:var(--accent-ink)}
+.flx-when{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.flx-when input{margin-left:6px;padding:6px 8px;border-radius:8px;border:1px solid var(--line-strong);
+  background:var(--bg);color:var(--text);font-family:inherit;font-size:12px}
+.flx-when .sk-btn{padding:6px 12px;font-size:12px}
+.flx-msg{width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;
+  color:var(--text);font-family:inherit;font-size:12px}
+.flx-log{max-height:150px;overflow:auto;font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:5px;
+  border-top:1px dashed var(--line);padding-top:8px}
+.flx-log b{color:var(--text);font-weight:600}
 .sk-post-meta{gap:7px}
 .sk-post-actions.a5{grid-template-columns:repeat(5,1fr)}
 /* modal estilo Instagram (item 9) */
@@ -1752,6 +1788,21 @@ __TOPBAR__
       <div class=igmpg id=mpg></div></div>
     <div class=igmicons><span>&#9825;</span><span>&#128172;</span><span>&#10148;</span><span style="flex:1"></span><span id=msave class=msave></span></div>
     <textarea class=igmcap id=mcap placeholder="escreva a legenda… (salva sozinho)" spellcheck=false></textarea>
+    <div class=flx id=mflow>
+      <div class=flx-row>
+        <span class=flx-lb>Situação</span><span id=mflow_now></span>
+        <span style="flex:1"></span>
+        <button type=button class=flx-hist id=mflow_hist>ver histórico</button>
+      </div>
+      <div class=flx-acts id=mflow_acts></div>
+      <div class=flx-when id=mflow_when hidden>
+        <label>Sai no dia <input type=datetime-local id=mflow_dt></label>
+        <button type=button class="sk-btn" id=mflow_go>Agendar</button>
+        <button type=button class="sk-btn sk-btn--secondary" id=mflow_cancel>Cancelar</button>
+      </div>
+      <input class=flx-msg id=mflow_msg placeholder="comentário (opcional) — fica no histórico" maxlength=300>
+      <div class=flx-log id=mflow_log hidden></div>
+    </div>
     <div class=igmbtns>
       <button class="sk-btn" id=mopen style="flex:2">✎ Abrir no editor</button>
       <button class="sk-btn sk-btn--secondary" id=mcopy title="copiar legenda">⧉ Copiar</button>
@@ -1763,6 +1814,22 @@ __TOPBAR__
 <script>
 const T="__EDITOR_TOKEN__";let D=null,VIEW='cards',SORT='recent',Q='',MI=0,MP=0;const SEL=new Set();
 let STATUS_SET=new Set(), MARCA_SET=new Set();
+// Espelho do fluxo que vive em _db.py. Se mudar lá, muda aqui.
+const ST_LABEL={rascunho:'Rascunho',salvo:'Pronto',revisao:'Em revisão',ajuste:'Pedido de ajuste',
+  aprovado:'Aprovado',agendado:'Agendado',publicado:'Publicado',erro:'Falhou'};
+const ST_NEXT={rascunho:['salvo','revisao','aprovado'],salvo:['revisao','aprovado','rascunho'],
+  revisao:['aprovado','ajuste','rascunho'],ajuste:['revisao','salvo','rascunho'],
+  aprovado:['agendado','publicado','rascunho','ajuste'],
+  agendado:['publicado','aprovado','erro','ajuste'],erro:['agendado','aprovado','rascunho'],publicado:[]};
+// O verbo importa: "Enviar pro cliente" diz o que acontece; "revisao" só diz o nome do estado.
+const ST_VERBO={salvo:'Marcar pronto',revisao:'Enviar pro cliente',aprovado:'Aprovar',
+  ajuste:'Pedir ajuste',agendado:'Agendar',publicado:'Marcar publicado',
+  rascunho:'Voltar pra rascunho',erro:'Marcar falha'};
+const ST_PRIM={salvo:1,revisao:1,aprovado:1,agendado:1};
+function stLabel(s){return ST_LABEL[s||'rascunho']||s}
+function stPill(s){s=s||'rascunho';return '<span class="stpill stp-'+s+'">'+stLabel(s)+'</span>'}
+function fmtQuando(iso){if(!iso)return '';const d=new Date(iso);if(isNaN(d))return '';
+  return d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
 let NOME_MARCA={};
 function esc(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 async function load(){
@@ -1864,7 +1931,7 @@ function nActiveFilters(){return STATUS_SET.size+MARCA_SET.size}
 function renderActive(){
   const el=document.getElementById('factive');if(!el)return;
   const tags=[];
-  STATUS_SET.forEach(s=>tags.push(['s',s,s==='salvo'?'Pronto':'Rascunho']));
+  STATUS_SET.forEach(s=>tags.push(['s',s,stLabel(s)]));
   MARCA_SET.forEach(m=>tags.push(['m',m,nomeMarca(m)]));
   const badge=document.getElementById('fcount');
   if(badge){if(tags.length){badge.hidden=false;badge.textContent=tags.length}else badge.hidden=true}
@@ -1902,7 +1969,7 @@ function filtered(){
 function render(){
   VIEW=document.getElementById('viewsel').value||'cards';
   SORT=document.getElementById('sortsel').value||'recent';
-  buildChecks(document.getElementById('sfilters'),[['rascunho','Rascunho'],['salvo','Pronto']],STATUS_SET,()=>render());
+  buildChecks(document.getElementById('sfilters'),Object.keys(ST_LABEL).map(k=>[k,ST_LABEL[k]]),STATUS_SET,()=>render());
   buildChecks(document.getElementById('filters'),brands().map(b=>[b,nomeMarca(b)]),MARCA_SET,()=>render());
   renderActive();
   const g=document.getElementById('grid');g.innerHTML='';
@@ -1910,8 +1977,8 @@ function render(){
   const items=filtered();let n=0;
   items.forEach(({p,i})=>{
     n++;
-    const salvo=p.status==='salvo';
-    const badge='<span class="stdot '+(salvo?'st-s':'st-r')+'" title="'+(salvo?'pronto':'rascunho')+'"></span>';
+    const badge=stPill(p.status||'rascunho');
+    const quando=(p.status==='agendado'&&p.agendado_para)?fmtQuando(p.agendado_para):'';
     const ch=(p.canais||['instagram']).map(chIcon).join('');
     const on=SEL.has(i);
     const age=relTime(p.updated_at||p.created_at);
@@ -1924,7 +1991,8 @@ function render(){
       +'</div><div class="sk-post-body">'
       +'<div class="sk-post-title">'+(p.titulo||p.slug)+'</div>'
       +'<div class="sk-post-meta">'+badge+nomeMarca(p.marca||'smark')+'<span class=sk-dot></span>'+fmtTipo(p.frames?p.frames.length:0)
-      +(age?('<span class=sk-dot></span><span class=timetag>'+age+'</span>'):'')
+      +(quando?('<span class=sk-dot></span><span class=timetag title="sai no dia">🕑 '+quando+'</span>')
+             :(age?('<span class=sk-dot></span><span class=timetag>'+age+'</span>'):''))
       +'</div>'
       +'<div class="sk-post-actions a5">'
       +'<button data-a=ver data-i="'+i+'" title=Ver>👁</button>'
@@ -1961,8 +2029,78 @@ document.getElementById('grid').addEventListener('click',e=>{
 async function ver(i){MP=i;MI=0;const p=D.posts[i];
   document.getElementById('modal').style.display='flex';
   document.getElementById('mtitle').value=p.titulo||p.slug||'';
-  document.getElementById('mst').innerHTML=(p.status==='salvo'?'<span class="stdot st-s"></span> salvo':'<span class="stdot st-r"></span> rascunho');
-  document.getElementById('mcap').value=p.caption||'';document.getElementById('msave').textContent='';mframe()}
+  document.getElementById('mst').innerHTML=stPill(p.status||'rascunho');
+  document.getElementById('mcap').value=p.caption||'';document.getElementById('msave').textContent='';
+  renderFluxo();mframe()}
+
+// ── fluxo de aprovação ───────────────────────────────────────────────────────
+// Os botões saem da máquina de estados, não de uma lista fixa: o que não pode
+// acontecer não aparece na tela. É mais honesto do que deixar clicar e negar.
+function renderFluxo(){
+  const p=D.posts[MP];if(!p)return;
+  const st=p.status||'rascunho';
+  const now=document.getElementById('mflow_now');
+  now.innerHTML=stPill(st)
+    +(st==='agendado'&&p.agendado_para?(' <span style="font-size:11.5px;color:var(--muted)">sai '+fmtQuando(p.agendado_para)+'</span>'):'')
+    +(st==='aprovado'&&p.aprovado_por?(' <span style="font-size:11.5px;color:var(--muted)">por '+esc(p.aprovado_por)+'</span>'):'');
+  const acts=document.getElementById('mflow_acts');
+  const nx=ST_NEXT[st]||[];
+  acts.innerHTML=nx.length
+    ? nx.map(s=>'<button data-para="'+s+'"'+(ST_PRIM[s]?' class=prim':'')+'>'+(ST_VERBO[s]||stLabel(s))+'</button>').join('')
+    : '<span style="font-size:12px;color:var(--muted)">Publicado — duplique o post pra refazer.</span>';
+  document.getElementById('mflow_when').hidden=true;
+  document.getElementById('mflow_log').hidden=true;
+}
+document.getElementById('mflow_acts').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-para]');if(!b)return;
+  const para=b.dataset.para;
+  if(para==='agendado'){
+    const w=document.getElementById('mflow_when');w.hidden=false;
+    const dt=document.getElementById('mflow_dt');
+    if(!dt.value){const d=new Date(Date.now()+3600000);d.setMinutes(0,0,0);
+      dt.value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}
+    dt.focus();return;
+  }
+  aplicarStatus(para);
+});
+document.getElementById('mflow_cancel').onclick=()=>{document.getElementById('mflow_when').hidden=true};
+document.getElementById('mflow_go').onclick=()=>{
+  const v=document.getElementById('mflow_dt').value;
+  if(!v){toast('Escolha o dia e a hora');return}
+  // manda em UTC: o servidor não precisa adivinhar o fuso de quem clicou
+  aplicarStatus('agendado',new Date(v).toISOString());
+};
+async function aplicarStatus(para,quando){
+  const p=D.posts[MP];if(!p)return;
+  const msg=document.getElementById('mflow_msg');
+  const r=await fetch('/post-status',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},
+    body:JSON.stringify({marca:p.marca||'smark',slug:p.slug,para:para,quando:quando||'',
+      comentario:(msg.value||'').trim(),por:'time'})});
+  let j={};try{j=await r.json()}catch(e){}
+  if(!j.ok){toast(j.erro||'não deu pra mudar');return}
+  p.status=para;
+  if(para==='agendado')p.agendado_para=j.agendado_para||quando||'';
+  if(para==='publicado'){p.publicado_em=new Date().toISOString();p.agendado_para=''}
+  if(['rascunho','ajuste','salvo'].includes(para))p.agendado_para='';
+  msg.value='';
+  document.getElementById('mst').innerHTML=stPill(para);
+  renderFluxo();render();
+  toast(stLabel(para)+' ✓');
+}
+document.getElementById('mflow_hist').onclick=async()=>{
+  const p=D.posts[MP];if(!p)return;
+  const log=document.getElementById('mflow_log');
+  if(!log.hidden){log.hidden=true;return}
+  log.hidden=false;log.innerHTML='carregando…';
+  const r=await fetch('/post-eventos?marca='+encodeURIComponent(p.marca||'smark')+'&slug='+encodeURIComponent(p.slug));
+  const j=await r.json().catch(()=>({}));
+  const evs=(j&&j.eventos)||[];
+  if(!evs.length){log.innerHTML=(j&&j.com_banco===false)
+    ? 'Sem banco agora — o histórico aparece quando o Postgres responde.'
+    : 'Nada registrado ainda.';return}
+  log.innerHTML=evs.map(e=>'<div><b>'+stLabel(e.para)+'</b> · '+fmtQuando(e.quando)
+    +(e.por?(' · '+esc(e.por)):'')+(e.comentario?('<br>“'+esc(e.comentario)+'”'):'')+'</div>').join('');
+};
 async function mframe(){const p=D.posts[MP],fr=p.frames[MI],host=document.getElementById('mhost');
   const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
   const html=await r.text();const s=(host.clientWidth||420)/1080;
@@ -2715,6 +2853,122 @@ def _passada_arte():
     print("  arte: %d renderizada(s)%s" % (
         renderizados, (", %d erro(s): %s" % (len(erros), erros[:3])) if erros else ""),
         file=sys.stderr)
+
+
+# ── fluxo de aprovação ───────────────────────────────────────────────────────
+#
+# Quem manda no status é o `editor.json`. Parece contraintuitivo (o banco é
+# canônico em produção), mas é o único jeito que não se contradiz: `/salvar`
+# grava o post inteiro e o upsert leva tudo pro Postgres. Se a aprovação
+# mudasse só a coluna, o próximo save do editor a sobrescreveria — o cliente
+# aprovaria e o post voltaria pra rascunho sozinho, sem ninguém tocar nele.
+#
+# A trilha (`post_evento`) vai direto pro banco, porque não existe no arquivo.
+
+_STATUS_FALLBACK = ("rascunho", "salvo", "revisao", "ajuste", "aprovado",
+                    "agendado", "publicado", "erro")
+
+
+def _fluxo():
+    """Vocabulário do fluxo. Sem banco (psycopg2 ausente), degrada pro embutido."""
+    db = _db_mod()
+    if db and hasattr(db, "STATUS_VALIDOS"):
+        return db
+    return None
+
+
+def status_validos():
+    db = _fluxo()
+    return db.STATUS_VALIDOS if db else _STATUS_FALLBACK
+
+
+def _transicao_ok(de, para):
+    db = _fluxo()
+    if db:
+        return db.transicao_ok(de, para)
+    return True  # sem o módulo do fluxo não dá pra validar; não trava o usuário
+
+
+def _norm_quando(v):
+    """Normaliza a data que veio da tela pra ISO com fuso.
+
+    A tela manda `toISOString()` (sempre em UTC, com Z). Se vier ingênua — de um
+    script ou de um curl — assume o fuso da máquina, que é o que a pessoa quis
+    dizer ao escrever "dia 3 às 9h".
+    """
+    s = (v or "").strip()
+    if not s:
+        return ""
+    try:
+        dt = datetime.datetime.fromisoformat(s.replace("Z", "+00:00"))
+    except Exception:
+        return ""
+    if dt.tzinfo is None:
+        dt = dt.astimezone()
+    return dt.astimezone(datetime.timezone.utc).isoformat(timespec="seconds")
+
+
+def _agora_iso():
+    return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+
+
+def achar_post(d, marca, slug):
+    for i, p in enumerate(d.get("posts") or []):
+        if (p.get("marca") or "smark") == marca and (p.get("slug") or "") == slug:
+            return i, p
+    return -1, None
+
+
+def mudar_status_post(marca, slug, para, *, por="time", comentario="",
+                      quando=None, forcar=False):
+    """Move um post no fluxo, carimba as datas e registra quem foi."""
+    para = (para or "").strip()
+    if para not in status_validos():
+        return {"ok": False, "erro": "status inválido: %s" % para}
+    with IO_LOCK:
+        d = load()
+        _, alvo = achar_post(d, marca, slug)
+        if alvo is None:
+            return {"ok": False, "erro": "post não encontrado: %s/%s" % (marca, slug)}
+        de = (alvo.get("status") or "rascunho").strip() or "rascunho"
+        if de == para:
+            return {"ok": True, "de": de, "para": para, "sem_mudanca": True}
+        if not forcar and not _transicao_ok(de, para):
+            return {"ok": False, "de": de,
+                    "erro": "de %s não dá pra ir pra %s" % (de, para)}
+        # Um post sem frame não tem o que publicar. Barrar aqui evita descobrir
+        # isso no meio da fila do worker, quando já é tarde.
+        if para in ("revisao", "aprovado", "agendado", "publicado") and not (alvo.get("frames") or []):
+            return {"ok": False, "de": de, "erro": "este post ainda não tem arte"}
+
+        quando_iso = ""
+        if para == "agendado":
+            quando_iso = _norm_quando(quando)
+            if not quando_iso:
+                return {"ok": False, "de": de, "erro": "agendar exige data e hora"}
+            alvo["agendado_para"] = quando_iso
+            alvo["tentativas"] = 0
+        if para == "aprovado":
+            alvo["aprovado_em"] = _agora_iso()
+            alvo["aprovado_por"] = (por or "")[:120]
+        if para == "publicado":
+            alvo["publicado_em"] = _agora_iso()
+            alvo["agendado_para"] = ""
+        if para in ("rascunho", "ajuste", "salvo"):
+            alvo["agendado_para"] = ""
+        if comentario:
+            alvo["ultimo_comentario"] = comentario[:2000]
+        alvo["status"] = para
+        alvo["updated_at"] = _agora_iso()
+        save(d)
+
+    db = _db_mod()
+    if db and db.disponivel():
+        try:
+            db.registrar_evento(marca, slug, de, para, por=por, comentario=comentario)
+        except Exception as e:
+            print("  fluxo: evento não registrado: %s" % e, file=sys.stderr)
+    return {"ok": True, "de": de, "para": para, "agendado_para": quando_iso}
 
 
 def _parse_arte_meta(stdout):
@@ -3471,6 +3725,45 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
+        if path == "/post-eventos":
+            # trilha do fluxo: quem mudou o quê, quando e com que comentário
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            marca = (qs.get("marca", ["smark"])[0] or "smark").strip()
+            slug = (qs.get("slug", [""])[0] or "").strip()
+            if not slug:
+                return self._send(400, {"ok": False, "erro": "slug obrigatório"})
+            db = _db_mod()
+            evs = []
+            if db and db.disponivel():
+                try:
+                    for e in db.eventos_do_post(marca, slug, 50):
+                        q = e.get("created_at")
+                        evs.append({
+                            "de": e.get("de") or "",
+                            "para": e.get("para") or "",
+                            "por": e.get("por") or "",
+                            "comentario": e.get("comentario") or "",
+                            "quando": q.isoformat() if hasattr(q, "isoformat") else str(q or ""),
+                        })
+                except Exception as e:
+                    return self._send(500, {"ok": False, "erro": str(e)})
+            return self._send(200, {"ok": True, "eventos": evs, "com_banco": bool(db and db.disponivel())})
+
+        if path == "/agenda":
+            # o que está na fila pra sair, e o que já venceu
+            d = load()
+            fila = []
+            agora = _agora_iso()
+            for p in d.get("posts") or []:
+                if (p.get("status") or "") != "agendado":
+                    continue
+                q = p.get("agendado_para") or ""
+                fila.append({"marca": p.get("marca") or "smark", "slug": p.get("slug") or "",
+                             "titulo": p.get("titulo") or "", "quando": q,
+                             "vencido": bool(q and q <= agora)})
+            fila.sort(key=lambda x: x["quando"] or "9")
+            return self._send(200, {"ok": True, "agora": agora, "fila": fila})
+
         if path == "/historico":
             # versões de UM post ao longo dos autosaves do git (dedupe: só quando o post mudou)
             try:
@@ -3657,6 +3950,23 @@ class H(http.server.BaseHTTPRequestHandler):
         if path == "/salvar":
             save(normaliza(req.get("dados", load())))
             return self._send(200, {"ok": True})
+
+        if path == "/post-status":
+            marca = (req.get("marca") or "smark").strip()
+            slug = (req.get("slug") or "").strip()
+            if not slug:
+                return self._send(400, {"ok": False, "erro": "slug obrigatório"})
+            try:
+                r = mudar_status_post(
+                    marca, slug, req.get("para") or "",
+                    por=(req.get("por") or "time")[:120],
+                    comentario=req.get("comentario") or "",
+                    quando=req.get("quando") or "",
+                    forcar=bool(req.get("forcar")),
+                )
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+            return self._send(200 if r.get("ok") else 400, r)
 
         if path == "/restaurar":
             # troca UM post pela sua versão de um commit — só esse post, o resto do editor.json fica igual
