@@ -1763,6 +1763,7 @@ __TOPBAR__
 const T="__EDITOR_TOKEN__";let D=null,VIEW='cards',SORT='recent',Q='',MI=0,MP=0;const SEL=new Set();
 let STATUS_SET=new Set(), MARCA_SET=new Set();
 let NOME_MARCA={};
+function esc(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 async function load(){
   try{const r=await(await fetch('/marcas')).json();if(r.ok)(r.marcas||[]).forEach(m=>NOME_MARCA[m.slug]=m.nome||m.slug)}catch(e){}
   D=await(await fetch('/dados')).json();render()}
