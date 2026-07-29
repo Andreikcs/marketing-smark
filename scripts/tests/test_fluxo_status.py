@@ -351,6 +351,52 @@ class TestAbaVelhaNaoDesfazAprovacao(unittest.TestCase):
         self.assertEqual(r["posts"][0]["status"], "rascunho")
 
 
+class TestFlushSoDoQueMudou(unittest.TestCase):
+    """O batch não pode reescrever 48 posts a cada tecla.
+
+    Enquanto reescrevia, ele segurava o lock de todas as linhas de `post` e a
+    `aplicar_status` — que precisa de UMA linha — levava lock timeout. No log:
+    "gravado no arquivo, mas o banco recusou", status certo no Mac e velho no
+    banco. E o boot acredita no banco.
+    """
+
+    def setUp(self):
+        import editor_server as es
+        self.es = es
+        es._DB_ENVIADO.clear()
+        self.p = {"marca": "smark", "slug": "a", "titulo": "T", "status": "aprovado",
+                  "aprovado_por": "cliente@x", "frames": [{"n": 1, "headline": "H"}]}
+
+    def tearDown(self):
+        self.es._DB_ENVIADO.clear()
+
+    def test_primeira_vez_vai_inteiro(self):
+        self.assertEqual(len(self.es._so_o_que_mudou([self.p])), 1)
+
+    def test_sem_mudanca_nao_vai_nada(self):
+        self.es._so_o_que_mudou([self.p])
+        self.assertEqual(self.es._so_o_que_mudou([self.p]), [])
+
+    def test_mudanca_de_conteudo_vai(self):
+        self.es._so_o_que_mudou([self.p])
+        p2 = dict(self.p, titulo="outro")
+        self.assertEqual(len(self.es._so_o_que_mudou([p2])), 1)
+
+    def test_mudanca_so_de_status_nao_vai(self):
+        """Status é da `aplicar_status`. Se o batch também mandasse, voltavam a brigar."""
+        self.es._so_o_que_mudou([self.p])
+        p2 = dict(self.p, status="rascunho", aprovado_por="")
+        self.assertEqual(self.es._so_o_que_mudou([p2]), [])
+
+    def test_erro_no_flush_faz_tentar_de_novo(self):
+        self.es._so_o_que_mudou([self.p])
+        self.es._esquecer([self.p])
+        self.assertEqual(len(self.es._so_o_que_mudou([self.p])), 1)
+
+    def test_post_sem_slug_fica_de_fora(self):
+        self.assertEqual(self.es._so_o_que_mudou([{"marca": "smark", "titulo": "sem slug"}]), [])
+
+
 class _CursorFalso:
     def __init__(self, sacola): self.sacola = sacola; self.rowcount = 1
     def execute(self, sql, vals=None): self.sacola.append((sql, list(vals or [])))

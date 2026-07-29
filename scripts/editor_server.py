@@ -2647,6 +2647,37 @@ def _schedule_db_flush(posts):
         t.start()
 
 
+_DB_ENVIADO: dict = {}     # (marca, slug) -> hash do que já foi pro banco
+
+
+def _impressao(p) -> str:
+    """Hash do post ignorando o que só a `aplicar_status` escreve."""
+    limpo = {k: v for k, v in p.items() if k not in _CAMPOS_FLUXO and k != "status"}
+    return hashlib.sha1(
+        json.dumps(limpo, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
+
+
+def _so_o_que_mudou(posts):
+    """Filtra o batch pro que mudou de verdade desde o último flush.
+
+    Antes ia o editor.json inteiro a cada save: 48 posts e 65 frames numa
+    transação só, a cada 1,2s de digitação. Além de lento, isso segurava o lock
+    de TODAS as linhas de `post` — e a `aplicar_status`, que precisa de uma
+    linha, levava lock timeout. A aprovação ficava no arquivo e não no banco.
+    """
+    novos = []
+    for p in posts or []:
+        ch = ((p.get("marca") or "smark"), p.get("slug") or "")
+        if not ch[1]:
+            continue
+        imp = _impressao(p)
+        if _DB_ENVIADO.get(ch) != imp:
+            novos.append(p)
+            _DB_ENVIADO[ch] = imp
+    return novos
+
+
 def _run_db_flush():
     global _DB_PENDING
     with _DB_FLUSH_LOCK:
@@ -2657,11 +2688,22 @@ def _run_db_flush():
     db = _db_mod()
     if not db or not db.disponivel():
         return
+    mudaram = _so_o_que_mudou(posts)
+    if not mudaram:
+        return
     try:
-        r = db.upsert_posts_batch(posts)
-        print(f"  DB flush async: {r}", file=sys.stderr)
+        r = db.upsert_posts_batch(mudaram)
+        print(f"  DB flush async: {r} (de {len(posts)} posts)", file=sys.stderr)
+        if r.get("erros"):
+            _esquecer(mudaram)     # alguém ficou fora: tenta de novo no próximo save
     except Exception as e:
+        _esquecer(mudaram)
         print(f"  DB flush ERRO: {e}", file=sys.stderr)
+
+
+def _esquecer(posts):
+    for p in posts or []:
+        _DB_ENVIADO.pop(((p.get("marca") or "smark"), p.get("slug") or ""), None)
 
 
 def sync_db_boot():

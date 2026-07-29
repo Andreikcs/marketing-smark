@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from contextlib import contextmanager
 from typing import Any, Optional
 
@@ -361,19 +362,29 @@ def aplicar_status(marca: str, slug: str, para: str, *, por: str = "",
     if para == "agendado":
         sets.append("tentativas=0")
     vals += [marca, slug]
-    try:
-        with conn() as c:
-            with c.cursor() as cur:
-                cur.execute("UPDATE post SET %s WHERE marca=%%s AND slug=%%s"
-                            % ",".join(sets), vals)
-                n = cur.rowcount
-                cur.execute(
-                    "INSERT INTO post_evento (marca, slug, de, para, por, comentario) "
-                    "VALUES (%s,%s,%s,%s,%s,%s)",
-                    (marca, slug, de or "", para, por or "time", (comentario or "")[:2000]))
-        return {"ok": n > 0, "linhas": n}
-    except Exception as e:
-        return {"ok": False, "erro": str(e)}
+    # Insiste: o batch de 48 posts pode estar com a linha travada por alguns
+    # segundos. Desistir na primeira tentativa é deixar o Mac e o banco
+    # discordando até o próximo boot — e o boot acredita no banco.
+    erro = ""
+    for tentativa in range(3):
+        try:
+            with conn() as c:
+                with c.cursor() as cur:
+                    cur.execute("SET LOCAL lock_timeout = '4s'")
+                    cur.execute("UPDATE post SET %s WHERE marca=%%s AND slug=%%s"
+                                % ",".join(sets), vals)
+                    n = cur.rowcount
+                    cur.execute(
+                        "INSERT INTO post_evento (marca, slug, de, para, por, comentario) "
+                        "VALUES (%s,%s,%s,%s,%s,%s)",
+                        (marca, slug, de or "", para, por or "time",
+                         (comentario or "")[:2000]))
+            return {"ok": n > 0, "linhas": n, "tentativas": tentativa + 1}
+        except Exception as e:
+            erro = str(e)
+            if tentativa < 2:
+                time.sleep(1.5 * (tentativa + 1))
+    return {"ok": False, "erro": erro}
 
 
 def registrar_evento(marca: str, slug: str, de: str, para: str, *,
@@ -492,6 +503,13 @@ def _upsert_post_cur(cur, post: dict, marcas_ok: Optional[set] = None) -> Option
     # As datas do fluxo viajam no payload (JSONB) e também em colunas próprias.
     # A duplicação é de propósito: o worker de agenda pergunta "o que vence
     # agora?" por índice — dentro do JSONB isso seria varredura de tabela.
+    #
+    # No UPDATE as colunas de fluxo ficam de fora: quem manda nelas é a
+    # `aplicar_status`, e só ela. Enquanto o batch também as escrevia, os dois
+    # brigavam pelo lock da mesma linha — o batch (48 posts, uma transação)
+    # segurava e o `aplicar_status` levava statement timeout. Resultado visto no
+    # log: "gravado no arquivo, mas o banco recusou", com o status certo no Mac e
+    # o antigo no banco até o próximo boot desfazer tudo.
     cur.execute(
         """
         INSERT INTO post (marca, slug, titulo, size, status, caption, canais, payload,
