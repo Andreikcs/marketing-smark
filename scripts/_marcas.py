@@ -801,6 +801,17 @@ def criar(slug, nome, acento, *, acento_claro=None, handle=None, glyph=None,
         with open(readme, "w", encoding="utf-8") as f:
             f.write(f"# {nome}\n\nMarca de cliente no vault Smark.\n\nSlug: `{slug}`\nHandle: {handle}\n")
 
+    # Postgres multi-marca (Railway): garante linha em `marca` para FK de posts/canais
+    try:
+        import _db
+        if _db.disponivel():
+            meta_db = dict(entry)
+            meta_db["nome"] = nome
+            meta_db["glyph"] = glyph
+            _db.ensure_marca(slug, meta_db)
+    except Exception as e:
+        print(f"  DB: aviso ao registrar marca '{slug}': {e}", file=sys.stderr)
+
     return {"slug": slug, "meta": entry, "pronta": pronta(slug), "dir": os.path.join(MARCAS_DIR, slug)}
 
 
