@@ -587,15 +587,22 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
         # ter a marca. Stub visual evita galeria preta; registro formal
         # continua via nova_marca / ensure_stub.
         slug = (marca or "smark").strip() or "smark"
+        nome = slug.replace("-", " ").title()
         b = {
-            "nome": slug.replace("-", " ").title(),
-            "handle": "@" + slug.replace("-", ""),
-            "acento": "#8B3CF7",
+            "name": nome,
             "accent": "#8B3CF7",
             "bright": "#A472FF",
-            "acento_claro": "#A472FF",
+            "glyph": (nome[:1].upper() or "•"),
+            "handle": "@" + slug.replace("-", ""),
+            "endossa": False,
+            "logo_path": "",
+            "logo_svg": "",
+            "logo_file": "",
+            "logo_estilo": "glyph",
+            "wordmark": nome,
             "gradiente": "linear-gradient(155deg,#9A4DFF 0%,#2A1CA8 100%)",
-            "papel": "cliente",
+            "base_escura": "#2A1CA8",
+            "tab": nome.split()[0].upper()[:12],
         }
         print(f"AVISO: marca '{slug}' não está no tokens.json — usando paleta stub",
               file=sys.stderr)
