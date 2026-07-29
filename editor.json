@@ -9,60 +9,17 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "e2e-db-preserve",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "salvo",
-      "titulo": "Preserve",
-      "caption": "legenda e2e",
-      "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
-      "created_at": "2026-07-29T14:25:15",
-      "tentativas": 0,
-      "updated_at": "2026-07-29T19:10:20",
-      "aprovado_em": "2026-07-29T22:03:51+00:00",
-      "aprovado_por": "andreik",
-      "publicado_em": "",
-      "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cta": "cta",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/e2e-db-preserve/01.png",
-          "sub": "sub",
-          "page": "",
-          "tema": "claro",
-          "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
-          "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
-          "headline": "H1 *x*",
-          "arte_src_sha": "7b39e80f530bf25ff80c88f396cd0e73603b3d8901fd1fd3142bc9b3e5a02d75"
-        }
-      ],
-      "ultimo_comentario": "fim do teste do fluxo — devolvendo ao estado interno"
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "elever-crm",
-      "marca": "elever-ai",
-      "thumb": ".thumbs/elever-ai__elever-crm.jpg",
+      "slug": "novo-post-5420",
+      "marca": "amosim",
+      "thumb": ".thumbs/amosim__novo-post-5420.jpg",
       "canais": [
         "instagram"
       ],
       "status": "rascunho",
-      "titulo": "ELEVER CRM",
+      "titulo": "Novo post",
       "caption": "",
-      "arte_sha": "cd74d11262233f72b91b0989fd3ca09446b5f5c1b9a47913d774a56323c6ef15",
-      "created_at": "2026-07-27T21:44:35",
+      "arte_sha": "a0a3d2ebb17a8df572eb155767deeb73866a87428c3b25a0dc35413cd3b02e0c",
+      "created_at": "2026-07-29T03:18:17",
       "updated_at": "2026-07-29T20:53:37",
       "aprovado_em": "",
       "aprovado_por": "",
@@ -71,28 +28,26 @@
       "frames": [
         {
           "n": 1,
-          "_v": 3,
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_uploads/3ab517f1bb.png",
+          "bg": "",
           "cor": "#F4F2FB",
-          "cta": "chama no acelerador",
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/01.png",
-          "sub": "{#3bf748:Confira as melhores opcoes e orcamentos}",
+          "cta": "",
+          "out": "marcas/amosim/publicacoes/social/instagram/arte/novo-post-5420/01.png",
+          "sub": "",
+          "tab": true,
           "chip": true,
+          "logo": true,
           "page": "",
           "tema": "claro",
-          "zoom": 1.25,
           "grade": true,
           "hsize": 0,
-          "thumb": ".thumbs/elever-ai__elever-crm.jpg",
+          "thumb": ".thumbs/amosim__novo-post-5420.jpg",
           "accent": "",
-          "bg_sha": "8695abcc383c5e1c0b1f339955c0a4ac7e8a52440ecef72c313ef0c5eae34dc6",
-          "bgmode": "imagem",
-          "brilho": 0.55,
-          "overlay": "branco",
-          "arte_sha": "cd74d11262233f72b91b0989fd3ca09446b5f5c1b9a47913d774a56323c6ef15",
-          "headline": "Sistemas de IA com Velocidade ",
-          "bg_src_sha": "5771567d98557b68ce6e3bb4d001e1469c0e8b7555fa2ffadb1d8318c6a081a7",
-          "arte_src_sha": "c143b220490def0c9c868f9de6f64073a772c1e16795eaeaa6b6fcc0facf311d"
+          "bgmode": "claro",
+          "footer": true,
+          "paleta": "marca",
+          "arte_sha": "a0a3d2ebb17a8df572eb155767deeb73866a87428c3b25a0dc35413cd3b02e0c",
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "arte_src_sha": "f42e700c34816d9e6f58a9e9260ba7e1f968559feab121b5d2bfbe1a17e30fc3"
         }
       ]
     },
@@ -191,6 +146,109 @@
           "arte_src_sha": "3268e082e20eb2d215cb78fcc3f34966d300b04f6db26bdce53ae724dde67e2d",
           "bg_custo_usd": 0.242806,
           "bg_publicavel": true
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post",
+      "marca": "elever-ai",
+      "thumb": ".thumbs/elever-ai__novo-post.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Novo post",
+      "caption": "",
+      "arte_sha": "d6bbd0cc3924c5e07664ce37e025fb7d7b0696483551ea926c0e46424cc494ca",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/_uploads/61883a72dc.png",
+          "cor": "#F4F2FB",
+          "cta": "Teste agora e veja",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/01.png",
+          "sub": "Como R$ 200,00",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/elever-ai__novo-post.jpg",
+          "accent": "",
+          "bg_sha": "81a95cdf5298343924ed9d8c3445763c8d2b4a150384ea62dfb2eb91789e1ba2",
+          "bgmode": "imagem",
+          "overlay": "branco",
+          "arte_sha": "d6bbd0cc3924c5e07664ce37e025fb7d7b0696483551ea926c0e46424cc494ca",
+          "headline": "CRM DE IA |para {#8b3cf7:lojas de móveis}",
+          "bg_src_sha": "bf5c8ffb68e4266f40536590aa9eae23b8a7968c64eb948ee3e97a21ff317528",
+          "overlay_op": 1,
+          "arte_src_sha": "124ba59d5da3606efc56dfddca6fe052fda4bda90c2d8699cb0da67d89a608f5"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-5102",
+      "marca": "track-brasil",
+      "thumb": ".thumbs/track-brasil__novo-post-5102.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Novo post",
+      "caption": "",
+      "arte_sha": "7707bbda3fd8cb1891b77e39372fde4c33a57c2b8a2c3786fff3290c28c86b57",
+      "created_at": "2026-07-28T01:36:52",
+      "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/track-brasil/publicacoes/social/instagram/arte/novo-post-5102/01.png",
+          "sub": "",
+          "tab": true,
+          "chip": true,
+          "logo": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/track-brasil__novo-post-5102.jpg",
+          "accent": "",
+          "bgmode": "claro",
+          "footer": true,
+          "paleta": "marca",
+          "arte_sha": "7707bbda3fd8cb1891b77e39372fde4c33a57c2b8a2c3786fff3290c28c86b57",
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "arte_src_sha": "a8a4f59560617f806239c73878460d33f9b186a5ee0665d018694ec5b9bca793"
         }
       ]
     },
@@ -805,16 +863,70 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "novo-post",
-      "marca": "elever-ai",
-      "thumb": ".thumbs/elever-ai__novo-post.jpg",
+      "slug": "construir-em-volta-nao-trocar",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__construir-em-volta-nao-trocar.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Construir em volta, não trocar",
+      "caption": "O problema quase nunca é o sistema inteiro. É aquela parte que falta e trava o dia a dia do time. A gente constrói em volta do que você já tem, sem começar tudo de novo. Chama pra um diagnóstico gratuito.\n\n#gestao #tecnologia #operacao #produtividade",
+      "arte_sha": "f75410aa620ce9b6aec3a9d066b7aa30c32569f978ae32f7a8885f952f0972fe",
+      "created_at": "2026-07-29T03:51:13",
+      "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/construir-em-volta-nao-trocar/_regen/01-58ce96.png",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/construir-em-volta-nao-trocar/01.png",
+          "sub": "A gente resolve o que falta sem detonar o que já funciona.",
+          "chip": false,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "thumb": ".thumbs/smark__construir-em-volta-nao-trocar.jpg",
+          "bgmode": "imagem",
+          "bg_seed": 1123616133,
+          "bg_tier": "rascunho",
+          "arte_sha": "f75410aa620ce9b6aec3a9d066b7aa30c32569f978ae32f7a8885f952f0972fe",
+          "headline": "Seu sistema faz quase tudo|falta *a partezinha*",
+          "bg_modelo": "bytedance-seed/seedream-4.5",
+          "bg_usd_brl": 5.1339,
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "arte_src_sha": "a22ad2f3e6a9aa7e0e1a208511d1b81e019ec71ca3a599d5f0665a25b29148fb",
+          "bg_custo_brl": 0.2054,
+          "bg_custo_usd": 0.04,
+          "bg_publicavel": false
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-9382",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__novo-post-9382.jpg",
       "canais": [
         "instagram"
       ],
       "status": "salvo",
-      "titulo": "Novo post",
-      "caption": "",
-      "arte_sha": "d6bbd0cc3924c5e07664ce37e025fb7d7b0696483551ea926c0e46424cc494ca",
+      "titulo": "Funcionários de IA por departamento",
+      "caption": "A Smark acessoria desenvolve funcionários de IA sob medida para a sua operação.  \n\nComente \"EU QUERO\"  e receba um diagnóstico gratuito da sua operação para entender quais funcionários podem complementar o seu time.  Ou acesse nosso site na BIO e agende com um de nossos especialistas.\n\n\n\n#smark #inteligenciaartificial #gestao #produtividade",
+      "arte_sha": "4eb52d30d234f7769ffa4e65d68af3c3239acea7a16abeb5640d5e5ef2e92810",
       "created_at": "2026-07-27T21:44:35",
       "updated_at": "2026-07-29T20:53:37",
       "aprovado_em": "",
@@ -825,26 +937,24 @@
         {
           "n": 1,
           "_v": 1,
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/_uploads/61883a72dc.png",
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/_regen/01-022341.png",
           "cor": "#F4F2FB",
-          "cta": "Teste agora e veja",
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/01.png",
-          "sub": "Como R$ 200,00",
+          "cta": "Solicite um Diagnóstico gratuito  ",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/01.png",
+          "sub": "Menos tarefas repetidas, mais tempo para decidir.",
           "chip": true,
           "page": "",
           "tema": "claro",
           "grade": true,
           "hsize": 0,
-          "thumb": ".thumbs/elever-ai__novo-post.jpg",
+          "thumb": ".thumbs/smark__novo-post-9382.jpg",
           "accent": "",
-          "bg_sha": "81a95cdf5298343924ed9d8c3445763c8d2b4a150384ea62dfb2eb91789e1ba2",
+          "bg_sha": "ab1121721fe30bcfb669617d385034a80c0e7e96a3b8ae7cd95505b8c3400870",
           "bgmode": "imagem",
-          "overlay": "branco",
-          "arte_sha": "d6bbd0cc3924c5e07664ce37e025fb7d7b0696483551ea926c0e46424cc494ca",
-          "headline": "CRM DE IA |para {#8b3cf7:lojas de móveis}",
-          "bg_src_sha": "bf5c8ffb68e4266f40536590aa9eae23b8a7968c64eb948ee3e97a21ff317528",
-          "overlay_op": 1,
-          "arte_src_sha": "124ba59d5da3606efc56dfddca6fe052fda4bda90c2d8699cb0da67d89a608f5"
+          "arte_sha": "4eb52d30d234f7769ffa4e65d68af3c3239acea7a16abeb5640d5e5ef2e92810",
+          "headline": "Cada setor com um \n*funcionário de IA*",
+          "bg_src_sha": "6795a299e1e15096624ac8a78bef2de3eae1c69bf17ed14afba446ca885fa556",
+          "arte_src_sha": "6d1a063f07a5488d37603c44e77488c6f3c9545ff5b63689de9d828960ea83c3"
         }
       ]
     },
@@ -960,104 +1070,6 @@
           "arte_sha": "788185eb66edee75b9b1544b078aa66c7007e769ccf9f1726619b7a01e3600e0",
           "headline": "SEU TÍT{#14238F:ULO|*AQUI.*}",
           "arte_src_sha": "73ccbf07c9cd794ce81fb2356fc8bb67387fb071cf71fe0f2d4d78bf730f228a"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "novo-post-5102",
-      "marca": "track-brasil",
-      "thumb": ".thumbs/track-brasil__novo-post-5102.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Novo post",
-      "caption": "",
-      "arte_sha": "7707bbda3fd8cb1891b77e39372fde4c33a57c2b8a2c3786fff3290c28c86b57",
-      "created_at": "2026-07-28T01:36:52",
-      "updated_at": "2026-07-29T20:53:37",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/track-brasil/publicacoes/social/instagram/arte/novo-post-5102/01.png",
-          "sub": "",
-          "tab": true,
-          "chip": true,
-          "logo": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/track-brasil__novo-post-5102.jpg",
-          "accent": "",
-          "bgmode": "claro",
-          "footer": true,
-          "paleta": "marca",
-          "arte_sha": "7707bbda3fd8cb1891b77e39372fde4c33a57c2b8a2c3786fff3290c28c86b57",
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "arte_src_sha": "a8a4f59560617f806239c73878460d33f9b186a5ee0665d018694ec5b9bca793"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "sul-cont-bil",
-      "marca": "sul-contabil",
-      "thumb": ".thumbs/sul-contabil__sul-cont-bil.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Sul Contábil",
-      "caption": "",
-      "arte_sha": "b21f12b081a59e499d4fafe594b0579557409ed53c5c334fea941e70164b0e84",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T20:53:37",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/sul-contabil/publicacoes/social/instagram/arte/sul-cont-bil/01.png",
-          "sub": "",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/sul-contabil__sul-cont-bil.jpg",
-          "accent": "",
-          "bgmode": "claro",
-          "arte_sha": "b21f12b081a59e499d4fafe594b0579557409ed53c5c334fea941e70164b0e84",
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "arte_src_sha": "94b8bc64260c1ba74109fa91fb0d45f98b05eb852e558d6009ad526c535731b2"
         }
       ]
     },
@@ -1278,6 +1290,59 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
+      "slug": "xxxx",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__xxxx.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "XXXx",
+      "caption": "",
+      "arte_sha": "eb65ccf0a749f7188140f70096e08af700f18e385906c7cc87494f0e92cf2f21",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/xxxx/_uploads/6d1a25a0c6.png",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/xxxx/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "_tipo": "autoridade",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/smark__xxxx.jpg",
+          "accent": "",
+          "bg_sha": "78ef013bf37770c026c5617c91065b642c159a45e47a4b1d5e4a51c1d90d87a7",
+          "bgmode": "imagem",
+          "overlay": "branco",
+          "arte_sha": "eb65ccf0a749f7188140f70096e08af700f18e385906c7cc87494f0e92cf2f21",
+          "contexto": "grandes lendas do futebol comerando ajuse para ficar somente os dois jogadores ",
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "bg_src_sha": "ce85208a1c8bf6d5b5c0cfb78bec57430f3eba5cf66022e2eae61ca9b4457485",
+          "arte_src_sha": "f03853c8f088a06ff9bd5e1cff33a3ef6130b31f9b5eecd12118c37020388194"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
       "slug": "novo-post-30f4",
       "marca": "norte-a-sul-contabilidade",
       "canais": [
@@ -1433,6 +1498,53 @@
           "bg_suplente": false,
           "arte_src_sha": "eee53ea3b496b094fa7c7fcece15024abaccda602fd1f1fa5b01f4be83405818",
           "bg_custo_usd": 0.242958
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "sul-cont-bil",
+      "marca": "sul-contabil",
+      "thumb": ".thumbs/sul-contabil__sul-cont-bil.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Sul Contábil",
+      "caption": "",
+      "arte_sha": "b21f12b081a59e499d4fafe594b0579557409ed53c5c334fea941e70164b0e84",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/sul-contabil/publicacoes/social/instagram/arte/sul-cont-bil/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/sul-contabil__sul-cont-bil.jpg",
+          "accent": "",
+          "bgmode": "claro",
+          "arte_sha": "b21f12b081a59e499d4fafe594b0579557409ed53c5c334fea941e70164b0e84",
+          "headline": "SEU TÍTULO|*AQUI.*",
+          "arte_src_sha": "94b8bc64260c1ba74109fa91fb0d45f98b05eb852e558d6009ad526c535731b2"
         }
       ]
     },
@@ -2692,202 +2804,90 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "construir-em-volta-nao-trocar",
+      "slug": "e2e-db-preserve",
       "marca": "smark",
-      "thumb": ".thumbs/smark__construir-em-volta-nao-trocar.jpg",
+      "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
       "canais": [
         "instagram"
       ],
-      "status": "rascunho",
-      "titulo": "Construir em volta, não trocar",
-      "caption": "O problema quase nunca é o sistema inteiro. É aquela parte que falta e trava o dia a dia do time. A gente constrói em volta do que você já tem, sem começar tudo de novo. Chama pra um diagnóstico gratuito.\n\n#gestao #tecnologia #operacao #produtividade",
-      "arte_sha": "f75410aa620ce9b6aec3a9d066b7aa30c32569f978ae32f7a8885f952f0972fe",
-      "created_at": "2026-07-29T03:51:13",
-      "updated_at": "2026-07-29T20:53:37",
-      "aprovado_em": "",
-      "aprovado_por": "",
+      "status": "ajuste",
+      "titulo": "Preserve",
+      "caption": "legenda e2e",
+      "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
+      "created_at": "2026-07-29T14:25:15",
+      "tentativas": 0,
+      "updated_at": "2026-07-29T19:10:17",
+      "aprovado_em": "2026-07-29T22:03:51+00:00",
+      "aprovado_por": "andreik",
       "publicado_em": "",
       "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 1,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/construir-em-volta-nao-trocar/_regen/01-58ce96.png",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/construir-em-volta-nao-trocar/01.png",
-          "sub": "A gente resolve o que falta sem detonar o que já funciona.",
-          "chip": false,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "thumb": ".thumbs/smark__construir-em-volta-nao-trocar.jpg",
-          "bgmode": "imagem",
-          "bg_seed": 1123616133,
-          "bg_tier": "rascunho",
-          "arte_sha": "f75410aa620ce9b6aec3a9d066b7aa30c32569f978ae32f7a8885f952f0972fe",
-          "headline": "Seu sistema faz quase tudo|falta *a partezinha*",
-          "bg_modelo": "bytedance-seed/seedream-4.5",
-          "bg_usd_brl": 5.1339,
-          "bg_provider": "openrouter",
-          "bg_suplente": false,
-          "arte_src_sha": "a22ad2f3e6a9aa7e0e1a208511d1b81e019ec71ca3a599d5f0665a25b29148fb",
-          "bg_custo_brl": 0.2054,
-          "bg_custo_usd": 0.04,
-          "bg_publicavel": false
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "novo-post-9382",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__novo-post-9382.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "salvo",
-      "titulo": "Funcionários de IA por departamento",
-      "caption": "A Smark acessoria desenvolve funcionários de IA sob medida para a sua operação.  \n\nComente \"EU QUERO\"  e receba um diagnóstico gratuito da sua operação para entender quais funcionários podem complementar o seu time.  Ou acesse nosso site na BIO e agende com um de nossos especialistas.\n\n\n\n#smark #inteligenciaartificial #gestao #produtividade",
-      "arte_sha": "4eb52d30d234f7769ffa4e65d68af3c3239acea7a16abeb5640d5e5ef2e92810",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T20:53:37",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 1,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/_regen/01-022341.png",
-          "cor": "#F4F2FB",
-          "cta": "Solicite um Diagnóstico gratuito  ",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/01.png",
-          "sub": "Menos tarefas repetidas, mais tempo para decidir.",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__novo-post-9382.jpg",
-          "accent": "",
-          "bg_sha": "ab1121721fe30bcfb669617d385034a80c0e7e96a3b8ae7cd95505b8c3400870",
-          "bgmode": "imagem",
-          "arte_sha": "4eb52d30d234f7769ffa4e65d68af3c3239acea7a16abeb5640d5e5ef2e92810",
-          "headline": "Cada setor com um \n*funcionário de IA*",
-          "bg_src_sha": "6795a299e1e15096624ac8a78bef2de3eae1c69bf17ed14afba446ca885fa556",
-          "arte_src_sha": "6d1a063f07a5488d37603c44e77488c6f3c9545ff5b63689de9d828960ea83c3"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "xxxx",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__xxxx.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "XXXx",
-      "caption": "",
-      "arte_sha": "eb65ccf0a749f7188140f70096e08af700f18e385906c7cc87494f0e92cf2f21",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T20:53:37",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 1,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/xxxx/_uploads/6d1a25a0c6.png",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/xxxx/01.png",
-          "sub": "",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "_tipo": "autoridade",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__xxxx.jpg",
-          "accent": "",
-          "bg_sha": "78ef013bf37770c026c5617c91065b642c159a45e47a4b1d5e4a51c1d90d87a7",
-          "bgmode": "imagem",
-          "overlay": "branco",
-          "arte_sha": "eb65ccf0a749f7188140f70096e08af700f18e385906c7cc87494f0e92cf2f21",
-          "contexto": "grandes lendas do futebol comerando ajuse para ficar somente os dois jogadores ",
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "bg_src_sha": "ce85208a1c8bf6d5b5c0cfb78bec57430f3eba5cf66022e2eae61ca9b4457485",
-          "arte_src_sha": "f03853c8f088a06ff9bd5e1cff33a3ef6130b31f9b5eecd12118c37020388194"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "novo-post-5420",
-      "marca": "amosim",
-      "thumb": ".thumbs/amosim__novo-post-5420.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Novo post",
-      "caption": "",
-      "arte_sha": "a0a3d2ebb17a8df572eb155767deeb73866a87428c3b25a0dc35413cd3b02e0c",
-      "created_at": "2026-07-29T03:18:17",
-      "updated_at": "2026-07-29T20:53:37",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
+      "ultimo_comentario": "fim do teste do fluxo — devolvendo ao estado interno",
       "frames": [
         {
           "n": 1,
           "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/amosim/publicacoes/social/instagram/arte/novo-post-5420/01.png",
-          "sub": "",
-          "tab": true,
-          "chip": true,
-          "logo": true,
+          "cta": "cta",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/e2e-db-preserve/01.png",
+          "sub": "sub",
           "page": "",
           "tema": "claro",
+          "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
+          "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
+          "headline": "H1 *x*",
+          "arte_src_sha": "7b39e80f530bf25ff80c88f396cd0e73603b3d8901fd1fd3142bc9b3e5a02d75"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "elever-crm",
+      "marca": "elever-ai",
+      "thumb": ".thumbs/elever-ai__elever-crm.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "ELEVER CRM",
+      "caption": "",
+      "arte_sha": "cd74d11262233f72b91b0989fd3ca09446b5f5c1b9a47913d774a56323c6ef15",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T20:53:37",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 3,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_uploads/3ab517f1bb.png",
+          "cor": "#F4F2FB",
+          "cta": "chama no acelerador",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/01.png",
+          "sub": "{#3bf748:Confira as melhores opcoes e orcamentos}",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "zoom": 1.25,
           "grade": true,
           "hsize": 0,
-          "thumb": ".thumbs/amosim__novo-post-5420.jpg",
+          "thumb": ".thumbs/elever-ai__elever-crm.jpg",
           "accent": "",
-          "bgmode": "claro",
-          "footer": true,
-          "paleta": "marca",
-          "arte_sha": "a0a3d2ebb17a8df572eb155767deeb73866a87428c3b25a0dc35413cd3b02e0c",
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "arte_src_sha": "f42e700c34816d9e6f58a9e9260ba7e1f968559feab121b5d2bfbe1a17e30fc3"
+          "bg_sha": "8695abcc383c5e1c0b1f339955c0a4ac7e8a52440ecef72c313ef0c5eae34dc6",
+          "bgmode": "imagem",
+          "brilho": 0.55,
+          "overlay": "branco",
+          "arte_sha": "cd74d11262233f72b91b0989fd3ca09446b5f5c1b9a47913d774a56323c6ef15",
+          "headline": "Sistemas de IA com Velocidade ",
+          "bg_src_sha": "5771567d98557b68ce6e3bb4d001e1469c0e8b7555fa2ffadb1d8318c6a081a7",
+          "arte_src_sha": "c143b220490def0c9c868f9de6f64073a772c1e16795eaeaa6b6fcc0facf311d"
         }
       ]
     }
