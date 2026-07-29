@@ -59,10 +59,10 @@ CREATE TABLE IF NOT EXISTS post (
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (marca, slug)
 );
--- O worker de agendamento pergunta "o que vence agora?" a cada minuto; sem este
--- índice ele varreria a tabela inteira toda vez.
-CREATE INDEX IF NOT EXISTS idx_post_agenda ON post (status, agendado_para)
-  WHERE agendado_para IS NOT NULL;
+-- O índice de agenda NÃO entra aqui: numa base que já existe, o CREATE TABLE
+-- acima é no-op e a coluna `agendado_para` só nasce nos ALTER lá embaixo. Um
+-- CREATE INDEX sobre coluna inexistente aborta o lote INTEIRO — inclusive os
+-- ALTER que ainda viriam. Foi exatamente o que travou a migração em produção.
 
 -- Trilha de quem mexeu no status. O aceite do cliente é a peça mais sensível do
 -- fluxo: precisa ficar registrado quem aprovou, quando e com que comentário —
@@ -224,7 +224,8 @@ def init_schema() -> dict:
             cur.execute(_SCHEMA)
             cur.execute(_MIGRATIONS)
     _SCHEMA_OK = True
-    return {"ok": True, "schema": "marca,post,post_frame,canal_conexao,publicacao_log,nota_publicacao"}
+    return {"ok": True, "schema": "marca,post,post_evento,post_frame,canal_conexao,"
+                                  "publicacao_log,nota_publicacao,arte_blob"}
 
 
 # ── fluxo de aprovação ────────────────────────────────────────────────────────
