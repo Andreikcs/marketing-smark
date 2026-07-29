@@ -73,15 +73,36 @@ def _env(key: str, default: str = "") -> str:
 
 
 def ig_app_config() -> dict:
-    """Credenciais do app Meta (uma app da smark; clientes só autorizam)."""
+    """Credenciais do app Meta (uma app da smark; clientes só autorizam).
+
+    Em Railway, se INSTAGRAM_REDIRECT_URI não estiver setado, monta a partir
+    de RAILWAY_PUBLIC_DOMAIN (HTTPS) — evita o erro clássico de redirect 127.0.0.1.
+    """
+    redirect = (
+        _env("INSTAGRAM_REDIRECT_URI")
+        or _env("META_IG_REDIRECT_URI")
+        or ""
+    )
+    if not redirect:
+        pub = (_env("RAILWAY_PUBLIC_DOMAIN") or _env("PUBLIC_HOSTS") or "").split(",")[0].strip()
+        if pub:
+            if not pub.startswith("http"):
+                pub = "https://" + pub
+            redirect = pub.rstrip("/") + "/oauth/instagram/callback"
+        else:
+            redirect = "http://127.0.0.1:8765/oauth/instagram/callback"
+    # Instagram Login exige o Instagram App ID (Business login settings),
+    # NÃO o App ID do Facebook. Se só tiver o FB ID, a Meta retorna
+    # "Invalid platform app".
+    app_id = (
+        _env("INSTAGRAM_PLATFORM_APP_ID")
+        or _env("INSTAGRAM_APP_ID")
+        or _env("META_IG_APP_ID")
+    )
     return {
-        "app_id": _env("INSTAGRAM_APP_ID") or _env("META_IG_APP_ID"),
+        "app_id": app_id,
         "app_secret": _env("INSTAGRAM_APP_SECRET") or _env("META_IG_APP_SECRET"),
-        "redirect_uri": (
-            _env("INSTAGRAM_REDIRECT_URI")
-            or _env("META_IG_REDIRECT_URI")
-            or "http://127.0.0.1:8765/oauth/instagram/callback"
-        ),
+        "redirect_uri": redirect,
     }
 
 
@@ -245,14 +266,15 @@ def iniciar_oauth(marca: str, canal: str = "instagram",
 
     state = secrets.token_urlsafe(24)
     mode = modo_instagram()
-    _save_pending(state, {
+    pending = {
         "marca": marca,
         "canal": canal,
         "return_to": return_to or "/config",
         "mode": mode,
-    })
+    }
 
     if mode == "fake":
+        _save_pending(state, pending)
         url = f"/oauth/instagram/fake?state={urllib.parse.quote(state)}"
         return {
             "ok": True,
@@ -263,16 +285,44 @@ def iniciar_oauth(marca: str, canal: str = "instagram",
         }
 
     cfg = ig_app_config()
+    if not cfg["app_id"] or not cfg["redirect_uri"]:
+        return {"ok": False, "erro": "INSTAGRAM_APP_ID / REDIRECT_URI ausentes no ambiente"}
+    # URL Meta — só params oficiais (enable_fb_login/force_reauth quebram em alguns apps)
     params = {
-        "client_id": cfg["app_id"],
-        "redirect_uri": cfg["redirect_uri"],
+        "client_id": str(cfg["app_id"]).strip(),
+        "redirect_uri": cfg["redirect_uri"].strip(),
         "response_type": "code",
         "scope": ",".join(IG_SCOPES),
         "state": state,
-        "force_reauth": "true",
     }
-    url = IG_AUTHORIZE + "?" + urllib.parse.urlencode(params)
-    return {"ok": True, "url": url, "mode": "real", "marca": marca}
+    meta_url = IG_AUTHORIZE + "?" + urllib.parse.urlencode(params)
+    pending["meta_url"] = meta_url
+    _save_pending(state, pending)
+    # página intermediária com branding Smark (Meta controla a tela do Instagram)
+    bridge = (
+        f"/oauth/instagram/start?state={urllib.parse.quote(state)}"
+        f"&marca={urllib.parse.quote(marca)}"
+    )
+    return {
+        "ok": True,
+        "url": bridge,           # UI branded primeiro
+        "meta_url": meta_url,    # URL real Meta (bridge redireciona)
+        "mode": "real",
+        "marca": marca,
+        "redirect_uri": cfg["redirect_uri"],
+        "app_id": cfg["app_id"],
+    }
+
+
+def peek_pending(state: str) -> Optional[dict]:
+    """Lê pending sem consumir (bridge OAuth)."""
+    path = os.path.join(PENDING_DIR, f"{state}.json")
+    data = _load_json(path)
+    if not data:
+        return None
+    if time.time() - float(data.get("created_at") or 0) > 1800:
+        return None
+    return data
 
 
 def _now_iso() -> str:
@@ -640,6 +690,66 @@ def publicar_instagram(marca: str, *,
     }
 
 
+def html_oauth_bridge(marca: str, meta_url: str, state: str = "") -> str:
+    """Tela smark antes de ir ao Instagram — deixa claro o que vai acontecer.
+
+    A Meta controla 100% as telas de login/captcha do Instagram (não customizáveis
+    como o OAuth do Claude). Aqui só contextualizamos a marca e o Smark Studio.
+    """
+    marca = marca or "esta marca"
+    return f"""<!doctype html>
+<html lang=pt-BR><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Conectar Instagram · Smark Studio</title>
+<style>
+  *{{box-sizing:border-box}}
+  body{{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:linear-gradient(160deg,#0b0618 0%,#1a0b2e 45%,#2a1c4a 100%);color:#f4f0ff}}
+  .card{{width:min(420px,92vw);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+    border-radius:20px;padding:28px 26px;backdrop-filter:blur(12px);
+    box-shadow:0 24px 60px rgba(0,0,0,.45)}}
+  .brand{{display:flex;align-items:center;gap:10px;margin-bottom:18px}}
+  .logo{{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#8b3cf7,#5b2fd6);
+    display:grid;place-items:center;font-weight:800;font-size:18px}}
+  .brand b{{font-size:15px;letter-spacing:-.02em}}
+  .brand span{{display:block;font-size:11px;color:#b8a8d8;font-weight:500}}
+  h1{{font-size:20px;margin:0 0 8px;line-height:1.25}}
+  p{{font-size:14px;color:#cfc2e8;line-height:1.5;margin:0 0 14px}}
+  ul{{margin:0 0 20px;padding-left:18px;color:#cfc2e8;font-size:13px;line-height:1.55}}
+  ul li{{margin-bottom:6px}}
+  .btn{{display:block;width:100%;text-align:center;padding:14px 16px;border:0;border-radius:14px;
+    font-size:15px;font-weight:700;color:#fff;text-decoration:none;cursor:pointer;
+    background:linear-gradient(90deg,#f58529,#dd2a7b,#8134af,#515bd4)}}
+  .btn:hover{{filter:brightness(1.06)}}
+  .hint{{font-size:11px;color:#9a8bb8;margin-top:14px;line-height:1.45;text-align:center}}
+  .marca{{display:inline-block;background:rgba(139,60,247,.25);color:#e8d8ff;padding:3px 10px;
+    border-radius:999px;font-size:12px;font-weight:600;margin-bottom:12px}}
+</style>
+</head><body>
+<div class=card>
+  <div class=brand>
+    <div class=logo>S</div>
+    <div><b>Smark Studio</b><span>Autorização de canais</span></div>
+  </div>
+  <div class=marca>Marca · {_esc(marca)}</div>
+  <h1>Autorizar o Smark Studio a publicar no Instagram</h1>
+  <p>Você será levado ao Instagram (Meta) para entrar com a conta
+  <b>Business ou Creator</b> desta marca e permitir a conexão.</p>
+  <ul>
+    <li>O Smark Studio pede só permissão para <b>identificar a conta</b> e <b>publicar posts</b> que você aprovar no editor.</li>
+    <li>Não postamos nada sem você clicar em Publicar.</li>
+    <li>As telas de login/captcha são da <b>Meta</b> — não dá para customizar o visual delas.</li>
+  </ul>
+  <a class=btn id=go href="{_esc(meta_url)}">Continuar com Instagram</a>
+  <p class=hint>Depois de autorizar, a Meta deve te devolver para o Smark Studio.
+  Se cair no feed do Instagram sem voltar, a conta precisa ser profissional e estar
+  como testador do app (modo Development).<br>
+  Clique no botão acima — não redirecionamos sozinhos.</p>
+</div>
+</body></html>"""
+
+
 def html_fake_login(state: str, marca: str = "", erro: str = "") -> str:
     """Página que simula a janela de autorização do Instagram."""
     marca = marca or "?"
@@ -711,24 +821,42 @@ def html_oauth_done(ok: bool, marca: str = "", username: str = "",
             sep = "&" if "?" in dest else "?"
             dest = f"{dest}{sep}canais=ok&marca={urllib.parse.quote(marca)}"
         return f"""<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
-<meta http-equiv="refresh" content="1;url={_esc(dest)}">
-<title>Conectado</title>
-<style>body{{font-family:system-ui;display:grid;place-items:center;min-height:100vh;background:#0b0b12;color:#eee;margin:0}}
-.card{{background:#16161f;border:1px solid #2a2a38;border-radius:16px;padding:28px;text-align:center;max-width:360px}}
-.ok{{color:#6dcf8a;font-weight:700}}</style></head><body>
+<meta http-equiv="refresh" content="2;url={_esc(dest)}">
+<title>Instagram conectado · Smark Studio</title>
+<style>
+body{{font-family:system-ui;display:grid;place-items:center;min-height:100vh;margin:0;
+  background:linear-gradient(160deg,#0b0618,#1a0b2e);color:#f4f0ff}}
+.card{{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;
+  padding:32px 28px;text-align:center;max-width:400px;width:92vw}}
+.ok{{color:#6dcf8a;font-weight:800;font-size:18px;margin-bottom:8px}}
+.sub{{color:#cfc2e8;font-size:14px;line-height:1.45}}
+a{{color:#d4b8ff}}
+</style></head><body>
 <div class=card>
-  <div class=ok>✓ Instagram conectado</div>
-  <p style="color:#aaa;font-size:14px">@{_esc(username)} · marca <b>{_esc(marca)}</b></p>
-  <p style="font-size:13px;color:#888">Redirecionando…</p>
-  <p><a href="{_esc(dest)}" style="color:#c4a0ff">Voltar agora</a></p>
+  <div class=ok>✓ Conta autorizada no Smark Studio</div>
+  <p class=sub>Instagram <b>@{_esc(username)}</b> vinculado à marca <b>{_esc(marca)}</b>.<br>
+  A bolinha do ícone IG deve ficar <b style="color:#34c759">verde</b> no card.</p>
+  <p class=sub style="margin-top:16px;font-size:12px;color:#9a8bb8">Voltando ao painel…</p>
+  <p><a href="{_esc(dest)}">Abrir Configurações agora</a></p>
 </div></body></html>"""
     return f"""<!doctype html><html lang=pt-BR><head><meta charset=utf-8>
-<title>Falha ao conectar</title>
-<style>body{{font-family:system-ui;display:grid;place-items:center;min-height:100vh;background:#0b0b12;color:#eee;margin:0}}
-.card{{background:#16161f;border:1px solid #2a2a38;border-radius:16px;padding:28px;text-align:center;max-width:400px}}
-.err{{color:#f08080}}</style></head><body>
+<title>Falha · Smark Studio</title>
+<style>
+body{{font-family:system-ui;display:grid;place-items:center;min-height:100vh;margin:0;
+  background:linear-gradient(160deg,#0b0618,#1a0b2e);color:#f4f0ff}}
+.card{{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;
+  padding:32px 28px;text-align:center;max-width:420px;width:92vw}}
+.err{{color:#f08080;font-weight:800;font-size:18px;margin-bottom:8px}}
+.sub{{color:#cfc2e8;font-size:14px;line-height:1.5}}
+a{{color:#d4b8ff}}
+code{{font-size:12px;background:rgba(0,0,0,.3);padding:2px 6px;border-radius:6px}}
+</style></head><body>
 <div class=card>
   <div class=err>Não foi possível conectar</div>
-  <p style="color:#aaa;font-size:14px">{_esc(erro)}</p>
-  <p><a href="/config" style="color:#c4a0ff">Voltar às configurações</a></p>
+  <p class=sub">{_esc(erro)}</p>
+  <p class=sub style="font-size:12px;color:#9a8bb8;margin-top:12px">
+  Dicas: conta <b>Business/Creator</b> · app em Development exige o usuário em
+  <b>Funções do app / Instagram testers</b> · redirect na Meta deve ser o HTTPS do Railway.
+  </p>
+  <p style="margin-top:18px"><a href="/config">Voltar ao Smark Studio</a></p>
 </div></body></html>"""

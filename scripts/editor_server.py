@@ -2588,6 +2588,19 @@ class H(http.server.BaseHTTPRequestHandler):
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
         # ── OAuth Instagram (fake + real callback) ──────────────────────────
+        if path == "/oauth/instagram/start":
+            # ponte branded Smark → Instagram (Meta)
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            state = (qs.get("state") or [""])[0]
+            pending = _canais.peek_pending(state) or {}
+            marca = pending.get("marca") or (qs.get("marca") or [""])[0]
+            meta_url = pending.get("meta_url") or ""
+            if not meta_url:
+                html = _canais.html_oauth_done(
+                    False, erro="Sessão de autorização expirada — volte ao Config e toque no Instagram de novo.")
+                return self._send(200, html, MIME[".html"])
+            html = _canais.html_oauth_bridge(marca, meta_url, state)
+            return self._send(200, html, MIME[".html"])
         if path == "/oauth/instagram/fake":
             qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             state = (qs.get("state") or [""])[0]
@@ -2603,6 +2616,9 @@ class H(http.server.BaseHTTPRequestHandler):
             return self._send(200, html, MIME[".html"])
         if path == "/oauth/instagram/callback":
             qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            print(f"[oauth/ig] callback qs keys={list(qs.keys())} error={qs.get('error')} "
+                  f"has_code={bool(qs.get('code'))} state={(qs.get('state') or [''])[0][:12]}…",
+                  file=sys.stderr)
             if qs.get("error"):
                 html = _canais.html_oauth_done(
                     False, erro=urllib.parse.unquote((qs.get("error_description") or ["negado"])[0]))
