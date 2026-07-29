@@ -99,6 +99,48 @@ def safe_marca(m, fallback="smark"):
     return fb
 
 
+def ensure_stub(slug, nome=None):
+    """Garante entrada mínima no tokens.json para marca vinda do editor/DB.
+
+    Não sobrescreve marca existente. Evita galeria preta / ValueError no compositor
+    quando o post foi criado antes do cadastro formal (multi-marca + Postgres).
+    """
+    slug = (slug or "").strip().lower()
+    if not is_slug_ok(slug):
+        return None
+    if exists(slug):
+        return get(slug)
+    nome = (nome or slug.replace("-", " ").title()).strip()
+    entry = {
+        "nome": nome,
+        "papel": "cliente",
+        "acento": "#8B3CF7",
+        "acento_claro": "#A472FF",
+        "gradiente": "linear-gradient(155deg,#9A4DFF 0%,#2A1CA8 100%)",
+        "base_escura": "#2A1CA8",
+        "logo_glyph": (nome[:1].upper() or "M"),
+        "wordmark": nome,
+        "handle": "@" + slug.replace("-", ""),
+        "endossa": False,
+        "mood": f"visual da marca {nome}",
+        "_nota": "Stub auto — complete com nova_marca.py ou Config → marcas.",
+    }
+    t = _load_tokens()
+    t.setdefault("marcas", {})[slug] = entry
+    _save_tokens(t)
+    brand_dir = os.path.join(MARCAS_DIR, slug, "branding")
+    os.makedirs(brand_dir, exist_ok=True)
+    try:
+        import _db
+        if _db.disponivel():
+            meta = dict(entry)
+            meta["nome"] = nome
+            _db.ensure_marca(slug, meta)
+    except Exception:
+        pass
+    return entry
+
+
 def pronta(slug):
     """True se a marca tem o mínimo de branding para produção.
 

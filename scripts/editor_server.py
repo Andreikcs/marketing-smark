@@ -1797,16 +1797,29 @@ async function loadThumb(host,p){
     await loadThumbPreview(host,p);
   }catch(e){host.textContent='sem arte'}
 }
+function thumbPlaceholder(host,p){
+  const fr=(p.frames||[])[0]||{};
+  const h=(fr.headline||p.titulo||p.slug||'post').replace(/\|/g,' · ').replace(/\*/g,'').slice(0,80);
+  host.innerHTML='';
+  const d=document.createElement('div');
+  d.style.cssText='position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;background:linear-gradient(160deg,#2A1CA8,#14141A);color:#fff';
+  d.innerHTML='<div style="font:700 15px/1.25 Inter,system-ui,sans-serif">'+esc(h)+'</div>'
+    +'<div style="margin-top:8px;font:12px Inter,system-ui;opacity:.65">'+(esc(p.marca||''))+'</div>';
+  host.appendChild(d);
+}
 async function loadThumbPreview(host,p){
   try{
-    const fr=(p.frames||[])[0];if(!fr){host.innerHTML='sem arte';return}
+    const fr=(p.frames||[])[0];if(!fr){thumbPlaceholder(host,p);return}
     const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
     const html=await r.text();
+    if(!r.ok || /preview erro|não está no tokens|ValueError/i.test(html)){
+      thumbPlaceholder(host,p);return;
+    }
     const w=host.clientWidth||228,s=w/1080;
     const ifr=document.createElement('iframe');ifr.className='thumbfr';
     ifr.style.width='1080px';ifr.style.height='1350px';ifr.style.transform='scale('+s+')';
     host.innerHTML='';host.appendChild(ifr);ifr.srcdoc=html;
-  }catch(e){host.textContent='sem arte'}
+  }catch(e){thumbPlaceholder(host,p)}
 }
 function buildChecks(host,opts,set,onChange){
   host.innerHTML='';
@@ -2446,6 +2459,12 @@ def sync_db_boot():
         if n_db > 0:
             rebuilt = db.load_posts_as_editor()
             posts = rebuilt.get("posts") or []
+            # registra no tokens.json marcas que só existem no DB (evita cards pretos)
+            for p in posts:
+                try:
+                    _marcas.ensure_stub(p.get("marca") or "smark")
+                except Exception:
+                    pass
             if posts:
                 _write_editor_file(rebuilt)
                 _MEM_CACHE = rebuilt
@@ -2505,6 +2524,12 @@ def save(d):
     global _MEM_CACHE
     with IO_LOCK:
         posts = list(d.get("posts") or [])
+        # multi-marca: stub no tokens para qualquer marca nova no editor
+        for p in posts:
+            try:
+                _marcas.ensure_stub(p.get("marca") or "smark", p.get("marca_nome"))
+            except Exception:
+                pass
         payload = dict(d)
         payload["posts"] = posts
         if "version" not in payload:
@@ -3287,12 +3312,31 @@ class H(http.server.BaseHTTPRequestHandler):
 
         if path == "/preview":
             try:
+                marca = (req.get("marca") or "smark").strip()
+                try:
+                    _marcas.ensure_stub(marca)
+                except Exception:
+                    pass
                 html, _, _ = compositor.compose_html(**frame_kwargs(req.get("frame", {}),
                                                      req.get("size", "1080x1350"), for_export=False,
-                                                     marca=req.get("marca", "smark")))
+                                                     marca=marca))
                 return self._send(200, html, MIME[".html"])
             except Exception as e:
-                return self._send(200, f"<pre style='color:#f66;font-family:monospace;padding:20px'>preview erro: {e}</pre>", MIME[".html"])
+                # Nunca devolver erro vermelho em tela cheia na galeria
+                import html as _htmlmod
+                fr = req.get("frame") or {}
+                h = str(fr.get("headline") or req.get("marca") or "post")[:80]
+                h = h.replace("|", " · ").replace("*", "")
+                m = _htmlmod.escape(str(req.get("marca") or ""))
+                ht = _htmlmod.escape(h)
+                safe = (
+                    "<!doctype html><html><body style='margin:0;background:linear-gradient(160deg,#2A1CA8,#14141A);"
+                    "color:#fff;font:700 42px/1.2 Inter,system-ui,sans-serif;display:flex;align-items:flex-end;"
+                    "padding:48px;min-height:100vh;box-sizing:border-box'>"
+                    f"<div>{ht}<div style='font:400 22px/1.3 Inter,system-ui;opacity:.7;margin-top:16px'>{m}</div>"
+                    f"</div></body></html>"
+                )
+                return self._send(200, safe, MIME[".html"])
 
         if path == "/salvar":
             save(normaliza(req.get("dados", load())))

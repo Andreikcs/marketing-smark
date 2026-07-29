@@ -583,8 +583,24 @@ def compose_html(marca, headline, sub="", cta="", page="", no_chip=False, tema="
     `bg_url` = URL direta (ex.: rota estática do servidor, p/ preview leve no navegador)."""
     brands, fund = load_brands()
     if marca not in brands:
-        raise ValueError(f"marca '{marca}' não está no tokens.json")
-    b = dict(brands[marca])
+        # Multi-marca / Postgres: post pode existir antes do tokens.json
+        # ter a marca. Stub visual evita galeria preta; registro formal
+        # continua via nova_marca / ensure_stub.
+        slug = (marca or "smark").strip() or "smark"
+        b = {
+            "nome": slug.replace("-", " ").title(),
+            "handle": "@" + slug.replace("-", ""),
+            "acento": "#8B3CF7",
+            "accent": "#8B3CF7",
+            "bright": "#A472FF",
+            "acento_claro": "#A472FF",
+            "gradiente": "linear-gradient(155deg,#9A4DFF 0%,#2A1CA8 100%)",
+            "papel": "cliente",
+        }
+        print(f"AVISO: marca '{slug}' não está no tokens.json — usando paleta stub",
+              file=sys.stderr)
+    else:
+        b = dict(brands[marca])
     if accent:
         b["accent"] = accent
         b["bright"] = bright or accent
