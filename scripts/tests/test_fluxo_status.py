@@ -293,6 +293,63 @@ class TestStatusNaoViajaDeCarona(unittest.TestCase):
         # o setUp devolve o espião de verdade — não precisa desfazer aqui
 
 
+class TestAbaVelhaNaoDesfazAprovacao(unittest.TestCase):
+    """O /salvar manda o editor.json inteiro — e a aba pode estar desatualizada.
+
+    Aconteceu de verdade: post foi pra `salvo`, uma aba aberta antes disso
+    chamou /salvar, e o arquivo voltou pra `ajuste` com a aprovação por baixo.
+    Numa vitrine que o cliente aprova, isso é apagar a aprovação em silêncio.
+    """
+
+    def setUp(self):
+        import editor_server as es
+        self.merge = es.merge_fluxo
+
+    def _disco(self, **kw):
+        p = {"marca": "smark", "slug": "p1", "status": "aprovado",
+             "aprovado_por": "cliente@x", "aprovado_em": "2026-07-29T10:00:00+00:00",
+             "agendado_para": "", "titulo": "T"}
+        p.update(kw)
+        return {"posts": [p]}
+
+    def _aba(self, **kw):
+        p = {"marca": "smark", "slug": "p1", "status": "ajuste",
+             "aprovado_por": "", "aprovado_em": "", "titulo": "T editado"}
+        p.update(kw)
+        return {"posts": [p]}
+
+    def test_status_velho_da_aba_e_ignorado(self):
+        r = self.merge(self._aba(), self._disco())
+        p = r["posts"][0]
+        self.assertEqual(p["status"], "aprovado", "aba velha rebaixou o status")
+        self.assertEqual(p["aprovado_por"], "cliente@x", "aba velha apagou quem aprovou")
+        self.assertEqual(p["titulo"], "T editado", "o merge comeu a edição de verdade")
+
+    def test_agenda_nao_vem_da_aba(self):
+        r = self.merge(self._aba(agendado_para="2030-01-01T00:00:00+00:00"),
+                       self._disco(status="agendado", agendado_para="2026-08-03T15:00:00+00:00"))
+        self.assertEqual(r["posts"][0]["agendado_para"], "2026-08-03T15:00:00+00:00")
+
+    def test_editar_ainda_derruba_a_aprovacao(self):
+        r = self.merge(self._aba(status="rascunho"), self._disco())
+        self.assertEqual(r["posts"][0]["status"], "rascunho",
+                         "editar tem que tirar a peça de aprovado")
+
+    def test_botao_salvar_ainda_promove_rascunho(self):
+        r = self.merge(self._aba(status="salvo"), self._disco(status="rascunho"))
+        self.assertEqual(r["posts"][0]["status"], "salvo")
+
+    def test_salvo_nao_rebaixa_aprovado(self):
+        r = self.merge(self._aba(status="salvo"), self._disco(status="aprovado"))
+        self.assertEqual(r["posts"][0]["status"], "aprovado")
+
+    def test_post_novo_passa_inteiro(self):
+        r = self.merge({"posts": [{"marca": "smark", "slug": "novo", "status": "rascunho"}]},
+                       self._disco())
+        self.assertEqual(r["posts"][0]["slug"], "novo")
+        self.assertEqual(r["posts"][0]["status"], "rascunho")
+
+
 class _CursorFalso:
     def __init__(self, sacola): self.sacola = sacola; self.rowcount = 1
     def execute(self, sql, vals=None): self.sacola.append((sql, list(vals or [])))

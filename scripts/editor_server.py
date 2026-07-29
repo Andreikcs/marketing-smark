@@ -2746,6 +2746,44 @@ def load():
         return _clone_editor(file_data)
 
 
+_CAMPOS_FLUXO = ("agendado_para", "aprovado_em", "aprovado_por", "publicado_em",
+                 "ultimo_comentario")
+
+
+def merge_fluxo(novos, disco):
+    """Devolve `novos` com os campos de fluxo vindos do disco.
+
+    Motivo: o /salvar manda o editor.json INTEIRO a partir do `D` que a aba
+    carregou. Uma aba aberta há uma hora salva e devolve todos os posts ao estado
+    de uma hora atrás — foi assim que um post aprovado voltou pra "ajuste"
+    sozinho. Aprovação e agenda só mudam por /post-status.
+
+    Duas exceções, e só duas, porque o editor as usa de propósito:
+      - `rascunho`: editar derruba a aprovação (a peça não é mais a que o cliente viu)
+      - `rascunho → salvo`: o botão Salvar promovendo um rascunho
+    """
+    antes = {}
+    for p in (disco.get("posts") or []):
+        antes[((p.get("marca") or "smark"), p.get("slug") or "")] = p
+    for p in (novos.get("posts") or []):
+        velho = antes.get(((p.get("marca") or "smark"), p.get("slug") or ""))
+        if not velho:
+            continue                      # post novo: o que veio é tudo que existe
+        for c in _CAMPOS_FLUXO:
+            if c in velho:
+                p[c] = velho[c]
+            else:
+                p.pop(c, None)
+        no_disco = velho.get("status") or "rascunho"
+        pedido = p.get("status") or "rascunho"
+        if pedido == no_disco:
+            continue
+        if pedido == "rascunho" or (pedido == "salvo" and no_disco == "rascunho"):
+            continue                      # as duas mudanças que o editor pode fazer sozinho
+        p["status"] = no_disco
+    return novos
+
+
 def save(d):
     """Persiste em editor.json + cache na hora; Postgres em background (não bloqueia)."""
     global _MEM_CACHE
@@ -4007,7 +4045,9 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(200, safe, MIME[".html"])
 
         if path == "/salvar":
-            save(normaliza(req.get("dados", load())))
+            # o fluxo não vem da aba: ela pode estar com um D velho. Ver merge_fluxo.
+            with IO_LOCK:
+                save(merge_fluxo(normaliza(req.get("dados", load())), load()))
             return self._send(200, {"ok": True})
 
         if path == "/post-status":
