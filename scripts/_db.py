@@ -442,6 +442,15 @@ def _ensure_marca_cur(cur, slug: str, meta: Optional[dict] = None) -> None:
     if not slug:
         return
     meta = meta or {}
+    if not meta:
+        # Só garantindo que a marca existe: um SELECT resolve e não trava nada.
+        # O UPSERT abaixo escreve índice em `marca` a cada batch — com dois
+        # escritores (Mac + Railway) isso virava "canceling statement due to
+        # statement timeout / while inserting index tuple in relation marca",
+        # e o post daquele savepoint não era gravado.
+        cur.execute("SELECT 1 FROM marca WHERE slug=%s", (slug,))
+        if cur.fetchone():
+            return
     cur.execute(
         """
         INSERT INTO marca (slug, nome, handle, acento, acento_claro, base_escura,
