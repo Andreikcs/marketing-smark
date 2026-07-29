@@ -50,10 +50,34 @@ CREATE TABLE IF NOT EXISTS post (
   caption         TEXT NOT NULL DEFAULT '',
   canais          JSONB NOT NULL DEFAULT '["instagram"]',
   payload         JSONB NOT NULL DEFAULT '{}',
+  agendado_para   TIMESTAMPTZ,
+  aprovado_em     TIMESTAMPTZ,
+  aprovado_por    TEXT NOT NULL DEFAULT '',
+  publicado_em    TIMESTAMPTZ,
+  tentativas      INT NOT NULL DEFAULT 0,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (marca, slug)
 );
+-- O worker de agendamento pergunta "o que vence agora?" a cada minuto; sem este
+-- índice ele varreria a tabela inteira toda vez.
+CREATE INDEX IF NOT EXISTS idx_post_agenda ON post (status, agendado_para)
+  WHERE agendado_para IS NOT NULL;
+
+-- Trilha de quem mexeu no status. O aceite do cliente é a peça mais sensível do
+-- fluxo: precisa ficar registrado quem aprovou, quando e com que comentário —
+-- senão vira a palavra de um contra a do outro.
+CREATE TABLE IF NOT EXISTS post_evento (
+  id              BIGSERIAL PRIMARY KEY,
+  marca           TEXT NOT NULL,
+  slug            TEXT NOT NULL,
+  de              TEXT NOT NULL DEFAULT '',
+  para            TEXT NOT NULL,
+  por             TEXT NOT NULL DEFAULT 'time',
+  comentario      TEXT NOT NULL DEFAULT '',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_post_evento ON post_evento (marca, slug, created_at DESC);
 
 CREATE TABLE IF NOT EXISTS post_frame (
   id              BIGSERIAL PRIMARY KEY,
@@ -178,6 +202,14 @@ ALTER TABLE marca ADD COLUMN IF NOT EXISTS papel TEXT NOT NULL DEFAULT 'cliente'
 ALTER TABLE canal_conexao ADD COLUMN IF NOT EXISTS username TEXT;
 ALTER TABLE canal_conexao ADD COLUMN IF NOT EXISTS user_id TEXT;
 ALTER TABLE canal_conexao ADD COLUMN IF NOT EXISTS conectado BOOLEAN NOT NULL DEFAULT false;
+-- fluxo de aprovação e agenda
+ALTER TABLE post ADD COLUMN IF NOT EXISTS agendado_para TIMESTAMPTZ;
+ALTER TABLE post ADD COLUMN IF NOT EXISTS aprovado_em TIMESTAMPTZ;
+ALTER TABLE post ADD COLUMN IF NOT EXISTS aprovado_por TEXT NOT NULL DEFAULT '';
+ALTER TABLE post ADD COLUMN IF NOT EXISTS publicado_em TIMESTAMPTZ;
+ALTER TABLE post ADD COLUMN IF NOT EXISTS tentativas INT NOT NULL DEFAULT 0;
+CREATE INDEX IF NOT EXISTS idx_post_agenda ON post (status, agendado_para)
+  WHERE agendado_para IS NOT NULL;
 """
 
 
