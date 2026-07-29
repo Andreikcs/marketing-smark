@@ -440,7 +440,11 @@ def _http_json(method: str, url: str, data: Optional[dict] = None,
 
 
 def _exchange_code(app_id: str, secret: str, redirect: str, code: str) -> dict:
-    """POST token — tenta multipart (docs oficiais) e cai pra urlencoded."""
+    """POST token — UMA tentativa multipart (docs Meta curl -F).
+
+    Não retentar com outro encoding: se o code for aceito e depois falhar,
+    a 2ª tentativa queima com 'authorization code has been used'.
+    """
     payload = {
         "client_id": app_id,
         "client_secret": secret,
@@ -448,21 +452,53 @@ def _exchange_code(app_id: str, secret: str, redirect: str, code: str) -> dict:
         "redirect_uri": redirect,
         "code": code,
     }
-    last_err = None
-    for multipart in (True, False):
+    return _http_json("POST", IG_TOKEN, payload, multipart=True)
+
+
+# resultados de callback (anti F5 / double-hit no code)
+_RESULT_DIR = os.path.join(VAULT, ".secrets", "oauth_results")
+
+
+def save_oauth_result(result: dict) -> str:
+    """Persiste resultado e devolve id curto p/ redirect sem code na URL."""
+    os.makedirs(_RESULT_DIR, exist_ok=True)
+    rid = secrets.token_urlsafe(12)
+    path = os.path.join(_RESULT_DIR, f"{rid}.json")
+    payload = dict(result)
+    payload["_ts"] = time.time()
+    _save_json(path, payload)
+    return rid
+
+
+def load_oauth_result(rid: str) -> Optional[dict]:
+    if not rid or "/" in rid or ".." in rid:
+        return None
+    path = os.path.join(_RESULT_DIR, f"{rid}.json")
+    data = _load_json(path)
+    if not data:
+        return None
+    # expira em 10 min
+    if time.time() - float(data.get("_ts") or 0) > 600:
         try:
-            return _http_json("POST", IG_TOKEN, payload, multipart=multipart)
-        except RuntimeError as e:
-            last_err = e
-            continue
-    raise last_err or RuntimeError("falha ao trocar code")
+            os.remove(path)
+        except OSError:
+            pass
+        return None
+    return data
 
 
 def trocar_code_real(code: str, state: str) -> dict:
     """Callback real: code → tokens long-lived + perfil."""
     pending = _pop_pending(state)
     if not pending:
-        return {"ok": False, "erro": "sessão OAuth expirada — tente Conectar de novo (não recarregue a URL do callback)"}
+        return {
+            "ok": False,
+            "erro": (
+                "Sessão OAuth expirada ou code já processado. "
+                "Volte em Config → Instagram e conecte de novo "
+                "(não recarregue a URL do callback)."
+            ),
+        }
     marca = pending["marca"]
     cfg = ig_app_config()
     # CRÍTICO: redirect_uri do exchange = o do authorize (do pending / meta_url)
@@ -476,40 +512,31 @@ def trocar_code_real(code: str, state: str) -> dict:
     redirect = _norm_redirect(redirect or cfg["redirect_uri"])
     app_id = str(pending.get("app_id") or cfg["app_id"]).strip()
     secret = cfg["app_secret"]
-    # secret alternativo (Facebook App Secret) se o Instagram for diferente
-    secret_fb = (_env("META_FACEBOOK_APP_SECRET") or _env("FACEBOOK_APP_SECRET") or "").strip()
     code = (code or "").strip()
     if code.endswith("#_"):
         code = code[:-2]
-    # NÃO usar unquote_plus no code — o + é parte do code base64-like da Meta
-    # só remove whitespace literal das bordas
     code = code.strip()
 
-    # 1) short-lived — mesmos client_id + redirect_uri do authorize
-    #    tenta secret principal e, se falhar, secret Facebook (mesmo app)
-    short = None
-    errors = []
-    for sec in ([secret, secret_fb] if secret_fb and secret_fb != secret else [secret]):
-        if not sec:
-            continue
-        try:
-            short = _exchange_code(app_id, sec, redirect, code)
-            break
-        except RuntimeError as e:
-            errors.append(str(e))
-            continue
-    if short is None:
-        err = " | ".join(errors) if errors else "falha desconhecida no exchange"
+    # 1) short-lived — UMA chamada only (code é one-shot)
+    try:
+        short = _exchange_code(app_id, secret, redirect, code)
+    except RuntimeError as e:
+        err = str(e)
+        if "has been used" in err.lower():
+            return {
+                "ok": False,
+                "erro": (
+                    "Este código de autorização já foi usado (página recarregada ou clique duplo). "
+                    "Volte ao Config e clique no Instagram de novo — não use o botão Voltar do browser."
+                ),
+            }
         return {
             "ok": False,
             "erro": (
                 f"{err}\n\n"
-                f"redirect usado: {redirect}\n"
-                f"client_id: {app_id}\n"
-                "1) Na Meta → Instagram → Business login: copie de novo o "
-                "**Instagram App Secret** (Mostrar) e atualize INSTAGRAM_APP_SECRET no Railway.\n"
-                "2) URI de redirect idêntica, sem barra no final.\n"
-                "3) Comece o login do zero no Config (não recarregue o callback)."
+                f"redirect: {redirect}\nclient_id: {app_id}\n"
+                "Confira Instagram App Secret no Railway e URI na Meta. "
+                "Sempre reinicie o fluxo pelo Config."
             ),
         }
     # resposta pode vir como {data:[{access_token,user_id,...}]} ou flat

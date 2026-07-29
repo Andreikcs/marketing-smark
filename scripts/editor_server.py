@@ -2615,8 +2615,9 @@ class H(http.server.BaseHTTPRequestHandler):
             html = _canais.html_fake_login(state, marca=pending.get("marca") or "")
             return self._send(200, html, MIME[".html"])
         if path == "/oauth/instagram/callback":
+            # PRG: processa code UMA vez e redireciona p/ /result?rid= (anti F5 / code used)
             qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-            print(f"[oauth/ig] callback qs keys={list(qs.keys())} error={qs.get('error')} "
+            print(f"[oauth/ig] callback error={qs.get('error')} "
                   f"has_code={bool(qs.get('code'))} state={(qs.get('state') or [''])[0][:12]}…",
                   file=sys.stderr)
             if qs.get("error"):
@@ -2629,6 +2630,23 @@ class H(http.server.BaseHTTPRequestHandler):
                 r = _canais.trocar_code_real(code, state)
             except Exception as e:
                 r = {"ok": False, "erro": str(e)}
+            rid = _canais.save_oauth_result(r)
+            # 302 sem code na URL — refresh da result page não re-queima o code
+            loc = f"/oauth/instagram/result?rid={urllib.parse.quote(rid)}"
+            body = b""
+            self.send_response(302)
+            self.send_header("Location", loc)
+            self.send_header("Content-Length", "0")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            return
+        if path == "/oauth/instagram/result":
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            rid = (qs.get("rid") or [""])[0]
+            r = _canais.load_oauth_result(rid) or {
+                "ok": False,
+                "erro": "Resultado expirado — volte ao Config e conecte de novo.",
+            }
             if r.get("ok"):
                 html = _canais.html_oauth_done(
                     True, marca=r.get("marca", ""), username=r.get("username", ""),
