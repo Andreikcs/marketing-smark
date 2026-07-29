@@ -13,3 +13,6 @@ __pycache__/
 *.pyc
 
 .backups/
+
+# artefatos do Playwright MCP (screenshots/logs de verificação)
+.playwright-mcp/
