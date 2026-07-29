@@ -1675,6 +1675,8 @@ __HEAD_THEME__<style>
 .stp-agendado{color:var(--accent);border-color:var(--accent-soft);background:var(--accent-soft)}
 .stp-publicado{color:var(--good);border-color:var(--good);background:transparent}
 .stp-erro{color:var(--danger);border-color:rgba(255,107,122,.45);background:rgba(255,107,122,.12)}
+/* qualquer display: em classe vence o hidden do navegador — esta regra devolve o hidden */
+[hidden]{display:none!important}
 /* bloco de fluxo dentro do modal */
 .flx{padding:10px 14px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:9px}
 .flx-row{display:flex;align-items:center;gap:8px}
@@ -1703,7 +1705,8 @@ __HEAD_THEME__<style>
 .sk-post-meta{gap:7px}
 .sk-post-actions.a5{grid-template-columns:repeat(5,1fr)}
 /* modal estilo Instagram (item 9) */
-.igm{max-width:420px;padding:0;overflow:hidden}
+/* o bloco de fluxo fez o modal passar da tela em notebook — sem isto o rodapé fica inalcançável */
+.igm{max-width:420px;padding:0;max-height:calc(100vh - 48px);overflow:hidden auto}
 .igmhead{display:flex;align-items:center;gap:10px;padding:11px 13px}
 .igmav{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));flex:0 0 auto}
 .igmtitle{flex:1;background:transparent;border:1px solid transparent;border-radius:8px;color:var(--text);font-weight:700;font-size:14px;padding:6px 8px;font-family:var(--font-text)}

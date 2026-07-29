@@ -2810,18 +2810,18 @@
       "canais": [
         "instagram"
       ],
-      "status": "ajuste",
+      "status": "agendado",
       "titulo": "Preserve",
       "caption": "legenda e2e",
       "arte_sha": "215fdb95770d28d496142223530b8b0a8f5137bf753512066d55b6ac9bab0e33",
       "created_at": "2026-07-29T14:25:15",
       "tentativas": 0,
-      "updated_at": "2026-07-29T19:10:17",
-      "aprovado_em": "2026-07-29T22:03:51+00:00",
-      "aprovado_por": "andreik",
+      "updated_at": "2026-07-29T19:29:42",
+      "aprovado_em": "2026-07-29T22:29:23+00:00",
+      "aprovado_por": "time",
       "publicado_em": "",
-      "agendado_para": "",
-      "ultimo_comentario": "fim do teste do fluxo — devolvendo ao estado interno",
+      "agendado_para": "2026-08-11T12:30:00+00:00",
+      "ultimo_comentario": "teste de UI ponta a ponta",
       "frames": [
         {
           "n": 1,
