@@ -357,7 +357,7 @@ def aplicar_status(marca: str, slug: str, para: str, *, por: str = "",
     quem = aprovado_por if aprovado_por is not None else (por or None)
     if quem is not None:
         sets.append("aprovado_por=%s")
-        vals.append(quem[:120] or None)
+        vals.append(quem[:120])       # coluna é NOT NULL DEFAULT '': limpar é '', não NULL
     if para == "agendado":
         sets.append("tentativas=0")
     vals += [marca, slug]

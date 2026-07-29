@@ -1178,9 +1178,13 @@ async function mudarStatus(para,quando,comentario){
   let j={};try{j=await r.json()}catch(e){}
   if(!j.ok){toast(j.erro||'não deu pra mudar a situação');return false}
   p.status=para;
+  p.aprovado_por=j.aprovado_por||'';p.aprovado_em=j.aprovado_em||'';
   if(para==='agendado')p.agendado_para=j.agendado_para||quando||'';
   if(['rascunho','ajuste','salvo'].includes(para))p.agendado_para='';
-  renderStatus();renderPosts();toast(stLabel(para)+' ✓');
+  renderStatus();renderPosts();
+  // aviso = gravou no arquivo mas o banco recusou; esconder isso é como perder a aprovação em silêncio
+  toast(j.aviso?('⚠ '+stLabel(para)+' só no arquivo — o banco recusou'):(stLabel(para)+' ✓'));
+  if(j.aviso)console.warn('fluxo:',j.aviso);
   return true;
 }
 

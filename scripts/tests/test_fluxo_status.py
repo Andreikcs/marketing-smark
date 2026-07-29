@@ -293,6 +293,70 @@ class TestStatusNaoViajaDeCarona(unittest.TestCase):
         # o setUp devolve o espião de verdade — não precisa desfazer aqui
 
 
+class _CursorFalso:
+    def __init__(self, sacola): self.sacola = sacola; self.rowcount = 1
+    def execute(self, sql, vals=None): self.sacola.append((sql, list(vals or [])))
+    def __enter__(self): return self
+    def __exit__(self, *a): return False
+
+
+class _ConnFalsa:
+    def __init__(self, sacola): self.sacola = sacola
+    def cursor(self, *a, **k): return _CursorFalso(self.sacola)
+    def __enter__(self): return self
+    def __exit__(self, *a): return False
+
+
+class TestSqlDoFluxo(unittest.TestCase):
+    """O SQL que a `aplicar_status` monta, sem banco.
+
+    `aprovado_por` é NOT NULL DEFAULT '' — mandar NULL pra limpar derruba o
+    UPDATE inteiro. Em produção isso apareceu como "aprovei, pedi ajuste e o
+    banco ficou dizendo aprovado": o arquivo andava, o banco não.
+    """
+
+    def setUp(self):
+        self.sacola: list = []
+        self._conn, self._disp = _db.conn, _db.disponivel
+        _db.conn = lambda *a, **k: _ConnFalsa(self.sacola)
+        _db.disponivel = lambda: True
+
+    def tearDown(self):
+        _db.conn, _db.disponivel = self._conn, self._disp
+
+    def _set(self) -> dict:
+        """Devolve {coluna: valor} do UPDATE, casando %s com a ordem dos vals."""
+        sql, vals = next(s for s in self.sacola if s[0].startswith("UPDATE post SET"))
+        cols = sql.split("SET ", 1)[1].split(" WHERE")[0].split(",")
+        out, i = {}, 0
+        for c in cols:
+            nome, _, val = c.partition("=")
+            if val == "%s":
+                out[nome] = vals[i]
+                i += 1
+        return out
+
+    def test_limpar_quem_aprovou_manda_string_vazia(self):
+        r = _db.aplicar_status("smark", "p1", "ajuste", de="aprovado",
+                               por="time", aprovado_por="", aprovado_em="")
+        self.assertTrue(r["ok"])
+        s = self._set()
+        self.assertEqual(s["aprovado_por"], "", "mandou NULL numa coluna NOT NULL")
+        self.assertIsNone(s["aprovado_em"], "data vazia devia virar NULL")
+        self.assertEqual(s["status"], "ajuste")
+
+    def test_aprovar_leva_quem_aprovou(self):
+        _db.aplicar_status("smark", "p1", "aprovado", de="revisao",
+                           por="cliente@x", aprovado_em="2026-07-29T10:00:00+00:00")
+        self.assertEqual(self._set()["aprovado_por"], "cliente@x")
+
+    def test_evento_entra_junto(self):
+        _db.aplicar_status("smark", "p1", "revisao", de="salvo", por="time",
+                           comentario="olha isso")
+        self.assertTrue(any(s[0].startswith("INSERT INTO post_evento") for s in self.sacola),
+                        "mudou o status e não registrou na trilha")
+
+
 class TestFusoDasDatasDoFluxo(unittest.TestCase):
     """Toda data do fluxo carrega fuso.
 

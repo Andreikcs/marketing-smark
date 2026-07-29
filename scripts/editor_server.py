@@ -2102,7 +2102,9 @@ async function aplicarStatus(para,quando){
   msg.value='';
   document.getElementById('mst').innerHTML=stPill(para);
   renderFluxo();render();
-  toast(stLabel(para)+' ✓');
+  // se o banco recusou, o arquivo está na frente dele — quem aprovou precisa saber
+  toast(j.aviso ? ('⚠ '+stLabel(para)+' só no arquivo — o banco recusou') : (stLabel(para)+' ✓'));
+  if(j.aviso)console.warn('fluxo:',j.aviso);
 }
 document.getElementById('mflow_hist').onclick=async()=>{
   const p=D.posts[MP];if(!p)return;
