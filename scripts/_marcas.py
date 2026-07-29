@@ -159,13 +159,31 @@ def pronta(slug):
     )
 
 
+def _resolve_logo_rel(rel):
+    """Resolve caminho de logo servível na UI (URL relativa à raiz do vault)."""
+    if not rel:
+        return ""
+    rel = rel.lstrip("/")
+    candidates = [
+        rel,
+        os.path.join("design-system", "assets", rel),
+        os.path.join("design-system", "assets", "logos-perfil", os.path.basename(rel)),
+    ]
+    for c in candidates:
+        full = os.path.join(VAULT, c)
+        if os.path.isfile(full):
+            return c.replace("\\", "/")
+    return ""
+
+
 def listar_detalhes():
     """Lista dicts ricos para UI de gestão de marcas."""
     out = []
     for s in list_slugs():
         m = get(s)
         brasao = m.get("brasao") or {}
-        logo = brasao.get("principal") or m.get("logo_file") or ""
+        logo_raw = brasao.get("principal") or m.get("logo_file") or ""
+        logo = _resolve_logo_rel(logo_raw) or logo_raw
         out.append({
             "slug": s,
             "nome": m.get("nome") or s,
