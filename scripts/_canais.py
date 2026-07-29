@@ -395,13 +395,23 @@ def re_slug_user(u: str) -> str:
 
 
 def _http_json(method: str, url: str, data: Optional[dict] = None,
-               form: bool = False) -> dict:
+               form: bool = False, multipart: bool = False) -> dict:
     headers = {"User-Agent": "smark-canais/1.0"}
     body = None
     if data is not None:
-        if form:
-            body = urllib.parse.urlencode(data).encode()
-            headers["Content-Type"] = "application/x-www-form-urlencoded"
+        if multipart:
+            # Docs Meta usam curl -F → multipart/form-data (não x-www-form-urlencoded)
+            boundary = "----SmarkFormBoundary" + secrets.token_hex(12)
+            chunks = []
+            for k, v in data.items():
+                chunks.append(
+                    f"--{boundary}\r\n"
+                    f'Content-Disposition: form-data; name="{k}"\r\n\r\n'
+                    f"{v}\r\n"
+                )
+            chunks.append(f"--{boundary}--\r\n")
+            body = "".join(chunks).encode("utf-8")
+            headers["Content-Type"] = f"multipart/form-data; boundary={boundary}"
         else:
             body = urllib.parse.urlencode(data).encode()
             headers["Content-Type"] = "application/x-www-form-urlencoded"
@@ -421,9 +431,31 @@ def _http_json(method: str, url: str, data: Optional[dict] = None,
             if isinstance(j.get("error"), dict)
             else j.get("error_message") or j.get("error") or err_body[:300]
         )
+        # Instagram às vezes manda error_type + error_message no root
+        if not msg or msg == err_body[:300]:
+            msg = j.get("error_message") or j.get("error_type") or msg
         raise RuntimeError(f"Instagram API HTTP {e.code}: {msg}") from e
     except urllib.error.URLError as e:
         raise RuntimeError(f"falha de rede Instagram: {e}") from e
+
+
+def _exchange_code(app_id: str, secret: str, redirect: str, code: str) -> dict:
+    """POST token — tenta multipart (docs oficiais) e cai pra urlencoded."""
+    payload = {
+        "client_id": app_id,
+        "client_secret": secret,
+        "grant_type": "authorization_code",
+        "redirect_uri": redirect,
+        "code": code,
+    }
+    last_err = None
+    for multipart in (True, False):
+        try:
+            return _http_json("POST", IG_TOKEN, payload, multipart=multipart)
+        except RuntimeError as e:
+            last_err = e
+            continue
+    raise last_err or RuntimeError("falha ao trocar code")
 
 
 def trocar_code_real(code: str, state: str) -> dict:
@@ -433,41 +465,53 @@ def trocar_code_real(code: str, state: str) -> dict:
         return {"ok": False, "erro": "sessão OAuth expirada — tente Conectar de novo (não recarregue a URL do callback)"}
     marca = pending["marca"]
     cfg = ig_app_config()
-    # CRÍTICO: o redirect_uri do exchange DEVE ser byte-a-byte o do authorize
-    redirect = _norm_redirect(pending.get("redirect_uri") or cfg["redirect_uri"])
+    # CRÍTICO: redirect_uri do exchange = o do authorize (do pending / meta_url)
+    redirect = pending.get("redirect_uri") or cfg["redirect_uri"]
+    if not redirect and pending.get("meta_url"):
+        try:
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(pending["meta_url"]).query)
+            redirect = (q.get("redirect_uri") or [""])[0]
+        except Exception:
+            redirect = ""
+    redirect = _norm_redirect(redirect or cfg["redirect_uri"])
     app_id = str(pending.get("app_id") or cfg["app_id"]).strip()
     secret = cfg["app_secret"]
+    # secret alternativo (Facebook App Secret) se o Instagram for diferente
+    secret_fb = (_env("META_FACEBOOK_APP_SECRET") or _env("FACEBOOK_APP_SECRET") or "").strip()
     code = (code or "").strip()
     if code.endswith("#_"):
         code = code[:-2]
-    # Meta às vezes devolve code com espaços
-    code = code.replace(" ", "+")
+    # NÃO usar unquote_plus no code — o + é parte do code base64-like da Meta
+    # só remove whitespace literal das bordas
+    code = code.strip()
 
     # 1) short-lived — mesmos client_id + redirect_uri do authorize
-    try:
-        short = _http_json("POST", IG_TOKEN, {
-            "client_id": app_id,
-            "client_secret": secret,
-            "grant_type": "authorization_code",
-            "redirect_uri": redirect,
-            "code": code,
-        }, form=True)
-    except RuntimeError as e:
-        err = str(e)
-        # dica acionável se for o erro clássico de redirect/secret
-        if "redirect_uri" in err.lower() or "verification code" in err.lower():
-            return {
-                "ok": False,
-                "erro": (
-                    f"{err}\n\n"
-                    f"redirect usado: {redirect}\n"
-                    f"client_id: {app_id}\n"
-                    "Confira na Meta (Business login): URI idêntica (sem barra no final) e "
-                    "Instagram App Secret (não só o secret do Facebook se forem diferentes). "
-                    "Não recarregue a página do callback — o code é de uso único."
-                ),
-            }
-        return {"ok": False, "erro": err}
+    #    tenta secret principal e, se falhar, secret Facebook (mesmo app)
+    short = None
+    errors = []
+    for sec in ([secret, secret_fb] if secret_fb and secret_fb != secret else [secret]):
+        if not sec:
+            continue
+        try:
+            short = _exchange_code(app_id, sec, redirect, code)
+            break
+        except RuntimeError as e:
+            errors.append(str(e))
+            continue
+    if short is None:
+        err = " | ".join(errors) if errors else "falha desconhecida no exchange"
+        return {
+            "ok": False,
+            "erro": (
+                f"{err}\n\n"
+                f"redirect usado: {redirect}\n"
+                f"client_id: {app_id}\n"
+                "1) Na Meta → Instagram → Business login: copie de novo o "
+                "**Instagram App Secret** (Mostrar) e atualize INSTAGRAM_APP_SECRET no Railway.\n"
+                "2) URI de redirect idêntica, sem barra no final.\n"
+                "3) Comece o login do zero no Config (não recarregue o callback)."
+            ),
+        }
     # resposta pode vir como {data:[{access_token,user_id,...}]} ou flat
     if isinstance(short.get("data"), list) and short["data"]:
         short = short["data"][0]
