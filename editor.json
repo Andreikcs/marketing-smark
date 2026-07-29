@@ -1,16 +1,15 @@
 {
   "posts": [
     {
-      "size": "1080x1350",
       "slug": "e2e-db-preserve",
       "marca": "smark",
-      "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
+      "titulo": "Preserve",
+      "caption": "legenda e2e",
+      "size": "1080x1350",
+      "status": "rascunho",
       "canais": [
         "instagram"
       ],
-      "status": "rascunho",
-      "titulo": "Preserve",
-      "caption": "legenda e2e",
       "frames": [
         {
           "n": 1,
@@ -18,57 +17,7 @@
           "cta": "cta",
           "sub": "sub",
           "tema": "claro",
-          "thumb": ".thumbs/smark__e2e-db-preserve.jpg",
           "headline": "H1 *x*"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "caz-tv",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__caz-tv.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "CAZé tv",
-      "caption": "",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 4,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/_regen/01-71f94a.png",
-          "cor": "#4419e1",
-          "cta": "Clique e saiba mais",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/01.png",
-          "sub": "**{#e8e8e8:Suspeiras de te}**",
-          "chip": true,
-          "page": "",
-          "posx": 29,
-          "posy": 33,
-          "tema": "claro",
-          "grade": true,
-          "hsize": 95,
-          "thumb": ".thumbs/smark__caz-tv.jpg",
-          "accent": "",
-          "bgmode": "imagem",
-          "handle": "fdfdd",
-          "rodape": "fdfdfd",
-          "overlay": "todo-roxo",
-          "contexto": "Esse está correto e bem embasado. A McKinsey reporta que 62% estão pelo menos experimentando agentes, e 23% já escalam sistemas agênticos em algum lugar. Mais preciso ainda: 23% dos respondentes dizem que suas organizações estão escalando um sistema de IA agêntica, e outros 39% dizem ter começado a experimentar agentes de IA (23% + 39% = 62%). Pode usar com segurança.",
-          "headline": "{#efe9f7:Cazemiro fora da copa 2027?  }",
-          "contraste": 0.45,
-          "overlay_op": 0
         }
       ]
     },
@@ -428,134 +377,6 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas",
-      "marca": "elever-ai",
-      "thumb": ".thumbs/elever-ai__lote-a-dark---concession-rias-revendas-e-lojas-multimarcas.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "salvo",
-      "titulo": "Concessionária com funcionário de IA",
-      "caption": "Todo dia chega gente perguntando preço, ficha técnica e condições. Um funcionário de IA responde na hora, organiza os interessados e passa pro vendedor só quem está pronto. Menos cliente perdido, mais tempo pra fechar negócio no pátio.\n\n#concessionaria #revenda #funcionariodeia #eleverai",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 3,
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/_regen/01-7fb9d9.png",
-          "cor": "#F4F2FB",
-          "cta": "Toque no botão abaixo.",
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/01.png",
-          "sub": "{#C1A4EA:Um funcionário de IA que responde \nantes que o comprador vá pra outra loja.👇}",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/elever-ai__lote-a-dark---concession-rias-revendas-e-lojas-multimarcas.jpg",
-          "accent": "",
-          "bgmode": "imagem",
-          "ov_pos": 0,
-          "paleta": "secundario",
-          "overlay": "roxo",
-          "headline": "{#100D1C:Quantos carros você deixa \nde vender sem perceber?}",
-          "overlay_op": 1
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "demo-horizonte-imoveis",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__demo-horizonte-imoveis.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "DEMO agência · Imobiliária (Horizonte)",
-      "caption": "O apê que cabe no seu plano — e na sua vista. 🌆\n\n3 lançamentos com condições de pré-obra. Fale com a Horizonte.\n\n#imoveis #lancamento #apartamento",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 4,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_regen/02-b51740.png",
-          "cor": "",
-          "cta": "AGENDE UMA VISITA →",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/demo-horizonte-imoveis/01.png",
-          "sub": "3 lançamentos em pré-obra, com condição que só quem chega cedo pega.",
-          "chip": false,
-          "page": "",
-          "tema": "escuro",
-          "zoom": 1.05,
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__demo-horizonte-imoveis.jpg",
-          "accent": "#3B82F6",
-          "bgmode": "imagem",
-          "overlay": "none",
-          "headline": "{#3B82F6:A vista que\n}você merece.\n"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "teste-ai",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__teste-ai.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Teste AI",
-      "caption": "",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-ai/01.png",
-          "sub": "",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__teste-ai.jpg",
-          "accent": "",
-          "bgmode": "claro",
-          "headline": "SEU TÍTULO|*AQUI.*"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
       "slug": "elever-auto",
       "marca": "elever-ai",
       "thumb": ".thumbs/elever-ai__elever-auto.jpg",
@@ -639,144 +460,6 @@
           "bg_custo_brl": 1.2451,
           "bg_custo_usd": 0.242924,
           "bg_publicavel": true
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "crm-com-ia-para-loja-de-moveis",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__crm-com-ia-para-loja-de-moveis.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "A sala de estar que vira lead",
-      "caption": "A sala de estar integrada com a cozinha é o cartão de visitas do imóvel: transmite espaço, aconchego e movimenta as redes. Só que atenção sozinha não vira nada. A Nina, funcionária de IA da smark, recebe cada pessoa que chega, responde na hora e guarda tudo no lugar certo. Assim o interesse pela foto bonita não esfria no caminho.\n\n#lojademoveis #moveisplanejados #atendimento #gestao",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "_v": 1,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/_regen/01-20cfa8.png",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/01.png",
-          "sub": "O living rende as fotos mais desejadas. Cada visita que chega vira cliente organizado.",
-          "chip": false,
-          "page": "01/02",
-          "tema": "claro",
-          "grade": true,
-          "thumb": ".thumbs/smark__crm-com-ia-para-loja-de-moveis.jpg",
-          "bgmode": "imagem",
-          "headline": "A SALA DE ESTAR|CHAMA. A *NINA* ATENDE"
-        },
-        {
-          "n": 2,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/02.png",
-          "sub": "",
-          "chip": false,
-          "page": "02/02",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "accent": "",
-          "bgmode": "claro",
-          "headline": "NOVO|*CARD.*"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "templates",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__templates.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Templates",
-      "caption": "",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cor": "#F4F2FB",
-          "cta": "",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/templates/01.png",
-          "sub": "gsdgd",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/smark__templates.jpg",
-          "accent": "",
-          "bgmode": "claro",
-          "paleta": "lima",
-          "headline": "sdgd"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "case-destaque",
-      "marca": "smark",
-      "thumb": ".thumbs/smark__case-destaque.jpg",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "Case destaque (post 4/5 — PENDENTE dado real)",
-      "caption": "Prova não é a smark dizendo que funciona. É o cliente mostrando o que mudou.\n\n[1-2 frases com o número principal do case.]\n\nO que essa empresa fez, a sua também pode fazer — e começa entendendo onde a IA se pagaria primeiro. Diagnóstico gratuito, link na bio. 👇\n\n#resultado #cases #produtividade #IAparaempresas #roi",
-      "importado": true,
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T00:53:28",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "marcas/smark/publicacoes/social/instagram/arte/case-destaque/_regen/01-3d5caf.png",
-          "cta": "",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/case-destaque/01.png",
-          "sub": "",
-          "chip": true,
-          "page": "",
-          "tema": "claro",
-          "grade": true,
-          "thumb": ".thumbs/smark__case-destaque.jpg",
-          "bgmode": "imagem",
-          "bg_seed": 159063493,
-          "headline": "CASE DESTAQUE (POST 4/5 — PENDENTE DADO REAL)",
-          "bg_modelo": "google/gemini-3-pro-image",
-          "bg_provider": "openrouter",
-          "bg_suplente": false,
-          "bg_custo_usd": 0.242958
         }
       ]
     },
@@ -1067,14 +750,14 @@
           "tema": "claro",
           "grade": true,
           "hsize": 0,
+          "thumb": ".thumbs/covatti-2__novo-post-5420.jpg",
           "accent": "",
           "bgmode": "claro",
           "footer": false,
           "paleta": "secundario",
           "overlay": "branco",
           "headline": "lokookoko SEU {#100D1C:TÍTULO}|*AQUI.*",
-          "overlay_op": 0.2,
-          "thumb": ".thumbs/covatti-2__novo-post-5420.jpg"
+          "overlay_op": 0.2
         }
       ]
     },
@@ -1311,12 +994,12 @@
           "tema": "claro",
           "grade": true,
           "hsize": 0,
+          "thumb": ".thumbs/covatti-4__novo-post-19b2.jpg",
           "accent": "",
           "bgmode": "claro",
           "footer": true,
           "paleta": "marca",
-          "headline": "SEU TÍTULO|*AQUI.*",
-          "thumb": ".thumbs/covatti-4__novo-post-19b2.jpg"
+          "headline": "SEU TÍTULO|*AQUI.*"
         }
       ]
     },
@@ -1363,6 +1046,272 @@
           "overlay": "roxo",
           "headline": "{#FFFFFF:Upgrade e renovação \nno automático  24/7.}",
           "overlay_op": 0.9
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas",
+      "marca": "elever-ai",
+      "thumb": ".thumbs/elever-ai__lote-a-dark---concession-rias-revendas-e-lojas-multimarcas.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Concessionária com funcionário de IA",
+      "caption": "Todo dia chega gente perguntando preço, ficha técnica e condições. Um funcionário de IA responde na hora, organiza os interessados e passa pro vendedor só quem está pronto. Menos cliente perdido, mais tempo pra fechar negócio no pátio.\n\n#concessionaria #revenda #funcionariodeia #eleverai",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 3,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/_regen/01-7fb9d9.png",
+          "cor": "#F4F2FB",
+          "cta": "Toque no botão abaixo.",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/01.png",
+          "sub": "{#C1A4EA:Um funcionário de IA que responde \nantes que o comprador vá pra outra loja.👇}",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/elever-ai__lote-a-dark---concession-rias-revendas-e-lojas-multimarcas.jpg",
+          "accent": "",
+          "bgmode": "imagem",
+          "ov_pos": 0,
+          "paleta": "secundario",
+          "overlay": "roxo",
+          "headline": "{#100D1C:Quantos carros você deixa \nde vender sem perceber?}",
+          "overlay_op": 1
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "demo-horizonte-imoveis",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__demo-horizonte-imoveis.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "DEMO agência · Imobiliária (Horizonte)",
+      "caption": "O apê que cabe no seu plano — e na sua vista. 🌆\n\n3 lançamentos com condições de pré-obra. Fale com a Horizonte.\n\n#imoveis #lancamento #apartamento",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 4,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_regen/02-b51740.png",
+          "cor": "",
+          "cta": "AGENDE UMA VISITA →",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/demo-horizonte-imoveis/01.png",
+          "sub": "3 lançamentos em pré-obra, com condição que só quem chega cedo pega.",
+          "chip": false,
+          "page": "",
+          "tema": "escuro",
+          "zoom": 1.05,
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/smark__demo-horizonte-imoveis.jpg",
+          "accent": "#3B82F6",
+          "bgmode": "imagem",
+          "overlay": "none",
+          "headline": "{#3B82F6:A vista que\n}você merece.\n"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "teste-ai",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__teste-ai.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Teste AI",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-ai/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/smark__teste-ai.jpg",
+          "accent": "",
+          "bgmode": "claro",
+          "headline": "SEU TÍTULO|*AQUI.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "crm-com-ia-para-loja-de-moveis",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__crm-com-ia-para-loja-de-moveis.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "A sala de estar que vira lead",
+      "caption": "A sala de estar integrada com a cozinha é o cartão de visitas do imóvel: transmite espaço, aconchego e movimenta as redes. Só que atenção sozinha não vira nada. A Nina, funcionária de IA da smark, recebe cada pessoa que chega, responde na hora e guarda tudo no lugar certo. Assim o interesse pela foto bonita não esfria no caminho.\n\n#lojademoveis #moveisplanejados #atendimento #gestao",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/_regen/01-20cfa8.png",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/01.png",
+          "sub": "O living rende as fotos mais desejadas. Cada visita que chega vira cliente organizado.",
+          "chip": false,
+          "page": "01/02",
+          "tema": "claro",
+          "grade": true,
+          "thumb": ".thumbs/smark__crm-com-ia-para-loja-de-moveis.jpg",
+          "bgmode": "imagem",
+          "headline": "A SALA DE ESTAR|CHAMA. A *NINA* ATENDE"
+        },
+        {
+          "n": 2,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/02.png",
+          "sub": "",
+          "chip": false,
+          "page": "02/02",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "headline": "NOVO|*CARD.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "templates",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__templates.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Templates",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/templates/01.png",
+          "sub": "gsdgd",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/smark__templates.jpg",
+          "accent": "",
+          "bgmode": "claro",
+          "paleta": "lima",
+          "headline": "sdgd"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "case-destaque",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__case-destaque.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Case destaque (post 4/5 — PENDENTE dado real)",
+      "caption": "Prova não é a smark dizendo que funciona. É o cliente mostrando o que mudou.\n\n[1-2 frases com o número principal do case.]\n\nO que essa empresa fez, a sua também pode fazer — e começa entendendo onde a IA se pagaria primeiro. Diagnóstico gratuito, link na bio. 👇\n\n#resultado #cases #produtividade #IAparaempresas #roi",
+      "importado": true,
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/case-destaque/_regen/01-3d5caf.png",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/case-destaque/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "thumb": ".thumbs/smark__case-destaque.jpg",
+          "bgmode": "imagem",
+          "bg_seed": 159063493,
+          "headline": "CASE DESTAQUE (POST 4/5 — PENDENTE DADO REAL)",
+          "bg_modelo": "google/gemini-3-pro-image",
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "bg_custo_usd": 0.242958
         }
       ]
     },
@@ -2301,6 +2250,55 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
+      "slug": "caz-tv",
+      "marca": "smark",
+      "thumb": ".thumbs/smark__caz-tv.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "CAZé tv",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T00:53:28",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 4,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/_regen/01-71f94a.png",
+          "cor": "#4419e1",
+          "cta": "Clique e saiba mais",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/01.png",
+          "sub": "**{#e8e8e8:Suspeiras de te}**",
+          "chip": true,
+          "page": "",
+          "posx": 29,
+          "posy": 33,
+          "tema": "claro",
+          "grade": true,
+          "hsize": 95,
+          "thumb": ".thumbs/smark__caz-tv.jpg",
+          "accent": "",
+          "bgmode": "imagem",
+          "handle": "fdfdd",
+          "rodape": "fdfdfd",
+          "overlay": "todo-roxo",
+          "contexto": "Esse está correto e bem embasado. A McKinsey reporta que 62% estão pelo menos experimentando agentes, e 23% já escalam sistemas agênticos em algum lugar. Mais preciso ainda: 23% dos respondentes dizem que suas organizações estão escalando um sistema de IA agêntica, e outros 39% dizem ter começado a experimentar agentes de IA (23% + 39% = 62%). Pode usar com segurança.",
+          "headline": "{#efe9f7:Cazemiro fora da copa 2027?  }",
+          "contraste": 0.45,
+          "overlay_op": 0
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
       "slug": "novo-post-5420",
       "marca": "amosim",
       "thumb": ".thumbs/amosim__novo-post-5420.jpg",
@@ -2337,5 +2335,6 @@
       ]
     }
   ],
-  "version": 2
+  "version": 2,
+  "source": "postgres"
 }
