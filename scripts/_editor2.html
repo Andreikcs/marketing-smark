@@ -51,7 +51,8 @@ header .sp{flex:1}
 .hicon{width:38px;height:38px;border:1px solid var(--field-line);background:var(--surface);color:var(--txt);border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
 .hicon:hover{border-color:var(--accent);color:var(--accent)}
 .histpanel{position:fixed;top:0;right:0;width:340px;max-width:92vw;height:100vh;background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow-lg);z-index:600;display:flex;flex-direction:column;animation:histin .18s ease}
-.histpanel[hidden]{display:none}  /* vence o display:flex acima — sem isso o hidden não esconde */
+/* vale pra tudo: qualquer display: em classe vence o hidden do navegador */
+[hidden]{display:none!important}
 @keyframes histin{from{transform:translateX(24px);opacity:.3}to{transform:none;opacity:1}}
 .histhead{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;font-size:16px;font-weight:700}
 .histsub{padding:0 16px 12px;color:var(--muted);font-size:13px;border-bottom:1px solid var(--line)}
@@ -397,7 +398,8 @@ input[type=range]{accent-color:var(--accent)}
     <a href="/editor" class="hnav on">Editor</a>
     <span class=sp></span>
     <span id=autosave class=autosave><span class="stdot ok"></span> salvo</span>
-    <button type=button class=stpill id=bstatus title="situação deste post no fluxo">Rascunho</button>
+    <!-- nasce escondido: antes do /dados ele não sabe a situação de nada -->
+    <button type=button class=stpill id=bstatus hidden title="situação deste post no fluxo"></button>
     <button class=hicon id=broi title="ROI humano — tempo e custo dos posts"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><circle cx=12 cy=12 r=9/><path d="M12 7v5l3 2"/></svg></button>
     <button class=hicon id=bhist title="Histórico de versões deste post"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg></button>
     <button class=hicon id=bexport title="exportar PNG (este frame ou o carrossel)"><svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></button>
@@ -543,7 +545,8 @@ function updateSaveStatus(){const e=$('#autosave');if(!e)return;
   e.innerHTML=dirty?'<span class="stdot warn"></span> salvando…':('<span class="stdot ok"></span> '+(lastSave?('salvo automaticamente em '+fmtHora(lastSave)):'salvo'));}
 function setDirty(v){dirty=v;updateSaveStatus();
   if(v){clearTimeout(autoT);autoT=setTimeout(()=>{if(dirty)salvar(true)},4000)}}
-function post(){return D.posts[PI]}
+// D só existe depois do /dados; clicar antes disso não é erro do usuário
+function post(){return (D&&D.posts)?D.posts[PI]:null}
 function frame(){return post().frames[FI]}
 function syncPages(p){const n=(p.frames||[]).length;(p.frames||[]).forEach((fr,i)=>{fr.page=n>1?(String(i+1).padStart(2,'0')+'/'+String(n).padStart(2,'0')):''})}
 function syncAllPages(){((D&&D.posts)||[]).forEach(syncPages)}
