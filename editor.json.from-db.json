@@ -1,0 +1,1854 @@
+{
+  "posts": [
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-9fbf",
+      "marca": "v4-company",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Entenda o que a V4 faz",
+      "caption": "Você não precisa de promessa. Precisa de clareza sobre o que está sendo feito no seu marketing. A gente mostra cada passo, com método e acompanhamento de perto. Chama pra um diagnóstico gratuito.\n\n#v4company #marketing #gestao #assessoria",
+      "created_at": "2026-07-28T03:07:46",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/v4-company/publicacoes/social/instagram/arte/novo-post-9fbf/_regen/01-f56647.png",
+          "cor": "#fbf5f3",
+          "cta": "",
+          "out": "marcas/v4-company/publicacoes/social/instagram/arte/novo-post-9fbf/01.png",
+          "sub": "Marketing e gestão, na prática",
+          "tab": false,
+          "chip": false,
+          "logo": false,
+          "page": "",
+          "posx": 0,
+          "posy": 100,
+          "tema": "escuro",
+          "grade": false,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "footer": false,
+          "paleta": "marca",
+          "bg_tier": "final",
+          "overlay": "acento",
+          "_accOpen": true,
+          "headline": "Entenda o que|a *V4* faz",
+          "bg_modelo": "google/gemini-3-pro-image",
+          "bg_usd_brl": 5.1285,
+          "overlay_op": 0.7,
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "bg_custo_brl": 1.2449,
+          "bg_custo_usd": 0.24275,
+          "bg_publicavel": true
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-586b",
+      "marca": "alem-do-olhar-chapeco",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Novo post",
+      "caption": "",
+      "created_at": "2026-07-28T02:55:59",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/alem-do-olhar-chapeco/publicacoes/social/instagram/arte/novo-post-586b/01.png",
+          "sub": "",
+          "tab": true,
+          "chip": true,
+          "logo": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "footer": true,
+          "paleta": "marca",
+          "headline": "SEU TÍTULO|*AQUI.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-e794",
+      "marca": "alem-do-olhar-chapeco",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Lançamento hidratante — pele macia no inverno",
+      "caption": "O inverno resseca a pele e você sente a diferença todo dia. Por isso lançamos nosso novo hidratante, feito pra manter sua pele macia mesmo no frio. Passe a mão e sinta a diferença. Vem conhecer.\n\n#cuidadocomapele #hidratante #peleMacia #inverno",
+      "created_at": "2026-07-28T02:47:00",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/alem-do-olhar-chapeco/publicacoes/social/instagram/arte/novo-post-e794/_regen/01-2a4ff3.png",
+          "cor": "#F4F2FB",
+          "cta": "Vem conhecer — link na bio",
+          "out": "marcas/alem-do-olhar-chapeco/publicacoes/social/instagram/arte/novo-post-e794/01.png",
+          "sub": "Chegou nosso novo hidratante pra cuidar da sua pele no frio",
+          "tab": true,
+          "chip": true,
+          "logo": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "footer": true,
+          "paleta": "secundario",
+          "bg_seed": 683750702,
+          "bg_tier": "rascunho",
+          "headline": "Pele *macia*|mesmo no inverno",
+          "bg_modelo": "bytedance-seed/seedream-4.5",
+          "bg_usd_brl": 5.1286,
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "bg_custo_brl": 0.2051,
+          "bg_custo_usd": 0.04,
+          "bg_publicavel": false,
+          "bg_gate_falhou": true
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-5102",
+      "marca": "track-brasil",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Novo post",
+      "caption": "",
+      "created_at": "2026-07-28T01:36:52",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/track-brasil/publicacoes/social/instagram/arte/novo-post-5102/01.png",
+          "sub": "",
+          "tab": true,
+          "chip": true,
+          "logo": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "footer": true,
+          "paleta": "marca",
+          "headline": "SEU TÍTULO|*AQUI.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-3c51",
+      "marca": "track-brasil",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Novo post",
+      "caption": "",
+      "created_at": "2026-07-28T01:16:33",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/track-brasil/publicacoes/social/instagram/arte/novo-post-3c51/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "paleta": "marca",
+          "headline": "SEU TÍT{#14238F:ULO|*AQUI.*}"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-513c",
+      "marca": "deatec",
+      "canais": [
+        "instagram",
+        "linkedin"
+      ],
+      "status": "rascunho",
+      "titulo": "Novo post",
+      "caption": "",
+      "created_at": "2026-07-28T00:54:38",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/deatec/publicacoes/social/instagram/arte/novo-post-513c/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "headline": "SEU TÍTULO|*AQUI.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-d658",
+      "marca": "deatec",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "TechWine 2026 — brinde à tecnologia",
+      "caption": "O TechWine 2026 juntou quem faz tecnologia acontecer aqui na região. Uma noite pra conversar, aprender e brindar as parcerias que a gente constrói todo dia. Obrigado a todo mundo que esteve com a gente.\n\n#Deatec #TechWine2026 #Chapecó #ACATE",
+      "created_at": "2026-07-28T00:17:13",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/deatec/publicacoes/social/instagram/arte/novo-post-d658/_regen/01-f1ae90.png",
+          "cor": "#F4F2FB",
+          "cta": "seja um associado",
+          "out": "marcas/deatec/publicacoes/social/instagram/arte/novo-post-d658/01.png",
+          "sub": "{#FFFFFF:Uma noite incrível que reuniu mentes brilhantes \npara comemorar.}",
+          "chip": false,
+          "page": "",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "ov_ang": 190,
+          "ov_pos": 50,
+          "paleta": "secundario",
+          "bg_tier": "final",
+          "overlay": "branco",
+          "headline": "TechWine 2026|foi um *{#C6EB0F:brinde}*|à tecnologia",
+          "bg_modelo": "google/gemini-3-pro-image",
+          "bg_usd_brl": 5.12546,
+          "overlay_op": 1,
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "bg_custo_brl": 1.2451,
+          "bg_custo_usd": 0.242924,
+          "bg_publicavel": true
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [
+          {
+            "minutes": 0,
+            "copy_calls": 1,
+            "image_gens": 0,
+            "started_at": "2026-07-27T20:36:17",
+            "auto_closed": true,
+            "exported_at": "2026-07-27T21:58:18"
+          }
+        ],
+        "exports_total": 0,
+        "copy_calls_total": 1,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "sul---x",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Split payment na reforma",
+      "caption": "A reforma tributária traz o chamado split payment: quando o cliente paga, o valor do imposto já é separado na hora e enviado ao governo. Na prática, muda o seu fluxo de caixa — o dinheiro do tributo não passa mais pela sua conta. Quem se organizar antes evita aperto. Quer entender o que muda no seu negócio?\n\n#reformatributaria #contabilidade #splitpayment #gestaofinanceira",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/sul-contabil/publicacoes/social/instagram/arte/sul---x/_regen/01-63dfdf.png",
+          "cor": "#F4F2FB",
+          "cta": "Faça um diagnóstico gratuito — link na bio",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/sul---x/01.png",
+          "sub": "{#FFFFFF:Split payment: parte da venda já vai direto pro fisco no PIX/cartão. Seu caixa precisa se preparar.}",
+          "chip": true,
+          "page": "",
+          "posx": 72,
+          "posy": 100,
+          "tema": "claro",
+          "zoom": 1,
+          "grade": true,
+          "hsize": 0,
+          "satur": 1,
+          "accent": "",
+          "bgmode": "imagem",
+          "brilho": 1.1,
+          "ov_ang": 150,
+          "ov_pos": 0,
+          "paleta": "lima",
+          "bg_seed": 783481873,
+          "bg_tier": "rascunho",
+          "overlay": "none",
+          "_accOpen": false,
+          "headline": "Reforma vai *reter*|o imposto na hora|do pagamento",
+          "bg_modelo": "bytedance-seed/seedream-4.5",
+          "contraste": 0.85,
+          "bg_usd_brl": 5.1293,
+          "overlay_op": 1,
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "bg_custo_brl": 0.2052,
+          "bg_custo_usd": 0.04,
+          "bg_publicavel": false
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "teste-105a",
+      "marca": "netsul",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Teste",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/netsul/publicacoes/social/instagram/arte/teste-105a/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "headline": "SEU TÍTULO|*AQUI.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "sul-cont-bil",
+      "marca": "sul-contabil",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Sul Contábil",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/sul-contabil/publicacoes/social/instagram/arte/sul-cont-bil/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "headline": "SEU TÍTULO|*AQUI.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "teste-ai",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Teste AI",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-ai/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "headline": "SEU TÍTULO|*AQUI.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "teste-integra-a-o",
+      "marca": "provider-max",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Internet rápida de verdade",
+      "caption": "Ninguém aguenta ficar esperando a tela carregar. Com a provider-max, a conexão fica firme o dia inteiro — pra trabalhar, estudar e relaxar sem interrupção. Quer saber onde sua rede pode melhorar? Comece pelo diagnóstico gratuito.\n\n#provedor #internetfibra #conexao #provedordeinternet",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/teste-integra-a-o/_regen/01-705eea.png",
+          "cor": "#F4F2FB",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/teste-integra-a-o/01.png",
+          "sub": "Navegue à vontade, sem espera",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "bg_tier": "final",
+          "overlay": "branco",
+          "headline": "Internet que|*não trava* nunca",
+          "bg_modelo": "google/gemini-3-pro-image",
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "bg_custo_usd": 0.242806,
+          "bg_publicavel": true
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "templates",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Templates",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/templates/01.png",
+          "sub": "gsdgd",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "paleta": "lima",
+          "headline": "sdgd"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "agencia",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Agencia",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "zsfsdfsd",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/agencia/01.png",
+          "sub": "fsdgsdgsdfgdgdf",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "headline": "SEU TÍTULO|*gdgsdfgdfgdf.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "demo-horizonte-imoveis",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "DEMO agência · Imobiliária (Horizonte)",
+      "caption": "O apê que cabe no seu plano — e na sua vista. 🌆\n\n3 lançamentos com condições de pré-obra. Fale com a Horizonte.\n\n#imoveis #lancamento #apartamento",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 4,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_regen/02-b51740.png",
+          "cor": "",
+          "cta": "AGENDE UMA VISITA →",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/demo-horizonte-imoveis/01.png",
+          "sub": "3 lançamentos em pré-obra, com condição que só quem chega cedo pega.",
+          "chip": false,
+          "page": "",
+          "tema": "escuro",
+          "zoom": 1.05,
+          "grade": true,
+          "hsize": 0,
+          "accent": "#3B82F6",
+          "bgmode": "imagem",
+          "overlay": "none",
+          "headline": "{#3B82F6:A vista que\n}você merece.\n"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "demo-bella-massa",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "DEMO agência · Restaurante (Bella Massa)",
+      "caption": "Massa fresca todo dia, do jeito da nonna. 🍝\n\nReserva pelo link. Bella Massa — cozinha italiana de bairro.\n\n#restauranteitaliano #massafresca #gastronomia",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 4,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/_teste-agentes-claro/bg.png",
+          "cor": "",
+          "cta": "RESERVE SUA MESA →",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/demo-bella-massa/01.png",
+          "sub": "Do jeito da nonna — feita de manhã, servida no almoço. Reserva pelo link.",
+          "chip": false,
+          "page": "",
+          "tema": "claro",
+          "zoom": 1.05,
+          "grade": true,
+          "hsize": 0,
+          "accent": "#E0562D",
+          "bgmode": "imagem",
+          "overlay": "none",
+          "headline": "{#E0562D:Massa fresca\n}todo dia.\n"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c8913",
+      "marca": "elever-ai",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Concessionária de motos com funcionário de IA",
+      "caption": "Na concessionária de motos, a gente perde venda no silêncio: o cliente manda mensagem e ninguém responde na hora. Um funcionário de IA atende cada contato na mesma hora, organiza e passa pro vendedor certo. Menos lead esquecido, mais tempo pra equipe fechar negócio.\n\n#motos #concessionaria #atendimento #inteligenciaartificial",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 3,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/_regen/01-7fb9d9.png",
+          "cor": "#F4F2FB",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas-c8913/01.png",
+          "sub": "Cada lead que espera é um cliente que vai embora.",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "ov_pos": 0,
+          "overlay": "branco",
+          "headline": "Quantas motos você|deixa de *atender* sem ver?",
+          "overlay_op": 1
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "lote-a-dark---concession-rias-revendas-e-lojas-multimarcas",
+      "marca": "elever-ai",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Concessionária com funcionário de IA",
+      "caption": "Todo dia chega gente perguntando preço, ficha técnica e condições. Um funcionário de IA responde na hora, organiza os interessados e passa pro vendedor só quem está pronto. Menos cliente perdido, mais tempo pra fechar negócio no pátio.\n\n#concessionaria #revenda #funcionariodeia #eleverai",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 3,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/_regen/01-7fb9d9.png",
+          "cor": "#F4F2FB",
+          "cta": "Toque no botão abaixo.",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---concession-rias-revendas-e-lojas-multimarcas/01.png",
+          "sub": "{#C1A4EA:Um funcionário de IA que responde \nantes que o comprador vá pra outra loja.👇}",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "ov_pos": 0,
+          "paleta": "secundario",
+          "overlay": "roxo",
+          "headline": "{#100D1C:Quantos carros você deixa \nde vender sem perceber?}",
+          "overlay_op": 1
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "crm-com-ia---loj-m-veis-c8902",
+      "marca": "elever-ai",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "CRM com IA - Lojá Móveis (cópia)",
+      "caption": "Já pensou ter um funcionário de IA que atende todos seus clientes no whatsApp, captura interesse de projeto,  identifica orçamento, alinha expectativa de prazos e entrega para seu time comercial ou de projetos somente quem realmente tem potencial e interesse. Clique no botão e saiba mais.",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 2,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/_uploads/7a78ac8141.png",
+          "cor": "#F4F2FB",
+          "cta": "Para loja de móveis",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis-c8902/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "01/02",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "ov_ang": 180,
+          "ov_pos": 48,
+          "overlay": "branco",
+          "headline": "CRM com IA + \nFuncionário \n{#8B3CF7:whatsapp }",
+          "overlay_op": 0.2
+        },
+        {
+          "n": 2,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis/_uploads/7a78ac8141.png",
+          "cor": "#F4F2FB",
+          "cta": "Clique no botão",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/crm-com-ia---loj-m-veis-c8902/02.png",
+          "sub": "Se isso ainda acontece na sua loja,\nnós temos uma oportunidade para você.",
+          "chip": true,
+          "page": "02/02",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "ov_ang": 180,
+          "ov_pos": 48,
+          "overlay": "branco",
+          "headline": "Clientes sem respostas \n= projetos perdidos.",
+          "overlay_op": 0.2
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "lote-a-dark---m-veis",
+      "marca": "elever-ai",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Cliente esperando resposta",
+      "caption": "O casal escolhe o móvel, manda a dúvida e fica olhando a tela. Se ninguém responde na hora, eles fecham o app e vão pra outra loja. Com um funcionário de IA no atendimento, cada pergunta tem resposta na mesma hora, dia e noite. Menos espera, menos cliente perdido.\n\n#atendimento #inteligenciaartificial #varejo #gestao",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 2,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---m-veis/_regen/01-d3bb74.png",
+          "cor": "#F4F2FB",
+          "cta": "Toque no botão abaixo.",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/lote-a-dark---m-veis/01.png",
+          "sub": "Loja sem resposta rápida perde a venda em silêncio. 👇",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "ov_ang": 195,
+          "overlay": "branco",
+          "headline": "Quantos orçamentos \nvocê perde sem saber?",
+          "overlay_op": 1
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "lote-b-light---provedor",
+      "marca": "provider-max",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Suporte que não dorme para provedores",
+      "caption": "No provedor, atendimento parado é cliente esperando. A Clara, funcionária de IA para ISP, responde dúvidas e cuida de renovação de contrato a qualquer hora. Menos fila, menos custo de plantão. Comece pelo diagnóstico gratuito.\n\n#provedor #isp #suporte #atendimento",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/_regen/01-66ebf0.png",
+          "cor": "#F4F2FB",
+          "cta": "Toque no botão abaixo",
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-b-light---provedor/01.png",
+          "sub": "Renova contrato e negocia upgrade, \nsem o custo de contratar mais uma pessoa.",
+          "chip": true,
+          "page": "",
+          "posx": 36,
+          "tema": "claro",
+          "zoom": 1,
+          "grade": true,
+          "hsize": 0,
+          "satur": 1.35,
+          "accent": "",
+          "bgmode": "imagem",
+          "brilho": 1,
+          "overlay": "todo-branco",
+          "_accOpen": true,
+          "headline": "Clara, a funcionária \nde IA para o seu provedor.",
+          "contraste": 1.25,
+          "overlay_op": 0.6
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "lote-a-dark---provedor",
+      "marca": "provider-max",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Clientes que ssomem sem aviso",
+      "caption": "Todo dia um cliente manda mensagem e ninguém responde a tempo. Ele espera, cansa e vai embora calado. A Clara, funcionária de IA pra provedores, atende na hora e mantém cada conversa viva. Faça o diagnóstico gratuito e veja quantas conversas você está deixando escapar.\n\n#provedor #internet #atendimento #gestao",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 2,
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/lote-a-dark---provedor/_regen/01-40d3cf.png",
+          "cor": "#F4F2FB",
+          "cta": "Toque no botão abaixo",
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/lote-a-dark---provedor/01.png",
+          "sub": "{#FFFFFF:Clara, a funcionária de IA que faz upgrade de plano e renegocia fidelidade antes do seu cliente cancelar. 👇}",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "ov_ang": 175,
+          "ov_pos": 28,
+          "paleta": "roxo",
+          "overlay": "roxo",
+          "headline": "{#FFFFFF:Upgrade e renovação \nno automático  24/7.}",
+          "overlay_op": 0.9
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "crm-com-ia-para-loja-de-moveis",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "A sala de estar que vira lead",
+      "caption": "A sala de estar integrada com a cozinha é o cartão de visitas do imóvel: transmite espaço, aconchego e movimenta as redes. Só que atenção sozinha não vira nada. A Nina, funcionária de IA da smark, recebe cada pessoa que chega, responde na hora e guarda tudo no lugar certo. Assim o interesse pela foto bonita não esfria no caminho.\n\n#lojademoveis #moveisplanejados #atendimento #gestao",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/_regen/01-20cfa8.png",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/01.png",
+          "sub": "O living rende as fotos mais desejadas. Cada visita que chega vira cliente organizado.",
+          "chip": false,
+          "page": "01/02",
+          "tema": "claro",
+          "grade": true,
+          "bgmode": "imagem",
+          "headline": "A SALA DE ESTAR|CHAMA. A *NINA* ATENDE"
+        },
+        {
+          "n": 2,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/crm-com-ia-para-loja-de-moveis/02.png",
+          "sub": "",
+          "chip": false,
+          "page": "02/02",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "claro",
+          "headline": "NOVO|*CARD.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "contrata-o",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Contratação sem dor de cabeça",
+      "caption": "Com a smark, cada departamento ganha um funcionário de IA que já começa trabalhando para executar  tarefas pontuais, processos inteiros ou  funções completas. \n\nQuer saber onde isso encaixa na sua empresa? Comece pelo diagnóstico gratuito no link da bio.\n\n#smark  #inteligenciaartificial #produtividade #escala",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 2,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/_regen/01-149cd6.png",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/01.png",
+          "sub": "Vaga aberta, currículos parados, horas e horas em sessões de entrevistas...",
+          "chip": true,
+          "page": "01/03",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "headline": "Contratar é|*difícil e demorado*"
+        },
+        {
+          "n": 2,
+          "_v": 2,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/_regen/02-fe97ca.png",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/02.png",
+          "sub": "Sem anúncio de vaga, sem espera, sem treinamento longo.",
+          "chip": false,
+          "page": "02/03",
+          "tema": "claro",
+          "grade": true,
+          "bgmode": "imagem",
+          "headline": "E se cada área|tivesse um *funcionário de IA*?"
+        },
+        {
+          "n": 3,
+          "_v": 2,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/_regen/03-dfaf30.png",
+          "cta": "Fala com a gente • link na bio",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/contrata-o/03.png",
+          "sub": "A gente mostra onde a IA entra no seu time.",
+          "chip": false,
+          "page": "03/03",
+          "tema": "claro",
+          "grade": true,
+          "bgmode": "imagem",
+          "headline": "Comece pelo|*diagnóstico gratuito*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "selecao-nina-teo-clara-c33c8-ce452",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "A seleção — post 3/5 (cópia) (cópia)",
+      "caption": "A smark acessoria treina e coloca profissionais de IA para jogarem no seu time. \nMas você é o treinador, e quem define quem faz cada lance. Quem ataca, quem resolve e como o time vai jogar. \n\nComente time de IA para um diagnóstico gratuito da sua operação e ver quem você pode escalar.",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 3,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/01-854ae2.png",
+          "cor": "",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8-ce452/01.png",
+          "sub": "Veja quem pode entrar em campo e jogar no seu time  👉",
+          "chip": true,
+          "page": "01/04",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "roxo",
+          "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
+          "headline": "A SMARK SELECIONOU|3 PROFISSIONAIS PaRA|*SUA EMPRESA.*"
+        },
+        {
+          "n": 2,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "cor": "",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8-ce452/02.png",
+          "sub": "Recebe todas as demandas do time, em qualquer horário da partida, escolhe a melhor jogada e passa  a bola para o time comercial marcar o gol. ",
+          "chip": true,
+          "page": "02/04",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "roxo",
+          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n",
+          "headline": "*NINA |{#FFFFFF:MEIO CAMPO}* - Pré vendas"
+        },
+        {
+          "n": 3,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-5af6a9.png",
+          "cor": "",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8-ce452/03.png",
+          "sub": "Ataca novas oportunidades e busca incansavelmente pelas melhores opções de jogada, para elevar o placar do time de vendas. ",
+          "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "chip": true,
+          "page": "03/04",
+          "posx": 0,
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "roxo",
+          "contexto": "\"o Téo, um caçador/atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
+          "headline": "*TÉO |{#FFFFFF:ATACANTE}* - prospecção",
+          "overlay_op": 0.85
+        },
+        {
+          "n": 4,
+          "_v": 2,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8-ce452/_regen/05-ab2401.png",
+          "cor": "",
+          "cta": "Escale seu time de IA para entrar em campo.",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8-ce452/04.png",
+          "sub": "Apoia o time na retaguarda, protege a operação e  ataca quando é necessário.",
+          "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "chip": true,
+          "page": "04/04",
+          "posx": 0,
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "roxo",
+          "contexto": "\"a Clara, é quem salva a patrica atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
+          "headline": "*CLARA*|ZAGA - Relacionamento e Receita",
+          "overlay_op": 0.85
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post-9382",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Funcionários de IA por departamento",
+      "caption": "A Smark acessoria desenvolve funcionários de IA sob medida para a sua operação.  \n\nComente \"EU QUERO\"  e receba um diagnóstico gratuito da sua operação para entender quais funcionários podem complementar o seu time.  Ou acesse nosso site na BIO e agende com um de nossos especialistas.\n\n\n\n#smark #inteligenciaartificial #gestao #produtividade",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/_regen/01-022341.png",
+          "cor": "#F4F2FB",
+          "cta": "Solicite um Diagnóstico gratuito  ",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/novo-post-9382/01.png",
+          "sub": "Menos tarefas repetidas, mais tempo para decidir.",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "headline": "Cada setor com um \n*funcionário de IA*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "eloise",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Copa do Mundo: cada posição no time certo",
+      "caption": "Na Copa, quem vence é o time bem escalado. Na empresa é igual: cada departamento precisa da posição certa. A smark coloca um funcionário de IA em cada função pra o time render sem apagar incêndio. Quer ver onde encaixa? Faça o diagnóstico gratuito.\n\n#copadomundo #inteligenciaartificial #gestao #produtividade",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/eloise/_regen/01-4f91e5.png",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/eloise/01.png",
+          "sub": "Não é sorte. É cada jogador no lugar certo. ",
+          "chip": true,
+          "page": "01/03",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "ov_ang": 0,
+          "overlay": "branco",
+          "headline": "TIME BOM GANHA|COM *{#FFFFFF:ESCALAÇÃO*}",
+          "overlay_op": 0.55
+        },
+        {
+          "n": 2,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/eloise/_regen/02-486050.png",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/eloise/02.png",
+          "sub": "Cada departamento é uma posição em campo.",
+          "chip": false,
+          "page": "02/03",
+          "tema": "claro",
+          "grade": true,
+          "bgmode": "imagem",
+          "headline": "SUA EMPRESA|TAMBÉM É UM *TIME*"
+        },
+        {
+          "n": 3,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/eloise/_regen/03-582007.png",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/eloise/03.png",
+          "sub": "Um funcionário de IA pra cada posição.",
+          "chip": false,
+          "page": "03/03",
+          "tema": "claro",
+          "grade": true,
+          "bgmode": "imagem",
+          "headline": "MONTE A SUA|*ESCALAÇÃO* DE IA"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "teste-novo-modelo",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Loja de móveis com funcionário de IA",
+      "caption": "Imagina cada canto da sua loja com alguém de IA cuidando: um pra atender quem chega, outro pra organizar os pedidos. Na smark, cada departamento ganha o seu. Você foca em vender móvel bonito, o resto anda sozinho.\n\n#smark #lojademoveis #inteligenciaartificial #gestao",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 2,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/teste-novo-modelo/_regen/01-147aa1.png",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/teste-novo-modelo/01.png",
+          "sub": "Atende, organiza e não perde cliente no fim do dia",
+          "chip": true,
+          "page": "",
+          "posx": 85,
+          "tema": "escuro",
+          "zoom": 1.1,
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "escuro",
+          "ov_ang": 165,
+          "ov_pos": 24,
+          "overlay": "roxo",
+          "_accOpen": true,
+          "headline": "Sua loja de móveis|com um *funcionário de IA*",
+          "overlay_op": 0
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "elever-auto",
+      "marca": "elever-ai",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Elever Auto no Piloto Automático",
+      "caption": "Enquanto sua equipe fecha negócio no salão, a Nina cuida das mensagens que chegam a qualquer hora. Ela responde na hora, tira dúvidas e deixa cada contato organizado pra ninguém escapar. Sua loja de carros ou motos rodando sem depender de você o tempo todo.\n\n#lojadecarros #concessionaria #motos #atendimento",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/_regen/01-34c6fc.png",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-auto/01.png",
+          "sub": "A Nina atende, responde, anota e organiza todos os contatos por você.🏆",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "headline": "Sua loja de carros ou motos|no *piloto automático*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "selecao-nina-teo-clara-c33c8",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "A seleção — post 3/5 (cópia)",
+      "caption": "Apresentando a seleção da smark. 👋\n\nNão são robôs de \"aperte 1\". São funções inteiras da sua empresa, cobertas por IA que trabalha na mão do seu time — não no lugar dele.\n\nQual dessas áreas mais dói na sua operação hoje? Comenta. 👇\n\n#IAparaempresas #prevendas #prospeccao #relacionamento #pmesbrasil",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 2,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/01-854ae2.png",
+          "cor": "",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/01.png",
+          "sub": "Veja quem pode entrar em campo e jogar no seu time  👉",
+          "chip": true,
+          "page": "01/05",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "roxo",
+          "contexto": "estamos em epoca de copa e quero trazer o contexto dos 3 melhores jogadores para essa imagem como se eles estivessem representando o time dos nossos assitentes, na capa quero os 3 juntos como um time comemorando",
+          "headline": "A SMARK SELECIONOU|3 PROFISSIONAIS PaRA|*SUA EMPRESA.*"
+        },
+        {
+          "n": 2,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "cor": "",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/02.png",
+          "sub": "Recebe todas as demandas do time, em qualquer horário da partida, escolhe a melhor jogada e passa  a bola para o time comercial marcar o gol. ",
+          "chip": false,
+          "page": "02/05",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "roxo",
+          "contexto": "torcedora da copa do mundo com a camisa do brasil que irá representar a nina, realista como o exemplo dos jogadores desta imagem da selecao\n",
+          "headline": "*NINA |{#FFFFFF:MEIO CAMPO}*"
+        },
+        {
+          "n": 3,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/03-5af6a9.png",
+          "cor": "",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/03.png",
+          "sub": "Ataca novas oportunidades e busca incansavelmente pelas melhores opções de jogada, para elevar o placar do time de vendas. ",
+          "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "chip": false,
+          "page": "03/05",
+          "posx": 0,
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "roxo",
+          "contexto": "\"o Téo, um caçador/atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
+          "headline": "*TÉO |{#FFFFFF:ATACANTE}*",
+          "overlay_op": 0.85
+        },
+        {
+          "n": 4,
+          "_v": 2,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/04-5dd660.png",
+          "cor": "",
+          "cta": "fdfddfd",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/04.png",
+          "sub": "Prospecção. A agenda comercial que vive vazia porque prospectar toma tempo que ninguém tem — abastecida sem depender de ânimo",
+          "_ref": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara/_regen/02-3804ab.png",
+          "chip": false,
+          "page": "04/05",
+          "posx": 0,
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "none",
+          "contexto": "\"a Clara, é quem salva a patrica atacante entrando em campo, mesma luz volumétrica e composição da Nina\".",
+          "headline": "*Clara* \nZAGA",
+          "overlay_op": 0
+        },
+        {
+          "n": 5,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-bg.png",
+          "cor": "",
+          "cta": "fale com a smark →",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/selecao-nina-teo-clara-c33c8/05.png",
+          "sub": "Sua próxima contratação começa com uma conversa. 👇 Link na bio.",
+          "chip": false,
+          "page": "05/05",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "headline": "NINA, TÉO|E *CLARA.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "elever-crm",
+      "marca": "elever-ai",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "ELEVER CRM",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 3,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_uploads/3ab517f1bb.png",
+          "cor": "#F4F2FB",
+          "cta": "chama no acelerador",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/01.png",
+          "sub": "{#3bf748:Confira as melhores opcoes e orcamentos}",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "zoom": 1.25,
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "brilho": 0.55,
+          "overlay": "branco",
+          "headline": "Sistemas de IA com Velocidade "
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "xxxx",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "XXXx",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/xxxx/_uploads/6d1a25a0c6.png",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/xxxx/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "_tipo": "autoridade",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "branco",
+          "contexto": "grandes lendas do futebol comerando ajuse para ficar somente os dois jogadores ",
+          "headline": "SEU TÍTULO|*AQUI.*"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "novo-post",
+      "marca": "elever-ai",
+      "canais": [
+        "instagram"
+      ],
+      "status": "salvo",
+      "titulo": "Novo post",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/_uploads/61883a72dc.png",
+          "cor": "#F4F2FB",
+          "cta": "Teste agora e veja",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/novo-post/01.png",
+          "sub": "Como R$ 200,00",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "branco",
+          "headline": "CRM DE IA |para {#8b3cf7:lojas de móveis}",
+          "overlay_op": 1
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "case-destaque",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Case destaque (post 4/5 — PENDENTE dado real)",
+      "caption": "Prova não é a smark dizendo que funciona. É o cliente mostrando o que mudou.\n\n[1-2 frases com o número principal do case.]\n\nO que essa empresa fez, a sua também pode fazer — e começa entendendo onde a IA se pagaria primeiro. Diagnóstico gratuito, link na bio. 👇\n\n#resultado #cases #produtividade #IAparaempresas #roi",
+      "importado": true,
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/case-destaque/_regen/01-3d5caf.png",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/case-destaque/01.png",
+          "sub": "",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "bgmode": "imagem",
+          "bg_seed": 159063493,
+          "headline": "CASE DESTAQUE (POST 4/5 — PENDENTE DADO REAL)",
+          "bg_modelo": "google/gemini-3-pro-image",
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "bg_custo_usd": 0.242958
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "caz-tv",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "CAZé tv",
+      "caption": "",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 4,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/_regen/01-71f94a.png",
+          "cor": "#4419e1",
+          "cta": "Clique e saiba mais",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/caz-tv/01.png",
+          "sub": "**{#e8e8e8:Suspeiras de te}**",
+          "chip": true,
+          "page": "",
+          "posx": 29,
+          "posy": 33,
+          "tema": "claro",
+          "grade": true,
+          "hsize": 95,
+          "accent": "",
+          "bgmode": "imagem",
+          "handle": "fdfdd",
+          "rodape": "fdfdfd",
+          "overlay": "todo-roxo",
+          "contexto": "Esse está correto e bem embasado. A McKinsey reporta que 62% estão pelo menos experimentando agentes, e 23% já escalam sistemas agênticos em algum lugar. Mais preciso ainda: 23% dos respondentes dizem que suas organizações estão escalando um sistema de IA agêntica, e outros 39% dizem ter começado a experimentar agentes de IA (23% + 39% = 62%). Pode usar com segurança.",
+          "headline": "{#efe9f7:Cazemiro fora da copa 2027?  }",
+          "contraste": 0.45,
+          "overlay_op": 0
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "mercado-virou-a-chave",
+      "marca": "smark",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Virou decisão de gestão — post 2/5",
+      "caption": "Quando um movimento sai do grupo dos \"inovadores\" e vira maioria, ele deixa de ser aposta e passa a ser gestão.\n\nOs números de Stanford, McKinsey e Harvard/BCG mostram a mesma coisa por ângulos diferentes: IA na operação não é mais tendência distante — é decisão que empresas sérias já estão tomando.\n\nE repare no ponto que quase ninguém comenta: nenhum desses estudos fala em substituir pessoas. Todos falam em fazer o mesmo time produzir mais e melhor.\n\nA pergunta, então, não é mais \"devo usar IA?\". É \"por onde eu começo?\".\n\nSalva esse post — e quando quiser responder essa pergunta pra sua empresa, o diagnóstico gratuito está no link da bio. 👇\n\n#inteligenciaartificial #gestaoempresarial #produtividade #IAparaempresas #pmesbrasil #tecnologia",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-28T03:15:09",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 4,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_regen/02-b51740.png",
+          "cor": "",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/01.png",
+          "sub": "já usam IA — quase o dobro de um ano atrás. Não é tendência distante. É o presente.  · _**Fonte:** Stanford AI Index · 2025_",
+          "chip": false,
+          "page": "01/05",
+          "tema": "escuro",
+          "zoom": 1.05,
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "overlay": "none",
+          "headline": "{#8B3CF7:78% das empresas\n}\n"
+        },
+        {
+          "n": 2,
+          "_v": 3,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/_uploads/5f3afa1194.png",
+          "cor": "",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/02.png",
+          "sub": "relatam aumento de velociadade e qualidade nas entregas com apoio de IA. **_**·  ____Fonte: Harvard + BCG · 2023**_**____",
+          "chip": false,
+          "page": "02/05",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "handle": "@andreik.schneider",
+          "rodape": "@énois",
+          "headline": "*+40% das empresas*"
+        },
+        {
+          "n": 3,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave-bg.png",
+          "cor": "",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/03.png",
+          "sub": "Todos falam em fazer o mesmo time entregar mais e melhor.",
+          "chip": false,
+          "page": "03/05",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "headline": "NINGUÉM FALA EM|*SUBSTITUIR GENTE.*"
+        },
+        {
+          "n": 4,
+          "bg": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave-bg.png",
+          "cor": "",
+          "cta": "diagnóstico gratuito →",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/04.png",
+          "sub": "A gente ajuda você a decidir. Um funcionário de IA para cada departamento.",
+          "chip": false,
+          "page": "04/05",
+          "tema": "escuro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "headline": "ONDE A IA SE|*PAGARIA* PRIMEIRO?"
+        },
+        {
+          "n": 5,
+          "bg": "",
+          "cor": "#F4F2FB",
+          "cta": "",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/mercado-virou-a-chave/05.png",
+          "sub": "fd",
+          "chip": false,
+          "page": "05/05",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "accent": "",
+          "bgmode": "imagem",
+          "headline": "NOVO|*CARD.*"
+        }
+      ]
+    }
+  ],
+  "version": 2,
+  "source": "postgres"
+}
