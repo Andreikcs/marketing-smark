@@ -2288,9 +2288,14 @@
           "contexto": "Esse está correto e bem embasado. A McKinsey reporta que 62% estão pelo menos experimentando agentes, e 23% já escalam sistemas agênticos em algum lugar. Mais preciso ainda: 23% dos respondentes dizem que suas organizações estão escalando um sistema de IA agêntica, e outros 39% dizem ter começado a experimentar agentes de IA (23% + 39% = 62%). Pode usar com segurança.",
           "headline": "{#efe9f7:Cazemiro fora da copa 2027?  }",
           "contraste": 0.45,
-          "overlay_op": 0
+          "overlay_op": 0,
+          "bg_sha": "3fdf11b34535f5c8853702071f5f90ca5c5fa6eb931abf1402eca3fbdc87d29c",
+          "bg_src_sha": "e076de072a81104a8d54b4a47fb06d4edf5c99571fad6aad58fce585a3177316",
+          "arte_sha": "16fd0872fb5265c641218629919f69552f1f53439e5947dbdcd4e7168c132ac3",
+          "arte_src_sha": "b07e6a67c5e6a931c2dd65b43389e9f6d7254f5f3bf44b939d795512676af17d"
         }
-      ]
+      ],
+      "arte_sha": "16fd0872fb5265c641218629919f69552f1f53439e5947dbdcd4e7168c132ac3"
     },
     {
       "roi": {
