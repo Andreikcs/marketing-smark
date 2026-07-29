@@ -32,7 +32,15 @@ import _marcas  # noqa: E402
 import _dna_marca  # noqa: E402
 import _canais  # noqa: E402
 
-PORT = 8765
+# Local: 8765. Railway/produção: PORT do ambiente + bind 0.0.0.0
+PORT = int(os.environ.get("PORT") or "8765")
+BIND_HOST = (os.environ.get("BIND_HOST") or "127.0.0.1").strip() or "127.0.0.1"
+# hosts públicos extras (Railway domain, custom): "app.up.railway.app,studio.smarktech.com.br"
+PUBLIC_HOSTS = {
+    h.strip().lower()
+    for h in (os.environ.get("PUBLIC_HOSTS") or os.environ.get("RAILWAY_PUBLIC_DOMAIN") or "").split(",")
+    if h.strip()
+}
 PAINEL = os.path.join(VAULT, "painel.html")
 VITRINE = os.path.join(VAULT, "lancamento.html")
 
@@ -1994,7 +2002,24 @@ def _load_or_make_token():
     return t
 
 
-ALLOWED_HOSTS = {f"127.0.0.1:{PORT}", f"localhost:{PORT}", f"[::1]:{PORT}"}
+def _build_allowed_hosts():
+    hosts = {
+        f"127.0.0.1:{PORT}", f"localhost:{PORT}", f"[::1]:{PORT}",
+        "127.0.0.1", "localhost", "[::1]",
+    }
+    for h in PUBLIC_HOSTS:
+        hosts.add(h)
+        # com e sem porta comum
+        if ":" not in h:
+            hosts.add(f"{h}:{PORT}")
+    # Railway injeta RAILWAY_PUBLIC_DOMAIN sem porta
+    rd = (os.environ.get("RAILWAY_PUBLIC_DOMAIN") or "").strip().lower()
+    if rd:
+        hosts.add(rd)
+    return hosts
+
+
+ALLOWED_HOSTS = _build_allowed_hosts()
 TOKEN = _load_or_make_token()
 DATA = os.path.join(VAULT, "editor.json")
 UI = os.path.join(HERE, "_editor2.html")
@@ -2422,19 +2447,33 @@ class H(http.server.BaseHTTPRequestHandler):
                 return {k: (v[0] if isinstance(v, list) and len(v) == 1 else v) for k, v in q.items()}
             raise
 
-    def _host_ok(self):
-        host = (self.headers.get("Host") or "").strip().lower()
+    def _host_allowed(self, host: str) -> bool:
+        host = (host or "").strip().lower()
+        if not host:
+            return False
         if host in ALLOWED_HOSTS:
             return True
-        # aceita host sem porta explícita se for loopback
         bare = host.split(":")[0].strip("[]")
-        return bare in ("127.0.0.1", "localhost", "::1")
+        if bare in ("127.0.0.1", "localhost", "::1"):
+            return True
+        if bare in ALLOWED_HOSTS or host in ALLOWED_HOSTS:
+            return True
+        # Railway / preview: *.up.railway.app e *.railway.app
+        if bare.endswith(".up.railway.app") or bare.endswith(".railway.app"):
+            return True
+        # hosts públicos configurados
+        for ph in PUBLIC_HOSTS:
+            if bare == ph or host == ph or bare.endswith("." + ph):
+                return True
+        return False
+
+    def _host_ok(self):
+        return self._host_allowed(self.headers.get("Host") or "")
 
     def _origin_ok(self):
-        """Origin ausente = same-origin clássico; se presente, tem que ser loopback."""
+        """Origin ausente = same-origin; se presente, loopback ou host público permitido."""
         origin = (self.headers.get("Origin") or "").strip()
         if not origin or origin == "null":
-            # null/ausente: ainda confere Referer se houver
             ref = (self.headers.get("Referer") or "").strip()
             if not ref:
                 return True
@@ -2442,16 +2481,12 @@ class H(http.server.BaseHTTPRequestHandler):
                 netloc = urllib.parse.urlparse(ref).netloc.lower()
             except Exception:
                 return False
-            bare = netloc.split(":")[0].strip("[]")
-            return bare in ("127.0.0.1", "localhost", "::1") or netloc in ALLOWED_HOSTS
+            return self._host_allowed(netloc)
         try:
             netloc = urllib.parse.urlparse(origin).netloc.lower()
         except Exception:
             return False
-        if netloc in ALLOWED_HOSTS:
-            return True
-        bare = netloc.split(":")[0].strip("[]")
-        return bare in ("127.0.0.1", "localhost", "::1")
+        return self._host_allowed(netloc)
 
     def _oauth_path(self, path=None):
         """Callbacks OAuth (Meta redirect / form fake) não carregam X-Editor-Token."""
@@ -3525,12 +3560,25 @@ class H(http.server.BaseHTTPRequestHandler):
 
 def main():
     if not os.path.isfile(DATA):
-        sys.exit(f"ERRO: {DATA} não existe. Gere o editor.json primeiro.")
+        # em deploy novo, cria esqueleto mínimo
+        try:
+            with open(DATA, "w", encoding="utf-8") as f:
+                json.dump({"posts": [], "version": 1}, f)
+            print(f"AVISO: criei {DATA} vazio.", file=sys.stderr)
+        except OSError:
+            sys.exit(f"ERRO: {DATA} não existe e não pôde ser criado.")
+    bind = BIND_HOST
+    # Railway sempre precisa escutar em 0.0.0.0
+    if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RAILWAY_PUBLIC_DOMAIN"):
+        bind = "0.0.0.0"
     http.server.ThreadingHTTPServer.allow_reuse_address = True
-    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), H)
+    httpd = http.server.ThreadingHTTPServer((bind, PORT), H)
     httpd.daemon_threads = True
     with httpd:
-        print(f"\n  ✎ SUPER EDITOR (multi-thread) em  http://localhost:{PORT}   (Ctrl+C pra parar)\n")
+        pub = (os.environ.get("RAILWAY_PUBLIC_DOMAIN")
+               or (next(iter(PUBLIC_HOSTS), "") if PUBLIC_HOSTS else ""))
+        where = f"https://{pub}" if pub else f"http://{bind}:{PORT}"
+        print(f"\n  ✎ SUPER EDITOR (multi-thread) em  {where}   bind={bind}:{PORT}\n")
         httpd.serve_forever()
 
 

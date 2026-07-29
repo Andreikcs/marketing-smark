@@ -1,0 +1,25 @@
+.git
+.obsidian
+.pytest_cache
+.superpowers
+.backups
+.DS_Store
+.env
+.editor-token
+.secrets
+**/__pycache__
+**/*.pyc
+**/.DS_Store
+# artes pesadas — regeneráveis; mantém deploy leve (branding fica)
+marcas/**/publicacoes/**/arte/**
+marcas/**/referencias/acervo/**
+marcas/**/referencias/feed/**
+marcas/**/referencias/inbox/**
+tests
+sites
+imersao-resultado
+studio-check.jpg
+hero.jpeg
+ordo-hero.jpeg
+.compositor.tmp*
+docs

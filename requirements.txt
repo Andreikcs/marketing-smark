@@ -1,0 +1,2 @@
+# Runtime do Super Editor no Railway (mínimo)
+Pillow>=10.0.0
