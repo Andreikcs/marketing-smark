@@ -1,75 +1,136 @@
 #!/usr/bin/env python3
-"""Postgres opcional — produção multi-cliente (Railway DATABASE_URL).
+"""Postgres — multi-marca produção (Railway DATABASE_URL).
 
-Se DATABASE_URL não existir, o sistema continua em arquivos (.secrets/, vault).
-Schema mínimo para:
-  - conexões de canais (tokens Instagram por marca)
-  - fila / log de publicações
+Schema:
+  marca              — cadastro de marcas/clientes
+  post               — posts do editor (1 linha por post)
+  post_frame         — frames/cards do carrossel
+  canal_conexao      — tokens OAuth Instagram/LinkedIn por marca
+  publicacao_log     — histórico de publicações
+  nota_publicacao    — notas .md do vault (opcional)
+
+Sem DATABASE_URL: no-op (sistema usa arquivos).
 """
 from __future__ import annotations
 
 import json
 import os
-import time
 from contextlib import contextmanager
 from typing import Any, Optional
-from urllib.parse import urlparse, urlunparse
 
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 _SCHEMA = """
+CREATE TABLE IF NOT EXISTS marca (
+  slug            TEXT PRIMARY KEY,
+  nome            TEXT NOT NULL DEFAULT '',
+  handle          TEXT NOT NULL DEFAULT '',
+  acento          TEXT NOT NULL DEFAULT '',
+  acento_claro    TEXT NOT NULL DEFAULT '',
+  base_escura     TEXT NOT NULL DEFAULT '',
+  wordmark        TEXT NOT NULL DEFAULT '',
+  glyph           TEXT NOT NULL DEFAULT '',
+  segmento        TEXT NOT NULL DEFAULT '',
+  site            TEXT NOT NULL DEFAULT '',
+  papel           TEXT NOT NULL DEFAULT 'cliente',
+  gradiente       TEXT NOT NULL DEFAULT '',
+  meta            JSONB NOT NULL DEFAULT '{}',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS post (
+  id              BIGSERIAL PRIMARY KEY,
+  marca           TEXT NOT NULL REFERENCES marca(slug) ON DELETE CASCADE,
+  slug            TEXT NOT NULL,
+  titulo          TEXT NOT NULL DEFAULT '',
+  size            TEXT NOT NULL DEFAULT '1080x1350',
+  status          TEXT NOT NULL DEFAULT 'rascunho',
+  caption         TEXT NOT NULL DEFAULT '',
+  canais          JSONB NOT NULL DEFAULT '["instagram"]',
+  payload         JSONB NOT NULL DEFAULT '{}',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (marca, slug)
+);
+
+CREATE TABLE IF NOT EXISTS post_frame (
+  id              BIGSERIAL PRIMARY KEY,
+  post_id         BIGINT NOT NULL REFERENCES post(id) ON DELETE CASCADE,
+  n               INT NOT NULL DEFAULT 1,
+  headline        TEXT NOT NULL DEFAULT '',
+  sub             TEXT NOT NULL DEFAULT '',
+  cta             TEXT NOT NULL DEFAULT '',
+  tema            TEXT NOT NULL DEFAULT 'claro',
+  bg              TEXT NOT NULL DEFAULT '',
+  bgmode          TEXT NOT NULL DEFAULT 'claro',
+  payload         JSONB NOT NULL DEFAULT '{}',
+  UNIQUE (post_id, n)
+);
+
 CREATE TABLE IF NOT EXISTS canal_conexao (
-  marca       TEXT NOT NULL,
-  canal       TEXT NOT NULL DEFAULT 'instagram',
-  payload     JSONB NOT NULL DEFAULT '{}',
-  username    TEXT,
-  user_id     TEXT,
-  conectado   BOOLEAN NOT NULL DEFAULT false,
-  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  marca           TEXT NOT NULL REFERENCES marca(slug) ON DELETE CASCADE,
+  canal           TEXT NOT NULL DEFAULT 'instagram',
+  payload         JSONB NOT NULL DEFAULT '{}',
+  username        TEXT,
+  user_id         TEXT,
+  conectado       BOOLEAN NOT NULL DEFAULT false,
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (marca, canal)
 );
 
 CREATE TABLE IF NOT EXISTS publicacao_log (
-  id          BIGSERIAL PRIMARY KEY,
-  marca       TEXT NOT NULL,
-  canal       TEXT NOT NULL DEFAULT 'instagram',
-  status      TEXT NOT NULL,
-  media_id    TEXT,
-  image_path  TEXT,
-  image_url   TEXT,
-  caption     TEXT,
-  detalhe     JSONB NOT NULL DEFAULT '{}',
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id              BIGSERIAL PRIMARY KEY,
+  marca           TEXT NOT NULL,
+  canal           TEXT NOT NULL DEFAULT 'instagram',
+  post_id         BIGINT REFERENCES post(id) ON DELETE SET NULL,
+  status          TEXT NOT NULL,
+  media_id        TEXT,
+  image_path      TEXT,
+  image_url       TEXT,
+  caption         TEXT,
+  detalhe         JSONB NOT NULL DEFAULT '{}',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS nota_publicacao (
+  id              BIGSERIAL PRIMARY KEY,
+  marca           TEXT NOT NULL,
+  canal           TEXT NOT NULL DEFAULT 'instagram',
+  path            TEXT NOT NULL UNIQUE,
+  titulo          TEXT NOT NULL DEFAULT '',
+  frontmatter     JSONB NOT NULL DEFAULT '{}',
+  body            TEXT NOT NULL DEFAULT '',
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_post_marca ON post (marca, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_post_frame_post ON post_frame (post_id, n);
 CREATE INDEX IF NOT EXISTS idx_publicacao_marca ON publicacao_log (marca, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_nota_marca ON nota_publicacao (marca, canal);
 """
 
 
 def database_url() -> str:
-    return (os.environ.get("DATABASE_URL") or "").strip()
+    url = (os.environ.get("DATABASE_URL") or "").strip()
+    if "railway.internal" in url and not os.environ.get("RAILWAY_ENVIRONMENT"):
+        pub = (os.environ.get("DATABASE_PUBLIC_URL") or "").strip()
+        if pub:
+            return pub
+    if not url:
+        return (os.environ.get("DATABASE_PUBLIC_URL") or "").strip()
+    return url
 
 
 def disponivel() -> bool:
     return bool(database_url())
 
 
-def _dsn() -> str:
-    """Railway internal URL; se rodar local, prefira DATABASE_PUBLIC_URL."""
-    url = database_url()
-    # local dev: se host for .railway.internal e não estiver na rede Railway, use public
-    if "railway.internal" in url and not os.environ.get("RAILWAY_ENVIRONMENT"):
-        pub = (os.environ.get("DATABASE_PUBLIC_URL") or "").strip()
-        if pub:
-            return pub
-    return url
-
-
 @contextmanager
 def conn():
     import psycopg2
-    from psycopg2.extras import RealDictCursor
-    c = psycopg2.connect(_dsn(), cursor_factory=RealDictCursor)
+    from psycopg2.extras import RealDictCursor, Json
+    c = psycopg2.connect(database_url(), cursor_factory=RealDictCursor)
     try:
         yield c
         c.commit()
@@ -86,13 +147,180 @@ def init_schema() -> dict:
     with conn() as c:
         with c.cursor() as cur:
             cur.execute(_SCHEMA)
-    return {"ok": True}
+    return {"ok": True, "schema": "marca,post,post_frame,canal_conexao,publicacao_log,nota_publicacao"}
 
+
+def ensure_marca(slug: str, meta: Optional[dict] = None) -> None:
+    if not disponivel() or not slug:
+        return
+    meta = meta or {}
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO marca (slug, nome, handle, acento, acento_claro, base_escura,
+                                  wordmark, glyph, segmento, site, papel, gradiente, meta, updated_at)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,NOW())
+                ON CONFLICT (slug) DO UPDATE SET
+                  nome=COALESCE(NULLIF(EXCLUDED.nome,''), marca.nome),
+                  handle=COALESCE(NULLIF(EXCLUDED.handle,''), marca.handle),
+                  acento=COALESCE(NULLIF(EXCLUDED.acento,''), marca.acento),
+                  acento_claro=COALESCE(NULLIF(EXCLUDED.acento_claro,''), marca.acento_claro),
+                  base_escura=COALESCE(NULLIF(EXCLUDED.base_escura,''), marca.base_escura),
+                  wordmark=COALESCE(NULLIF(EXCLUDED.wordmark,''), marca.wordmark),
+                  glyph=COALESCE(NULLIF(EXCLUDED.glyph,''), marca.glyph),
+                  segmento=COALESCE(NULLIF(EXCLUDED.segmento,''), marca.segmento),
+                  site=COALESCE(NULLIF(EXCLUDED.site,''), marca.site),
+                  papel=COALESCE(NULLIF(EXCLUDED.papel,''), marca.papel),
+                  gradiente=COALESCE(NULLIF(EXCLUDED.gradiente,''), marca.gradiente),
+                  meta=marca.meta || EXCLUDED.meta,
+                  updated_at=NOW()
+                """,
+                (
+                    slug,
+                    meta.get("nome") or slug,
+                    meta.get("handle") or ("@" + slug.replace("-", "")),
+                    meta.get("acento") or "",
+                    meta.get("acento_claro") or "",
+                    meta.get("base_escura") or "",
+                    meta.get("wordmark") or "",
+                    str(meta.get("glyph") if meta.get("glyph") is not None else "")[:8],
+                    meta.get("segmento") or "",
+                    meta.get("site") or "",
+                    meta.get("papel") or "cliente",
+                    meta.get("gradiente") or "",
+                    json.dumps(meta, ensure_ascii=False),
+                ),
+            )
+
+
+def upsert_post(post: dict) -> Optional[int]:
+    """Insere/atualiza post + frames. Devolve post_id."""
+    if not disponivel():
+        return None
+    marca = (post.get("marca") or "smark").strip()
+    slug = (post.get("slug") or "").strip()
+    if not slug:
+        return None
+    ensure_marca(marca)
+    frames = post.get("frames") or []
+    canais = post.get("canais") or ["instagram"]
+    payload = {k: v for k, v in post.items() if k not in ("frames",)}
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO post (marca, slug, titulo, size, status, caption, canais, payload, updated_at)
+                VALUES (%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,NOW())
+                ON CONFLICT (marca, slug) DO UPDATE SET
+                  titulo=EXCLUDED.titulo,
+                  size=EXCLUDED.size,
+                  status=EXCLUDED.status,
+                  caption=EXCLUDED.caption,
+                  canais=EXCLUDED.canais,
+                  payload=EXCLUDED.payload,
+                  updated_at=NOW()
+                RETURNING id
+                """,
+                (
+                    marca,
+                    slug,
+                    post.get("titulo") or slug,
+                    post.get("size") or "1080x1350",
+                    post.get("status") or "rascunho",
+                    post.get("caption") or "",
+                    json.dumps(canais, ensure_ascii=False),
+                    json.dumps(payload, ensure_ascii=False),
+                ),
+            )
+            row = cur.fetchone()
+            post_id = int(row["id"])
+            # replace frames
+            cur.execute("DELETE FROM post_frame WHERE post_id=%s", (post_id,))
+            for i, fr in enumerate(frames):
+                n = int(fr.get("n") or (i + 1))
+                cur.execute(
+                    """
+                    INSERT INTO post_frame (post_id, n, headline, sub, cta, tema, bg, bgmode, payload)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb)
+                    """,
+                    (
+                        post_id,
+                        n,
+                        fr.get("headline") or "",
+                        fr.get("sub") or "",
+                        fr.get("cta") or "",
+                        fr.get("tema") or "claro",
+                        fr.get("bg") or "",
+                        fr.get("bgmode") or fr.get("tema") or "claro",
+                        json.dumps(fr, ensure_ascii=False),
+                    ),
+                )
+            return post_id
+
+
+def load_posts_as_editor() -> dict:
+    """Reconstrói editor.json a partir do DB (fonte canônica em produção)."""
+    if not disponivel():
+        return {"posts": []}
+    init_schema()
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                "SELECT id, payload, marca, slug, titulo, size, status, caption, canais "
+                "FROM post ORDER BY updated_at DESC"
+            )
+            rows = cur.fetchall() or []
+            posts = []
+            for r in rows:
+                cur.execute(
+                    "SELECT payload, n FROM post_frame WHERE post_id=%s ORDER BY n",
+                    (r["id"],),
+                )
+                frs = cur.fetchall() or []
+                frames = []
+                for f in frs:
+                    pl = f["payload"]
+                    if isinstance(pl, str):
+                        pl = json.loads(pl)
+                    frames.append(pl if isinstance(pl, dict) else {"n": f["n"]})
+                p = r["payload"]
+                if isinstance(p, str):
+                    p = json.loads(p)
+                if not isinstance(p, dict):
+                    p = {}
+                p.update({
+                    "marca": r["marca"],
+                    "slug": r["slug"],
+                    "titulo": r["titulo"],
+                    "size": r["size"],
+                    "status": r["status"],
+                    "caption": r["caption"] or p.get("caption") or "",
+                    "canais": r["canais"] if isinstance(r["canais"], list) else json.loads(r["canais"] or "[]"),
+                    "frames": frames,
+                })
+                posts.append(p)
+            return {"posts": posts, "version": 2, "source": "postgres"}
+
+
+def contagens() -> dict:
+    if not disponivel():
+        return {}
+    with conn() as c:
+        with c.cursor() as cur:
+            out = {}
+            for t in ("marca", "post", "post_frame", "canal_conexao", "publicacao_log", "nota_publicacao"):
+                cur.execute(f"SELECT COUNT(*) AS n FROM {t}")
+                out[t] = int(cur.fetchone()["n"])
+            return out
+
+
+# ── canais (tokens) ─────────────────────────────────────────────────────────
 
 def canal_salvar(marca: str, canal: str, payload: dict) -> None:
     if not disponivel():
         return
-    init_schema()
+    ensure_marca(marca)
     with conn() as c:
         with c.cursor() as cur:
             cur.execute(
@@ -121,7 +349,6 @@ def canal_carregar(marca: str, canal: str = "instagram") -> dict:
     if not disponivel():
         return {}
     try:
-        init_schema()
         with conn() as c:
             with c.cursor() as cur:
                 cur.execute(
@@ -157,7 +384,6 @@ def publicacao_log(marca: str, canal: str, status: str, **kw) -> None:
     if not disponivel():
         return
     try:
-        init_schema()
         with conn() as c:
             with c.cursor() as cur:
                 cur.execute(
