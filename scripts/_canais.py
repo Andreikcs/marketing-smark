@@ -712,6 +712,11 @@ _META_DICAS = {
         "HTTPS público, JPEG, que ela consiga baixar)."),
     (4, ""): ("limite de chamadas da Meta — espere e tente de novo."),
     (9, ""): ("limite de publicações da conta (25 posts/24h)."),
+    (9007, ""): (
+        "o contêiner da mídia ainda não terminou de ser preparado (a Meta "
+        "precisa baixar a arte do link antes). O publicador agora espera o "
+        "status FINISHED — se caiu aqui, o contêiner expirou ou deu erro no "
+        "download da imagem."),
 }
 
 
@@ -1111,6 +1116,61 @@ def url_publica_da_arte(sha: str) -> str:
     return f"{base}/arte/{sha}.jpg" if base else ""
 
 
+# Quanto esperar o contêiner ficar pronto antes de publicar. A Meta baixa a
+# arte do nosso link nesse meio-tempo; imagem de ~200 KB costuma levar 1-5 s,
+# mas o servidor dela às vezes enfileira.
+CONTAINER_TIMEOUT = float(_env("IG_CONTAINER_TIMEOUT", "90") or 90)
+CONTAINER_INTERVALO = 2.0
+
+
+def status_container(creation_id: str, access: str) -> dict:
+    """Estado do contêiner de mídia: IN_PROGRESS, FINISHED, ERROR, EXPIRED."""
+    url = (f"{IG_GRAPH}/{creation_id}?fields=status_code,status"
+           f"&access_token={urllib.parse.quote(access)}")
+    return _http_json("GET", url)
+
+
+def esperar_container(creation_id: str, access: str,
+                      timeout: float = 0.0) -> dict:
+    """Espera o contêiner chegar em FINISHED antes de publicar.
+
+    Sem isso, `media_publish` chamado logo depois de criar o contêiner volta
+    `9007/2207027 Media ID is not available` — a Meta ainda estava baixando a
+    arte. Era esse o erro que derrubava a fila em toda tentativa: cada retry
+    criava um contêiner novo e publicava no mesmo instante, então falhava
+    sempre igual, sem nunca dar tempo do download terminar.
+
+    Retorna {"ok": True} quando pronto; {"ok": False, "erro": ...} quando o
+    contêiner deu ERROR/EXPIRED ou estourou o tempo.
+    """
+    limite = time.monotonic() + (timeout or CONTAINER_TIMEOUT)
+    ultimo = ""
+    while True:
+        try:
+            j = status_container(creation_id, access)
+        except Exception as e:
+            # Consulta de status falhando não é motivo pra desistir do post:
+            # tenta de novo até o tempo acabar.
+            ultimo = str(e)
+            j = {}
+        code = (j.get("status_code") or "").upper()
+        if code == "FINISHED":
+            return {"ok": True, "status_code": code, "tentou": ultimo}
+        if code in ("ERROR", "EXPIRED"):
+            # `status` traz o motivo real (imagem não baixou, formato etc.)
+            return {"ok": False, "status_code": code,
+                    "erro": "contêiner %s: %s" % (
+                        code.lower(), j.get("status") or "sem detalhe da Meta")}
+        if code:
+            ultimo = code
+        if time.monotonic() >= limite:
+            return {"ok": False, "status_code": code or "?",
+                    "erro": ("contêiner não ficou pronto em %ds (último estado: "
+                             "%s)" % (int(timeout or CONTAINER_TIMEOUT),
+                                      ultimo or "desconhecido"))}
+        time.sleep(CONTAINER_INTERVALO)
+
+
 def publicar_instagram(marca: str, *,
                        image_path: str = "",
                        image_url: str = "",
@@ -1231,18 +1291,49 @@ def publicar_instagram(marca: str, *,
     if not creation_id:
         return {"ok": False, "erro": "sem creation_id", "raw": container}
 
-    # 2) publish
-    try:
-        pub_url = f"{IG_GRAPH}/{ig_user}/media_publish"
-        published = _http_json("POST", pub_url, {
-            "creation_id": creation_id,
-            "access_token": access,
-        }, form=True)
-    except Exception as e:
+    # 2) esperar a Meta baixar a arte (senão o publish volta 9007)
+    pronto = esperar_container(creation_id, access)
+    if not pronto.get("ok"):
         _log_publish(marca, "instagram", {
-            "acao": "erro_publish", "creation_id": creation_id, "erro": str(e),
+            "acao": "erro_container_status", "creation_id": creation_id,
+            "status_code": pronto.get("status_code"), "erro": pronto.get("erro"),
         })
-        return {"ok": False, "erro": f"falha ao publicar: {e}", "creation_id": creation_id}
+        try:
+            import _db
+            _db.publicacao_log(marca, "instagram", "erro_container",
+                               image_url=image_url, caption=caption,
+                               detalhe={"erro": pronto.get("erro"),
+                                        "creation_id": creation_id})
+        except Exception:
+            pass
+        return {"ok": False, "erro": pronto.get("erro"),
+                "creation_id": creation_id}
+
+    # 3) publish — com um repique curto, porque FINISHED e o publish liberado
+    # não são exatamente o mesmo instante do lado da Meta.
+    published = None
+    erro_pub = None
+    for tentativa in range(3):
+        try:
+            pub_url = f"{IG_GRAPH}/{ig_user}/media_publish"
+            published = _http_json("POST", pub_url, {
+                "creation_id": creation_id,
+                "access_token": access,
+            }, form=True)
+            erro_pub = None
+            break
+        except Exception as e:
+            erro_pub = e
+            if "9007" not in str(e) or tentativa == 2:
+                break
+            time.sleep(3 * (tentativa + 1))
+    if erro_pub is not None:
+        _log_publish(marca, "instagram", {
+            "acao": "erro_publish", "creation_id": creation_id,
+            "erro": str(erro_pub),
+        })
+        return {"ok": False, "erro": f"falha ao publicar: {erro_pub}",
+                "creation_id": creation_id}
 
     media_id = published.get("id")
     _log_publish(marca, "instagram", {
