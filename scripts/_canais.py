@@ -944,6 +944,32 @@ def trocar_code_real(code: str, state: str) -> dict:
     }
 
 
+def testar_conexao(marca: str, canal: str = "instagram") -> dict:
+    """Pergunta pra Meta se a conta responde — leitura, não publica nada.
+
+    Existe porque erro de app bloqueado só aparecia na hora de publicar, com
+    a peça já pronta. Aqui a resposta vem antes, e com o motivo em português.
+    """
+    if canal != "instagram":
+        return {"ok": False, "erro": "canal %s ainda não tem teste" % canal}
+    raw = token_bruto(marca, canal) or {}
+    if not raw.get("access_token"):
+        return {"ok": False, "erro": "Instagram não conectado nesta marca."}
+    if raw.get("modo") == "fake":
+        return {"ok": True, "modo": "fake", "username": raw.get("username") or "",
+                "aviso": "Conta simulada — não fala com a Meta."}
+    try:
+        me = _http_json(
+            "GET",
+            "%s/me?fields=id,username&access_token=%s"
+            % (IG_GRAPH, urllib.parse.quote(raw["access_token"])))
+    except Exception as e:
+        return {"ok": False, "modo": "real", "erro": str(e),
+                "username": raw.get("username") or ""}
+    return {"ok": True, "modo": "real", "user_id": me.get("id") or "",
+            "username": me.get("username") or raw.get("username") or ""}
+
+
 def token_bruto(marca: str, canal: str = "instagram") -> dict:
     """Uso interno (publish). Nunca expor na API HTTP."""
     return _load_canal(marca, canal)

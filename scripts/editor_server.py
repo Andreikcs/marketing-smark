@@ -972,7 +972,8 @@ async function menuIg(slug,btn){{
     h+='<div class=ttl>conectada</div>'
       +'<button disabled style="opacity:.9;cursor:default">@'+esc(ig.username||'')
       +'<small>'+(divide.length?('também publica por: '+esc(divide.join(', '))):'só esta marca')
-      +(ig.expira_em?(' · vence '+esc(String(ig.expira_em).slice(0,10))):'')+'</small></button>';
+      +(ig.expira_em?(' · vence '+esc(String(ig.expira_em).slice(0,10))):'')+'</small></button>'
+      +'<button data-test=1>Testar conexão<small>pergunta pra Meta se a conta responde</small></button>';
   }}
   if(outras.length){{
     h+='<div class=ttl>'+(ig.conectado?'trocar por':'usar conta já conectada')+'</div>'
@@ -991,11 +992,20 @@ async function menuIg(slug,btn){{
     box.remove();
     if(b.dataset.new)return conectarIg(slug);
     if(b.dataset.off)return desconectarIg(slug);
+    if(b.dataset.test)return testarIg(slug);
     if(b.dataset.use)return usarContaIg(slug,b.dataset.use);
   }};
   setTimeout(()=>document.addEventListener('mousedown',function hh(ev){{
     if(!box.contains(ev.target)){{box.remove();document.removeEventListener('mousedown',hh)}}
   }}),40);
+}}
+async function testarIg(slug){{
+  let j={{}};
+  try{{j=await(await fetch('/canais/testar?marca='+encodeURIComponent(slug))).json()}}
+  catch(e){{j={{ok:false,erro:String(e)}}}}
+  if(j.ok)alert('Conexão ok — @'+(j.username||'?')
+    +(j.modo==='fake'?'\\n\\n'+(j.aviso||''):'\\n\\nA Meta respondeu normalmente.'));
+  else alert('A Meta recusou:\\n\\n'+(j.erro||'erro desconhecido'));
 }}
 async function desconectarIg(slug){{
   const m=MARCAS.find(x=>x.slug===slug);
@@ -4806,6 +4816,19 @@ class H(http.server.BaseHTTPRequestHandler):
             try:
                 return self._send(200, {"ok": True, "canal": canal,
                                         "contas": _canais.contas_conectadas(canal)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/canais/testar":
+            # Bate na Meta só pra ler. Serve pra descobrir app bloqueado/token
+            # vencido ANTES de montar a peça e apanhar na hora de publicar.
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            marca = (qs.get("marca", [""])[0] or "").strip()
+            canal = qs.get("canal", ["instagram"])[0] or "instagram"
+            if not marca:
+                return self._send(400, {"ok": False, "erro": "marca obrigatória"})
+            try:
+                return self._send(200, _canais.testar_conexao(marca, canal))
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 
