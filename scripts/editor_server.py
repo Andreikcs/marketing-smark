@@ -345,7 +345,10 @@ def topbar(active=""):
     return ('<div class="sk-topbar">'
             f'<a href="/" style="text-decoration:none;margin-right:6px">{smark_logo(26)}</a>'
             + lk("/painel", "Painel", "painel") + lk("/vitrine", "Vitrine", "vitrine")
-            + lk("/config", "Config", "config") + lk("/fila", "Fila", "fila")
+            + lk("/config", "Config", "config")
+            # A Fila fica FORA do menu de propósito: é tabela interna de operação
+            # (quem está em que estado, o que já venceu), não tela de cliente. Segue
+            # acessível em /fila pra quem opera, sem virar uma aba que ninguém pediu.
             + lk("/db-status", "Status", "status")
             + lk("/editor", "Editor", "editor")
             + '<span class="sk-spacer"></span>'
