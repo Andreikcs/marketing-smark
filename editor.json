@@ -17,13 +17,16 @@
           "cta": "cta",
           "sub": "sub",
           "tema": "claro",
-          "headline": "H1 *x*"
+          "headline": "H1 *x*",
+          "arte_sha": "6f46557aeadba95776e73d0bdde444d6b004ac371a4bf9cab76a1e6cb7c80929",
+          "arte_src_sha": "7b39e80f530bf25ff80c88f396cd0e73603b3d8901fd1fd3142bc9b3e5a02d75"
         }
       ],
       "agendado_para": "",
       "aprovado_em": "",
       "publicado_em": "",
-      "aprovado_por": "limpeza-teste"
+      "aprovado_por": "limpeza-teste",
+      "arte_sha": "6f46557aeadba95776e73d0bdde444d6b004ac371a4bf9cab76a1e6cb7c80929"
     },
     {
       "size": "1080x1350",
@@ -42,13 +45,16 @@
           "cta": "C",
           "sub": "S",
           "tema": "claro",
-          "headline": "H1"
+          "headline": "H1",
+          "arte_sha": "18d81871698b31acb4b00f077b8774c58098fa461781ccd23f535a854bbb2146",
+          "arte_src_sha": "1036ffe595da071dc46bbaeb87c2a0addb79c90c0120a275fa3d7323bf033763"
         }
       ],
       "agendado_para": "",
       "aprovado_em": "",
       "publicado_em": "",
-      "aprovado_por": ""
+      "aprovado_por": "",
+      "arte_sha": "18d81871698b31acb4b00f077b8774c58098fa461781ccd23f535a854bbb2146"
     },
     {
       "roi": {
