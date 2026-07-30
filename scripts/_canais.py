@@ -674,6 +674,53 @@ def re_slug_user(u: str) -> str:
     return "".join(out)[:60] or "conta"
 
 
+# Erro da Meta traduzido. Sem isso a tela mostra só "falha ao criar container"
+# e some com o code/fbtrace — que é a única coisa que o suporte da Meta aceita.
+_META_DICAS = {
+    (200, "api access blocked"): (
+        "o APP da Meta está bloqueado/restrito (não é o post nem a arte — até "
+        "leitura simples falha). Abra o painel do app e veja se há aviso de "
+        "restrição ou se ele saiu do modo Live."),
+    (190, ""): (
+        "token inválido ou expirado — reconecte a conta no /config."),
+    (101, ""): (
+        "app id/secret não conferem, ou o app não existe mais."),
+    (10, ""): (
+        "falta a permissão instagram_business_content_publish — reconecte "
+        "pedindo publicação."),
+    (100, ""): (
+        "a Meta recusou algum campo (normalmente a image_url: precisa ser "
+        "HTTPS público, JPEG, que ela consiga baixar)."),
+    (4, ""): ("limite de chamadas da Meta — espere e tente de novo."),
+    (9, ""): ("limite de publicações da conta (25 posts/24h)."),
+}
+
+
+def _meta_erro_legivel(j: dict, msg: str) -> str:
+    """Mensagem da Meta + code + fbtrace + o que fazer, em pt-BR."""
+    err = j.get("error") if isinstance(j.get("error"), dict) else {}
+    code = err.get("code")
+    sub = err.get("error_subcode")
+    trace = err.get("fbtrace_id") or j.get("fbtrace_id")
+    dica = ""
+    baixo = (msg or "").strip().lower().rstrip(".")
+    for (c, m), d in _META_DICAS.items():
+        if c == code and (not m or m == baixo):
+            dica = d
+            break
+    partes = [msg or "erro sem mensagem"]
+    marca = []
+    if code is not None:
+        marca.append(f"code {code}" + (f"/{sub}" if sub else ""))
+    if trace:
+        marca.append(f"trace {trace}")
+    if marca:
+        partes.append("[" + " · ".join(marca) + "]")
+    if dica:
+        partes.append("→ " + dica)
+    return " ".join(partes)
+
+
 def _http_json(method: str, url: str, data: Optional[dict] = None,
                form: bool = False, multipart: bool = False) -> dict:
     headers = {"User-Agent": "smark-canais/1.0"}
