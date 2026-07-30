@@ -1,0 +1,11 @@
+{
+  "id": "9dbb5442",
+  "modo": "fake",
+  "username": "smarkacessoria",
+  "caption": "legenda e2e",
+  "image_path": "",
+  "image_url": "",
+  "em": "2026-07-30T00:55:47Z",
+  "status": "queued_fake",
+  "nota": "Simulação — app real publicará de verdade quando INSTAGRAM_APP_ID estiver no .env"
+}

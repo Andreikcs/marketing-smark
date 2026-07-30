@@ -9,51 +9,35 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "teste-integra-a-o",
-      "marca": "provider-max",
-      "thumb": ".thumbs/provider-max__teste-integra-a-o.jpg",
+      "slug": "e2e-db-preserve",
+      "marca": "smark",
       "canais": [
         "instagram"
       ],
-      "status": "rascunho",
-      "titulo": "Internet rápida de verdade",
-      "caption": "Ninguém aguenta ficar esperando a tela carregar. Com a provider-max, a conexão fica firme o dia inteiro — pra trabalhar, estudar e relaxar sem interrupção. Quer saber onde sua rede pode melhorar? Comece pelo diagnóstico gratuito.\n\n#provedor #internetfibra #conexao #provedordeinternet",
-      "arte_sha": "92907968c85bbedb7bd41368f96e0ce7fe5e1639cf2b3b4eca2deebaa9e6cdff",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T20:09:17",
+      "status": "revisao",
+      "titulo": "Preserve",
+      "caption": "legenda e2e",
+      "arte_sha": "da965688bf6f0c6dc47fb592146220bd88073bceaa3a492d2abc1fcb6d31c8a0",
+      "created_at": "2026-07-29T20:16:53",
+      "tentativas": 0,
+      "updated_at": "2026-07-29T21:57:15",
       "aprovado_em": "",
       "aprovado_por": "",
       "publicado_em": "",
       "agendado_para": "",
+      "ultimo_comentario": "teste do worker de agendados",
       "frames": [
         {
           "n": 1,
-          "_v": 1,
-          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/teste-integra-a-o/_regen/01-705eea.png",
-          "cor": "#F4F2FB",
-          "cta": "Diagnóstico gratuito — link na bio",
-          "out": "marcas/provider-max/publicacoes/social/instagram/arte/teste-integra-a-o/01.png",
-          "sub": "Navegue à vontade, sem espera",
-          "chip": true,
+          "bg": "",
+          "cta": "cta",
+          "out": "marcas/smark/publicacoes/social/instagram/arte/e2e-db-preserve/01.png",
+          "sub": "sub",
           "page": "",
           "tema": "claro",
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/provider-max__teste-integra-a-o.jpg",
-          "accent": "",
-          "bg_sha": "25f22a6c2d7873ee065f1a3a673b391fdcc7bf88356486495f726bd128f73cc1",
-          "bgmode": "imagem",
-          "bg_tier": "final",
-          "overlay": "branco",
-          "arte_sha": "92907968c85bbedb7bd41368f96e0ce7fe5e1639cf2b3b4eca2deebaa9e6cdff",
-          "headline": "Internet que|*não trava* nunca",
-          "bg_modelo": "google/gemini-3-pro-image",
-          "bg_src_sha": "b6236ed058f145e304589dba6ce0516f3fc355dfbdad5c9bde4ad196ed18b0ad",
-          "bg_provider": "openrouter",
-          "bg_suplente": false,
-          "arte_src_sha": "9ae6a4ec46d81486a11ceed6a31df80e2c2d7dcd0a25fcad0cc8e0bd509623e3",
-          "bg_custo_usd": 0.242806,
-          "bg_publicavel": true
+          "arte_sha": "da965688bf6f0c6dc47fb592146220bd88073bceaa3a492d2abc1fcb6d31c8a0",
+          "headline": "H1 *x*R",
+          "arte_src_sha": "80ec5d81721a8bd56dd575c9fa10f7ee4c4dcd79b0c79f039c7808761dddb3ab"
         }
       ]
     },
@@ -160,46 +144,6 @@
           "bg_src_sha": "b1cc25d7640f08cf5b00fe2d72f6803c7d36f0e413a275c55aa45d938d9a1917",
           "overlay_op": 1,
           "arte_src_sha": "8197fd522ab80d0d1b4d7b299c811f5634e2377e8da2b5bfb84f4d05bb9d1b4d"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
-      "slug": "e2e-db-preserve",
-      "marca": "smark",
-      "canais": [
-        "instagram"
-      ],
-      "status": "revisao",
-      "titulo": "Preserve",
-      "caption": "legenda e2e",
-      "arte_sha": "da965688bf6f0c6dc47fb592146220bd88073bceaa3a492d2abc1fcb6d31c8a0",
-      "created_at": "2026-07-29T20:16:53",
-      "updated_at": "2026-07-29T21:05:04",
-      "aprovado_em": "",
-      "aprovado_por": "time",
-      "publicado_em": "",
-      "agendado_para": "",
-      "ultimo_comentario": "fim dos testes do fluxo",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cta": "cta",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/e2e-db-preserve/01.png",
-          "sub": "sub",
-          "page": "",
-          "tema": "claro",
-          "arte_sha": "da965688bf6f0c6dc47fb592146220bd88073bceaa3a492d2abc1fcb6d31c8a0",
-          "headline": "H1 *x*R",
-          "arte_src_sha": "80ec5d81721a8bd56dd575c9fa10f7ee4c4dcd79b0c79f039c7808761dddb3ab"
         }
       ]
     },
@@ -464,6 +408,63 @@
           "headline": "{#E0562D:Massa fresca\n}todo dia.\n",
           "bg_src_sha": "133081244d5f87366251b8a8daf4de96a701358f49f299fa2ba73ecfc583a82f",
           "arte_src_sha": "84fcaf12b6bb88ece1e81450639dc9961902479bea8cc85d5d3a34c3f74374b1"
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "teste-integra-a-o",
+      "marca": "provider-max",
+      "thumb": ".thumbs/provider-max__teste-integra-a-o.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "Internet rápida de verdade",
+      "caption": "Ninguém aguenta ficar esperando a tela carregar. Com a provider-max, a conexão fica firme o dia inteiro — pra trabalhar, estudar e relaxar sem interrupção. Quer saber onde sua rede pode melhorar? Comece pelo diagnóstico gratuito.\n\n#provedor #internetfibra #conexao #provedordeinternet",
+      "arte_sha": "92907968c85bbedb7bd41368f96e0ce7fe5e1639cf2b3b4eca2deebaa9e6cdff",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T20:09:17",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 1,
+          "bg": "marcas/provider-max/publicacoes/social/instagram/arte/teste-integra-a-o/_regen/01-705eea.png",
+          "cor": "#F4F2FB",
+          "cta": "Diagnóstico gratuito — link na bio",
+          "out": "marcas/provider-max/publicacoes/social/instagram/arte/teste-integra-a-o/01.png",
+          "sub": "Navegue à vontade, sem espera",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/provider-max__teste-integra-a-o.jpg",
+          "accent": "",
+          "bg_sha": "25f22a6c2d7873ee065f1a3a673b391fdcc7bf88356486495f726bd128f73cc1",
+          "bgmode": "imagem",
+          "bg_tier": "final",
+          "overlay": "branco",
+          "arte_sha": "92907968c85bbedb7bd41368f96e0ce7fe5e1639cf2b3b4eca2deebaa9e6cdff",
+          "headline": "Internet que|*não trava* nunca",
+          "bg_modelo": "google/gemini-3-pro-image",
+          "bg_src_sha": "b6236ed058f145e304589dba6ce0516f3fc355dfbdad5c9bde4ad196ed18b0ad",
+          "bg_provider": "openrouter",
+          "bg_suplente": false,
+          "arte_src_sha": "9ae6a4ec46d81486a11ceed6a31df80e2c2d7dcd0a25fcad0cc8e0bd509623e3",
+          "bg_custo_usd": 0.242806,
+          "bg_publicavel": true
         }
       ]
     },

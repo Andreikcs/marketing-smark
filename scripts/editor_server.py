@@ -2495,7 +2495,7 @@ function render(){
       +(lista.length?lista.map(p=>{
         const venceu=s==='agendado'&&p.agendado_para&&new Date(p.agendado_para).getTime()<=agora;
         if(venceu)venceram++;
-        const quando=p.agendado_para?fmtQuando(p.agendado_para):'';
+        const quando=(s==='agendado'&&p.agendado_para)?fmtQuando(p.agendado_para):'';
         return '<div class="fcard'+(venceu?' venceu':'')+'">'
           +'<div class=tt>'+esc(p.titulo||p.slug||'sem título')+'</div>'
           +'<div class=mt><b>'+esc(NOMES[p.marca||'smark']||p.marca||'smark')+'</b>'
@@ -3522,6 +3522,10 @@ def mudar_status_post(marca, slug, para, *, por="time", comentario="",
             alvo["aprovado_por"] = (por or "")[:120]
         if para == "publicado":
             alvo["publicado_em"] = _agora_utc()
+            alvo["agendado_para"] = ""
+        # Saiu de agendado sem ir pro ar? A data morre com o agendamento. Deixá-la
+        # ali faria a fila mostrar "sai 10:00" num post que ninguém agendou mais.
+        if de == "agendado" and para not in ("agendado", "publicado"):
             alvo["agendado_para"] = ""
         if para in ("rascunho", "ajuste", "salvo"):
             alvo["agendado_para"] = ""
