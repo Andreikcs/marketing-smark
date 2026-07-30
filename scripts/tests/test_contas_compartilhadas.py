@@ -163,6 +163,43 @@ class TestMigracaoLegado(BaseContas):
                          "reescreveu a conta a cada leitura — grava por nada")
 
 
+class TestBancoFalhando(BaseContas):
+    """O disco é a palavra local. Banco que perde a escrita não pode esconder conta.
+
+    Aconteceu de verdade rodando esta suíte: o proxy do Railway engasgou, o
+    `_persist_canal` engoliu o erro do INSERT (de propósito — o arquivo já estava
+    gravado) e a conta ficou INVISÍVEL, porque a listagem só olhava o banco. O
+    usuário seria mandado pra um OAuth que não precisava.
+    """
+
+    def test_conta_no_disco_aparece_mesmo_sem_a_linha_no_banco(self):
+        self.c._persist_canal(M1, CANAL, _payload())
+        try:
+            import _db
+            if _db.disponivel():
+                _db.conta_apagar(CANAL, UID)      # simula a escrita perdida
+                _db.canal_apagar(M1, CANAL)
+        except Exception:
+            pass
+        achou = [c for c in self.c.contas_conectadas(CANAL) if c["user_id"] == UID]
+        self.assertEqual(len(achou), 1, "conta sumiu da tela porque o banco não tinha")
+        self.assertEqual(achou[0]["marcas"], [M1])
+        r = self.c.vincular_marca(M2, CANAL, UID)
+        self.assertTrue(r["ok"], r.get("erro"))
+
+    def test_marcas_da_conta_soma_banco_e_disco(self):
+        self.c._persist_canal(M1, CANAL, _payload())
+        self.c.vincular_marca(M2, CANAL, UID)
+        try:
+            import _db
+            if _db.disponivel():
+                _db.canal_apagar(M2, CANAL)       # vínculo só no disco agora
+        except Exception:
+            pass
+        self.assertEqual(self.c.marcas_da_conta(CANAL, UID), sorted([M1, M2]),
+                         "avisaria que só uma marca depende da conta")
+
+
 class TestDesvincular(BaseContas):
     def test_desvincular_nao_derruba_a_outra(self):
         self.c._persist_canal(M1, CANAL, _payload())

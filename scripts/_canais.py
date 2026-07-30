@@ -246,48 +246,60 @@ def contas_conectadas(canal: str = "instagram") -> list:
 
     É o que permite "conectar uma vez, usar em várias marcas": o /config lista
     isto em vez de mandar o usuário pro login de novo.
+
+    Banco E disco somam, nunca um OU o outro: a gravação no Postgres pode falhar
+    calada (proxy do Railway fora do ar) enquanto o arquivo local ficou correto.
+    Se o banco fosse a única palavra, a conta acabada de conectar sumiria da tela
+    e o usuário seria mandado pra um OAuth que não precisava.
     """
+    achadas, ordem = {}, []
+
+    def _pousar(uid, item):
+        if not uid:
+            return
+        if uid in achadas:
+            juntas = set(achadas[uid]["marcas"]) | set(item["marcas"])
+            achadas[uid]["marcas"] = sorted(juntas)
+            return
+        achadas[uid] = item
+        ordem.append(uid)
+
     try:
         import _db
         if _db.disponivel() and hasattr(_db, "contas_todas"):
-            out = []
             for c in _db.contas_todas(canal):
                 p = c.get("payload") or {}
-                out.append({
+                uid = str(c.get("user_id") or "").strip()
+                _pousar(uid, {
                     "canal": canal,
-                    "user_id": c.get("user_id") or "",
+                    "user_id": uid,
                     "username": c.get("username") or p.get("username") or "",
                     "nome": p.get("nome") or "",
                     "picture": p.get("picture") or "",
                     "expira_em": p.get("expira_em") or "",
                     "modo": p.get("modo") or ("real" if p.get("access_token") else ""),
                     "permissoes": list(p.get("permissoes") or []),
-                    "marcas": list(c.get("marcas") or []),
+                    "marcas": sorted(set(c.get("marcas") or [])),
                 })
-            return out
     except Exception:
         pass
-    # sem banco: varre os arquivos de conta e descobre os vínculos no disco
-    out = []
+
     d = os.path.join(SECRETS_DIR, "_contas")
-    if not os.path.isdir(d):
-        return out
-    for nome in sorted(os.listdir(d)):
-        if not nome.startswith(canal + "-") or not nome.endswith(".json"):
-            continue
-        p = _load_json(os.path.join(d, nome))
-        uid = str(p.get("user_id") or "").strip()
-        if not uid:
-            continue
-        out.append({
-            "canal": canal, "user_id": uid,
-            "username": p.get("username") or "", "nome": p.get("nome") or "",
-            "picture": p.get("picture") or "", "expira_em": p.get("expira_em") or "",
-            "modo": p.get("modo") or ("real" if p.get("access_token") else ""),
-            "permissoes": list(p.get("permissoes") or []),
-            "marcas": _marcas_da_conta_arquivo(canal, uid),
-        })
-    return out
+    if os.path.isdir(d):
+        for nome in sorted(os.listdir(d)):
+            if not nome.startswith(canal + "-") or not nome.endswith(".json"):
+                continue
+            p = _load_json(os.path.join(d, nome))
+            uid = str(p.get("user_id") or "").strip()
+            _pousar(uid, {
+                "canal": canal, "user_id": uid,
+                "username": p.get("username") or "", "nome": p.get("nome") or "",
+                "picture": p.get("picture") or "", "expira_em": p.get("expira_em") or "",
+                "modo": p.get("modo") or ("real" if p.get("access_token") else ""),
+                "permissoes": list(p.get("permissoes") or []),
+                "marcas": sorted(set(_marcas_da_conta_arquivo(canal, uid))),
+            })
+    return [achadas[u] for u in ordem]
 
 
 def _marcas_da_conta_arquivo(canal: str, user_id: str) -> list:
@@ -306,16 +318,20 @@ def _marcas_da_conta_arquivo(canal: str, user_id: str) -> list:
 
 
 def marcas_da_conta(canal: str, user_id: str) -> list:
-    """Todas as marcas que publicam por esta conta (banco, com fallback disco)."""
+    """Todas as marcas que publicam por esta conta — banco MAIS disco.
+
+    A união importa: quem vai ler isso é o aviso "esta conta também publica por
+    X". Faltar uma marca aí é pior que sobrar — o usuário publicaria pensando
+    que só uma empresa depende da conta.
+    """
+    achadas = set(_marcas_da_conta_arquivo(canal, user_id))
     try:
         import _db
         if _db.disponivel() and hasattr(_db, "marcas_da_conta"):
-            r = _db.marcas_da_conta(canal, user_id)
-            if r:
-                return r
+            achadas |= set(_db.marcas_da_conta(canal, user_id) or [])
     except Exception:
         pass
-    return _marcas_da_conta_arquivo(canal, user_id)
+    return sorted(achadas)
 
 
 def vincular_marca(marca: str, canal: str, user_id: str) -> dict:
