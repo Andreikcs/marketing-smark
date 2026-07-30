@@ -218,12 +218,36 @@ def _recorte_quadrado(im):
     return im
 
 
-def interpretar(dados: bytes, ext: str = "") -> "object":
-    """bytes de qualquer formato → PIL RGBA já limpo e recortado, ou None.
+def _parece_foto(im):
+    """Foto/peça de feed que o cliente arrastou no lugar da logo?
 
-    É aqui que mora a "interpretação": descobrir se o arquivo é mesmo uma marca
-    (e não uma foto que o cliente arrastou por engano), tirar o canvas branco,
-    aparar as sobras e isolar o brasão.
+    O sinal que separa de verdade é a contagem de cores. Medido nas marcas reais
+    do vault: logo fica entre ~290 e ~1.700 cores distintas numa miniatura de
+    256px; um post de Instagram inteiro deu ~28.900. Proporção não serve de
+    critério sozinha — um post 4:5 tem a mesma proporção de várias logos
+    verticais legítimas, e foi assim que um anúncio inteiro entrou como brasão.
+
+    Só vale pra imagem grande: logo pequena com degradê pode passar de 8.000
+    cores sem ser foto.
+    """
+    w, h = im.size
+    if max(w, h) < 900:
+        return False
+    if im.split()[-1].getextrema()[0] <= 200:
+        return False                      # tem transparência real → é marca
+    from PIL import Image
+    pq = im.convert("RGB").resize((256, 256), Image.Resampling.NEAREST)
+    # getcolors devolve None quando passa do teto — é exatamente a resposta que
+    # queremos, e conta em C sem materializar a lista de pixels.
+    return pq.getcolors(maxcolors=8000) is None
+
+
+def interpretar(dados: bytes, ext: str = "") -> "object":
+    """bytes de qualquer formato → PIL RGBA limpo e aparado, ou None.
+
+    É aqui que mora a "interpretação": ver se o arquivo é mesmo uma marca, tirar
+    o canvas branco e aparar as sobras. **A proporção original é preservada** —
+    quem precisa de recorte quadrado é só a tab/chip, via `icone_quadrado()`.
     """
     from PIL import Image
 
@@ -238,6 +262,9 @@ def interpretar(dados: bytes, ext: str = "") -> "object":
     if max(im.size) > LADO_ANALISE:
         im.thumbnail((LADO_ANALISE, LADO_ANALISE), Image.Resampling.LANCZOS)
 
+    if _parece_foto(im):
+        return None
+
     if im.split()[-1].getextrema()[0] > 200:   # sem transparência real
         im = _tirar_fundo_claro(im)
 
@@ -247,18 +274,27 @@ def interpretar(dados: bytes, ext: str = "") -> "object":
     w, h = im.size
     if w < 8 or h < 8:
         return None
+    return im
 
-    # Foto de feed disfarçada de logo: grande, opaca e quase quadrada. Melhor o
-    # monograma do que espremer uma foto no lugar do brasão.
-    if max(w, h) >= 900 and im.split()[-1].getextrema()[0] > 200 \
-            and 0.72 <= (w / float(h)) <= 1.35:
+
+def icone_quadrado(im):
+    """Recorte quadrado pro slot da tab/chip, que é quadrado por desenho.
+
+    Wordmark largo perde as letras nesse recorte — é esperado: aqui o objetivo é
+    o símbolo, não a assinatura. A logo por extenso continua inteira no PNG que
+    `normalizar()` grava. Marca sem símbolo separável (só letras) fica melhor
+    como monograma, então devolvemos None nesse caso e o compositor decide.
+    """
+    if im is None:
         return None
-
     return _recorte_quadrado(im)
 
 
 def normalizar(dados: bytes, ext: str = "", lado: int = LADO_BRASAO) -> bytes:
-    """Entrada de qualquer formato → PNG RGBA quadrado, pronto pra aplicar.
+    """Entrada de qualquer formato → PNG RGBA aparado, pronto pra aplicar.
+
+    Mantém a proporção da marca: wordmark continua wordmark. Recortar tudo em
+    quadrado transformava "smark." em "rk" e "DEATEC" em "DEA'".
 
     Devolve os bytes do PNG. Levanta ValueError quando o arquivo não dá brasão —
     o chamador decide se cai no monograma ou avisa o usuário.
@@ -267,21 +303,18 @@ def normalizar(dados: bytes, ext: str = "", lado: int = LADO_BRASAO) -> bytes:
     im = interpretar(dados, ext)
     if im is None:
         raise ValueError("não deu pra interpretar um brasão nesse arquivo "
-                         "(parece foto ou imagem sem marca isolável)")
-    canvas = Image.new("RGBA", (lado, lado), (0, 0, 0, 0))
+                         "(parece foto ou peça de feed, não uma marca)")
     copia = im.copy()
     copia.thumbnail((lado, lado), Image.Resampling.LANCZOS)
-    canvas.paste(copia, ((lado - copia.size[0]) // 2,
-                         (lado - copia.size[1]) // 2), copia)
     buf = io.BytesIO()
-    canvas.save(buf, format="PNG", optimize=True)
+    copia.save(buf, format="PNG", optimize=True)
     return buf.getvalue()
 
 
 # ------------------------------------------------------- uso na composição
 
-def icone_rgba(path: str):
-    """PIL RGBA do brasão, com cache por (arquivo, mtime, tamanho)."""
+def marca_rgba(path: str):
+    """PIL RGBA da marca inteira (proporção preservada). Cacheado."""
     if not path or not os.path.isfile(path):
         return None
 
@@ -293,6 +326,21 @@ def icone_rgba(path: str):
         except Exception as e:
             print("  logo: %s não virou brasão (%s)" % (path, e), file=sys.stderr)
             return None
+
+    return _memo(_chave(path, "marca"), produzir)
+
+
+def icone_rgba(path: str):
+    """PIL RGBA do símbolo em recorte quadrado — o que a tab/chip aplica.
+
+    Cacheado à parte de `marca_rgba` porque são usos diferentes: a tab quer o
+    símbolo quadrado, o rodapé e a exportação querem a marca por extenso.
+    """
+    if not path or not os.path.isfile(path):
+        return None
+
+    def produzir():
+        return icone_quadrado(marca_rgba(path))
 
     return _memo(_chave(path, "icone"), produzir)
 

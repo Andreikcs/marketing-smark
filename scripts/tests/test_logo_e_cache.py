@@ -26,8 +26,10 @@ def _png_com_fundo_branco(w=800, h=300):
     """Logo como o cliente costuma mandar: marca escura em canvas branco."""
     im = Image.new("RGB", (w, h), (255, 255, 255))
     d = ImageDraw.Draw(im)
-    d.ellipse((20, 40, 240, 260), fill=(20, 20, 30))
-    d.rectangle((300, 130, 700, 170), fill=(20, 20, 30))
+    # símbolo à esquerda + assinatura à direita, como a maioria dos wordmarks
+    d.ellipse((20, int(h * .13), int(h * .8), int(h * .87)), fill=(20, 20, 30))
+    d.rectangle((int(w * .38), int(h * .43), int(w * .88), int(h * .57)),
+                fill=(20, 20, 30))
     buf = io.BytesIO()
     im.save(buf, "PNG")
     return buf.getvalue()
@@ -46,11 +48,11 @@ class TestInterpretacao:
         # se o canvas branco não saiu, o alpha mínimo seria 255
         assert im.split()[-1].getextrema()[0] == 0
 
-    def test_saida_e_png_quadrado(self):
+    def test_saida_e_png_dentro_do_limite(self):
         png = _logo.normalizar(_png_com_fundo_branco(), ".png")
         im = Image.open(io.BytesIO(png))
         assert im.format == "PNG"
-        assert im.size == (_logo.LADO_BRASAO, _logo.LADO_BRASAO)
+        assert max(im.size) <= _logo.LADO_BRASAO
 
     def test_jpeg_tambem_e_aceito(self):
         im = Image.new("RGB", (600, 600), (255, 255, 255))
@@ -60,12 +62,23 @@ class TestInterpretacao:
         png = _logo.normalizar(buf.getvalue(), ".jpg")
         assert Image.open(io.BytesIO(png)).mode == "RGBA"
 
-    def test_wordmark_largo_recorta_no_brasao(self):
-        """Wordmark 800x300 tem que virar quadrado, não ser espremido."""
-        im = _logo.interpretar(_png_com_fundo_branco(), ".png")
+    def test_wordmark_continua_wordmark(self):
+        """Regressão real: o recorte quadrado virava "smark." em "rk".
+
+        A assinatura por extenso tem que sair inteira do normalizar(); quem
+        recorta em quadrado é só o caminho da tab.
+        """
+        im = _logo.interpretar(_png_com_fundo_branco(800, 300), ".png")
         assert im is not None
         w, h = im.size
-        assert 0.75 <= w / float(h) <= 1.35, f"não ficou quadrado: {im.size}"
+        assert w / float(h) > 1.6, f"o wordmark foi recortado: {im.size}"
+
+    def test_icone_quadrado_ainda_recorta(self):
+        """A tab é um slot quadrado — ali o recorte continua sendo o certo."""
+        im = _logo.interpretar(_png_com_fundo_branco(800, 300), ".png")
+        q = _logo.icone_quadrado(im)
+        w, h = q.size
+        assert 0.75 <= w / float(h) <= 1.35, f"não ficou quadrado: {q.size}"
 
     def test_foto_nao_vira_brasao(self):
         """Foto arrastada por engano: melhor recusar do que espremer na tab."""
@@ -78,6 +91,32 @@ class TestInterpretacao:
         im.save(buf, "JPEG", quality=88)
         with pytest.raises(ValueError):
             _logo.normalizar(buf.getvalue(), ".jpg")
+
+    def test_peca_de_feed_e_recusada(self):
+        """Caso real: um post 2160x2700 inteiro estava entrando como logo.
+
+        Proporção não bastava pra pegar (4:5 é proporção de logo vertical
+        legítima); o que denuncia é a quantidade de cores.
+        """
+        im = Image.new("RGB", (1080, 1350))
+        px = im.load()
+        for y in range(1350):
+            for x in range(0, 1080, 3):
+                px[x, y] = ((x * 5) % 256, (y * 3) % 256, ((x * y) // 7) % 256)
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=90)
+        with pytest.raises(ValueError):
+            _logo.normalizar(buf.getvalue(), ".jpg")
+
+    def test_logo_pequena_com_degrade_passa(self):
+        """Contagem de cores só vale pra imagem grande — senão derruba logo boa."""
+        im = Image.new("RGB", (400, 400), (255, 255, 255))
+        d = ImageDraw.Draw(im)
+        for i in range(150):              # degradê: muitas cores, mas é logo
+            d.ellipse((i, i, 400 - i, 400 - i), outline=(i, 60, 200 - i // 2))
+        buf = io.BytesIO()
+        im.save(buf, "PNG")
+        assert _logo.interpretar(buf.getvalue(), ".png") is not None
 
     def test_arquivo_lixo_levanta_erro(self):
         with pytest.raises(Exception):
@@ -94,7 +133,7 @@ class TestSVG:
             pytest.skip(f"Chromium indisponível neste ambiente: {e}")
         im = Image.open(io.BytesIO(png))
         assert im.format == "PNG"
-        assert im.size == (_logo.LADO_BRASAO, _logo.LADO_BRASAO)
+        assert max(im.size) <= _logo.LADO_BRASAO
         assert im.split()[-1].getextrema()[0] == 0    # fundo transparente
         assert im.split()[-1].getextrema()[1] > 0     # e tem desenho
 
