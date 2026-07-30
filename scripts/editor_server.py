@@ -2464,7 +2464,7 @@ const ST_LABEL={rascunho:'Rascunho',salvo:'Pronto',revisao:'Em revisão',ajuste:
 // A ordem das colunas é a ordem do fluxo: lê-se da esquerda (com o time) pra
 // direita (no ar). "Falhou" fica no fim porque é desvio, não etapa.
 const COLS=['rascunho','salvo','revisao','ajuste','aprovado','agendado','publicado','erro'];
-let D=null,MARCA='',NOMES={},ALVO=null;
+let D=null,MARCA='',NOMES={},ALVO=null,GATE=null;
 function esc(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function stLabel(s){return ST_LABEL[s||'rascunho']||s}
 function stPill(s){s=s||'rascunho';return '<span class="stpill stp-'+s+'">'+stLabel(s)+'</span>'}
@@ -2550,6 +2550,7 @@ async function abrirGate(i){
   try{j=await(await fetch('/publicar-check?marca='+encodeURIComponent(p.marca||'smark')
       +'&slug='+encodeURIComponent(p.slug||'')+'&post='+i)).json()}
   catch(e){box.innerHTML='<h2>Servidor não respondeu</h2>'+fecharBtn();return}
+  GATE=j;   // a confirmação de publicar lê a conta daqui
   const c=j.conta||{},faltas=j.faltas||[],avisos=j.avisos||[];
   let h='<h2>'+esc(p.titulo||p.slug||'post')+' '+stPill(j.post&&j.post.status)+'</h2>';
   h+='<div class=who>'+(c.username
@@ -2606,6 +2607,14 @@ document.getElementById('gatebox').addEventListener('click',async e=>{
     p.status='aprovado';render();abrirGate(ALVO);return;
   }
   if(acao==='publicar'){
+    // Mesma confirmação do painel: nomeia a conta, quem divide ela e a legenda.
+    // O gate diz que PODE; quem decide que VAI é a pessoa.
+    const c=(GATE&&GATE.conta)||{};
+    const div=(c.compartilhada_com&&c.compartilhada_com.length)
+      ?('\\nEsta conta também publica por: '+c.compartilhada_com.join(', ')+'.'):'';
+    const cap=((p.caption||'').split('\\n')[0]||'').slice(0,80);
+    if(!confirm('Publicar AGORA em @'+(c.username||'?')+'?'+div
+      +'\\n\\n“'+cap+'…”\\n\\nIsso vai pro feed de verdade e não tem como desfazer daqui.'))return;
     b.disabled=true;b.textContent='publicando…';
     let r={};
     try{r=await(await fetch('/canais/publicar',{method:'POST',headers:HJSON,
