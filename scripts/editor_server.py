@@ -2301,10 +2301,10 @@ async function publicarAgora(btn){
   if(!j.pode){toast('Ainda falta: '+((j.faltas[0]||{}).titulo||'algo'));return}
   const c=j.conta||{},p=D.posts[MP];
   const div=(c.compartilhada_com&&c.compartilhada_com.length)
-    ?('\nEsta conta também publica por: '+c.compartilhada_com.join(', ')+'.'):'';
-  const cap=((p.caption||'').split('\n')[0]||'').slice(0,80);
+    ?('\\nEsta conta também publica por: '+c.compartilhada_com.join(', ')+'.'):'';
+  const cap=((p.caption||'').split('\\n')[0]||'').slice(0,80);
   if(!confirm('Publicar AGORA em @'+(c.username||'?')+'?'+div
-    +'\n\n“'+cap+'…”\n\nIsso vai pro feed de verdade e não tem como desfazer daqui.'))return;
+    +'\\n\\n“'+cap+'…”\\n\\nIsso vai pro feed de verdade e não tem como desfazer daqui.'))return;
   btn.disabled=true;const antes=btn.textContent;btn.textContent='publicando…';
   let r={};
   try{r=await(await fetch('/canais/publicar',{method:'POST',
