@@ -2369,6 +2369,263 @@ load();
 </script></body></html>""").replace("__TOPBAR__", topbar("painel")).replace("__LOGOSTORE__", smark_logo(34, suffix="STORE")).replace("__HEAD_THEME__", HEAD_THEME).replace("__CRITICAL_CSS__", CRITICAL_CSS)
 
 
+def fila_html():
+    """Fila de produção: em que pé está cada peça, e o que sai quando.
+
+    O painel mostra as peças; aqui a leitura é o FLUXO — colunas por estado, com
+    o que já venceu no agendamento em destaque. É a tela onde dá pra publicar
+    agora e conferir se os agendados saíram.
+    """
+    return ("""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><title>Fila · smark</title>
+<link rel="stylesheet" href="/design-system/dist/smark-ds.css">
+<style id="smark-critical">__CRITICAL_CSS__</style>
+__HEAD_THEME__<style>
+.wrap{padding:22px 26px 60px;max-width:1500px;margin:0 auto}
+.fhead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.fhead h1{font-family:var(--font-display);text-transform:uppercase;font-weight:400;font-size:30px;line-height:1;margin:4px 0}
+.fhead .sub{color:var(--muted);font-size:12.5px;margin-top:3px}
+.facts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.facts select{padding:7px 10px;border-radius:9px;border:1px solid var(--line-strong);background:var(--bg);
+  color:var(--text);font-family:inherit;font-size:12.5px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;align-items:start}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;min-height:90px}
+.col h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:2px 4px 9px;
+  display:flex;align-items:center;gap:6px;font-weight:600}
+.col h3 i{font-style:normal;background:rgba(255,255,255,.08);border-radius:99px;padding:1px 7px;font-size:10.5px}
+.fcard{border:1px solid var(--line);border-radius:11px;padding:9px 10px;margin-bottom:8px;background:var(--bg);
+  display:flex;flex-direction:column;gap:6px}
+.fcard:last-child{margin-bottom:0}
+.fcard .tt{font-size:12.5px;font-weight:600;line-height:1.3;word-break:break-word}
+.fcard .mt{font-size:11px;color:var(--muted);line-height:1.4}
+.fcard .mt b{color:var(--text);font-weight:600}
+.fcard .rowb{display:flex;gap:5px;flex-wrap:wrap}
+.fcard button{padding:4px 9px;border-radius:7px;border:1px solid var(--line-strong);background:transparent;
+  color:var(--text);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.fcard button:hover{border-color:var(--accent);color:var(--accent)}
+.fcard button.prim{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fcard.venceu{border-color:var(--warn);box-shadow:0 0 0 1px rgba(245,197,66,.25)}
+.vazio{font-size:11.5px;color:var(--muted);padding:6px 4px}
+.stpill{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;
+  font-size:10.5px;font-weight:600;line-height:1.6;white-space:nowrap;border:1px solid transparent}
+.stpill:before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex:0 0 auto}
+.stp-rascunho{color:var(--muted);border-color:var(--line-strong)}
+.stp-salvo{color:var(--text);border-color:var(--line-strong)}
+.stp-revisao{color:#4C9AFF;border-color:rgba(76,154,255,.4);background:rgba(76,154,255,.10)}
+.stp-ajuste{color:var(--warn);border-color:rgba(245,197,66,.45);background:rgba(245,197,66,.12)}
+.stp-aprovado{color:var(--good);border-color:rgba(61,220,151,.45);background:rgba(61,220,151,.12)}
+.stp-agendado{color:var(--accent);border-color:var(--accent-soft);background:var(--accent-soft)}
+.stp-publicado{color:var(--good);border-color:var(--good);background:transparent}
+.stp-erro{color:var(--danger);border-color:rgba(255,107,122,.45);background:rgba(255,107,122,.12)}
+[hidden]{display:none!important}
+.gate{position:fixed;inset:0;background:rgba(8,6,14,.72);display:none;align-items:center;justify-content:center;z-index:90;padding:20px}
+.gate.on{display:flex}
+.gatebox{background:var(--surface);border:1px solid var(--line-strong);border-radius:16px;max-width:520px;width:100%;
+  padding:18px 20px;box-shadow:0 24px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:11px}
+.gatebox h2{font-size:16px;margin:0;font-weight:600}
+.gatebox .who{font-size:12px;color:var(--muted)}
+.gatebox .who b{color:var(--text)}
+.gitem{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;line-height:1.45}
+.gitem .gtxt{flex:1;min-width:0}.gitem .gtxt b{display:block}
+.gitem .gtxt span{color:var(--muted);font-size:11.5px}
+.gitem button,.gitem select{flex:0 0 auto;padding:5px 10px;border-radius:8px;font-size:11.5px;font-weight:600;
+  cursor:pointer;font-family:inherit;border:1px solid var(--accent);background:transparent;color:var(--accent)}
+.gitem select{border-color:var(--line-strong);color:var(--text);background:var(--bg);max-width:180px}
+.gwarn{font-size:11.5px;color:var(--warn)}.gok{font-size:12.5px;color:var(--good)}
+.gatebtns{display:flex;gap:8px;justify-content:flex-end;margin-top:2px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);
+  border:1px solid var(--accent);padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;
+  transition:.2s;pointer-events:none;z-index:99;max-width:80vw;text-align:center}
+#toast.on{opacity:1}
+</style></head><body>
+__TOPBAR__
+<div class=wrap>
+  <div class=fhead>
+    <div>
+      <h1>Fila de produção</h1>
+      <div class=sub id=fsub>carregando…</div>
+    </div>
+    <div class=facts>
+      <select id=fmarca><option value="">todas as marcas</option></select>
+      <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=bsortear>🎲 Sortear peça</button>
+      <button type=button class="sk-btn sk-btn--secondary sk-btn--sm" id=brodar title="publica os agendados que já venceram">▶ Rodar agendados</button>
+      <button type=button class="sk-btn sk-btn--sm" id=brecarregar>↻</button>
+    </div>
+  </div>
+  <div class=cols id=cols></div>
+</div>
+<div class=gate id=gate><div class=gatebox id=gatebox></div></div>
+<script>
+const T="__EDITOR_TOKEN__";
+const HJSON={'Content-Type':'application/json','X-Editor-Token':T};
+const ST_LABEL={rascunho:'Rascunho',salvo:'Pronto',revisao:'Em revisão',ajuste:'Pedido de ajuste',
+  aprovado:'Aprovado',agendado:'Agendado',publicado:'Publicado',erro:'Falhou'};
+// A ordem das colunas é a ordem do fluxo: lê-se da esquerda (com o time) pra
+// direita (no ar). "Falhou" fica no fim porque é desvio, não etapa.
+const COLS=['rascunho','salvo','revisao','ajuste','aprovado','agendado','publicado','erro'];
+let D=null,MARCA='',NOMES={},ALVO=null;
+function esc(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function stLabel(s){return ST_LABEL[s||'rascunho']||s}
+function stPill(s){s=s||'rascunho';return '<span class="stpill stp-'+s+'">'+stLabel(s)+'</span>'}
+function fmtQuando(iso){if(!iso)return '';const d=new Date(iso);if(isNaN(d))return '';
+  return d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function toast(m){let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}
+  t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),3200)}
+async function carregar(){
+  try{const r=await(await fetch('/marcas')).json();(r.marcas||[]).forEach(m=>NOMES[m.slug]=m.nome||m.slug)}catch(e){}
+  let j={};try{j=await(await fetch('/dados')).json()}catch(e){toast('Servidor não respondeu');return}
+  D=j;
+  const sel=document.getElementById('fmarca');
+  const marcas=[...new Set((D.posts||[]).map(p=>p.marca||'smark'))].sort();
+  sel.innerHTML='<option value="">todas as marcas</option>'
+    +marcas.map(m=>'<option value="'+esc(m)+'"'+(m===MARCA?' selected':'')+'>'+esc(NOMES[m]||m)+'</option>').join('');
+  render();
+}
+function render(){
+  const posts=(D.posts||[]).map((p,i)=>({...p,_i:i}))
+    .filter(p=>!MARCA||(p.marca||'smark')===MARCA);
+  const porSt={};COLS.forEach(s=>porSt[s]=[]);
+  posts.forEach(p=>{const s=p.status||'rascunho';(porSt[s]||porSt.rascunho).push(p)});
+  const agora=Date.now();
+  let venceram=0;
+  document.getElementById('cols').innerHTML=COLS.map(s=>{
+    const lista=porSt[s]||[];
+    return '<div class=col><h3>'+stLabel(s)+' <i>'+lista.length+'</i></h3>'
+      +(lista.length?lista.map(p=>{
+        const venceu=s==='agendado'&&p.agendado_para&&new Date(p.agendado_para).getTime()<=agora;
+        if(venceu)venceram++;
+        const quando=p.agendado_para?fmtQuando(p.agendado_para):'';
+        return '<div class="fcard'+(venceu?' venceu':'')+'">'
+          +'<div class=tt>'+esc(p.titulo||p.slug||'sem título')+'</div>'
+          +'<div class=mt><b>'+esc(NOMES[p.marca||'smark']||p.marca||'smark')+'</b>'
+          +' · '+((p.frames||[]).length||0)+' peça(s)'
+          +(quando?(' · '+(venceu?'venceu ':'sai ')+quando):'')
+          +(p.publicado_em?(' · no ar '+fmtQuando(p.publicado_em)):'')
+          +(p.tentativas?(' · '+p.tentativas+' tentativa(s)'):'')+'</div>'
+          +'<div class=rowb>'
+          +(s!=='publicado'?'<button class=prim data-pub="'+p._i+'">📷 Publicar</button>':'')
+          +'<button data-ed="'+p._i+'">✎ Editar</button>'
+          +'</div></div>';
+      }).join(''):'<div class=vazio>vazio</div>')
+      +'</div>';
+  }).join('');
+  document.getElementById('fsub').textContent=posts.length+' peça(s)'
+    +(MARCA?(' em '+(NOMES[MARCA]||MARCA)):' em '+[...new Set(posts.map(p=>p.marca||'smark'))].length+' marca(s)')
+    +(venceram?(' · '+venceram+' agendado(s) já venceu/venceram'):'');
+}
+document.getElementById('cols').addEventListener('click',e=>{
+  const ed=e.target.closest('button[data-ed]');if(ed){location.href='/editor?post='+ed.dataset.ed;return}
+  const pb=e.target.closest('button[data-pub]');if(pb)abrirGate(+pb.dataset.pub);
+});
+document.getElementById('fmarca').onchange=e=>{MARCA=e.target.value;render()};
+document.getElementById('brecarregar').onclick=()=>carregar();
+document.getElementById('bsortear').onclick=async()=>{
+  const q=MARCA?('?marca='+encodeURIComponent(MARCA)):'?marca=smark';
+  let j={};try{j=await(await fetch('/sortear'+q+'&com_arte=1')).json()}catch(e){}
+  if(!j.ok){toast(j.erro||'não achei peça com arte');return}
+  toast('Sorteada: '+(j.post.titulo||j.post.slug)+' ('+j.post.status+') — 1 de '+j.total);
+  abrirGate(j.post.i);
+};
+document.getElementById('brodar').onclick=async()=>{
+  if(!confirm('Publicar agora tudo que já venceu na fila de agendados?\\n\\nVai pro feed de verdade.'))return;
+  toast('Rodando a fila…');
+  let j={};try{j=await(await fetch('/agenda/rodar',{method:'POST',headers:HJSON,
+    body:JSON.stringify({limite:5})})).json()}catch(e){toast('Servidor não respondeu');return}
+  if(j.rodando){toast('Já tem uma passada em andamento');return}
+  const ok=(j.feitos||[]).length,nao=(j.pulados||[]).length;
+  toast(j.venceram?('Venceram '+j.venceram+': '+ok+' publicado(s), '+nao+' com problema'):'Nada venceu ainda');
+  if(nao)console.warn('pulados:',j.pulados);
+  carregar();
+};
+// ── gate: mesma verificação do painel, mesma resposta do servidor ────────────
+async function abrirGate(i){
+  const p=(D.posts||[])[i];if(!p)return;
+  ALVO=i;
+  const box=document.getElementById('gatebox');
+  document.getElementById('gate').classList.add('on');
+  box.innerHTML='<h2>Verificando…</h2>';
+  let j={};
+  try{j=await(await fetch('/publicar-check?marca='+encodeURIComponent(p.marca||'smark')
+      +'&slug='+encodeURIComponent(p.slug||'')+'&post='+i)).json()}
+  catch(e){box.innerHTML='<h2>Servidor não respondeu</h2>'+fecharBtn();return}
+  const c=j.conta||{},faltas=j.faltas||[],avisos=j.avisos||[];
+  let h='<h2>'+esc(p.titulo||p.slug||'post')+' '+stPill(j.post&&j.post.status)+'</h2>';
+  h+='<div class=who>'+(c.username
+    ?('Sai em <b>@'+esc(c.username)+'</b>'+(c.compartilhada_com&&c.compartilhada_com.length
+      ?(' · conta também usada por '+esc(c.compartilhada_com.join(', '))):''))
+    :'Nenhuma conta conectada nesta marca')+'</div>';
+  if(faltas.length){
+    h+=faltas.map(f=>{
+      const a=f.acao||{};let btn='';
+      if(a.tipo==='status')btn='<button data-g=aprovar>Aprovar</button>';
+      else if(a.tipo==='editor')btn='<button data-g=editor>Abrir editor</button>';
+      else if(a.tipo==='conectar'){
+        const cs=a.contas||[];
+        btn=(cs.length?('<select data-g=usarconta><option value="">usar conta existente…</option>'
+          +cs.map(x=>'<option value="'+esc(x.user_id)+'">@'+esc(x.username)+'</option>').join('')+'</select>'):'')
+          +'<button data-g=conectar>Conectar</button>';
+      }
+      return '<div class=gitem><span>❌</span><span class=gtxt><b>'+esc(f.titulo)+'</b>'
+        +'<span>'+esc(f.como||'')+'</span></span>'+btn+'</div>';
+    }).join('');
+  }else{
+    h+='<div class=gok>✓ Liberado. A publicação é imediata e não dá pra desfazer daqui.</div>';
+  }
+  h+=avisos.map(a=>'<div class=gwarn>⚠ '+esc(a)+'</div>').join('');
+  h+='<div class=gatebtns>'
+    +(faltas.length?'':'<button class="sk-btn" data-g=publicar>📷 Publicar agora</button>')
+    +'<button class="sk-btn sk-btn--secondary" data-g=fechar>Fechar</button></div>';
+  box.innerHTML=h;
+}
+function fecharBtn(){return '<div class=gatebtns><button class="sk-btn sk-btn--secondary" data-g=fechar>Fechar</button></div>'}
+document.getElementById('gatebox').addEventListener('change',async e=>{
+  const s=e.target.closest('select[data-g=usarconta]');if(!s||!s.value)return;
+  const p=(D.posts||[])[ALVO];
+  const r=await(await fetch('/canais/vincular',{method:'POST',headers:HJSON,
+    body:JSON.stringify({marca:p.marca||'smark',canal:'instagram',user_id:s.value})})).json();
+  if(!r.ok){toast(r.erro||'não deu pra vincular');return}
+  toast('Conta @'+(r.username||'')+' vinculada a '+(p.marca||'smark'));abrirGate(ALVO);
+});
+document.getElementById('gatebox').addEventListener('click',async e=>{
+  const b=e.target.closest('button[data-g]');if(!b)return;
+  const acao=b.dataset.g,p=(D.posts||[])[ALVO];
+  if(acao==='fechar'){document.getElementById('gate').classList.remove('on');return}
+  if(acao==='editor'){location.href='/editor?post='+ALVO;return}
+  if(acao==='conectar'){
+    const r=await(await fetch('/canais/conectar',{method:'POST',headers:HJSON,
+      body:JSON.stringify({marca:p.marca||'smark',canal:'instagram',return_to:'/fila'})})).json();
+    if(!r.ok){toast(r.erro||'não deu pra conectar');return}
+    location.href=r.url;return;
+  }
+  if(acao==='aprovar'){
+    const r=await(await fetch('/post-status',{method:'POST',headers:HJSON,
+      body:JSON.stringify({marca:p.marca||'smark',slug:p.slug,para:'aprovado',por:'time'})})).json();
+    if(!r.ok){toast(r.erro||'não deu pra aprovar');return}
+    p.status='aprovado';render();abrirGate(ALVO);return;
+  }
+  if(acao==='publicar'){
+    b.disabled=true;b.textContent='publicando…';
+    let r={};
+    try{r=await(await fetch('/canais/publicar',{method:'POST',headers:HJSON,
+      body:JSON.stringify({marca:p.marca||'smark',canal:'instagram',post:ALVO,
+        post_slug:p.slug||''})})).json()}
+    catch(e){r={ok:false,erro:'servidor não respondeu'}}
+    if(!r.ok){toast('Não publicou: '+(r.erro||'falhou'));abrirGate(ALVO);carregar();return}
+    document.getElementById('gate').classList.remove('on');
+    toast((r.modo==='fake'?'✓ Simulado':'✓ Publicado')+' em @'+((r.conta||{}).username||'')
+      +(r.media_id?(' · '+r.media_id):''));
+    carregar();return;
+  }
+});
+document.getElementById('gate').addEventListener('mousedown',e=>{
+  if(e.target.id==='gate')document.getElementById('gate').classList.remove('on');
+});
+carregar();
+</script></body></html>""").replace("__TOPBAR__", topbar("fila")).replace(
+        "__HEAD_THEME__", HEAD_THEME).replace("__CRITICAL_CSS__", CRITICAL_CSS)
+
+
 def vitrine_html():
     """Vitrine — feed Instagram, mosaico 3 colunas, ordenação e filtro de marca."""
     return ("""<!doctype html><html lang=pt-BR data-theme="escuro"><head><meta charset=utf-8>
@@ -4208,6 +4465,8 @@ class H(http.server.BaseHTTPRequestHandler):
             return self._serve_module(PAINEL, "Painel (notas)")
         if path == "/vitrine":
             return self._send(200, vitrine_html().replace("__EDITOR_TOKEN__", TOKEN), MIME[".html"])
+        if path == "/fila":
+            return self._send(200, fila_html().replace("__EDITOR_TOKEN__", TOKEN), MIME[".html"])
         if path == "/vitrine-notas":
             return self._serve_module(VITRINE, "Vitrine (notas)")
         if path == "/config":
