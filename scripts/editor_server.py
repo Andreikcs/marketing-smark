@@ -182,7 +182,7 @@ def cmdk():
 <div class=cmdk-ov id=cmdk>
   <div class="sk-command" onclick="event.stopPropagation()">
     <div class=sk-command-head>
-      <svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 style="color:var(--muted);flex:0 0 auto"><circle cx=11 cy=11 r=7/><path d="M21 21l-4-4"/></svg>
+      <svg viewBox="0 0 24 24" width=17 height=17 fill=none stroke=currentColor stroke-width=2 style="color:var(--muted);flex:0 0 auto"><circle cx=11 cy=11 r="7"/><path d="M21 21l-4-4"/></svg>
       <input id=cmdkin placeholder="Buscar publicação ou comando…" autocomplete=off spellcheck=false style="flex:1;background:transparent;border:0;outline:none;color:var(--text);font-size:15px;font-family:var(--font-text)">
       <span class=sk-kbd>Esc</span>
     </div>
