@@ -21,6 +21,7 @@ import socketserver
 import subprocess
 import sys
 import tempfile
+import time
 import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -3582,6 +3583,57 @@ STATUS_PUBLICAVEIS = ("aprovado", "agendado", "erro")
 
 _PERM_PUBLICAR = "instagram_business_content_publish"
 
+# ── memória curta do estado das contas ──────────────────────────────────────
+# Cada `conn()` do _db abre conexão nova, e pelo proxy do Railway isso custa ~2 s.
+# Ler a conexão de UMA marca dava 3 idas (vínculo, conta, quem divide a conta) —
+# 6 s por clique em "Publicar agora", que parece tela travada.
+#
+# `status_todas` resolve TODAS as marcas em uma consulta e deriva em memória quem
+# divide cada conta. Guardamos isso por poucos segundos: conexão de Instagram
+# muda quando alguém conecta ou desvincula, e esses dois caminhos limpam o cache
+# na hora. Mesmo assim ninguém publica por engano com dado velho — a Meta valida
+# o token na hora, e `publicar_instagram` relê o token do disco/banco.
+_CONTAS_MEMO = {"t": 0.0, "por_marca": {}}
+_CONTAS_MEMO_TTL = 20.0
+_CONTAS_MEMO_LOCK = threading.Lock()
+
+
+def esquecer_memo_contas():
+    """Chamado por quem muda vínculo/token: a próxima leitura vai no banco."""
+    with _CONTAS_MEMO_LOCK:
+        _CONTAS_MEMO["t"] = 0.0
+        _CONTAS_MEMO["por_marca"] = {}
+
+
+def status_de_canal(marca, canal="instagram", forcar=False):
+    """`status_canal` de uma marca, servido pelo lote de todas as marcas."""
+    agora = time.monotonic()
+    with _CONTAS_MEMO_LOCK:
+        fresco = (not forcar and _CONTAS_MEMO["por_marca"]
+                  and (agora - _CONTAS_MEMO["t"]) < _CONTAS_MEMO_TTL)
+        if fresco:
+            achou = (_CONTAS_MEMO["por_marca"].get(marca) or {}).get(canal)
+            if achou is not None:
+                return dict(achou)
+    try:
+        todas = list(_marcas.list_slugs())
+    except Exception:
+        todas = [marca]
+    if marca not in todas:
+        todas = list(todas) + [marca]
+    # A lista COMPLETA importa: `status_todas` descobre quem divide cada conta
+    # olhando só as marcas que recebeu. Com uma marca só, o aviso de conta
+    # compartilhada desapareceria.
+    lote = _canais.status_todas(todas)
+    por_marca = {m: (v.get("canais") or {}) for m, v in (lote or {}).items()}
+    with _CONTAS_MEMO_LOCK:
+        _CONTAS_MEMO["t"] = agora
+        _CONTAS_MEMO["por_marca"] = por_marca
+    achou = (por_marca.get(marca) or {}).get(canal)
+    if achou is not None:
+        return dict(achou)
+    return _canais.status_canal(marca, canal)
+
 
 def _falta(codigo, titulo, como, acao=None):
     f = {"codigo": codigo, "titulo": titulo, "como": como}
@@ -3649,7 +3701,7 @@ def checar_publicacao(marca, slug, canal="instagram", post_idx=None):
 
     # ── conta ────────────────────────────────────────────────────────────────
     try:
-        ig = _canais.status_canal(marca, canal)
+        ig = status_de_canal(marca, canal)
     except Exception as e:
         out["faltas"].append(_falta("canal_erro", "Não deu pra ler a conexão",
                                     str(e)))
@@ -4605,6 +4657,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 r = _canais.trocar_code_real(code, state)
             except Exception as e:
                 r = {"ok": False, "erro": str(e)}
+            esquecer_memo_contas()   # login novo: o estado em memória virou pó
             rid = _canais.save_oauth_result(r)
             # 302 sem code na URL — refresh da result page não re-queima o code
             loc = f"/oauth/instagram/result?rid={urllib.parse.quote(rid)}"
@@ -4703,7 +4756,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 m = it["marca"]
                 if m not in contas:
                     try:
-                        ig = _canais.status_canal(m, "instagram")
+                        ig = status_de_canal(m, "instagram")
                         contas[m] = {"username": ig.get("username") or "",
                                      "conectado": bool(ig.get("conectado")),
                                      "compartilhada_com": [x for x in (ig.get("marcas_da_conta") or [])
@@ -4887,6 +4940,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 marca = _marcas.require(req.get("marca") or req.get("slug") or "")
                 canal = (req.get("canal") or "instagram").lower()
                 r = _canais.desconectar(marca, canal)
+                esquecer_memo_contas()
                 return self._send(200 if r.get("ok") else 400, r)
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
@@ -4923,6 +4977,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 marca = _marcas.require(req.get("marca") or "")
                 r = _canais.vincular_marca(marca, (req.get("canal") or "instagram").lower(),
                                            req.get("user_id") or "")
+                esquecer_memo_contas()
                 return self._send(200 if r.get("ok") else 400, r)
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
@@ -4933,6 +4988,7 @@ class H(http.server.BaseHTTPRequestHandler):
             try:
                 r = _canais.esquecer_conta((req.get("canal") or "instagram").lower(),
                                            req.get("user_id") or "")
+                esquecer_memo_contas()
                 return self._send(200 if r.get("ok") else 400, r)
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
