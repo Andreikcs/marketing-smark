@@ -1,98 +1,54 @@
 {
   "posts": [
     {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
       "slug": "e2e-db-preserve",
       "marca": "smark",
+      "titulo": "Preserve",
+      "caption": "legenda e2e",
+      "size": "1080x1350",
+      "status": "revisao",
       "canais": [
         "instagram"
       ],
-      "status": "revisao",
-      "titulo": "Preserve",
-      "caption": "legenda e2e",
-      "arte_sha": "da965688bf6f0c6dc47fb592146220bd88073bceaa3a492d2abc1fcb6d31c8a0",
-      "created_at": "2026-07-29T20:16:53",
-      "tentativas": 0,
-      "updated_at": "2026-07-29T21:57:15",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
-      "ultimo_comentario": "teste do worker de agendados",
       "frames": [
         {
           "n": 1,
           "bg": "",
           "cta": "cta",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/e2e-db-preserve/01.png",
           "sub": "sub",
-          "page": "",
           "tema": "claro",
-          "arte_sha": "da965688bf6f0c6dc47fb592146220bd88073bceaa3a492d2abc1fcb6d31c8a0",
-          "headline": "H1 *x*R",
-          "arte_src_sha": "80ec5d81721a8bd56dd575c9fa10f7ee4c4dcd79b0c79f039c7808761dddb3ab"
+          "headline": "H1 *x*"
         }
-      ]
+      ],
+      "agendado_para": "",
+      "aprovado_em": "",
+      "publicado_em": "",
+      "aprovado_por": "limpeza-teste"
     },
     {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
       "size": "1080x1350",
-      "slug": "elever-crm",
-      "marca": "elever-ai",
-      "thumb": ".thumbs/elever-ai__elever-crm.jpg",
+      "slug": "test-sync-perf-unit",
+      "marca": "smark",
       "canais": [
         "instagram"
       ],
       "status": "rascunho",
-      "titulo": "ELEVER CRM",
-      "caption": "",
-      "arte_sha": "f5cd873e0841e19706e62c86ab1bc53de7b200a979cbf1abdf08d9d9e3a36c93",
-      "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T20:09:17",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
+      "titulo": "teste unit",
+      "caption": "cap",
       "frames": [
         {
           "n": 1,
-          "_v": 3,
-          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_uploads/3ab517f1bb.png",
-          "cor": "#F4F2FB",
-          "cta": "chama no acelerador",
-          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/01.png",
-          "sub": "{#3bf748:Confira as melhores opcoes e orcamentos}",
-          "chip": true,
-          "page": "",
+          "bg": "",
+          "cta": "C",
+          "sub": "S",
           "tema": "claro",
-          "zoom": 1.25,
-          "grade": true,
-          "hsize": 0,
-          "thumb": ".thumbs/elever-ai__elever-crm.jpg",
-          "accent": "",
-          "bg_sha": "8695abcc383c5e1c0b1f339955c0a4ac7e8a52440ecef72c313ef0c5eae34dc6",
-          "bgmode": "imagem",
-          "brilho": 0.55,
-          "overlay": "branco",
-          "arte_sha": "f5cd873e0841e19706e62c86ab1bc53de7b200a979cbf1abdf08d9d9e3a36c93",
-          "headline": "Sistemas de IA com Velocidade ",
-          "bg_src_sha": "5771567d98557b68ce6e3bb4d001e1469c0e8b7555fa2ffadb1d8318c6a081a7",
-          "arte_src_sha": "d7e610539d3daaa40020601260e8182b55bc1ac29222807487a027bba747e6c6"
+          "headline": "H1"
         }
-      ]
+      ],
+      "agendado_para": "",
+      "aprovado_em": "",
+      "publicado_em": "",
+      "aprovado_por": ""
     },
     {
       "roi": {
@@ -329,45 +285,6 @@
         "image_gens_total": 0
       },
       "size": "1080x1350",
-      "slug": "test-sync-perf-unit",
-      "marca": "smark",
-      "canais": [
-        "instagram"
-      ],
-      "status": "rascunho",
-      "titulo": "teste unit",
-      "caption": "cap",
-      "arte_sha": "18d81871698b31acb4b00f077b8774c58098fa461781ccd23f535a854bbb2146",
-      "created_at": "2026-07-29T20:16:53",
-      "updated_at": "2026-07-29T20:16:53",
-      "aprovado_em": "",
-      "aprovado_por": "",
-      "publicado_em": "",
-      "agendado_para": "",
-      "frames": [
-        {
-          "n": 1,
-          "bg": "",
-          "cta": "C",
-          "out": "marcas/smark/publicacoes/social/instagram/arte/test-sync-perf-unit/01.png",
-          "sub": "S",
-          "page": "",
-          "tema": "claro",
-          "arte_sha": "18d81871698b31acb4b00f077b8774c58098fa461781ccd23f535a854bbb2146",
-          "headline": "H1",
-          "arte_src_sha": "1036ffe595da071dc46bbaeb87c2a0addb79c90c0120a275fa3d7323bf033763"
-        }
-      ]
-    },
-    {
-      "roi": {
-        "active": null,
-        "cycles": [],
-        "exports_total": 0,
-        "copy_calls_total": 0,
-        "image_gens_total": 0
-      },
-      "size": "1080x1350",
       "slug": "demo-bella-massa",
       "marca": "smark",
       "thumb": ".thumbs/smark__demo-bella-massa.jpg",
@@ -465,6 +382,59 @@
           "arte_src_sha": "9ae6a4ec46d81486a11ceed6a31df80e2c2d7dcd0a25fcad0cc8e0bd509623e3",
           "bg_custo_usd": 0.242806,
           "bg_publicavel": true
+        }
+      ]
+    },
+    {
+      "roi": {
+        "active": null,
+        "cycles": [],
+        "exports_total": 0,
+        "copy_calls_total": 0,
+        "image_gens_total": 0
+      },
+      "size": "1080x1350",
+      "slug": "elever-crm",
+      "marca": "elever-ai",
+      "thumb": ".thumbs/elever-ai__elever-crm.jpg",
+      "canais": [
+        "instagram"
+      ],
+      "status": "rascunho",
+      "titulo": "ELEVER CRM",
+      "caption": "",
+      "arte_sha": "f5cd873e0841e19706e62c86ab1bc53de7b200a979cbf1abdf08d9d9e3a36c93",
+      "created_at": "2026-07-27T21:44:35",
+      "updated_at": "2026-07-29T20:09:17",
+      "aprovado_em": "",
+      "aprovado_por": "",
+      "publicado_em": "",
+      "agendado_para": "",
+      "frames": [
+        {
+          "n": 1,
+          "_v": 3,
+          "bg": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/_uploads/3ab517f1bb.png",
+          "cor": "#F4F2FB",
+          "cta": "chama no acelerador",
+          "out": "marcas/elever-ai/publicacoes/social/instagram/arte/elever-crm/01.png",
+          "sub": "{#3bf748:Confira as melhores opcoes e orcamentos}",
+          "chip": true,
+          "page": "",
+          "tema": "claro",
+          "zoom": 1.25,
+          "grade": true,
+          "hsize": 0,
+          "thumb": ".thumbs/elever-ai__elever-crm.jpg",
+          "accent": "",
+          "bg_sha": "8695abcc383c5e1c0b1f339955c0a4ac7e8a52440ecef72c313ef0c5eae34dc6",
+          "bgmode": "imagem",
+          "brilho": 0.55,
+          "overlay": "branco",
+          "arte_sha": "f5cd873e0841e19706e62c86ab1bc53de7b200a979cbf1abdf08d9d9e3a36c93",
+          "headline": "Sistemas de IA com Velocidade ",
+          "bg_src_sha": "5771567d98557b68ce6e3bb4d001e1469c0e8b7555fa2ffadb1d8318c6a081a7",
+          "arte_src_sha": "d7e610539d3daaa40020601260e8182b55bc1ac29222807487a027bba747e6c6"
         }
       ]
     },
