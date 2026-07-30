@@ -3728,7 +3728,14 @@ def checar_publicacao(marca, slug, canal="instagram", post_idx=None):
         out["faltas"].append(_falta("canal_erro", "Não deu pra ler a conexão",
                                     str(e)))
         return out
-    if not ig.get("conectado"):
+    if not ig.get("conectado") and ig.get("indisponivel"):
+        # Banco fora não é conta ausente. Oferecer OAuth aqui faria o dono
+        # reconectar à toa — e o token novo invalidaria o que já funcionava.
+        out["faltas"].append(_falta(
+            "conexao_indisponivel", "Não deu pra confirmar a conexão",
+            ig.get("aviso") or "O banco não respondeu agora. Tente de novo em instantes.",
+            {"tipo": "tentar_de_novo", "marca": marca, "canal": canal}))
+    elif not ig.get("conectado"):
         contas = []
         try:
             contas = [{"user_id": c["user_id"], "username": c["username"],

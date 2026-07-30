@@ -204,6 +204,7 @@ def _load_canal(marca: str, canal: str) -> dict:
     o token vem de `_contas/`. Arquivo legado (payload inteiro na marca) é
     promovido a conta na primeira leitura, pra ninguém precisar reconectar.
     """
+    banco_falhou = False
     try:
         import _db
         if _db.disponivel():
@@ -211,8 +212,12 @@ def _load_canal(marca: str, canal: str) -> dict:
             if p:
                 return p
     except Exception:
-        pass
+        banco_falhou = True   # o disco pode estar vazio: não chame de desconectado
     raw = _load_canal_arquivo(marca, canal)
+    if banco_falhou and not raw.get("connected"):
+        raw = dict(raw)
+        raw["_banco_falhou"] = True
+        return raw
     ja_e_conta = bool(raw.pop("_de_conta", False))   # marcador interno, não vaza
     uid = str(raw.get("user_id") or "").strip()
     if raw.get("connected") and uid and not ja_e_conta:
@@ -386,13 +391,18 @@ def esquecer_conta(canal: str, user_id: str) -> dict:
     return {"ok": True, "canal": canal, "user_id": user_id, "desvinculou": marcas}
 
 
-def _publico_de(raw: dict, canal: str) -> dict:
+def _publico_de(raw: dict, canal: str, banco_ok: bool = True) -> dict:
     """Status sem tokens — seguro pra UI."""
-    if not raw or not raw.get("connected"):
-        return {
+    raw = raw or {}
+    if not raw.get("connected"):
+        # Banco fora + disco vazio NÃO é "desconectado": é "não deu pra saber".
+        # Chamar isso de desconectado manda o dono refazer um OAuth que ele não
+        # precisava — e foi o que aconteceu num piscar do proxy do Railway.
+        cego = (not banco_ok) or bool(raw.get("_banco_falhou"))
+        pub = {
             "canal": canal,
             "conectado": False,
-            "status": "desconectado",
+            "status": "indisponivel" if cego else "desconectado",
             "username": "",
             "user_id": "",
             "conectado_em": "",
@@ -400,6 +410,11 @@ def _publico_de(raw: dict, canal: str) -> dict:
             "modo": raw.get("modo") or "",
             "permissoes": [],
         }
+        if cego:
+            pub["indisponivel"] = True
+            pub["aviso"] = ("Não deu pra confirmar a conexão agora (banco fora do ar). "
+                            "Não reconecte ainda — tente de novo em instantes.")
+        return pub
     return {
         "canal": canal,
         "conectado": True,
@@ -452,12 +467,16 @@ def status_todas(marcas: list) -> dict:
     """
     marcas = list(marcas or [])
     todos = {}
+    banco_ok = True
     try:
         import _db
         if _db.disponivel() and hasattr(_db, "canais_todos"):
             todos = _db.canais_todos()
     except Exception:
+        # Só conta como cegueira quando o banco DEVERIA responder. Instalação
+        # sem Postgres é disco-only de propósito, e ali o disco é a verdade.
         todos = {}
+        banco_ok = False
     modo = modo_instagram()
     out = {}
     for m in marcas:
@@ -466,7 +485,7 @@ def status_todas(marcas: list) -> dict:
             raw = todos.get((m, c))
             if raw is None:
                 raw = _load_canal_arquivo(m, c)   # só disco: o banco já veio inteiro acima
-            pub = _publico_de(raw or {}, c)
+            pub = _publico_de(raw or {}, c, banco_ok=banco_ok)
             if c == "linkedin" and not pub["conectado"]:
                 pub["status"] = "em_breve"
                 pub["aviso"] = "LinkedIn em breve — estrutura pronta, OAuth na próxima etapa."
