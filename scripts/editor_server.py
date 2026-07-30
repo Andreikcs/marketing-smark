@@ -4901,6 +4901,7 @@ class H(http.server.BaseHTTPRequestHandler):
                 )
             except Exception as e:
                 r = {"ok": False, "erro": str(e)}
+            esquecer_memo_contas()
             if r.get("ok"):
                 html = _canais.html_oauth_done(
                     True, marca=r.get("marca", ""), username=r.get("username", ""),

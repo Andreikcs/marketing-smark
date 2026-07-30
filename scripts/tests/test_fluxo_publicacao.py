@@ -182,19 +182,19 @@ class BaseGate(unittest.TestCase):
     def setUp(self):
         os.environ.setdefault("PUBLIC_BASE_URL", "https://exemplo.up.railway.app")
         import editor_server as ed
-        import _canais
         self.ed = ed
         self._load = ed.load
-        self._status = _canais.status_canal
-        self._canais = _canais
+        # `status_de_canal` é o que o gate usa (lote + memória curta). Dublar aqui
+        # e não o `_canais.status_canal` mantém o teste alinhado com o caminho real.
+        self._status = ed.status_de_canal
         self.posts = [_post_falso()]
         ed.load = lambda: {"posts": self.posts}
         self.conta = _conta_falsa()
-        _canais.status_canal = lambda m, c="instagram": dict(self.conta)
+        ed.status_de_canal = lambda m, c="instagram", forcar=False: dict(self.conta)
 
     def tearDown(self):
         self.ed.load = self._load
-        self._canais.status_canal = self._status
+        self.ed.status_de_canal = self._status
 
     def codigos(self, **kw):
         r = self.ed.checar_publicacao("smark", "peca-de-teste", **kw)
@@ -318,6 +318,57 @@ class TestGateAvisa(BaseGate):
         r, cods = self.codigos()
         self.assertEqual(cods, [])
         self.assertTrue(any("2200" in a or "legenda" in a.lower() for a in r["avisos"]))
+
+
+class TestMemoDeContas(unittest.TestCase):
+    """A memória curta não pode sobreviver a quem desconecta a conta.
+
+    O gate lê o estado das contas em lote e guarda por segundos, senão cada
+    clique custa 3 idas ao Postgres (~6 s pelo proxy). O risco do cache é dizer
+    "conectado" depois de alguém desvincular — por isso todo caminho que muda
+    vínculo chama `esquecer_memo_contas`.
+    """
+
+    def setUp(self):
+        import editor_server as ed
+        import _canais
+        self.ed, self._canais = ed, _canais
+        self._todas = _canais.status_todas
+        self.chamadas = []
+        ed.esquecer_memo_contas()
+
+        def falso_status_todas(marcas):
+            self.chamadas.append(list(marcas))
+            return {m: {"marca": m, "canais": {"instagram": {
+                "conectado": True, "username": "cache_teste",
+                "marcas_da_conta": list(marcas)}}} for m in marcas}
+        _canais.status_todas = falso_status_todas
+
+    def tearDown(self):
+        self._canais.status_todas = self._todas
+        self.ed.esquecer_memo_contas()
+
+    def test_segunda_leitura_nao_vai_ao_banco(self):
+        self.ed.status_de_canal("smark")
+        self.ed.status_de_canal("smark")
+        self.ed.status_de_canal("provider-max")
+        self.assertEqual(len(self.chamadas), 1, "consultou o banco de novo à toa")
+
+    def test_pergunta_por_todas_as_marcas(self):
+        self.ed.status_de_canal("smark")
+        self.assertIn("provider-max", self.chamadas[0],
+                      "com uma marca só, o aviso de conta compartilhada sumiria")
+
+    def test_esquecer_forca_leitura_nova(self):
+        self.ed.status_de_canal("smark")
+        self.ed.esquecer_memo_contas()
+        self.ed.status_de_canal("smark")
+        self.assertEqual(len(self.chamadas), 2, "desvincular deixaria o cache mentindo")
+
+    def test_forcar_ignora_o_cache(self):
+        self.ed.status_de_canal("smark")
+        self.ed.status_de_canal("smark", forcar=True)
+        self.assertEqual(len(self.chamadas), 2)
 
 
 class TestRodarAgenda(BaseGate):

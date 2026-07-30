@@ -1398,12 +1398,12 @@
       "canais": [
         "instagram"
       ],
-      "status": "rascunho",
+      "status": "erro",
       "titulo": "Split payment na reforma",
       "caption": "A reforma tributária traz o chamado split payment: quando o cliente paga, o valor do imposto já é separado na hora e enviado ao governo. Na prática, muda o seu fluxo de caixa — o dinheiro do tributo não passa mais pela sua conta. Quem se organizar antes evita aperto. Quer entender o que muda no seu negócio?\n\n#reformatributaria #contabilidade #splitpayment #gestaofinanceira",
       "arte_sha": "093584655e888b9e7c64fd2cdb92c794074197fd459058ee9d69c879e19b628c",
       "created_at": "2026-07-27T21:44:35",
-      "updated_at": "2026-07-29T20:09:17",
+      "updated_at": "2026-07-29T22:48:03",
       "aprovado_em": "",
       "aprovado_por": "",
       "publicado_em": "",
@@ -1452,7 +1452,9 @@
           "bg_custo_usd": 0.04,
           "bg_publicavel": false
         }
-      ]
+      ],
+      "ultimo_comentario": "falhou (tentativa 1): falha ao criar container: Instagram API HTTP 400: API access blocked.",
+      "tentativas": 1
     },
     {
       "roi": {
