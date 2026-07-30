@@ -1,0 +1,233 @@
+#!/usr/bin/env python3
+"""Interpretação da logo e os caches que seguram o desempenho do editor.
+
+Estes testes existem por causa de uma regressão real: o editor rodava rápido no
+Mac e travava no Railway. A causa não era a rede — era trabalho repetido que o
+Mac absorvia e o container não. Cada teste aqui trava uma dessas repetições.
+"""
+import io
+import os
+import sys
+
+import pytest
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SCRIPTS = os.path.dirname(HERE)
+VAULT = os.path.dirname(SCRIPTS)
+sys.path.insert(0, SCRIPTS)
+
+PIL = pytest.importorskip("PIL")
+from PIL import Image, ImageDraw  # noqa: E402
+
+import _logo  # noqa: E402
+
+
+def _png_com_fundo_branco(w=800, h=300):
+    """Logo como o cliente costuma mandar: marca escura em canvas branco."""
+    im = Image.new("RGB", (w, h), (255, 255, 255))
+    d = ImageDraw.Draw(im)
+    d.ellipse((20, 40, 240, 260), fill=(20, 20, 30))
+    d.rectangle((300, 130, 700, 170), fill=(20, 20, 30))
+    buf = io.BytesIO()
+    im.save(buf, "PNG")
+    return buf.getvalue()
+
+
+SVG = (b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+       b'<circle cx="50" cy="50" r="40" fill="#8B3CF7"/>'
+       b'<rect x="20" y="45" width="60" height="10" fill="#fff"/></svg>')
+
+
+class TestInterpretacao:
+    def test_fundo_branco_vira_transparente(self):
+        png = _logo.normalizar(_png_com_fundo_branco(), ".png")
+        im = Image.open(io.BytesIO(png))
+        assert im.mode == "RGBA"
+        # se o canvas branco não saiu, o alpha mínimo seria 255
+        assert im.split()[-1].getextrema()[0] == 0
+
+    def test_saida_e_png_quadrado(self):
+        png = _logo.normalizar(_png_com_fundo_branco(), ".png")
+        im = Image.open(io.BytesIO(png))
+        assert im.format == "PNG"
+        assert im.size == (_logo.LADO_BRASAO, _logo.LADO_BRASAO)
+
+    def test_jpeg_tambem_e_aceito(self):
+        im = Image.new("RGB", (600, 600), (255, 255, 255))
+        ImageDraw.Draw(im).ellipse((100, 100, 500, 500), fill=(200, 30, 40))
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=90)
+        png = _logo.normalizar(buf.getvalue(), ".jpg")
+        assert Image.open(io.BytesIO(png)).mode == "RGBA"
+
+    def test_wordmark_largo_recorta_no_brasao(self):
+        """Wordmark 800x300 tem que virar quadrado, não ser espremido."""
+        im = _logo.interpretar(_png_com_fundo_branco(), ".png")
+        assert im is not None
+        w, h = im.size
+        assert 0.75 <= w / float(h) <= 1.35, f"não ficou quadrado: {im.size}"
+
+    def test_foto_nao_vira_brasao(self):
+        """Foto arrastada por engano: melhor recusar do que espremer na tab."""
+        im = Image.new("RGB", (1200, 1200))
+        px = im.load()
+        for y in range(0, 1200, 4):       # ruído: nada de fundo uniforme
+            for x in range(0, 1200, 4):
+                px[x, y] = ((x * 7) % 256, (y * 13) % 256, ((x + y) * 3) % 256)
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=88)
+        with pytest.raises(ValueError):
+            _logo.normalizar(buf.getvalue(), ".jpg")
+
+    def test_arquivo_lixo_levanta_erro(self):
+        with pytest.raises(Exception):
+            _logo.normalizar(b"isso nao e imagem nenhuma", ".png")
+
+
+class TestSVG:
+    """SVG antes caía no monograma: o Pillow não abre SVG e o código desistia."""
+
+    def test_svg_vira_png_com_transparencia(self):
+        try:
+            png = _logo.normalizar(SVG, ".svg")
+        except Exception as e:
+            pytest.skip(f"Chromium indisponível neste ambiente: {e}")
+        im = Image.open(io.BytesIO(png))
+        assert im.format == "PNG"
+        assert im.size == (_logo.LADO_BRASAO, _logo.LADO_BRASAO)
+        assert im.split()[-1].getextrema()[0] == 0    # fundo transparente
+        assert im.split()[-1].getextrema()[1] > 0     # e tem desenho
+
+    def test_svg_com_script_e_recusado(self):
+        mau = (b'<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script>'
+               b'<circle r="10"/></svg>')
+        with pytest.raises(ValueError):
+            _logo.svg_para_png(mau)
+
+
+class TestCache:
+    """O ponto do módulo: interpretar uma vez, não a cada composição."""
+
+    @pytest.fixture
+    def arquivo(self, tmp_path):
+        p = tmp_path / "logo.png"
+        p.write_bytes(_png_com_fundo_branco())
+        return str(p)
+
+    def test_icone_reusa_o_mesmo_objeto(self, arquivo):
+        _logo.limpar_cache()
+        a = _logo.icone_rgba(arquivo)
+        b = _logo.icone_rgba(arquivo)
+        assert a is b, "cache não pegou: reinterpretou a logo"
+
+    def test_badge_reusa_o_resultado(self, arquivo):
+        _logo.limpar_cache()
+        a = _logo.badge_png_b64(arquivo, "#8B3CF7", 64)
+        b = _logo.badge_png_b64(arquivo, "#8B3CF7", 64)
+        assert a is not None and a is b
+
+    def test_cor_diferente_nao_compartilha_cache(self, arquivo):
+        _logo.limpar_cache()
+        roxo = _logo.badge_png_b64(arquivo, "#8B3CF7", 64)
+        branco = _logo.badge_png_b64(arquivo, "#FFFFFF", 64)
+        assert roxo != branco, "a cor do brasão não estava na chave do cache"
+
+    def test_arquivo_alterado_invalida_o_cache(self, arquivo):
+        _logo.limpar_cache()
+        antes = _logo.badge_png_b64(arquivo, "#8B3CF7", 64)
+        # nova logo, mesmo caminho — o mtime/tamanho tem que derrubar o cache
+        im = Image.new("RGB", (400, 400), (255, 255, 255))
+        ImageDraw.Draw(im).rectangle((50, 50, 350, 350), fill=(10, 10, 10))
+        buf = io.BytesIO()
+        im.save(buf, "PNG")
+        os.utime(arquivo, None)
+        with open(arquivo, "wb") as f:
+            f.write(buf.getvalue())
+        os.utime(arquivo, (0, 0))          # força mtime diferente
+        depois = _logo.badge_png_b64(arquivo, "#8B3CF7", 64)
+        assert antes != depois, "trocou a logo e o cache serviu a antiga"
+
+    def test_caminho_inexistente_devolve_none(self):
+        assert _logo.icone_rgba("/nao/existe/logo.png") is None
+        assert _logo.icone_rgba("") is None
+
+    def test_cache_tem_teto(self, arquivo):
+        """Sem teto, um servidor longevo acumularia brasão até estourar memória."""
+        _logo.limpar_cache()
+        for i in range(_logo._CACHE_MAX + 20):
+            _logo.badge_png_b64(arquivo, "#8B3CF7", 16 + i)
+        assert len(_logo._CACHE) <= _logo._CACHE_MAX
+
+
+class TestCompositorDelegando:
+    """O compositor tem que passar pelo cache, senão o ganho some."""
+
+    def test_compositor_usa_o_cache(self, tmp_path):
+        import compositor
+        p = tmp_path / "logo.png"
+        p.write_bytes(_png_com_fundo_branco())
+        _logo.limpar_cache()
+        a = compositor._logo_badge_png(str(p), "#8B3CF7", 64)
+        b = compositor._logo_badge_png(str(p), "#8B3CF7", 64)
+        assert a is not None and a is b
+
+    def test_variantes_continuam_saindo(self, tmp_path):
+        import compositor
+        p = tmp_path / "logo.png"
+        p.write_bytes(_png_com_fundo_branco())
+        v = compositor.logo_variantes(str(p), color="#8B3CF7", px=64)
+        assert v["mono"] and v["color"]
+
+
+class TestImpressaoDoFrame:
+    """A impressão digital substituiu um sha de 28 MB de HTML por frame."""
+
+    def _post(self):
+        return {"marca": "smark", "size": "1080x1350",
+                "frames": [{"n": 1, "headline": "TESTE", "sub": "sub",
+                            "tema": "claro", "bgmode": "claro"}]}
+
+    def test_estavel_quando_nada_muda(self):
+        import _arte
+        p = self._post()
+        fr = p["frames"][0]
+        assert _arte.impressao_frame(p, fr) == _arte.impressao_frame(p, fr)
+
+    def test_muda_com_o_texto(self):
+        import _arte
+        p = self._post()
+        fr = p["frames"][0]
+        antes = _arte.impressao_frame(p, fr)
+        fr["headline"] = "OUTRO TÍTULO"
+        assert _arte.impressao_frame(p, fr) != antes
+
+    def test_muda_com_o_tema(self):
+        import _arte
+        p = self._post()
+        fr = p["frames"][0]
+        antes = _arte.impressao_frame(p, fr)
+        fr["tema"] = "escuro"
+        fr["bgmode"] = "escuro"
+        assert _arte.impressao_frame(p, fr) != antes
+
+    def test_muda_quando_troca_o_fundo(self):
+        import _arte
+        p = self._post()
+        fr = p["frames"][0]
+        fr.update({"bgmode": "imagem", "bg_sha": "a" * 64})
+        antes = _arte.impressao_frame(p, fr)
+        fr["bg_sha"] = "b" * 64
+        assert _arte.impressao_frame(p, fr) != antes
+
+    def test_e_barata(self):
+        """Se voltar a montar o HTML de exportação, o tempo denuncia."""
+        import time
+        import _arte
+        p = self._post()
+        fr = p["frames"][0]
+        _arte.impressao_frame(p, fr)          # aquece import/cache
+        t = time.time()
+        for _ in range(10):
+            _arte.impressao_frame(p, fr)
+        media = (time.time() - t) / 10
+        assert media < 0.25, f"impressão custando {media*1000:.0f}ms — caro demais"

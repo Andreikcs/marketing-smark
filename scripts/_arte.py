@@ -139,16 +139,43 @@ def impressao_frame(post: dict, fr: dict) -> str:
     return sha256(("%s|%s|%s" % (html, fundo, post.get("size") or "")).encode("utf-8"))
 
 
-def garantir_arte(post: dict, fr: dict, *, force: bool = False, origem: str = "auto") -> dict:
+def shas_no_banco(frames) -> set:
+    """Uma consulta só pra saber quais artes desses frames já estão no Postgres.
+
+    Vale a pena existir porque `conn()` abre conexão nova a cada chamada: uma
+    pergunta por frame custava ~2s × número de frames, e a passada de arte
+    percorre todos eles a cada salvamento.
+    """
+    import _db
+    shas = [s for s in ((fr.get("arte_sha") or "").strip() for fr in (frames or [])) if s]
+    if not shas:
+        return set()
+    try:
+        return _db.blob_existe(list(set(shas)))
+    except Exception:
+        return set()
+
+
+def garantir_arte(post: dict, fr: dict, *, force: bool = False, origem: str = "auto",
+                  existentes=None) -> dict:
     """Garante que o frame tenha arte final publicável no Postgres.
 
     Escreve `arte_sha` e `arte_fp` no próprio frame (o chamador salva).
     Devolve {"ok", "sha", "novo", "motivo"} — `novo=False` quer dizer que o cache
     valeu e nada foi re-renderizado.
+
+    `existentes`: conjunto de sha já sabidamente no banco. Quem percorre vários
+    frames deve consultar uma vez e passar aqui — cada `blob_existe` abre uma
+    conexão nova no Postgres, então perguntar frame a frame custava ~2s × 69.
     """
     import _db
 
     atual = (fr.get("arte_sha") or "").strip()
+
+    def _no_banco(sha):
+        if existentes is not None:
+            return sha in existentes
+        return sha in _db.blob_existe([sha])
 
     # Caminho barato: impressão digital bate → nada mudou, nem monta o HTML caro.
     fp = ""
@@ -159,7 +186,7 @@ def garantir_arte(post: dict, fr: dict, *, force: bool = False, origem: str = "a
             fp = ""   # não conseguiu a via barata: cai no caminho antigo
         if fp and fr.get("arte_fp") == fp:
             try:
-                if atual in _db.blob_existe([atual]):
+                if _no_banco(atual):
                     return {"ok": True, "sha": atual, "novo": False, "motivo": "cache"}
             except Exception:
                 # banco fora do ar não é motivo pra re-renderizar
@@ -179,7 +206,7 @@ def garantir_arte(post: dict, fr: dict, *, force: bool = False, origem: str = "a
         if fp:
             fr["arte_fp"] = fp
         try:
-            if atual in _db.blob_existe([atual]):
+            if _no_banco(atual):
                 return {"ok": True, "sha": atual, "novo": False, "motivo": "cache"}
         except Exception:
             return {"ok": True, "sha": atual, "novo": False, "motivo": "cache (banco off)"}
@@ -213,8 +240,9 @@ def garantir_post(post: dict, *, force: bool = False, origem: str = "auto") -> d
     """
     frames = post.get("frames") or []
     feitos, novos, erros = 0, 0, []
+    existentes = shas_no_banco(frames)
     for i, fr in enumerate(frames):
-        r = garantir_arte(post, fr, force=force, origem=origem)
+        r = garantir_arte(post, fr, force=force, origem=origem, existentes=existentes)
         if r["ok"]:
             feitos += 1
             novos += 1 if r["novo"] else 0

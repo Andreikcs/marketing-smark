@@ -638,6 +638,50 @@ def salvar_logo_bytes(slug, raw, *, ext=".png"):
     return dest
 
 
+def regerar_brasao(slug):
+    """Reinterpreta a logo já cadastrada e regrava o PNG limpo.
+
+    Serve pras marcas que subiram a logo antes desta versão: elas continuam
+    apontando pro arquivo original (às vezes um JPG com canvas branco, às vezes
+    um SVG que o Pillow nem abre). Aqui a gente passa o original pelo mesmo
+    interpretador do upload, sem pedir arquivo novo pro cliente.
+    """
+    require(slug)
+    import _logo
+    m = (get(slug) or {})
+    b = dict(m.get("brasao") or {})
+    rel = b.get("original") or b.get("principal") or m.get("logo_file") or ""
+    if not rel:
+        return {"ok": False, "slug": slug, "erro": "marca sem logo cadastrada"}
+    # mesma resolução do compositor: raiz do vault OU design-system/assets
+    import compositor
+    origem = compositor._resolve_logo_file(rel)
+    if not origem:
+        return {"ok": False, "slug": slug, "erro": f"arquivo não encontrado: {rel}"}
+    with open(origem, "rb") as f:
+        raw = f.read()
+    try:
+        png = _logo.normalizar(raw, os.path.splitext(origem)[1])
+    except Exception as e:
+        return {"ok": False, "slug": slug, "erro": str(e)}
+
+    destino = os.path.join(os.path.dirname(origem), "logo-brasao.png")
+    with open(destino, "wb") as f:
+        f.write(png)
+    _logo.limpar_cache()
+
+    rel_png = os.path.relpath(destino, VAULT).replace("\\", "/")
+    t = _load_tokens()
+    mm = t["marcas"][slug]
+    bb = mm.setdefault("brasao", {})
+    bb.setdefault("original", rel)
+    bb["png"] = rel_png
+    bb["principal"] = rel_png
+    t["marcas"][slug] = mm
+    _save_tokens(t)
+    return {"ok": True, "slug": slug, "png": rel_png, "bytes": len(png)}
+
+
 def salvar_referencia_bytes(slug, raw, *, nome=None, ext=".jpg"):
     """Salva print/peça de referência em referencias/feed e PNG no acervo da marca.
 

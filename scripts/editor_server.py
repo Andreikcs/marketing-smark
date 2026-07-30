@@ -7,6 +7,7 @@ Preview ao vivo (mesmo HTML/CSS do compositor) + export do PNG final + upload de
 Rodar:  python3 scripts/editor_server.py   →   http://localhost:8765
 """
 import base64
+import collections
 import datetime
 import glob
 import gzip
@@ -3076,7 +3077,12 @@ _ARTE_TIMER = None                # debounce da composição automática
 _ARTE_LOCK = threading.Lock()
 _ARTE_RODANDO = False             # uma passada por vez (render é caro em CPU)
 _ARTE_PEDIDO = threading.Event()  # chegou save enquanto rodava → repassa no fim
-_BLOB_CACHE = {}                  # sha -> blob; galeria pede o mesmo fundo N vezes
+_BLOB_CACHE = collections.OrderedDict()   # sha -> blob; a galeria repete o mesmo fundo
+_BLOB_CACHE_LOCK = threading.Lock()
+# Teto por memória, não por quantidade: 60 fundos de 400 KB são 24 MB, enquanto
+# 60 miniaturas somam quase nada. O container do Railway é pequeno — o que
+# importa é o total, não a contagem.
+_BLOB_CACHE_MAX_BYTES = int(os.environ.get("BLOB_CACHE_MB") or 96) * 1024 * 1024
 
 
 def _db_mod():
@@ -3393,10 +3399,14 @@ def _passada_arte():
     posts = d.get("posts") or []
 
     mudou, renderizados, erros = False, 0, []
+    # Uma consulta pro lote inteiro, não uma por frame: cada consulta abre
+    # conexão nova no Postgres (~2s pelo proxy). Ver _arte.shas_no_banco.
+    todos_frames = [fr for p in posts for fr in (p.get("frames") or [])]
+    existentes = _arte.shas_no_banco(todos_frames)
     for p in posts:
         for fr in (p.get("frames") or []):
             antes = fr.get("arte_sha")
-            r = _arte.garantir_arte(p, fr, origem="editor")
+            r = _arte.garantir_arte(p, fr, origem="editor", existentes=existentes)
             if r["ok"] and r["novo"]:
                 renderizados += 1
             elif not r["ok"]:
@@ -4440,7 +4450,20 @@ class H(http.server.BaseHTTPRequestHandler):
         if not re.fullmatch(r"[0-9a-f]{16,64}", sha or ""):
             return self._send(404, {"erro": "sha inválido"})
         import _db
-        hit = _BLOB_CACHE.get(sha)
+        etag = '"%s"' % sha
+        # Responder o 304 ANTES de tocar no banco: recarregar a galeria com o
+        # cache do navegador quente não deveria custar nem uma consulta.
+        if (self.headers.get("If-None-Match") or "") == etag:
+            self.send_response(304)
+            self.send_header("ETag", etag)
+            self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+            self.end_headers()
+            return
+
+        with _BLOB_CACHE_LOCK:
+            hit = _BLOB_CACHE.get(sha)
+            if hit is not None:
+                _BLOB_CACHE.move_to_end(sha)      # usado agora: vai pro fim da fila
         if hit is None:
             try:
                 hit = _db.blob_get(sha)
@@ -4448,15 +4471,16 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(503, {"erro": f"blob: {e}"})
             if not hit:
                 return self._send(404, {"erro": "não encontrado"})
-            if len(_BLOB_CACHE) > 60:
-                _BLOB_CACHE.clear()
-            _BLOB_CACHE[sha] = hit
-        etag = '"%s"' % sha
-        if (self.headers.get("If-None-Match") or "") == etag:
-            self.send_response(304)
-            self.send_header("ETag", etag)
-            self.end_headers()
-            return
+            with _BLOB_CACHE_LOCK:
+                # Descarta o mais antigo até caber. Antes o cache era limpo
+                # INTEIRO ao passar de 60 itens, então a galeria voltava a puxar
+                # todos os fundos do Postgres de uma vez.
+                _BLOB_CACHE[sha] = hit
+                _BLOB_CACHE.move_to_end(sha)
+                total = sum(len(v.get("bytes") or b"") for v in _BLOB_CACHE.values())
+                while total > _BLOB_CACHE_MAX_BYTES and len(_BLOB_CACHE) > 1:
+                    _, velho = _BLOB_CACHE.popitem(last=False)
+                    total -= len(velho.get("bytes") or b"")
         return self._send(200, hit["bytes"], hit["mime"] or "image/jpeg",
                           cache="public, max-age=31536000, immutable",
                           extra={"ETag": etag, "Access-Control-Allow-Origin": "*"})
@@ -5642,6 +5666,25 @@ class H(http.server.BaseHTTPRequestHandler):
                     "glyph": str(glyph)[:2].upper(),
                     "estilo": brasao.get("estilo") or "mono",
                 })
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/marca-logo-regerar":
+            # Reinterpreta a logo já cadastrada e regrava o PNG limpo. Sem slug,
+            # passa em todas as marcas que têm logo.
+            try:
+                slug = str(req.get("slug", "")).strip().lower()
+                alvos = [slug] if slug else [d["slug"] for d in _marcas.listar_detalhes()]
+                res = []
+                for s in alvos:
+                    try:
+                        res.append(_marcas.regerar_brasao(s))
+                    except Exception as e:
+                        res.append({"ok": False, "slug": s, "erro": str(e)})
+                return self._send(200, {"ok": True, "resultados": res,
+                                        "feitas": sum(1 for r in res if r.get("ok"))})
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
             except Exception as e:
