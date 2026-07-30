@@ -105,6 +105,22 @@ CREATE TABLE IF NOT EXISTS canal_conexao (
   PRIMARY KEY (marca, canal)
 );
 
+-- Uma conta de rede social pode atender VÁRIAS marcas: é comum o mesmo dono ter
+-- duas empresas e um Instagram só. O token vive aqui, uma vez, e `canal_conexao`
+-- virou vínculo (`conta_user_id`). Antes o payload era copiado por marca: o
+-- refresh renovava UMA cópia e a outra vencia calada, além de exigir OAuth novo
+-- pra cada marca na mesma conta.
+CREATE TABLE IF NOT EXISTS conta_canal (
+  canal           TEXT NOT NULL DEFAULT 'instagram',
+  user_id         TEXT NOT NULL,
+  username        TEXT,
+  payload         JSONB NOT NULL DEFAULT '{}',
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (canal, user_id)
+);
+
+ALTER TABLE canal_conexao ADD COLUMN IF NOT EXISTS conta_user_id TEXT;
+
 CREATE TABLE IF NOT EXISTS publicacao_log (
   id              BIGSERIAL PRIMARY KEY,
   marca           TEXT NOT NULL,
@@ -149,6 +165,7 @@ CREATE INDEX IF NOT EXISTS idx_arte_blob_kind ON arte_blob (kind, created_at DES
 CREATE INDEX IF NOT EXISTS idx_post_frame_post ON post_frame (post_id, n);
 CREATE INDEX IF NOT EXISTS idx_publicacao_marca ON publicacao_log (marca, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_nota_marca ON nota_publicacao (marca, canal);
+CREATE INDEX IF NOT EXISTS idx_canal_conta ON canal_conexao (canal, conta_user_id);
 """
 
 
