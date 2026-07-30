@@ -4461,6 +4461,19 @@ class H(http.server.BaseHTTPRequestHandler):
                           cache="public, max-age=31536000, immutable",
                           extra={"ETag": etag, "Access-Control-Allow-Origin": "*"})
 
+    def _drenar_corpo(self):
+        """Lê e descarta o corpo da requisição (ver do_POST, caminho do 403)."""
+        try:
+            n = int(self.headers.get("Content-Length", 0) or 0)
+        except ValueError:
+            n = 0
+        restante = n
+        while restante > 0:
+            pedaco = self.rfile.read(min(restante, 1 << 16))
+            if not pedaco:
+                break
+            restante -= len(pedaco)
+
     def _body(self):
         n = int(self.headers.get("Content-Length", 0))
         raw = self.rfile.read(n) if n else b""
@@ -4956,6 +4969,10 @@ class H(http.server.BaseHTTPRequestHandler):
         path = urllib.parse.urlparse(self.path).path
         if not self._post_allowed():
             why = self._post_block_reason()
+            # Esvaziar o corpo antes de responder é obrigatório com keep-alive:
+            # o que não for lido fica no buffer do socket e a requisição
+            # seguinte lê aquilo como se fosse o cabeçalho dela.
+            self._drenar_corpo()
             return self._send(403, {
                 "ok": False,
                 "erro": f"bloqueado ({why}) — recarregue a página (F5) e tente de novo",

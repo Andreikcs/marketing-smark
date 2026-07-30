@@ -14,6 +14,7 @@ import json
 import os
 import re
 import shutil
+import sys
 
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOKENS = os.path.join(VAULT, "design-system", "tokens", "tokens.json")
@@ -596,13 +597,42 @@ def salvar_logo_bytes(slug, raw, *, ext=".png"):
         raise ValueError(f"extensão de logo não suportada: {ext}")
     dest_dir = os.path.join(MARCAS_DIR, slug, "branding", "assets")
     os.makedirs(dest_dir, exist_ok=True)
-    dest = os.path.join(dest_dir, "logo" + ext)
-    with open(dest, "wb") as f:
+
+    # Guarda o arquivo do jeito que o cliente mandou (é o original dele, e SVG
+    # a gente ainda aplica direto quando dá).
+    orig = os.path.join(dest_dir, "logo" + ext)
+    with open(orig, "wb") as f:
         f.write(raw)
+
+    # Interpreta e regrava como PNG limpo: fundo branco fora, brasão isolado,
+    # transparência de verdade. É esse PNG que a arte aplica. Vantagem dupla —
+    # SVG deixa de virar monograma (o Pillow não abre SVG) e a composição para
+    # de reinterpretar a imagem a cada render.
+    dest, rel_pronto = orig, ""
+    try:
+        import _logo
+        png = _logo.normalizar(raw, ext)
+        pronto = os.path.join(dest_dir, "logo-brasao.png")
+        with open(pronto, "wb") as f:
+            f.write(png)
+        _logo.limpar_cache()   # trocou a logo: o cache antigo não vale mais
+        dest = pronto
+        rel_pronto = os.path.relpath(pronto, VAULT).replace("\\", "/")
+    except Exception as e:
+        # Não dá pra isolar um brasão (foto, imagem chapada): fica o original e
+        # o compositor decide entre aplicar assim ou cair no monograma.
+        print("  logo %s: mantendo original (%s)" % (slug, e), file=sys.stderr)
+
     rel = os.path.relpath(dest, VAULT).replace("\\", "/")
     t = _load_tokens()
     m = t["marcas"][slug]
-    m.setdefault("brasao", {})["principal"] = rel
+    b = m.setdefault("brasao", {})
+    b["principal"] = rel
+    b["original"] = os.path.relpath(orig, VAULT).replace("\\", "/")
+    if rel_pronto:
+        b["png"] = rel_pronto
+    else:
+        b.pop("png", None)
     t["marcas"][slug] = m
     _save_tokens(t)
     return dest
