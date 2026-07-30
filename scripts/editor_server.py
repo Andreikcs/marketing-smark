@@ -13,6 +13,7 @@ import hashlib
 import http.server
 import json
 import os
+import random
 import re
 import secrets
 import threading
@@ -1698,6 +1699,24 @@ __HEAD_THEME__<style>
 .flx-log{max-height:150px;overflow:auto;font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:5px;
   border-top:1px dashed var(--line);padding-top:8px}
 .flx-log b{color:var(--text);font-weight:600}
+/* gate de publicação: cada linha é um impedimento + o botão que resolve.
+   Informar sem oferecer a saída é o que faz o usuário chamar o suporte. */
+.flx-gate{border-top:1px dashed var(--line);padding-top:9px;display:flex;flex-direction:column;gap:7px}
+.flx-gate .gh{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.gitem{display:flex;align-items:flex-start;gap:9px;font-size:12px;line-height:1.45}
+.gitem .gx{flex:0 0 auto;line-height:1.3}
+.gitem .gtxt{flex:1;min-width:0}
+.gitem .gtxt b{color:var(--text);font-weight:600;display:block}
+.gitem .gtxt span{color:var(--muted)}
+.gitem button{flex:0 0 auto;padding:5px 10px;border-radius:8px;border:1px solid var(--accent);
+  background:transparent;color:var(--accent);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.gitem button:hover{background:var(--accent);color:var(--accent-ink)}
+.gitem select{flex:0 0 auto;padding:5px 8px;border-radius:8px;border:1px solid var(--line-strong);
+  background:var(--bg);color:var(--text);font-size:11.5px;font-family:inherit;max-width:170px}
+.gwarn{font-size:11.5px;color:var(--warn);line-height:1.45}
+.gok{font-size:12px;color:var(--good);line-height:1.45}
+.gconta{font-size:11.5px;color:var(--muted)}
+.gconta b{color:var(--text)}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface,#1c1729);
   border:1px solid var(--accent);padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;
   transition:.2s;pointer-events:none;z-index:99}
@@ -1809,6 +1828,7 @@ __TOPBAR__
       </div>
       <input class=flx-msg id=mflow_msg placeholder="comentário (opcional) — fica no histórico" maxlength=300>
       <div class=flx-log id=mflow_log hidden></div>
+      <div class=flx-gate id=mflow_gate hidden></div>
     </div>
     <div class=igmbtns>
       <button class="sk-btn" id=mopen style="flex:2">✎ Abrir no editor</button>
@@ -3105,6 +3125,330 @@ def mudar_status_post(marca, slug, para, *, por="time", comentario="",
     return out
 
 
+# ── gate de publicação ───────────────────────────────────────────────────────
+#
+# UMA função decide se um post pode ir pro ar. Todas as telas chamam ela e
+# obedecem — o botão do editor antes tinha a regra dele (`if(!ig.conectado)`) e
+# publicava rascunho sem aprovação de ninguém. Regra duplicada em JS é regra que
+# um dia discorda de si mesma, e o preço aqui é post de cliente no ar.
+#
+# Cada falta carrega a AÇÃO que resolve, pra tela poder oferecer o botão em vez
+# de só informar o problema.
+
+# De onde é honesto publicar. `erro` está aqui porque é retentativa do que já
+# tinha sido aprovado, não atalho de rascunho.
+STATUS_PUBLICAVEIS = ("aprovado", "agendado", "erro")
+
+_PERM_PUBLICAR = "instagram_business_content_publish"
+
+
+def _falta(codigo, titulo, como, acao=None):
+    f = {"codigo": codigo, "titulo": titulo, "como": como}
+    if acao:
+        f["acao"] = acao
+    return f
+
+
+def _dias_pra_vencer(iso):
+    """Dias até o token vencer. None quando a data não dá pra ler."""
+    s = (iso or "").strip()
+    if not s:
+        return None
+    try:
+        d = datetime.datetime.fromisoformat(s.replace("Z", "+00:00"))
+        if d.tzinfo is None:
+            d = d.replace(tzinfo=datetime.timezone.utc)
+        return (d - datetime.datetime.now(datetime.timezone.utc)).total_seconds() / 86400.0
+    except Exception:
+        return None
+
+
+def checar_publicacao(marca, slug, canal="instagram", post_idx=None):
+    """Diz se este post pode ir pro ar e, se não, o que falta e como resolver.
+
+    Não compõe arte nem chama a Meta: é leitura. `POST /canais/publicar` chama
+    isto antes de qualquer efeito, e a tela chama pra desenhar a lista.
+    """
+    canal = (canal or "instagram").lower().strip()
+    out = {"ok": True, "pode": False, "marca": marca, "slug": slug,
+           "canal": canal, "faltas": [], "avisos": [], "conta": {}, "arte": {},
+           "post": {}}
+    try:
+        marca = _marcas.require(marca)
+        out["marca"] = marca
+    except ValueError as e:
+        out["faltas"].append(_falta("marca_invalida", str(e),
+                                    "Só publicamos por marcas cadastradas."))
+        return out
+
+    if canal != "instagram":
+        out["faltas"].append(_falta("canal_indisponivel", "Só Instagram por enquanto",
+                                    "LinkedIn tem a estrutura pronta, mas não o login."))
+        return out
+
+    d = load()
+    i, p = achar_post(d, marca, slug)
+    if p is None and post_idx is not None:
+        try:
+            pi = int(post_idx)
+            if 0 <= pi < len(d.get("posts") or []):
+                i, p = pi, d["posts"][pi]
+        except (TypeError, ValueError):
+            pass
+    if p is None:
+        out["faltas"].append(_falta("post_ausente", "Post não encontrado",
+                                    "Recarregue a tela: a lista pode estar velha."))
+        return out
+    st = (p.get("status") or "rascunho").strip() or "rascunho"
+    out["post"] = {"i": i, "titulo": p.get("titulo") or p.get("slug") or "",
+                   "status": st, "marca": p.get("marca") or marca,
+                   "slug": p.get("slug") or slug,
+                   "frames": len(p.get("frames") or []),
+                   "agendado_para": p.get("agendado_para") or ""}
+
+    # ── conta ────────────────────────────────────────────────────────────────
+    try:
+        ig = _canais.status_canal(marca, canal)
+    except Exception as e:
+        out["faltas"].append(_falta("canal_erro", "Não deu pra ler a conexão",
+                                    str(e)))
+        return out
+    if not ig.get("conectado"):
+        contas = []
+        try:
+            contas = [{"user_id": c["user_id"], "username": c["username"],
+                       "marcas": c["marcas"]} for c in _canais.contas_conectadas(canal)]
+        except Exception:
+            contas = []
+        acao = {"tipo": "conectar", "marca": marca, "canal": canal,
+                "contas": contas}
+        como = ("Conecte o Instagram desta marca." if not contas else
+                "Conecte o Instagram — ou use uma conta que já está no sistema, "
+                "sem login novo.")
+        out["faltas"].append(_falta("sem_conta", "Instagram não conectado", como, acao))
+    else:
+        outras = [m for m in (ig.get("marcas_da_conta") or []) if m != marca]
+        out["conta"] = {"username": ig.get("username") or "",
+                        "user_id": ig.get("user_id") or "",
+                        "nome": ig.get("nome") or "",
+                        "modo": ig.get("modo") or "",
+                        "expira_em": ig.get("expira_em") or "",
+                        "compartilhada_com": outras}
+        dias = _dias_pra_vencer(ig.get("expira_em"))
+        if dias is not None and dias <= 0:
+            out["faltas"].append(_falta(
+                "token_vencido", "A conexão com o Instagram venceu",
+                "Reconecte a conta: o token expirou em %s." % (ig.get("expira_em") or "?"),
+                {"tipo": "conectar", "marca": marca, "canal": canal}))
+        elif dias is not None and dias < 7:
+            out["avisos"].append("A conexão vence em %d dia(s) — vale reconectar." % int(dias))
+        perms = list(ig.get("permissoes") or [])
+        if ig.get("modo") == "real" and perms and _PERM_PUBLICAR not in perms:
+            out["faltas"].append(_falta(
+                "sem_permissao", "A conta não autorizou publicação",
+                "Reconecte marcando a permissão de publicar conteúdo.",
+                {"tipo": "conectar", "marca": marca, "canal": canal}))
+        if outras:
+            out["avisos"].append(
+                "Esta conta (@%s) também publica por: %s." %
+                (ig.get("username") or "?", ", ".join(outras)))
+        if ig.get("modo") == "fake":
+            out["avisos"].append("Conta em modo simulado — nada sai de verdade.")
+
+    # ── arte ─────────────────────────────────────────────────────────────────
+    frames = p.get("frames") or []
+    if not frames:
+        out["faltas"].append(_falta(
+            "sem_arte", "Este post não tem arte", "Monte a peça no editor.",
+            {"tipo": "editor", "post": i}))
+    else:
+        fr = frames[0] or {}
+        sha = (fr.get("arte_sha") or "").strip()
+        out["arte"] = {"sha": sha, "frames": len(frames),
+                       "url": _canais.url_publica_da_arte(sha) if sha else ""}
+        if len(frames) > 1:
+            out["avisos"].append(
+                "Carrossel de %d páginas: a API publica só a primeira." % len(frames))
+
+    # ── fluxo ────────────────────────────────────────────────────────────────
+    if st not in STATUS_PUBLICAVEIS:
+        out["faltas"].append(_falta(
+            "nao_aprovado", "Falta aprovar este post",
+            "Está em %s. Aprovação fica registrada com data e autor." %
+            (st or "rascunho"),
+            {"tipo": "status", "para": "aprovado", "marca": marca,
+             "slug": p.get("slug") or slug}))
+
+    # ── legenda ──────────────────────────────────────────────────────────────
+    cap = (p.get("caption") or "").strip()
+    if not cap:
+        out["faltas"].append(_falta(
+            "sem_legenda", "Post sem legenda", "Escreva a legenda no editor.",
+            {"tipo": "editor", "post": i}))
+    elif len(cap) > 2200:
+        out["avisos"].append(
+            "Legenda com %d caracteres: o Instagram corta em 2200." % len(cap))
+
+    # ── endereço público da arte ─────────────────────────────────────────────
+    # A Meta BAIXA a imagem: sem origem pública, ela toma 404 e o post falha do
+    # lado dela, com erro difícil de ler.
+    if not _canais.base_publica():
+        out["faltas"].append(_falta(
+            "sem_url_publica", "Falta o endereço público da arte",
+            "Defina PUBLIC_BASE_URL no .env — a Meta precisa baixar a imagem "
+            "por HTTPS.",
+            {"tipo": "config", "chave": "PUBLIC_BASE_URL"}))
+
+    out["pode"] = not out["faltas"]
+    return out
+
+
+def _bump_tentativa(marca, slug):
+    """Conta a tentativa que falhou, pra fila não insistir pra sempre."""
+    with IO_LOCK:
+        d = load()
+        _, p = achar_post(d, marca, slug)
+        if p is None:
+            return 0
+        n = int(p.get("tentativas") or 0) + 1
+        p["tentativas"] = n
+        save(d)
+        return n
+
+
+def publicar_post(marca, *, slug="", post_idx=None, canal="instagram", caption=None,
+                  image_sha="", image_path="", image_url="", dry_run=False,
+                  por="time"):
+    """Publica UM post — passando pelo gate e carimbando o resultado no fluxo.
+
+    Único caminho pro ar: a tela, o editor e a fila de agendados chamam esta
+    função. Sucesso vira `publicado`; falha da Meta vira `erro` com a mensagem
+    crua no histórico, pra ninguém precisar caçar log pra entender.
+    """
+    d = load()
+    i, p = achar_post(d, marca, slug) if slug else (-1, None)
+    if p is None and post_idx is not None:
+        try:
+            pi = int(post_idx)
+            if 0 <= pi < len(d.get("posts") or []):
+                i, p = pi, d["posts"][pi]
+        except (TypeError, ValueError):
+            pass
+    if p is None:
+        return {"ok": False, "erro": "post não encontrado"}
+    slug = p.get("slug") or slug
+
+    chk = checar_publicacao(marca, slug, canal=canal, post_idx=i)
+    faltas = list(chk.get("faltas") or [])
+    if dry_run:
+        # Simulação não chama a Meta, então não precisa de endereço público.
+        # Todo o resto do gate continua valendo — dry-run que ignora tudo não
+        # testa nada.
+        faltas = [f for f in faltas if f["codigo"] != "sem_url_publica"]
+    if faltas:
+        return {"ok": False, "erro": faltas[0]["titulo"], "faltas": faltas,
+                "avisos": chk.get("avisos") or [], "conta": chk.get("conta") or {},
+                "gate": True}
+
+    sha = (image_sha or "").strip().lower()
+    if not sha and not image_url:
+        # garante a arte na hora: publicar não pode depender de alguém ter
+        # rodado um script antes
+        import _arte
+        with IO_LOCK:
+            d = load()
+            p = d["posts"][i]
+            fr = (p.get("frames") or [{}])[0]
+            rr = _arte.garantir_arte(p, fr, origem="publicar")
+            if not rr["ok"]:
+                return {"ok": False,
+                        "erro": "não consegui compor a arte: " + rr["motivo"]}
+            sha = rr["sha"]
+            if rr["novo"]:
+                save(d)
+
+    cap = caption if caption is not None else (p.get("caption") or "")
+    r = _canais.publicar_instagram(
+        marca, image_path=image_path, image_url=image_url, image_sha=sha,
+        caption=cap, dry_run=dry_run,
+    )
+    r["marca"] = marca
+    r["slug"] = slug
+    r["conta"] = chk.get("conta") or {}
+    r["avisos"] = chk.get("avisos") or []
+
+    if dry_run:
+        r["nota_fluxo"] = "simulação: o status não mudou"
+        return r
+
+    if r.get("ok"):
+        # forcar: o gate já decidiu quem pode publicar (STATUS_PUBLICAVEIS), e
+        # `erro → publicado` não está na máquina de estados — é retentativa.
+        st = mudar_status_post(marca, slug, "publicado", por=por, forcar=True,
+                               comentario="publicado em @%s%s" % (
+                                   (chk.get("conta") or {}).get("username") or "?",
+                                   (" (media %s)" % r.get("media_id")) if r.get("media_id") else ""))
+        r["status"] = "publicado"
+        if st.get("aviso"):
+            r["aviso_fluxo"] = st["aviso"]
+    else:
+        n = _bump_tentativa(marca, slug)
+        mudar_status_post(marca, slug, "erro", por=por, forcar=True,
+                          comentario="falhou (tentativa %d): %s" % (n, r.get("erro") or "?"))
+        r["status"] = "erro"
+        r["tentativas"] = n
+    return r
+
+
+_AGENDA_LOCK = threading.Lock()
+
+
+def rodar_agenda(limite=5, dry_run=False, por="agenda"):
+    """Publica o que já venceu na fila de agendados.
+
+    Reentrância importa: o botão da tela e o launchd podem cair na mesma janela,
+    e publicar duas vezes é irreversível. Quem chega depois volta na mão vazia.
+    """
+    if not _AGENDA_LOCK.acquire(blocking=False):
+        return {"ok": True, "rodando": True, "feitos": [], "pulados": [],
+                "nota": "já tem uma passada em andamento"}
+    try:
+        agora = datetime.datetime.now(datetime.timezone.utc)
+        fila = []
+        for p in load().get("posts") or []:
+            if (p.get("status") or "") != "agendado":
+                continue
+            q = (p.get("agendado_para") or "").strip()
+            if not q:
+                continue
+            try:
+                venceu = datetime.datetime.fromisoformat(q.replace("Z", "+00:00")) <= agora
+            except Exception:
+                continue
+            if venceu:
+                fila.append((q, p.get("marca") or "smark", p.get("slug") or ""))
+        fila.sort()
+        feitos, pulados = [], []
+        for quando, marca, slug in fila[:max(0, int(limite))]:
+            r = publicar_post(marca, slug=slug, dry_run=dry_run, por=por)
+            item = {"marca": marca, "slug": slug, "quando": quando,
+                    "ok": bool(r.get("ok"))}
+            if r.get("ok"):
+                item["media_id"] = r.get("media_id") or ""
+                item["modo"] = r.get("modo") or "real"
+                feitos.append(item)
+            else:
+                item["erro"] = r.get("erro") or ""
+                if r.get("gate"):
+                    item["faltas"] = [f["codigo"] for f in r.get("faltas") or []]
+                pulados.append(item)
+        return {"ok": True, "venceram": len(fila), "feitos": feitos,
+                "pulados": pulados, "dry_run": bool(dry_run),
+                "sobraram": max(0, len(fila) - int(limite))}
+    finally:
+        _AGENDA_LOCK.release()
+
+
 def _parse_arte_meta(stdout):
     """Extrai custo/modelo/provider/seed do stdout de openai_image / openai_edit.
 
@@ -3903,11 +4247,85 @@ class H(http.server.BaseHTTPRequestHandler):
                                   <= datetime.datetime.now(datetime.timezone.utc))
                     except Exception:
                         venceu = False
+                fr = (p.get("frames") or [{}])[0] or {}
                 fila.append({"marca": p.get("marca") or "smark", "slug": p.get("slug") or "",
                              "titulo": p.get("titulo") or "", "quando": q,
-                             "vencido": venceu})
+                             "vencido": venceu,
+                             "arte_sha": (fr.get("arte_sha") or ""),
+                             "tentativas": int(p.get("tentativas") or 0)})
             fila.sort(key=lambda x: x["quando"] or "9")
+            # conta de destino: uma leitura por marca, não uma por item da fila
+            contas = {}
+            for it in fila:
+                m = it["marca"]
+                if m not in contas:
+                    try:
+                        ig = _canais.status_canal(m, "instagram")
+                        contas[m] = {"username": ig.get("username") or "",
+                                     "conectado": bool(ig.get("conectado")),
+                                     "compartilhada_com": [x for x in (ig.get("marcas_da_conta") or [])
+                                                           if x != m]}
+                    except Exception:
+                        contas[m] = {"username": "", "conectado": False,
+                                     "compartilhada_com": []}
+                it["conta"] = contas[m]
             return self._send(200, {"ok": True, "agora": agora, "fila": fila})
+
+        if path == "/publicar-check":
+            # Leitura pura: a tela desenha a lista do que falta a partir daqui.
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            marca = (qs.get("marca", [""])[0] or "").strip()
+            slug = (qs.get("slug", [""])[0] or "").strip()
+            pi = qs.get("post", [""])[0]
+            if not marca and pi != "":
+                try:
+                    d = load()
+                    p = (d.get("posts") or [])[int(pi)]
+                    marca, slug = p.get("marca") or "smark", p.get("slug") or ""
+                except Exception:
+                    pass
+            try:
+                r = checar_publicacao(marca, slug,
+                                     canal=(qs.get("canal", ["instagram"])[0] or "instagram"),
+                                     post_idx=pi if pi != "" else None)
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+            return self._send(200, r)
+
+        if path == "/canais/contas":
+            canal = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                     .get("canal", ["instagram"])[0] or "instagram")
+            try:
+                return self._send(200, {"ok": True, "canal": canal,
+                                        "contas": _canais.contas_conectadas(canal)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/sortear":
+            # Sorteia uma peça elegível pra teste — server-side, pra a tela não
+            # precisar carregar os 48 posts só pra escolher um.
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            marca = (qs.get("marca", [""])[0] or "").strip()
+            exige_arte = (qs.get("com_arte", ["1"])[0] or "1") not in ("0", "", "false")
+            st_filtro = [s for s in (qs.get("status", [""])[0] or "").split(",") if s]
+            cands = []
+            for i, p in enumerate(load().get("posts") or []):
+                if marca and (p.get("marca") or "smark") != marca:
+                    continue
+                if st_filtro and (p.get("status") or "rascunho") not in st_filtro:
+                    continue
+                frames = p.get("frames") or []
+                if exige_arte and not (frames and (frames[0] or {}).get("arte_sha")):
+                    continue
+                cands.append({"i": i, "marca": p.get("marca") or "smark",
+                              "slug": p.get("slug") or "",
+                              "titulo": p.get("titulo") or p.get("slug") or "",
+                              "status": p.get("status") or "rascunho"})
+            if not cands:
+                return self._send(404, {"ok": False,
+                                        "erro": "nenhuma peça com arte pra essa marca"})
+            return self._send(200, {"ok": True, "total": len(cands),
+                                    "post": random.choice(cands)})
 
         if path == "/historico":
             # versões de UM post ao longo dos autosaves do git (dedupe: só quando o post mudou)
@@ -4033,34 +4451,50 @@ class H(http.server.BaseHTTPRequestHandler):
                 canal = (req.get("canal") or "instagram").lower()
                 if canal != "instagram":
                     return self._send(400, {"ok": False, "erro": "só Instagram por enquanto"})
-                sha = (req.get("image_sha") or "").strip().lower()
-                pi = req.get("post")
-                if not sha and isinstance(pi, int):
-                    # garante a arte na hora: publicar não pode depender de
-                    # alguém ter rodado um script antes
-                    import _arte
-                    d = load()
-                    if 0 <= pi < len(d.get("posts") or []):
-                        p = d["posts"][pi]
-                        fr = (p.get("frames") or [{}])[0]
-                        rr = _arte.garantir_arte(p, fr, origem="publicar")
-                        if not rr["ok"]:
-                            return self._send(400, {"ok": False,
-                                                    "erro": "não consegui compor a arte: " + rr["motivo"]})
-                        sha = rr["sha"]
-                        if rr["novo"]:
-                            save(d)
-                r = _canais.publicar_instagram(
+                r = publicar_post(
                     marca,
+                    slug=req.get("post_slug") or req.get("slug_post") or "",
+                    post_idx=req.get("post"),
+                    canal=canal,
+                    caption=req.get("caption"),
+                    image_sha=(req.get("image_sha") or "").strip().lower(),
                     image_path=req.get("image_path") or req.get("path") or "",
                     image_url=req.get("image_url") or "",
-                    image_sha=sha,
-                    caption=req.get("caption") or "",
                     dry_run=bool(req.get("dry_run")),
+                    por=req.get("por") or "time",
                 )
                 return self._send(200 if r.get("ok") else 400, r)
             except ValueError as e:
                 return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/canais/vincular":
+            # Reusa uma conta já conectada: um login serve várias marcas.
+            try:
+                marca = _marcas.require(req.get("marca") or "")
+                r = _canais.vincular_marca(marca, (req.get("canal") or "instagram").lower(),
+                                           req.get("user_id") or "")
+                return self._send(200 if r.get("ok") else 400, r)
+            except ValueError as e:
+                return self._send(400, {"ok": False, "erro": str(e)})
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/canais/esquecer-conta":
+            try:
+                r = _canais.esquecer_conta((req.get("canal") or "instagram").lower(),
+                                           req.get("user_id") or "")
+                return self._send(200 if r.get("ok") else 400, r)
+            except Exception as e:
+                return self._send(500, {"ok": False, "erro": str(e)})
+
+        if path == "/agenda/rodar":
+            try:
+                r = rodar_agenda(limite=int(req.get("limite") or 5),
+                                 dry_run=bool(req.get("dry_run")),
+                                 por=req.get("por") or "agenda")
+                return self._send(200, r)
             except Exception as e:
                 return self._send(500, {"ok": False, "erro": str(e)})
 
