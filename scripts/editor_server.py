@@ -344,7 +344,8 @@ def topbar(active=""):
     return ('<div class="sk-topbar">'
             f'<a href="/" style="text-decoration:none;margin-right:6px">{smark_logo(26)}</a>'
             + lk("/painel", "Painel", "painel") + lk("/vitrine", "Vitrine", "vitrine")
-            + lk("/config", "Config", "config") + lk("/db-status", "Status", "status")
+            + lk("/config", "Config", "config") + lk("/fila", "Fila", "fila")
+            + lk("/db-status", "Status", "status")
             + lk("/editor", "Editor", "editor")
             + '<span class="sk-spacer"></span>'
             '<button type="button" id="btheme" title="Alternar claro/escuro" aria-label="Tema">◐</button>'
@@ -419,6 +420,21 @@ tr:last-child td{{border-bottom:0}}
 .soc .dot.on{{background:#34c759}}
 .soc .dot.off{{background:#8e8e93}}
 .soc .dot.wait{{background:#ffcc00}}
+/* menu de conta: um dono pode ter várias empresas e UM Instagram. O login é uma
+   vez por conta; as outras marcas só se vinculam. */
+.igmenu{{
+  position:fixed;z-index:120;min-width:250px;max-width:330px;background:var(--surface);
+  border:1px solid var(--line-strong);border-radius:12px;padding:6px;
+  box-shadow:0 18px 44px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:2px;
+}}
+.igmenu .ttl{{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  padding:6px 9px 3px}}
+.igmenu button{{text-align:left;background:none;border:0;color:var(--text);font-family:inherit;
+  font-size:12.5px;padding:8px 9px;border-radius:8px;cursor:pointer;line-height:1.35}}
+.igmenu button:hover{{background:rgba(255,255,255,.07)}}
+.igmenu button small{{display:block;color:var(--muted);font-size:11px;margin-top:2px}}
+.igmenu button.dang{{color:#ff6b7a}}
+.igmenu hr{{border:0;border-top:1px solid var(--line);margin:4px 2px}}
 /* corpo: nome SEMPRE em superfície clara legível — nunca sobre o degradê */
 .mbody{{
   padding:40px 16px 14px;display:flex;flex-direction:column;gap:10px;flex:1;min-width:0;
@@ -906,9 +922,11 @@ function socialBar(m){{
   const li=(m.canais&&m.canais.linkedin)||{{}};
   const igOk=!!ig.conectado;
   const igSvg=svgIg('ig_'+String(m.slug||'x').replace(/[^a-z0-9]/gi,''));
+  const divide=(ig.marcas_da_conta||[]).filter(x=>x!==m.slug);
   const igTitle=igOk
-    ?('Instagram @'+(ig.username||'')+(ig.modo==='fake'?' (simulado)':'')+' — clique p/ desconectar')
-    :'Conectar Instagram';
+    ?('Instagram @'+(ig.username||'')+(ig.modo==='fake'?' (simulado)':'')
+      +(divide.length?(' · dividida com '+divide.join(', ')):'')+' — clique p/ gerenciar')
+    :'Conectar Instagram (ou usar uma conta que já existe)';
   const liTitle=li.conectado?('LinkedIn @'+(li.username||'')):'LinkedIn em breve';
   const igBtn=igOk
     ?`<button type=button class=soc data-ig-off="${{esc(m.slug)}}" title="${{esc(igTitle)}}">${{igSvg}}<i class="dot on"></i></button>`
@@ -921,10 +939,69 @@ async function conectarIg(slug){{
   if(!r.ok){{alert(r.erro||'não foi possível iniciar a conexão');return}}
   location.href=r.url;
 }}
+async function usarContaIg(slug,user_id){{
+  const r=await api('/canais/vincular',{{marca:slug,canal:'instagram',user_id}});
+  if(!r.ok){{alert(r.erro||'não deu pra vincular');return}}
+  await loadMarcas();
+}}
+/* O menu existe pra separar duas coisas que pareciam uma: CONECTAR uma conta
+   (login na Meta) e USAR uma conta que já está aqui (só vínculo). Antes só havia
+   a primeira, então ligar a segunda empresa do mesmo dono exigia um OAuth novo —
+   e ficava com duas cópias do token, das quais só uma era renovada. */
+async function menuIg(slug,btn){{
+  document.querySelectorAll('.igmenu').forEach(x=>x.remove());
+  const m=MARCAS.find(x=>x.slug===slug)||{{}};
+  const ig=(m.canais&&m.canais.instagram)||{{}};
+  const box=document.createElement('div');box.className='igmenu';
+  box.innerHTML='<div class=ttl>carregando contas…</div>';
+  document.body.appendChild(box);
+  const r=btn.getBoundingClientRect();
+  box.style.top=Math.min(r.bottom+6,window.innerHeight-40)+'px';
+  box.style.left=Math.max(8,Math.min(r.left-8,window.innerWidth-340))+'px';
+  let contas=[];
+  try{{const j=await(await fetch('/canais/contas')).json();contas=(j.ok&&j.contas)||[]}}catch(e){{}}
+  const uid=ig.user_id||'';
+  const outras=contas.filter(c=>c.user_id!==uid);
+  let h='';
+  if(ig.conectado){{
+    const divide=(ig.marcas_da_conta||[]).filter(x=>x!==slug);
+    h+='<div class=ttl>conectada</div>'
+      +'<button disabled style="opacity:.9;cursor:default">@'+esc(ig.username||'')
+      +'<small>'+(divide.length?('também publica por: '+esc(divide.join(', '))):'só esta marca')
+      +(ig.expira_em?(' · vence '+esc(String(ig.expira_em).slice(0,10))):'')+'</small></button>';
+  }}
+  if(outras.length){{
+    h+='<div class=ttl>'+(ig.conectado?'trocar por':'usar conta já conectada')+'</div>'
+      +outras.map(c=>'<button data-use="'+esc(c.user_id)+'">@'+esc(c.username||'?')
+        +'<small>'+(c.marcas&&c.marcas.length?('em uso por: '+esc(c.marcas.join(', '))):'livre')
+        +' · sem login novo</small></button>').join('');
+  }}
+  h+=(h?'<hr>':'')
+    +'<button data-new=1>'+(ig.conectado?'Conectar outra conta…':'Conectar Instagram…')
+    +'<small>abre o login da Meta</small></button>';
+  if(ig.conectado)h+='<button class=dang data-off=1>Desvincular desta marca'
+    +'<small>a conta continua servindo as outras</small></button>';
+  box.innerHTML=h;
+  box.onclick=async ev=>{{
+    const b=ev.target.closest('button');if(!b||b.disabled)return;
+    box.remove();
+    if(b.dataset.new)return conectarIg(slug);
+    if(b.dataset.off)return desconectarIg(slug);
+    if(b.dataset.use)return usarContaIg(slug,b.dataset.use);
+  }};
+  setTimeout(()=>document.addEventListener('mousedown',function hh(ev){{
+    if(!box.contains(ev.target)){{box.remove();document.removeEventListener('mousedown',hh)}}
+  }}),40);
+}}
 async function desconectarIg(slug){{
   const m=MARCAS.find(x=>x.slug===slug);
-  const u=(m&&m.canais&&m.canais.instagram&&m.canais.instagram.username)||'';
-  if(!confirm('Desconectar Instagram'+(u?(' @'+u):'')+' da marca '+((m&&m.nome)||slug)+'?'))return;
+  const ig=(m&&m.canais&&m.canais.instagram)||{{}};
+  const u=ig.username||'';
+  const divide=(ig.marcas_da_conta||[]).filter(x=>x!==slug);
+  const nota=divide.length
+    ?('\\n\\nA conta continua conectada para: '+divide.join(', ')+'.')
+    :'\\n\\nNenhuma outra marca usa esta conta — ela fica salva pra reusar depois.';
+  if(!confirm('Desvincular o Instagram'+(u?(' @'+u):'')+' da marca '+((m&&m.nome)||slug)+'?'+nota))return;
   const r=await api('/canais/desconectar',{{marca:slug,canal:'instagram'}});
   if(!r.ok){{alert(r.erro||'falhou');return}}
   await loadMarcas();
@@ -975,8 +1052,8 @@ async function loadMarcas(){{
   }}).join('');
   g.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
   g.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>excluirMarca(b.dataset.del));
-  g.querySelectorAll('[data-ig-on]').forEach(b=>b.onclick=()=>conectarIg(b.dataset.igOn));
-  g.querySelectorAll('[data-ig-off]').forEach(b=>b.onclick=()=>desconectarIg(b.dataset.igOff));
+  g.querySelectorAll('[data-ig-on]').forEach(b=>b.onclick=()=>menuIg(b.dataset.igOn,b));
+  g.querySelectorAll('[data-ig-off]').forEach(b=>b.onclick=()=>menuIg(b.dataset.igOff,b));
 }}
 function slugifyNome(s){{
   return (s||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')
@@ -2078,13 +2155,18 @@ function renderFluxo(){
     +(st==='aprovado'&&p.aprovado_por?(' <span style="font-size:11.5px;color:var(--muted)">por '+esc(p.aprovado_por)+'</span>'):'');
   const acts=document.getElementById('mflow_acts');
   const nx=ST_NEXT[st]||[];
-  acts.innerHTML=nx.length
+  acts.innerHTML=(nx.length
     ? nx.map(s=>'<button data-para="'+s+'"'+(ST_PRIM[s]?' class=prim':'')+'>'+(ST_VERBO[s]||stLabel(s))+'</button>').join('')
-    : '<span style="font-size:12px;color:var(--muted)">Publicado — duplique o post pra refazer.</span>';
+    : '<span style="font-size:12px;color:var(--muted)">Publicado — duplique o post pra refazer.</span>')
+  // O botão aparece em qualquer estado menos "publicado": é ele que revela o
+  // que falta. Esconder até estar aprovado deixaria a pessoa adivinhando.
+  +(st!=='publicado'?'<button data-pub=1 class=prim title="verifica e publica no Instagram">📷 Publicar agora</button>':'');
   document.getElementById('mflow_when').hidden=true;
   document.getElementById('mflow_log').hidden=true;
+  document.getElementById('mflow_gate').hidden=true;
 }
 document.getElementById('mflow_acts').addEventListener('click',e=>{
+  const pb=e.target.closest('button[data-pub]');if(pb){publicarAgora(pb);return}
   const b=e.target.closest('button[data-para]');if(!b)return;
   const para=b.dataset.para;
   if(para==='agendado'){
@@ -2142,6 +2224,104 @@ document.getElementById('mflow_hist').onclick=async()=>{
   log.innerHTML=evs.map(e=>'<div><b>'+stLabel(e.para)+'</b> · '+fmtQuando(e.quando)
     +(e.por?(' · '+esc(e.por)):'')+(e.comentario?('<br>“'+esc(e.comentario)+'”'):'')+'</div>').join('');
 };
+
+// ── gate de publicação ───────────────────────────────────────────────────────
+// Quem decide é o servidor (/publicar-check). A tela só desenha o que ele disse
+// e oferece o botão de cada pendência — a regra não é reescrita aqui.
+let GATE=null;
+async function checarPub(){
+  const p=D.posts[MP];if(!p)return null;
+  const g=document.getElementById('mflow_gate');
+  g.hidden=false;g.innerHTML='<div class=gh>verificando…</div>';
+  let j=null;
+  try{const r=await fetch('/publicar-check?marca='+encodeURIComponent(p.marca||'smark')
+        +'&slug='+encodeURIComponent(p.slug||'')+'&post='+MP);j=await r.json()}
+  catch(e){g.innerHTML='<div class=gwarn>Servidor não respondeu.</div>';return null}
+  GATE=j;renderGate(j);return j;
+}
+function renderGate(j){
+  const g=document.getElementById('mflow_gate');
+  const c=j.conta||{},faltas=j.faltas||[],avisos=j.avisos||[];
+  let h='';
+  if(c.username){
+    h+='<div class=gconta>Vai sair em <b>@'+esc(c.username)+'</b>'
+      +(c.compartilhada_com&&c.compartilhada_com.length
+        ?(' · conta também usada por '+esc(c.compartilhada_com.join(', '))):'')+'</div>';
+  }
+  if(faltas.length){
+    h+='<div class=gh>Falta '+faltas.length+' coisa'+(faltas.length>1?'s':'')+' pra publicar</div>';
+    h+=faltas.map((f,k)=>{
+      const a=f.acao||{};let btn='';
+      if(a.tipo==='status')btn='<button data-g=aprovar>Aprovar</button>';
+      else if(a.tipo==='editor')btn='<button data-g=editor data-i="'+(a.post!=null?a.post:MP)+'">Abrir editor</button>';
+      else if(a.tipo==='conectar'){
+        const cs=a.contas||[];
+        btn=(cs.length?('<select data-g=usarconta><option value="">usar conta já conectada…</option>'
+            +cs.map(x=>'<option value="'+esc(x.user_id)+'">@'+esc(x.username)
+              +(x.marcas&&x.marcas.length?(' ('+esc(x.marcas.join(', '))+')'):'')+'</option>').join('')
+            +'</select>'):'')
+          +'<button data-g=conectar>Conectar</button>';
+      }
+      return '<div class=gitem><span class=gx>❌</span><span class=gtxt><b>'+esc(f.titulo)+'</b>'
+        +'<span>'+esc(f.como||'')+'</span></span>'+btn+'</div>';
+    }).join('');
+  }else{
+    h+='<div class=gok>✓ Liberado pra publicar.</div>';
+  }
+  h+=avisos.map(a=>'<div class=gwarn>⚠ '+esc(a)+'</div>').join('');
+  g.innerHTML=h;
+}
+document.getElementById('mflow_gate').addEventListener('change',async e=>{
+  const s=e.target.closest('select[data-g=usarconta]');if(!s||!s.value)return;
+  const p=D.posts[MP];
+  const r=await(await fetch('/canais/vincular',{method:'POST',
+    headers:{'Content-Type':'application/json','X-Editor-Token':T},
+    body:JSON.stringify({marca:p.marca||'smark',canal:'instagram',user_id:s.value})})).json();
+  if(!r.ok){toast(r.erro||'não deu pra vincular');return}
+  toast('Conta @'+(r.username||'')+' vinculada a '+(p.marca||'smark'));
+  checarPub();
+});
+document.getElementById('mflow_gate').addEventListener('click',async e=>{
+  const b=e.target.closest('button[data-g]');if(!b)return;
+  const p=D.posts[MP],acao=b.dataset.g;
+  if(acao==='editor'){location.href='/editor?post='+(b.dataset.i||MP);return}
+  if(acao==='aprovar'){await aplicarStatus('aprovado');checarPub();return}
+  if(acao==='conectar'){
+    const r=await(await fetch('/canais/conectar',{method:'POST',
+      headers:{'Content-Type':'application/json','X-Editor-Token':T},
+      body:JSON.stringify({marca:p.marca||'smark',canal:'instagram',
+        return_to:'/painel'})})).json();
+    if(!r.ok){toast(r.erro||'não deu pra iniciar a conexão');return}
+    location.href=r.url;return;
+  }
+});
+async function publicarAgora(btn){
+  const j=await checarPub();
+  if(!j)return;
+  if(!j.pode){toast('Ainda falta: '+((j.faltas[0]||{}).titulo||'algo'));return}
+  const c=j.conta||{},p=D.posts[MP];
+  const div=(c.compartilhada_com&&c.compartilhada_com.length)
+    ?('\nEsta conta também publica por: '+c.compartilhada_com.join(', ')+'.'):'';
+  const cap=((p.caption||'').split('\n')[0]||'').slice(0,80);
+  if(!confirm('Publicar AGORA em @'+(c.username||'?')+'?'+div
+    +'\n\n“'+cap+'…”\n\nIsso vai pro feed de verdade e não tem como desfazer daqui.'))return;
+  btn.disabled=true;const antes=btn.textContent;btn.textContent='publicando…';
+  let r={};
+  try{r=await(await fetch('/canais/publicar',{method:'POST',
+    headers:{'Content-Type':'application/json','X-Editor-Token':T},
+    body:JSON.stringify({marca:p.marca||'smark',canal:'instagram',post:MP,
+      post_slug:p.slug||''})})).json()}
+  catch(e){r={ok:false,erro:'servidor não respondeu'}}
+  btn.disabled=false;btn.textContent=antes;
+  if(!r.ok){toast('Não publicou: '+(r.erro||'falhou'));checarPub();
+    if(r.status==='erro'){p.status='erro';renderFluxo();render()}
+    return}
+  p.status='publicado';p.publicado_em=new Date().toISOString();p.agendado_para='';
+  document.getElementById('mst').innerHTML=stPill('publicado');
+  renderFluxo();render();
+  toast((r.modo==='fake'?'✓ Simulado':'✓ Publicado')+' em @'+((r.conta||{}).username||'')
+    +(r.media_id?(' · '+r.media_id):''));
+}
 async function mframe(){const p=D.posts[MP],fr=p.frames[MI],host=document.getElementById('mhost');
   const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Token':T},body:JSON.stringify({frame:fr,size:p.size,marca:p.marca||'smark'})});
   const html=await r.text();const s=(host.clientWidth||420)/1080;

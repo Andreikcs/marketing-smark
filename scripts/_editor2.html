@@ -1249,25 +1249,50 @@ $('#bexport').onclick=(e)=>{
 async function publicarInstagram(){
   const p=post();if(!p){toast('Sem post ativo');return}
   const marca=p.marca||'smark';
-  // status do canal
-  let st;try{st=await(await fetch('/canais?marca='+encodeURIComponent(marca))).json()}catch(e){toast('Falha ao checar Instagram');return}
-  const ig=(st.canais&&st.canais.instagram)||{};
-  if(!ig.conectado){
-    if(confirm('Instagram da marca "'+marca+'" não está conectado.\\n\\nAbrir Configurações para conectar?'))location.href='/config?editar='+encodeURIComponent(marca);
+  // Salva antes de checar: o gate olha legenda e arte do DISCO, não da tela.
+  await salvar(true);
+  // Quem decide é /publicar-check — o mesmo gate do painel. Antes aqui havia uma
+  // regra própria (só "está conectado?") e um rascunho ia pro ar sem aprovação.
+  let j;
+  try{j=await(await fetch('/publicar-check?marca='+encodeURIComponent(marca)
+      +'&slug='+encodeURIComponent(p.slug||'')+'&post='+PI)).json()}
+  catch(e){toast('Falha ao checar publicação');return}
+  const c=j.conta||{},faltas=j.faltas||[];
+  if(!j.pode){
+    const lista=faltas.map(f=>'· '+f.titulo+(f.como?(' — '+f.como):'')).join('\n');
+    const semConta=faltas.some(f=>f.codigo==='sem_conta'||f.codigo==='token_vencido');
+    if(semConta){
+      if(confirm('Não dá pra publicar ainda:\n\n'+lista
+        +'\n\nAbrir Configurações pra conectar o Instagram?'))
+        location.href='/config?editar='+encodeURIComponent(marca);
+      return;
+    }
+    const soFluxo=faltas.length===1&&faltas[0].codigo==='nao_aprovado';
+    if(soFluxo&&confirm('Este post ainda não foi aprovado.\n\nAprovar agora e publicar?')){
+      const ok=await mudarStatus('aprovado');
+      if(ok)return publicarInstagram();   // re-checa do zero, não confia no palpite
+      return;
+    }
+    alert('Não dá pra publicar ainda:\n\n'+lista);
     return;
   }
+  const div=(c.compartilhada_com&&c.compartilhada_com.length)
+    ?('\nEsta conta também publica por: '+c.compartilhada_com.join(', ')+'.'):'';
+  if(!confirm('Publicar AGORA em @'+(c.username||'?')+'?'+div
+    +'\n\nVai pro feed de verdade e não tem como desfazer daqui.'))return;
   // O servidor compõe a arte e publica a partir do sha (URL pública do Postgres).
   // Antes isso passava por /exportar, que grava PNG no disco — e o disco do
   // servidor não é visível pra Meta, então a publicação real quebrava.
-  toast('Preparando arte e publicando em @'+(ig.username||'…')+'…');
-  await salvar(true);
-  const cap=(p.caption||'').trim();
+  toast('Preparando arte e publicando em @'+(c.username||'…')+'…');
   const r=await(await fetch('/canais/publicar',{method:'POST',headers:HJSON,body:JSON.stringify({
-    marca,canal:'instagram',post:PI,caption:cap
+    marca,canal:'instagram',post:PI,post_slug:p.slug||''
   })})).json();
   if(r.ok){
-    toast((r.modo==='fake'?'✓ Simulado':'✓ Publicado')+' @'+(r.username||ig.username)+(r.aviso?(' — '+r.aviso):''));
+    p.status='publicado';renderStatus();
+    toast((r.modo==='fake'?'✓ Simulado':'✓ Publicado')+' @'+((r.conta||{}).username||c.username)
+      +(r.media_id?(' · '+r.media_id):''));
   }else{
+    if(r.status==='erro'){p.status='erro';renderStatus()}
     toast('Publicação: '+(r.erro||'falhou'));
   }
 }
