@@ -58,13 +58,30 @@ def _payload(token="tok-inicial", username="zz_conta_teste", expira="2030-01-01T
 
 
 class BaseContas(unittest.TestCase):
+    """Cada teste roda num `.secrets` próprio, descartável.
+
+    Antes usava o `.secrets` real. O editor (localhost:8765) varre esse diretório
+    pra montar a lista de contas e, ao ler um payload legado, MIGRA — reescrevendo
+    disco e banco. Com o servidor no ar a suíte falhava sozinha: ele ressuscitava
+    a conta que o teste tinha acabado de esquecer. Fora do diretório real ele nem
+    enxerga as marcas de teste, e a suíte para de depender de quem mais está vivo
+    na máquina.
+    """
+
     def setUp(self):
+        import tempfile
         import _canais
         self.c = _canais
+        self._tmp = tempfile.mkdtemp(prefix="zz-secrets-")
+        self._secrets_real = _canais.SECRETS_DIR
+        _canais.SECRETS_DIR = self._tmp
         self._limpar()
 
     def tearDown(self):
+        import shutil
         self._limpar()
+        self.c.SECRETS_DIR = self._secrets_real
+        shutil.rmtree(self._tmp, ignore_errors=True)
 
     def _limpar(self):
         """Some com tudo que o teste criou — arquivo e banco."""
