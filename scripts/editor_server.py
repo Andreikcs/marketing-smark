@@ -9,6 +9,7 @@ Rodar:  python3 scripts/editor_server.py   →   http://localhost:8765
 import base64
 import datetime
 import glob
+import gzip
 import hashlib
 import http.server
 import json
@@ -4378,22 +4379,54 @@ def normaliza(d):
 
 
 class H(http.server.BaseHTTPRequestHandler):
+    # HTTP/1.1 liga o keep-alive. Sem isto o servidor responde em HTTP/1.0 e
+    # fecha a conexão a cada resposta, obrigando o proxy do Railway a abrir uma
+    # conexão nova por requisição. Carregar a galeria são centenas de
+    # requisições — local o custo era zero, na rede virava espera visível.
+    protocol_version = "HTTP/1.1"
+
     def log_message(self, *a):
         pass
+
+    # Comprimir só o que compensa. Abaixo de ~1 KB o cabeçalho come o ganho, e
+    # JPEG/PNG já vêm comprimidos — gzipar de novo só gasta CPU.
+    _GZIP_MIN = 1024
+    _GZIP_TIPOS = ("text/", "application/json", "application/javascript",
+                   "image/svg+xml")
 
     def _send(self, code, body, ctype="application/json", cache="no-store", extra=None):
         if isinstance(body, (dict, list)):
             body = json.dumps(body, ensure_ascii=False)
         if isinstance(body, str):
             body = body.encode("utf-8")
+
+        # gzip: /editor tem 150 KB, /dados 95 KB e cada prévia ~160 KB de HTML.
+        # Local isso não custava nada (era memória); saindo pela internet, era o
+        # grosso da espera. Texto assim comprime ~85%.
+        headers = dict(extra or {})
+        if (len(body) >= self._GZIP_MIN
+                and any(ctype.startswith(t) for t in self._GZIP_TIPOS)
+                and "gzip" in (self.headers.get("Accept-Encoding") or "").lower()):
+            try:
+                body = gzip.compress(body, 6)
+                headers["Content-Encoding"] = "gzip"
+                headers["Vary"] = "Accept-Encoding"
+            except Exception:
+                pass
+
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", cache)
-        for k, v in (extra or {}).items():
+        for k, v in headers.items():
             self.send_header(k, v)
         self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            # aba fechada ou prévia cancelada no meio do envio — normal agora que
+            # o editor aborta requisição em voo; não é erro que mereça stacktrace
+            self.close_connection = True
 
     def _serve_blob(self, path):
         """GET /bg/<sha>.jpg e /arte/<sha>.jpg — imagens vindas do Postgres.

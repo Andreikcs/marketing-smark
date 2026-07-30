@@ -242,156 +242,28 @@ def _logo_is_mark(im):
 def _logo_to_icon_rgba(path):
     """Converte qualquer logo em recorte quadrado de ÍCONE (não wordmark largo).
 
-    - trim
-    - se aspect ratio largo (wordmark): recorta o quadrado mais denso à esquerda
-      (brasão costuma ficar no início) ou o centro
-    - devolve PIL RGBA ou None
+    A interpretação de verdade mora em `_logo.py`, atrás de cache por arquivo:
+    aqui era um laço Python sobre todos os pixels que custava ~465ms e rodava de
+    novo em CADA composição (tab, chip, rodapé × 69 frames). Agora é uma leitura
+    de cache. Mantido como função pra não quebrar quem já chamava.
     """
-    try:
-        from PIL import Image
-    except ImportError:
-        return None
-    try:
-        im = Image.open(path)
-    except Exception:
-        return None
-    if path.lower().endswith(".svg"):
-        return None
-    if im.mode != "RGBA":
-        im = im.convert("RGBA")
-    # remove fundo quase-branco / off-white (logos de clínica costumam vir em canvas branco)
-    a0 = im.split()[-1]
-    if a0.getextrema()[0] > 200:
-        px_list = list(im.getdata())
-        out = []
-        for r, g, b, a in px_list:
-            # branco e off-white viram transparentes
-            if r > 235 and g > 235 and b > 235:
-                out.append((r, g, b, 0))
-            elif min(r, g, b) > 220 and max(r, g, b) - min(r, g, b) < 18:
-                out.append((r, g, b, 0))
-            else:
-                out.append((r, g, b, a))
-        im.putdata(out)
-    bbox = im.getbbox()
-    if bbox:
-        im = im.crop(bbox)
-    w, h = im.size
-    if w < 8 or h < 8:
-        return None
-    ratio = w / max(1, h)
-    # foto de feed full-bleed sem transparência real → recusa (usa glyph)
-    a_min = im.split()[-1].getextrema()[0]
-    if max(w, h) >= 900 and a_min > 200 and 0.72 <= ratio <= 1.35:
-        return None
-    # wordmark largo → recorte quadrado (preferência = janela mais "tinta")
-    if ratio > 1.35:
-        side = h
-        # densidade de tinta em colunas: pega a janela side×side mais "cheia"
-        gray = im.convert("L")
-        best_x, best_score = 0, -1
-        step = max(1, side // 8)
-        for x in range(0, max(1, w - side + 1), step):
-            crop = gray.crop((x, 0, x + side, side))
-            # tinta = pixels escuros
-            hist = crop.histogram()
-            score = sum(hist[:128])
-            if score > best_score:
-                best_score = score
-                best_x = x
-        im = im.crop((best_x, 0, best_x + side, side))
-    elif ratio < 0.75:
-        side = w
-        y = max(0, (h - side) // 4)  # um pouco do topo
-        im = im.crop((0, y, side, y + side))
-    return im
+    import _logo
+    return _logo.icone_rgba(path)
 
 
 def _logo_badge_png(path, color, px, pad_ratio=0.12):
-    """Ícone mono na cor alvo (ONACC), canvas quadrado — tab/chip com contraste alto.
+    """Ícone mono na cor alvo, canvas quadrado — tab/chip com contraste alto.
 
-    Depois de strip do fundo branco, o que resta é TINTA da marca → máscara
-    binária forte (não cinza lavado). Cor RGB 100% opaca na tinta.
+    Só delega: o trabalho e o cache estão em `_logo.badge_png_b64`.
     """
-    try:
-        from PIL import Image, ImageOps, ImageFilter
-        import io
-    except ImportError:
-        return None
-    im = _logo_to_icon_rgba(path)
-    if im is None:
-        return None
-    if (color or "").startswith("#") and len(color) >= 7:
-        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
-    else:
-        r, g, b = 255, 255, 255
-    a_orig = im.split()[-1]
-    gray = ImageOps.grayscale(im.convert("RGB"))
-    # só pixels com alpha real contam
-    hist = [0] * 256
-    for gv, av in zip(gray.getdata(), a_orig.getdata()):
-        if av > 24:
-            hist[gv] += 1
-    dark = sum(hist[:110])
-    light = sum(hist[160:])
-    # após strip de branco, quase sempre tinta escura; mas se o símbolo for claro…
-    ink_is_dark = dark >= light
-    if ink_is_dark:
-        # tinta escura → opaco; threshold alto pra matar anti-alias cinza
-        mask = gray.point(lambda p: 255 if p < 175 else max(0, int((200 - p) * 3.5)))
-    else:
-        mask = gray.point(lambda p: 255 if p > 80 else max(0, int((p - 20) * 3.0)))
-    mask = Image.composite(mask, Image.new("L", mask.size, 0), a_orig)
-    # reforço: entorta levemente a máscara pra não sumir em 32–48px
-    try:
-        mask = mask.filter(ImageFilter.MaxFilter(3))
-    except Exception:
-        pass
-    # binário: o que passou de 90 vira 255 (contraste máximo)
-    mask = mask.point(lambda p: 255 if p >= 90 else (int(p * 1.4) if p > 40 else 0))
-    badge = Image.new("RGBA", im.size, (r, g, b, 0))
-    badge.putalpha(mask)
-    canvas = Image.new("RGBA", (px * 2, px * 2), (0, 0, 0, 0))
-    pad = int(px * 2 * pad_ratio)
-    inner = px * 2 - pad * 2
-    try:
-        resample = Image.Resampling.LANCZOS
-    except AttributeError:
-        resample = Image.LANCZOS
-    badge.thumbnail((inner, inner), resample)
-    ox = (px * 2 - badge.size[0]) // 2
-    oy = (px * 2 - badge.size[1]) // 2
-    canvas.paste(badge, (ox, oy), badge)
-    buf = io.BytesIO()
-    canvas.save(buf, format="PNG", optimize=True)
-    return base64.b64encode(buf.getvalue()).decode()
+    import _logo
+    return _logo.badge_png_b64(path, color, px, pad_ratio)
 
 
 def _logo_color_icon_png(path, px, pad_ratio=0.14):
-    """Ícone com cores originais (contain em canvas quadrado)."""
-    try:
-        from PIL import Image
-        import io
-    except ImportError:
-        return None
-    im = _logo_to_icon_rgba(path)
-    if im is None:
-        return None
-    canvas = Image.new("RGBA", (px * 2, px * 2), (0, 0, 0, 0))
-    pad = int(px * 2 * pad_ratio)
-    inner = px * 2 - pad * 2
-    try:
-        resample = Image.Resampling.LANCZOS
-    except AttributeError:
-        resample = Image.LANCZOS
-    im = im.copy()
-    im.thumbnail((inner, inner), resample)
-    ox = (px * 2 - im.size[0]) // 2
-    oy = (px * 2 - im.size[1]) // 2
-    canvas.paste(im, (ox, oy), im)
-    buf = io.BytesIO()
-    canvas.save(buf, format="PNG", optimize=True)
-    return base64.b64encode(buf.getvalue()).decode()
+    """Ícone com as cores originais (contain em canvas quadrado). Cacheado."""
+    import _logo
+    return _logo.color_png_b64(path, px, pad_ratio)
 
 
 def logo_variantes(path, color="#FFFFFF", px=64):

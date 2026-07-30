@@ -103,14 +103,68 @@ def html_do_frame(post: dict, fr: dict) -> tuple:
     return compositor.compose_html(**kw)
 
 
+def impressao_frame(post: dict, fr: dict) -> str:
+    """Impressão digital barata do frame — muda quando a arte mudaria.
+
+    Existe por um motivo de desempenho concreto. O jeito antigo de saber se a
+    arte precisava re-renderizar era montar o HTML de exportação e tirar o sha
+    dele. Só que o HTML de exportação embute o fundo em base64: são ~28 MB de
+    string por frame. Com 69 frames, cada passada gastava ~10s de CPU e gerava
+    ~2 GB de texto só pra descobrir que nada tinha mudado — e a passada roda a
+    cada salvamento. No Mac isso passava batido; no container do Railway
+    saturava o processador e travava todo o resto (prévia, galeria, comandos).
+
+    Aqui usamos o HTML de PRÉVIA (~160 KB, ~1ms, sem base64) mais a identidade
+    do fundo. Cobre a mesma superfície: texto, cores, tema, moldura e filtros
+    entram no HTML; a troca de imagem entra pela identidade do fundo.
+    """
+    from editor_server import frame_kwargs
+    marca = post.get("marca") or "smark"
+    kw = frame_kwargs(fr, post.get("size") or "1080x1350", for_export=False, marca=marca)
+    html, _, _ = compositor.compose_html(**kw)
+
+    # Identidade do fundo: o sha do blob quando existe; senão caminho + mtime +
+    # tamanho do arquivo local. Sem isto, trocar o PNG mantendo o nome não
+    # invalidaria o cache.
+    fundo = (fr.get("bg_sha") or "").strip().lower()
+    if not fundo:
+        rel = (fr.get("bg") or "").strip()
+        if rel:
+            caminho = os.path.join(VAULT, rel) if not os.path.isabs(rel) else rel
+            try:
+                st = os.stat(caminho)
+                fundo = "%s:%d:%d" % (rel, int(st.st_mtime), st.st_size)
+            except OSError:
+                fundo = rel
+    return sha256(("%s|%s|%s" % (html, fundo, post.get("size") or "")).encode("utf-8"))
+
+
 def garantir_arte(post: dict, fr: dict, *, force: bool = False, origem: str = "auto") -> dict:
     """Garante que o frame tenha arte final publicável no Postgres.
 
-    Escreve `arte_sha` e `arte_src_sha` no próprio frame (o chamador salva).
+    Escreve `arte_sha` e `arte_fp` no próprio frame (o chamador salva).
     Devolve {"ok", "sha", "novo", "motivo"} — `novo=False` quer dizer que o cache
     valeu e nada foi re-renderizado.
     """
     import _db
+
+    atual = (fr.get("arte_sha") or "").strip()
+
+    # Caminho barato: impressão digital bate → nada mudou, nem monta o HTML caro.
+    fp = ""
+    if not force and atual:
+        try:
+            fp = impressao_frame(post, fr)
+        except Exception:
+            fp = ""   # não conseguiu a via barata: cai no caminho antigo
+        if fp and fr.get("arte_fp") == fp:
+            try:
+                if atual in _db.blob_existe([atual]):
+                    return {"ok": True, "sha": atual, "novo": False, "motivo": "cache"}
+            except Exception:
+                # banco fora do ar não é motivo pra re-renderizar
+                return {"ok": True, "sha": atual, "novo": False,
+                        "motivo": "cache (banco off)"}
 
     try:
         html, w, h = html_do_frame(post, fr)
@@ -118,14 +172,16 @@ def garantir_arte(post: dict, fr: dict, *, force: bool = False, origem: str = "a
         return {"ok": False, "sha": "", "novo": False, "motivo": "compose_html: %s" % e}
 
     src = sha256(html.encode("utf-8"))
-    atual = (fr.get("arte_sha") or "").strip()
     if not force and atual and fr.get("arte_src_sha") == src:
-        # o HTML não mudou; só confirma que o blob continua no banco
+        # Peça de antes desta versão: o HTML caro confirma que nada mudou, então
+        # só gravamos a impressão nova e a próxima passada já usa o atalho.
+        # Isso evita re-renderizar 69 frames de uma vez logo após o deploy.
+        if fp:
+            fr["arte_fp"] = fp
         try:
             if atual in _db.blob_existe([atual]):
                 return {"ok": True, "sha": atual, "novo": False, "motivo": "cache"}
         except Exception:
-            # banco fora do ar não é motivo pra re-renderizar: devolve o que já tem
             return {"ok": True, "sha": atual, "novo": False, "motivo": "cache (banco off)"}
 
     try:
@@ -141,6 +197,12 @@ def garantir_arte(post: dict, fr: dict, *, force: bool = False, origem: str = "a
 
     fr["arte_sha"] = sha
     fr["arte_src_sha"] = src
+    # a impressão só é confiável depois do render; recalcula caso o atalho não
+    # tenha rodado (force=True, ou frame que ainda não tinha arte)
+    try:
+        fr["arte_fp"] = fp or impressao_frame(post, fr)
+    except Exception:
+        fr.pop("arte_fp", None)
     return {"ok": True, "sha": sha, "novo": True, "motivo": "renderizado"}
 
 
