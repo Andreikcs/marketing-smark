@@ -714,7 +714,8 @@ def _http_json(method: str, url: str, data: Optional[dict] = None,
         # Instagram às vezes manda error_type + error_message no root
         if not msg or msg == err_body[:300]:
             msg = j.get("error_message") or j.get("error_type") or msg
-        raise RuntimeError(f"Instagram API HTTP {e.code}: {msg}") from e
+        raise RuntimeError(
+            f"Instagram API HTTP {e.code}: {_meta_erro_legivel(j, msg)}") from e
     except urllib.error.URLError as e:
         raise RuntimeError(f"falha de rede Instagram: {e}") from e
 
