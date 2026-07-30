@@ -27,6 +27,25 @@
 marcas/**/publicacoes/**
 marcas/**/referencias/**
 
+# Material de ORIGEM de branding: entra no vault pra consulta, nunca é lido em
+# runtime. O que a composição usa é branding/assets/logo.* e os brasões
+# apontados em design-system/tokens/tokens.json.
+#
+# Não é economia cosmética: o endpoint de upload do Railway fica atrás do
+# Cloudflare, que corta em 100s. Com 19MB o deploy morria em 524 sempre.
+marcas/**/branding/source/**
+marcas/**/branding/branding-book/**
+marcas/**/branding/assets/_*
+marcas/**/branding/assets/*-raw.png
+
+# Exports de logo que token nenhum referencia (só 01, 06, 07 e o favicon são
+# usados — ver marcas.smark.brasao). Confira antes de apagar da lista.
+design-system/assets/logos-perfil/02-*
+design-system/assets/logos-perfil/03-*
+design-system/assets/logos-perfil/04-*
+design-system/assets/logos-perfil/05-*
+design-system/assets/logos-perfil/_*
+
 # material que não roda em produção
 tests
 sites
