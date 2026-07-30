@@ -165,9 +165,30 @@ def _save_json(path: str, data: dict) -> None:
     os.replace(tmp, path)
 
 
+def _path_conta(canal: str, user_id: str) -> str:
+    """Onde o token de UMA conta mora. Uma conta serve N marcas."""
+    d = os.path.join(SECRETS_DIR, "_contas")
+    os.makedirs(d, exist_ok=True)
+    return os.path.join(d, f"{canal}-{user_id}.json")
+
+
 def _persist_canal(marca: str, canal: str, data: dict) -> None:
-    """Arquivo local + Postgres (se DATABASE_URL)."""
-    _save_json(_path_token(marca, canal), data)
+    """Token na conta, vínculo na marca — arquivo local + Postgres.
+
+    Duas marcas no mesmo Instagram é cenário normal (um dono, duas empresas).
+    Antes o payload inteiro era copiado por marca: o refresh renovava uma cópia
+    e a outra vencia calada, e cada marca exigia um OAuth novo na mesma conta.
+    """
+    user_id = str(data.get("user_id") or "").strip()
+    if user_id and data.get("connected"):
+        _save_json(_path_conta(canal, user_id), data)
+        _save_json(_path_token(marca, canal),
+                   {"canal": canal, "conta_user_id": user_id,
+                    "username": data.get("username") or "",
+                    "vinculado_em": _now_iso()})
+    else:
+        # token fake ou conexão pela metade: não há conta pra apontar
+        _save_json(_path_token(marca, canal), data)
     try:
         import _db
         if _db.disponivel():
@@ -177,7 +198,12 @@ def _persist_canal(marca: str, canal: str, data: dict) -> None:
 
 
 def _load_canal(marca: str, canal: str) -> dict:
-    """Prefere Postgres em produção; fallback arquivo."""
+    """Prefere Postgres em produção; fallback arquivo.
+
+    No arquivo, uma marca pode ser só um vínculo (`conta_user_id`) — nesse caso
+    o token vem de `_contas/`. Arquivo legado (payload inteiro na marca) é
+    promovido a conta na primeira leitura, pra ninguém precisar reconectar.
+    """
     try:
         import _db
         if _db.disponivel():
@@ -186,7 +212,146 @@ def _load_canal(marca: str, canal: str) -> dict:
                 return p
     except Exception:
         pass
-    return _load_json(_path_token(marca, canal))
+    raw = _load_json(_path_token(marca, canal))
+    link = str(raw.get("conta_user_id") or "").strip()
+    if link:
+        return _load_json(_path_conta(canal, link))
+    uid = str(raw.get("user_id") or "").strip()
+    if raw.get("connected") and uid:
+        try:
+            _persist_canal(marca, canal, raw)  # migra: vira conta + vínculo
+        except OSError:
+            pass  # migrar é otimização; o payload em mãos já serve
+    return raw
+
+
+def contas_conectadas(canal: str = "instagram") -> list:
+    """Contas disponíveis pra reuso + quais marcas já publicam por cada uma.
+
+    É o que permite "conectar uma vez, usar em várias marcas": o /config lista
+    isto em vez de mandar o usuário pro login de novo.
+    """
+    try:
+        import _db
+        if _db.disponivel() and hasattr(_db, "contas_todas"):
+            out = []
+            for c in _db.contas_todas(canal):
+                p = c.get("payload") or {}
+                out.append({
+                    "canal": canal,
+                    "user_id": c.get("user_id") or "",
+                    "username": c.get("username") or p.get("username") or "",
+                    "nome": p.get("nome") or "",
+                    "picture": p.get("picture") or "",
+                    "expira_em": p.get("expira_em") or "",
+                    "modo": p.get("modo") or ("real" if p.get("access_token") else ""),
+                    "permissoes": list(p.get("permissoes") or []),
+                    "marcas": list(c.get("marcas") or []),
+                })
+            return out
+    except Exception:
+        pass
+    # sem banco: varre os arquivos de conta e descobre os vínculos no disco
+    out = []
+    d = os.path.join(SECRETS_DIR, "_contas")
+    if not os.path.isdir(d):
+        return out
+    for nome in sorted(os.listdir(d)):
+        if not nome.startswith(canal + "-") or not nome.endswith(".json"):
+            continue
+        p = _load_json(os.path.join(d, nome))
+        uid = str(p.get("user_id") or "").strip()
+        if not uid:
+            continue
+        out.append({
+            "canal": canal, "user_id": uid,
+            "username": p.get("username") or "", "nome": p.get("nome") or "",
+            "picture": p.get("picture") or "", "expira_em": p.get("expira_em") or "",
+            "modo": p.get("modo") or ("real" if p.get("access_token") else ""),
+            "permissoes": list(p.get("permissoes") or []),
+            "marcas": _marcas_da_conta_arquivo(canal, uid),
+        })
+    return out
+
+
+def _marcas_da_conta_arquivo(canal: str, user_id: str) -> list:
+    """Quem aponta pra essa conta, olhando só o disco."""
+    out = []
+    if not os.path.isdir(SECRETS_DIR):
+        return out
+    for m in sorted(os.listdir(SECRETS_DIR)):
+        if m.startswith("_") or not os.path.isdir(os.path.join(SECRETS_DIR, m)):
+            continue
+        raw = _load_json(os.path.join(SECRETS_DIR, m, f"{canal}.json"))
+        uid = str(raw.get("conta_user_id") or raw.get("user_id") or "").strip()
+        if uid == str(user_id):
+            out.append(m)
+    return out
+
+
+def marcas_da_conta(canal: str, user_id: str) -> list:
+    """Todas as marcas que publicam por esta conta (banco, com fallback disco)."""
+    try:
+        import _db
+        if _db.disponivel() and hasattr(_db, "marcas_da_conta"):
+            r = _db.marcas_da_conta(canal, user_id)
+            if r:
+                return r
+    except Exception:
+        pass
+    return _marcas_da_conta_arquivo(canal, user_id)
+
+
+def vincular_marca(marca: str, canal: str, user_id: str) -> dict:
+    """Liga a marca a uma conta que já existe. Sem OAuth, sem token novo."""
+    canal = (canal or "instagram").lower().strip()
+    if canal not in CANAIS:
+        return {"ok": False, "erro": "canal inválido: %s" % canal}
+    user_id = str(user_id or "").strip()
+    conta = None
+    for c in contas_conectadas(canal):
+        if c["user_id"] == user_id:
+            conta = c
+            break
+    if not conta:
+        return {"ok": False, "erro": "conta não encontrada — conecte uma primeiro"}
+    _save_json(_path_token(marca, canal),
+               {"canal": canal, "conta_user_id": user_id,
+                "username": conta.get("username") or "", "vinculado_em": _now_iso()})
+    try:
+        import _db
+        if _db.disponivel() and hasattr(_db, "marca_vincular"):
+            _db.marca_vincular(marca, canal, user_id, conta.get("username") or "")
+    except Exception as e:
+        return {"ok": False, "erro": "vinculado no arquivo, banco recusou: %s" % e}
+    return {"ok": True, "marca": marca, "canal": canal,
+            "username": conta.get("username") or "",
+            "marcas_da_conta": marcas_da_conta(canal, user_id)}
+
+
+def esquecer_conta(canal: str, user_id: str) -> dict:
+    """Apaga a conta e todos os vínculos. Exige saber quem depende dela."""
+    canal = (canal or "instagram").lower().strip()
+    user_id = str(user_id or "").strip()
+    if not user_id:
+        return {"ok": False, "erro": "user_id obrigatório"}
+    marcas = marcas_da_conta(canal, user_id)
+    for m in marcas:
+        try:
+            os.remove(_path_token(m, canal))
+        except OSError:
+            pass
+    try:
+        os.remove(_path_conta(canal, user_id))
+    except OSError:
+        pass
+    try:
+        import _db
+        if _db.disponivel() and hasattr(_db, "conta_apagar"):
+            _db.conta_apagar(canal, user_id)
+    except Exception:
+        pass
+    return {"ok": True, "canal": canal, "user_id": user_id, "desvinculou": marcas}
 
 
 def _publico_de(raw: dict, canal: str) -> dict:
@@ -230,7 +395,11 @@ def status_canal(marca: str, canal: str) -> dict:
             pub["aviso"] = "LinkedIn em breve — estrutura pronta, OAuth na próxima etapa."
         return pub
     raw = _load_canal(marca, canal)
-    return _publico_de(raw, canal)
+    pub = _publico_de(raw, canal)
+    if pub["conectado"] and pub["user_id"]:
+        # quem mais publica por esta conta: a tela avisa antes de postar
+        pub["marcas_da_conta"] = marcas_da_conta(canal, pub["user_id"])
+    return pub
 
 
 def status_marca(marca: str) -> dict:
@@ -264,17 +433,36 @@ def status_todas(marcas: list) -> dict:
         for c in CANAIS:
             raw = todos.get((m, c))
             if raw is None:
-                raw = _load_json(_path_token(m, c))   # marca só em arquivo
+                raw = _load_canal(m, c)   # marca só em arquivo (ou vínculo local)
             pub = _publico_de(raw or {}, c)
             if c == "linkedin" and not pub["conectado"]:
                 pub["status"] = "em_breve"
                 pub["aviso"] = "LinkedIn em breve — estrutura pronta, OAuth na próxima etapa."
             canais[c] = pub
         out[m] = {"marca": m, "modo_app": modo, "canais": canais}
+    # Quem divide conta com quem, sem uma consulta por marca: o agrupamento sai
+    # do que já está em mãos. A tela precisa disso pra avisar antes de publicar.
+    for c in CANAIS:
+        por_conta = {}
+        for m in marcas:
+            uid = out[m]["canais"][c].get("user_id") or ""
+            if uid:
+                por_conta.setdefault(uid, []).append(m)
+        for m in marcas:
+            uid = out[m]["canais"][c].get("user_id") or ""
+            if uid:
+                out[m]["canais"][c]["marcas_da_conta"] = sorted(por_conta[uid])
     return out
 
 
 def desconectar(marca: str, canal: str = "instagram") -> dict:
+    """Solta ESTA marca da conta. A conta continua servindo as outras.
+
+    Apagar a conta junto seria destruir o acesso de marcas que não pediram nada
+    — quem quer isso chama `esquecer_conta`.
+    """
+    raw = _load_json(_path_token(marca, canal))
+    uid = str(raw.get("conta_user_id") or raw.get("user_id") or "").strip()
     path = _path_token(marca, canal)
     if os.path.isfile(path):
         try:
@@ -286,7 +474,9 @@ def desconectar(marca: str, canal: str = "instagram") -> dict:
         _db.canal_apagar(marca, canal)
     except Exception:
         pass
-    return {"ok": True, "marca": marca, "canal": canal, "conectado": False}
+    restantes = marcas_da_conta(canal, uid) if uid else []
+    return {"ok": True, "marca": marca, "canal": canal, "conectado": False,
+            "conta_user_id": uid, "conta_ainda_usada_por": restantes}
 
 
 # ── OAuth state ─────────────────────────────────────────────────────────────
@@ -679,9 +869,50 @@ def token_bruto(marca: str, canal: str = "instagram") -> dict:
     return _load_canal(marca, canal)
 
 
+def conta_bruta(canal: str, user_id: str) -> dict:
+    """Token de uma conta, direto — sem passar por marca."""
+    try:
+        import _db
+        if _db.disponivel() and hasattr(_db, "conta_carregar"):
+            p = _db.conta_carregar(canal, user_id)
+            if p:
+                return p
+    except Exception:
+        pass
+    return _load_json(_path_conta(canal, str(user_id)))
+
+
+def _persist_conta(canal: str, data: dict) -> None:
+    """Grava o token da conta nos dois lugares. Os vínculos não mudam."""
+    uid = str(data.get("user_id") or "").strip()
+    if not uid:
+        return
+    _save_json(_path_conta(canal, uid), data)
+    try:
+        import _db
+        if _db.disponivel() and hasattr(_db, "conta_salvar"):
+            _db.conta_salvar(canal, data)
+    except Exception:
+        pass
+
+
 def refresh_token_se_preciso(marca: str) -> dict:
-    """Renova long-lived se faltar < 7 dias. No-op em fake."""
+    """Renova o token da CONTA usada por esta marca.
+
+    A renovação é por conta, não por marca: se duas marcas dividem o Instagram,
+    um refresh serve as duas. Antes, com o payload copiado por marca, renovava-se
+    uma cópia e a outra vencia sem ninguém ver.
+    """
     raw = token_bruto(marca, "instagram")
+    uid = str(raw.get("user_id") or "").strip()
+    if raw.get("connected") and uid:
+        return refresh_conta_se_preciso("instagram", uid)
+    return {"ok": False, "erro": "não conectado"}
+
+
+def refresh_conta_se_preciso(canal: str, user_id: str) -> dict:
+    """Renova long-lived se faltar < 7 dias. No-op em fake."""
+    raw = conta_bruta(canal, user_id)
     if not raw.get("connected"):
         return {"ok": False, "erro": "não conectado"}
     if raw.get("modo") == "fake":
@@ -716,8 +947,9 @@ def refresh_token_se_preciso(marca: str) -> dict:
         raw["expires_in"] = int(j.get("expires_in") or raw.get("expires_in") or 5184000)
         raw["expira_em"] = _expira_iso(raw["expires_in"])
         raw["refreshed_em"] = _now_iso()
-        _persist_canal(marca, "instagram", raw)
-        return {"ok": True, "expira_em": raw["expira_em"]}
+        _persist_conta(canal, raw)
+        return {"ok": True, "expira_em": raw["expira_em"],
+                "marcas": marcas_da_conta(canal, user_id)}
     return {"ok": False, "erro": "refresh sem access_token", "raw": j}
 
 

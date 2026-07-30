@@ -762,53 +762,227 @@ def blob_stats() -> dict:
 
 # ── canais (tokens) ─────────────────────────────────────────────────────────
 
-def canal_salvar(marca: str, canal: str, payload: dict) -> None:
+def conta_salvar(canal: str, payload: dict) -> str:
+    """Grava o token de UMA conta. Devolve o user_id (chave da conta).
+
+    É aqui que o access_token mora. Marca nenhuma guarda cópia — ver
+    `marca_vincular`.
+    """
+    user_id = str(payload.get("user_id") or "").strip()
+    if not user_id:
+        return ""
     if not disponivel():
+        return user_id
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO conta_canal (canal, user_id, username, payload, updated_at)
+                VALUES (%s, %s, %s, %s::jsonb, NOW())
+                ON CONFLICT (canal, user_id) DO UPDATE SET
+                  username = EXCLUDED.username,
+                  payload = EXCLUDED.payload,
+                  updated_at = NOW()
+                """,
+                (canal, user_id, payload.get("username") or "",
+                 json.dumps(payload, ensure_ascii=False)),
+            )
+    return user_id
+
+
+def conta_carregar(canal: str, user_id: str) -> dict:
+    if not disponivel() or not user_id:
+        return {}
+    try:
+        with conn() as c:
+            with c.cursor() as cur:
+                cur.execute(
+                    "SELECT payload FROM conta_canal WHERE canal=%s AND user_id=%s",
+                    (canal, str(user_id)),
+                )
+                row = cur.fetchone()
+                if not row:
+                    return {}
+                p = row["payload"]
+                return json.loads(p) if isinstance(p, str) else dict(p or {})
+    except Exception:
+        return {}
+
+
+def contas_todas(canal: str = "instagram") -> list:
+    """Contas conectadas + quem publica por cada uma, em UMA consulta.
+
+    O `/config` precisa oferecer "usar conta que já existe" sem obrigar a um
+    OAuth novo por marca — pra isso ele precisa saber, de uma vez, quais contas
+    existem e quantas marcas já dependem de cada uma.
+    """
+    if not disponivel():
+        return []
+    try:
+        with conn() as c:
+            with c.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT ct.user_id, ct.username, ct.payload, ct.updated_at,
+                           COALESCE(ARRAY_AGG(cx.marca ORDER BY cx.marca)
+                                    FILTER (WHERE cx.marca IS NOT NULL), '{}') AS marcas
+                      FROM conta_canal ct
+                      LEFT JOIN canal_conexao cx
+                             ON cx.canal = ct.canal AND cx.conta_user_id = ct.user_id
+                     WHERE ct.canal = %s
+                     GROUP BY ct.user_id, ct.username, ct.payload, ct.updated_at
+                     ORDER BY ct.username
+                    """,
+                    (canal,),
+                )
+                out = []
+                for r in cur.fetchall() or []:
+                    p = r["payload"]
+                    p = json.loads(p) if isinstance(p, str) else dict(p or {})
+                    out.append({"canal": canal, "user_id": r["user_id"],
+                                "username": r["username"] or "",
+                                "payload": p,
+                                "marcas": list(r["marcas"] or [])})
+                return out
+    except Exception:
+        return []
+
+
+def conta_apagar(canal: str, user_id: str) -> None:
+    """Esquece a conta (e os vínculos que sobraram apontando pra ela)."""
+    if not disponivel() or not user_id:
+        return
+    try:
+        with conn() as c:
+            with c.cursor() as cur:
+                cur.execute(
+                    "DELETE FROM canal_conexao WHERE canal=%s AND conta_user_id=%s",
+                    (canal, str(user_id)),
+                )
+                cur.execute(
+                    "DELETE FROM conta_canal WHERE canal=%s AND user_id=%s",
+                    (canal, str(user_id)),
+                )
+    except Exception:
+        pass
+
+
+def marca_vincular(marca: str, canal: str, user_id: str, username: str = "") -> None:
+    """Liga uma marca a uma conta já conectada. Sem token, sem login novo."""
+    if not disponivel() or not user_id:
         return
     ensure_marca(marca)
     with conn() as c:
         with c.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO canal_conexao (marca, canal, payload, username, user_id, conectado, updated_at)
-                VALUES (%s, %s, %s::jsonb, %s, %s, %s, NOW())
+                INSERT INTO canal_conexao
+                       (marca, canal, payload, username, user_id, conta_user_id,
+                        conectado, updated_at)
+                VALUES (%s, %s, '{}'::jsonb, %s, %s, %s, true, NOW())
                 ON CONFLICT (marca, canal) DO UPDATE SET
-                  payload = EXCLUDED.payload,
+                  payload = '{}'::jsonb,
                   username = EXCLUDED.username,
                   user_id = EXCLUDED.user_id,
-                  conectado = EXCLUDED.conectado,
+                  conta_user_id = EXCLUDED.conta_user_id,
+                  conectado = true,
                   updated_at = NOW()
                 """,
-                (
-                    marca,
-                    canal,
-                    json.dumps(payload, ensure_ascii=False),
-                    payload.get("username") or "",
-                    str(payload.get("user_id") or ""),
-                    bool(payload.get("connected")),
-                ),
+                (marca, canal, username, str(user_id), str(user_id)),
             )
 
 
+def marca_desvincular(marca: str, canal: str = "instagram") -> None:
+    """Solta a marca da conta. A conta continua viva pras outras marcas."""
+    canal_apagar(marca, canal)
+
+
+def marcas_da_conta(canal: str, user_id: str) -> list:
+    if not disponivel() or not user_id:
+        return []
+    try:
+        with conn() as c:
+            with c.cursor() as cur:
+                cur.execute(
+                    "SELECT marca FROM canal_conexao "
+                    " WHERE canal=%s AND conta_user_id=%s ORDER BY marca",
+                    (canal, str(user_id)),
+                )
+                return [r["marca"] for r in cur.fetchall() or []]
+    except Exception:
+        return []
+
+
+def canal_salvar(marca: str, canal: str, payload: dict) -> None:
+    """Compat: recebe o payload cheio, guarda na conta e vincula a marca.
+
+    Quem chama (o OAuth em `_canais`) não precisa saber que token e vínculo
+    passaram a viver em lugares diferentes.
+    """
+    if not disponivel():
+        return
+    user_id = str(payload.get("user_id") or "").strip()
+    if not user_id or not payload.get("connected"):
+        # Sem user_id não há conta pra apontar: guarda como antes, na marca.
+        # Acontece com token fake e com desconexão parcial.
+        ensure_marca(marca)
+        with conn() as c:
+            with c.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO canal_conexao
+                           (marca, canal, payload, username, user_id, conectado, updated_at)
+                    VALUES (%s, %s, %s::jsonb, %s, %s, %s, NOW())
+                    ON CONFLICT (marca, canal) DO UPDATE SET
+                      payload = EXCLUDED.payload,
+                      username = EXCLUDED.username,
+                      user_id = EXCLUDED.user_id,
+                      conectado = EXCLUDED.conectado,
+                      updated_at = NOW()
+                    """,
+                    (marca, canal, json.dumps(payload, ensure_ascii=False),
+                     payload.get("username") or "", user_id,
+                     bool(payload.get("connected"))),
+                )
+        return
+    conta_salvar(canal, payload)
+    marca_vincular(marca, canal, user_id, payload.get("username") or "")
+
+
 def canal_carregar(marca: str, canal: str = "instagram") -> dict:
+    """Token da marca — seguindo o vínculo quando existe.
+
+    Linha legada (payload próprio, sem `conta_user_id`) é PROMOVIDA a conta aqui
+    mesmo: quem lê primeiro migra. Evita pedir reconexão manual das marcas que
+    já estavam ligadas antes desta tabela existir.
+    """
     if not disponivel():
         return {}
     try:
         with conn() as c:
             with c.cursor() as cur:
                 cur.execute(
-                    "SELECT payload FROM canal_conexao WHERE marca=%s AND canal=%s",
+                    "SELECT payload, conta_user_id, user_id, username"
+                    "  FROM canal_conexao WHERE marca=%s AND canal=%s",
                     (marca, canal),
                 )
                 row = cur.fetchone()
                 if not row:
                     return {}
+                link = str(row.get("conta_user_id") or "").strip()
+                if link:
+                    return conta_carregar(canal, link)
                 p = row["payload"]
-                if isinstance(p, str):
-                    return json.loads(p)
-                return dict(p or {})
+                p = json.loads(p) if isinstance(p, str) else dict(p or {})
     except Exception:
         return {}
+    if p.get("connected") and str(p.get("user_id") or "").strip():
+        try:
+            conta_salvar(canal, p)
+            marca_vincular(marca, canal, str(p["user_id"]), p.get("username") or "")
+        except Exception:
+            pass  # migrar é otimização; o payload em mãos já serve
+    return p
 
 
 def canais_todos() -> dict:
@@ -823,7 +997,17 @@ def canais_todos() -> dict:
     try:
         with conn() as c:
             with c.cursor() as cur:
-                cur.execute("SELECT marca, canal, payload FROM canal_conexao")
+                # COALESCE resolve o vínculo sem uma segunda volta ao banco: quem
+                # tem conta_user_id lê o token da conta, quem é legado lê o dele.
+                cur.execute(
+                    """
+                    SELECT cx.marca, cx.canal,
+                           COALESCE(ct.payload, cx.payload) AS payload
+                      FROM canal_conexao cx
+                      LEFT JOIN conta_canal ct
+                             ON ct.canal = cx.canal AND ct.user_id = cx.conta_user_id
+                    """
+                )
                 out = {}
                 for r in cur.fetchall() or []:
                     p = r["payload"]
