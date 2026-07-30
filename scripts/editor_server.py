@@ -4754,7 +4754,12 @@ class H(http.server.BaseHTTPRequestHandler):
                 if st_filtro and (p.get("status") or "rascunho") not in st_filtro:
                     continue
                 frames = p.get("frames") or []
+                # "com arte" quer dizer publicável de verdade: arte E legenda. Sortear
+                # uma peça que o gate barra na hora só desperdiça o clique de quem
+                # queria escolher uma peça pra pôr no ar.
                 if exige_arte and not (frames and (frames[0] or {}).get("arte_sha")):
+                    continue
+                if exige_arte and not (p.get("caption") or "").strip():
                     continue
                 cands.append({"i": i, "marca": p.get("marca") or "smark",
                               "slug": p.get("slug") or "",

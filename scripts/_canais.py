@@ -212,16 +212,32 @@ def _load_canal(marca: str, canal: str) -> dict:
                 return p
     except Exception:
         pass
-    raw = _load_json(_path_token(marca, canal))
-    link = str(raw.get("conta_user_id") or "").strip()
-    if link:
-        return _load_json(_path_conta(canal, link))
+    raw = _load_canal_arquivo(marca, canal)
+    ja_e_conta = bool(raw.pop("_de_conta", False))   # marcador interno, não vaza
     uid = str(raw.get("user_id") or "").strip()
-    if raw.get("connected") and uid:
+    if raw.get("connected") and uid and not ja_e_conta:
         try:
             _persist_canal(marca, canal, raw)  # migra: vira conta + vínculo
         except OSError:
             pass  # migrar é otimização; o payload em mãos já serve
+    return raw
+
+
+def _load_canal_arquivo(marca: str, canal: str) -> dict:
+    """Só disco, sem banco: resolve o vínculo lendo `_contas/` do lado.
+
+    Existe porque `status_todas` roda esta leitura 2× por marca. Chamar o
+    `_load_canal` inteiro ali custava uma ida ao Postgres por marca × canal —
+    com 13 marcas atrás do proxy do Railway, 47 s de espera pro painel pintar.
+    """
+    raw = _load_json(_path_token(marca, canal))
+    link = str(raw.get("conta_user_id") or "").strip()
+    if link:
+        conta = _load_json(_path_conta(canal, link))
+        if conta:
+            conta = dict(conta)
+            conta["_de_conta"] = True   # já é conta: não tentar migrar de novo
+            return conta
     return raw
 
 
@@ -433,7 +449,7 @@ def status_todas(marcas: list) -> dict:
         for c in CANAIS:
             raw = todos.get((m, c))
             if raw is None:
-                raw = _load_canal(m, c)   # marca só em arquivo (ou vínculo local)
+                raw = _load_canal_arquivo(m, c)   # só disco: o banco já veio inteiro acima
             pub = _publico_de(raw or {}, c)
             if c == "linkedin" and not pub["conectado"]:
                 pub["status"] = "em_breve"
