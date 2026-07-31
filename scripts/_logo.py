@@ -277,17 +277,83 @@ def interpretar(dados: bytes, ext: str = "") -> "object":
     return im
 
 
-def icone_quadrado(im):
-    """Recorte quadrado pro slot da tab/chip, que é quadrado por desenho.
+def _blocos_de_tinta(im, vazio=6):
+    """Faixas horizontais com tinta, separadas por colunas vazias.
 
-    Wordmark largo perde as letras nesse recorte — é esperado: aqui o objetivo é
-    o símbolo, não a assinatura. A logo por extenso continua inteira no PNG que
-    `normalizar()` grava. Marca sem símbolo separável (só letras) fica melhor
-    como monograma, então devolvemos None nesse caso e o compositor decide.
+    Devolve [(x0, x1)] em coordenadas da imagem original. Serve pra distinguir
+    "símbolo + assinatura" (dois blocos com um respiro no meio) de "só palavra"
+    (um bloco contínuo).
+    """
+    from PIL import Image
+    w, h = im.size
+    escala = min(1.0, 240.0 / max(1, w))
+    pq = im.resize((max(1, int(w * escala)), max(1, int(h * escala))),
+                   Image.Resampling.NEAREST)
+    alpha = pq.split()[-1]
+    pw, ph = pq.size
+    # quanta tinta por coluna
+    colunas = [0] * pw
+    dados = alpha.load()
+    for x in range(pw):
+        n = 0
+        for y in range(ph):
+            if dados[x, y] > 40:
+                n += 1
+        colunas[x] = n
+
+    limiar = max(1, int(ph * 0.02))
+    blocos, inicio, fim_vazio = [], None, 0
+    for x in range(pw):
+        if colunas[x] > limiar:
+            if inicio is None:
+                inicio = x
+            fim_vazio = 0
+        elif inicio is not None:
+            fim_vazio += 1
+            if fim_vazio >= max(2, int(vazio * escala * 4)):
+                blocos.append((inicio, x - fim_vazio))
+                inicio, fim_vazio = None, 0
+    if inicio is not None:
+        blocos.append((inicio, pw - 1))
+    return [(int(a / escala), int(b / escala)) for a, b in blocos if b > a]
+
+
+def icone_quadrado(im):
+    """Símbolo quadrado pro slot da tab/chip — ou None quando não existe símbolo.
+
+    O slot é quadrado por desenho, então uma assinatura larga não cabe. A
+    pergunta certa não é "onde corto?", e sim "essa marca TEM um símbolo?".
+
+    Marca do tipo "símbolo + palavra" (Nike, V4) tem um bloco de tinta separado
+    por um respiro: dá pra recortar o símbolo. Marca que é só palavra (DEATEC,
+    smark.) não tem — recortar dali devolve um pedaço de letra, que foi
+    exatamente o que apareceu na tab. Nesse caso devolvemos None e o compositor
+    usa o monograma, que é honesto.
     """
     if im is None:
         return None
-    return _recorte_quadrado(im)
+    w, h = im.size
+    if h <= 0:
+        return None
+    ratio = w / float(h)
+    if ratio <= 1.35:
+        return _recorte_quadrado(im)      # já é quadrado/vertical: serve direto
+
+    blocos = _blocos_de_tinta(im)
+    if len(blocos) < 2:
+        return None                        # bloco único e largo = só palavra
+
+    # símbolo = primeiro ou último bloco, se for aproximadamente quadrado
+    for x0, x1 in (blocos[0], blocos[-1]):
+        largura = x1 - x0
+        if largura <= 0:
+            continue
+        if 0.62 <= largura / float(h) <= 1.6:
+            centro = (x0 + x1) // 2
+            lado = min(h, max(largura, int(h * 0.9)))
+            ini = max(0, min(centro - lado // 2, w - lado))
+            return im.crop((ini, 0, ini + lado, h))
+    return None
 
 
 def normalizar(dados: bytes, ext: str = "", lado: int = LADO_BRASAO) -> bytes:
