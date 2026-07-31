@@ -663,7 +663,27 @@ def regerar_brasao(slug):
     try:
         png = _logo.normalizar(raw, os.path.splitext(origem)[1])
     except Exception as e:
-        return {"ok": False, "slug": slug, "erro": str(e)}
+        # Recusou agora, mas pode ter sobrado um PNG de uma versão anterior que
+        # aceitava peça de feed. Deixar esse arquivo no lugar é pior que não ter
+        # brasão: a arte sai com um pedaço de post espremido na tab. Derruba o
+        # registro pra marca voltar ao monograma.
+        antigo = b.get("png") or ""
+        if antigo:
+            caminho = os.path.join(VAULT, antigo)
+            if os.path.isfile(caminho):
+                try:
+                    os.remove(caminho)
+                except OSError:
+                    pass
+            t = _load_tokens()
+            bb = dict((t["marcas"].get(slug) or {}).get("brasao") or {})
+            bb.pop("png", None)
+            if bb.get("principal") == antigo:
+                bb.pop("principal", None)
+            t["marcas"][slug]["brasao"] = bb
+            _save_tokens(t)
+            _logo.limpar_cache()
+        return {"ok": False, "slug": slug, "erro": str(e), "descartado": antigo or None}
 
     destino = os.path.join(os.path.dirname(origem), "logo-brasao.png")
     with open(destino, "wb") as f:

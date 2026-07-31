@@ -218,6 +218,45 @@ class TestCompositorDelegando:
         assert v["mono"] and v["color"]
 
 
+class TestBrasaoDescartado:
+    """Marca que já tinha brasão gerado pela versão antiga (que aceitava peça
+    de feed) precisa perder esse arquivo quando a reinterpretação recusa —
+    senão a arte sai com um pedaço de post espremido na tab.
+    """
+
+    def test_recusa_derruba_o_png_antigo(self, tmp_path, monkeypatch):
+        import _marcas
+
+        origem = tmp_path / "logo.png"
+        # peça de feed: grande e cheia de cores — o interpretador tem que recusar
+        im = Image.new("RGB", (1080, 1350))
+        px = im.load()
+        for y in range(1350):
+            for x in range(0, 1080, 3):
+                px[x, y] = ((x * 5) % 256, (y * 3) % 256, ((x * y) // 7) % 256)
+        im.save(str(origem), "PNG")
+        velho = tmp_path / "logo-brasao.png"
+        velho.write_bytes(_png_com_fundo_branco(200, 200))
+
+        estado = {"marcas": {"fake-x": {"brasao": {
+            "original": "logo.png", "png": "logo-brasao.png",
+            "principal": "logo-brasao.png"}}}}
+        monkeypatch.setattr(_marcas, "VAULT", str(tmp_path))
+        monkeypatch.setattr(_marcas, "require", lambda s: None)
+        monkeypatch.setattr(_marcas, "get", lambda s: estado["marcas"][s])
+        monkeypatch.setattr(_marcas, "_load_tokens", lambda: estado)
+        monkeypatch.setattr(_marcas, "_save_tokens", lambda t: estado.update(t))
+        import compositor
+        monkeypatch.setattr(compositor, "_resolve_logo_file", lambda rel: str(origem))
+
+        r = _marcas.regerar_brasao("fake-x")
+        assert r["ok"] is False
+        assert not velho.exists(), "PNG velho continuou no disco"
+        b = estado["marcas"]["fake-x"]["brasao"]
+        assert "png" not in b and "principal" not in b
+        assert b["original"] == "logo.png", "perdeu o ponteiro pro arquivo original"
+
+
 class TestImpressaoDoFrame:
     """A impressão digital substituiu um sha de 28 MB de HTML por frame."""
 
