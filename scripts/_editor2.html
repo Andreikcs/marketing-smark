@@ -278,7 +278,7 @@ input[type=range]{accent-color:var(--accent)}
 .th.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
 /* ===================== ESTÚDIO IA (estilo Gemini) ===================== */
-#estudio{position:fixed;right:16px;bottom:16px;width:min(440px,94vw);height:min(72vh,720px);display:none;flex-direction:column;
+#estudio{position:fixed;right:16px;bottom:16px;width:min(440px,94vw);height:min(72vh,720px);max-height:calc(100vh - 32px);display:none;flex-direction:column;
   background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.45);z-index:400;overflow:hidden}
 #estudio.on{display:flex}
 #estudio .es-ambient{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.95;
@@ -295,10 +295,19 @@ input[type=range]{accent-color:var(--accent)}
 }
 #estudio .eshead,#estudio .eswelcome,#estudio .eslog,#estudio .esfoot{position:relative;z-index:1}
 #estudio .esmark{animation:wlogofloat 4.2s ease-in-out infinite;background:linear-gradient(155deg,#9A4DFF,#2A1CA8)!important}
-#estudio.min{height:auto;width:min(320px,90vw)}
-#estudio.min .eslog,#estudio.min .esfoot,#estudio.min .eswelcome{display:none}
+/* Minimizado = a barra de título e mais nada.
+   Não tire o !important sem ler isto: lá embaixo existe
+   `#estudio:has(.eslog .esmsg) .eslog{display:flex;flex:1}`, com especificidade
+   (1,3,0) contra os (1,2,0) daqui — assim que havia UMA mensagem no chat, ela
+   vencia, o log continuava visível e o `height:auto` fazia o painel crescer até
+   caber a conversa inteira. Ancorado em bottom:16px, isso empurrava o cabeçalho
+   (fechar e minimizar) pra fora da tela e prendia o usuário.
+   O `max-height` + `overflow:hidden` é a segunda trava: segura o painel mesmo se
+   alguém voltar a mexer no display. */
+#estudio.min{height:auto;max-height:96px;width:min(320px,90vw);overflow:hidden}
+#estudio.min .eslog,#estudio.min .esfoot,#estudio.min .eswelcome{display:none!important}
 #estudio.min .eshead{border-bottom:0;cursor:pointer}
-.eshead{display:flex;align-items:center;gap:8px;padding:12px 14px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
+.eshead{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:12px 14px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
 .eslogo{display:inline-flex;align-items:center;gap:8px}
 .esmark{width:26px;height:26px;border-radius:8px;background:linear-gradient(155deg,#9A4DFF,#2A1CA8);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
 .esword{font-family:var(--font-text);font-weight:800;font-size:15px;color:var(--txt);letter-spacing:-.02em}
@@ -329,7 +338,9 @@ input[type=range]{accent-color:var(--accent)}
 .esmsg .apply button{border:1px solid var(--field-line);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer}
 .esmsg .apply button.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 .esempty{display:none}
-.esfoot{border-top:1px solid transparent;padding:10px 12px 14px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,transparent,var(--surface) 18%)}
+/* flex:0 0 auto — o composer não pode ser espremido quando a conversa cresce;
+   quem encolhe é o log (.eslog tem flex:1 e min-height:0). */
+.esfoot{flex:0 0 auto;border-top:1px solid transparent;padding:10px 12px 14px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,transparent,var(--surface) 18%)}
 .escomposer{background:var(--inset);border:1px solid var(--line);border-radius:28px;padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,.12)}
 .escomposer:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .esopts{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:11px;color:var(--sub);padding:0 4px}
