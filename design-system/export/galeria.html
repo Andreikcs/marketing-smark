@@ -725,6 +725,14 @@ function toast(){
   setTimeout(()=>t.remove(), 2600);
 }
 
+/* ---- tema por querystring (?tema=escuro) — útil para print automatizado ---- */
+const temaURL = new URLSearchParams(location.search).get('tema');
+if (temaURL === 'escuro' || temaURL === 'claro'){
+  document.documentElement.setAttribute('data-theme', temaURL);
+  document.querySelectorAll('.sk-topbar .sk-segmented button').forEach(b=>
+    b.classList.toggle('is-active', b.textContent.trim().toLowerCase() === temaURL));
+}
+
 pintaSwatches();
 </script>
 </body>
