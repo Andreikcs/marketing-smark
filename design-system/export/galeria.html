@@ -538,7 +538,7 @@
         <div class="sk-post-body">
           <div class="sk-post-title">O churn invisível dos ISPs</div>
           <div class="sk-post-meta">Provider Max<span class="sk-dot"></span>03/08</div>
-          <div class="sk-post-actions"><button>👁</button><button class="act-edit">✎</button><button>⧉</button><button class="act-del">🗑</button></div>
+          <div class="sk-post-actions"><button title="Ver"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="act-edit" title="Editar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button><button title="Duplicar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button><button class="act-del" title="Excluir"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div>
         </div>
       </div>
       <div class="sk-post">
@@ -549,7 +549,7 @@
         <div class="sk-post-body">
           <div class="sk-post-title">Um funcionário de IA por departamento</div>
           <div class="sk-post-meta">smark<span class="sk-dot"></span>01/08</div>
-          <div class="sk-post-actions"><button>👁</button><button class="act-edit">✎</button><button>⧉</button><button class="act-del">🗑</button></div>
+          <div class="sk-post-actions"><button title="Ver"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="act-edit" title="Editar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button><button title="Duplicar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button><button class="act-del" title="Excluir"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div>
         </div>
       </div>
       <div class="sk-post">
@@ -731,6 +731,18 @@ if (temaURL === 'escuro' || temaURL === 'claro'){
   document.documentElement.setAttribute('data-theme', temaURL);
   document.querySelectorAll('.sk-topbar .sk-segmented button').forEach(b=>
     b.classList.toggle('is-active', b.textContent.trim().toLowerCase() === temaURL));
+}
+
+/* ---- modo print (?print=<id da seção>) — isola uma seção para screenshot ---- */
+const printID = new URLSearchParams(location.search).get('print');
+if (printID){
+  document.querySelector('.g-hero').style.display = 'none';
+  document.querySelector('.sk-topbar').style.display = 'none';
+  document.querySelectorAll('.g-sec').forEach(s=>{
+    if (s.id !== printID) s.remove();
+    else s.style.paddingTop = '28px';
+  });
+  document.querySelector('.g-wrap').style.paddingBottom = '40px';
 }
 
 pintaSwatches();
