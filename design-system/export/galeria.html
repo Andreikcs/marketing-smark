@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="claro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grupo Smark — Design System</title>
+<link rel="stylesheet" href="smark-ds.css">
+<style>
+/* =====================================================================
+   CSS DA GALERIA — não faz parte do design system.
+   Só a moldura que exibe os componentes. Prefixo .g-
+   ===================================================================== */
+.g-wrap{max-width:1120px;margin:0 auto;padding:0 26px 120px}
+.g-hero{padding:72px 0 48px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.g-sec{padding-top:64px;scroll-margin-top:76px}
+.g-sec-head{display:flex;align-items:baseline;gap:14px;padding-bottom:14px;margin-bottom:26px;border-bottom:1px solid var(--line)}
+.g-sec-num{font-family:var(--font-mono);font-size:13px;color:var(--accent);font-weight:600}
+.g-sub{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:34px 0 14px}
+.g-sub:first-child{margin-top:0}
+.g-demo{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.g-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow)}
+.g-note{font-size:13px;color:var(--muted);line-height:1.55;margin-top:10px;max-width:62ch}
+.g-code{font-family:var(--font-mono);font-size:12px;color:var(--muted);background:var(--inset);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+
+/* swatches */
+.g-swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
+.g-sw{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.g-sw-chip{height:64px}
+.g-sw-meta{padding:9px 11px}
+.g-sw-name{font-size:12px;font-weight:700}
+.g-sw-val{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:2px}
+
+/* escala tipográfica */
+.g-type-row{display:grid;grid-template-columns:130px 1fr;gap:20px;align-items:baseline;padding:16px 0;border-bottom:1px solid var(--line)}
+.g-type-tag{font-family:var(--font-mono);font-size:11px;color:var(--muted);line-height:1.5}
+
+/* raio / espaço */
+.g-radii{display:flex;gap:16px;flex-wrap:wrap}
+.g-radius{width:88px;height:88px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-family:var(--font-mono);font-size:11px;color:var(--accent)}
+.g-spaces{display:flex;align-items:flex-end;gap:10px}
+.g-space{background:var(--accent);border-radius:3px 3px 0 0;width:34px}
+.g-space-tag{font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:center;margin-top:6px}
+
+/* marcas */
+.g-brand{display:flex;align-items:center;gap:16px;padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.g-brand-mark{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.g-brand-name{font-family:var(--font-display);text-transform:uppercase;font-size:22px;line-height:1}
+.g-brand-role{font-size:12px;color:var(--muted);margin-top:5px}
+.g-brand-hex{font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-top:6px}
+
+/* faixa comparativa claro/escuro */
+.g-split{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden}
+.g-split>div{padding:26px}
+.g-split-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:16px}
+
+.g-index{display:flex;flex-wrap:wrap;gap:6px;margin-top:26px}
+.g-index a{font-size:13px;color:var(--sub);text-decoration:none;padding:6px 12px;border-radius:99px;background:var(--inset);transition:.15s}
+.g-index a:hover{background:var(--accent-soft);color:var(--accent)}
+@media(max-width:860px){.g-split,.sk-grid-2,.sk-grid-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="sk">
+
+<header class="sk-topbar">
+  <div class="sk-row sk-gap-2" style="font-family:var(--font-display);text-transform:uppercase;font-size:19px;letter-spacing:.01em">
+    <svg width="22" height="22" viewBox="0 0 100 100" style="color:var(--accent)"><path fill="currentColor" fill-rule="evenodd" d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg>
+    smark.
+  </div>
+  <span class="sk-badge sk-badge--accent">design system v2.1</span>
+  <div class="sk-spacer"></div>
+  <div class="sk-segmented">
+    <button class="is-active" onclick="setTema('claro',this)">Claro</button>
+    <button onclick="setTema('escuro',this)">Escuro</button>
+  </div>
+</header>
+
+<div class="g-wrap">
+
+  <!-- ============================ HERO ============================ -->
+  <section class="g-hero">
+    <div class="sk-kicker">Grupo Smark · sistema visual</div>
+    <h1 class="sk-h1" style="margin:16px 0 0;max-width:16ch">Um sistema, <span class="sk-accent">três marcas</span></h1>
+    <p class="sk-lead" style="max-width:58ch;margin:18px 0 0">
+      Tokens, componentes e padrões compostos da smark, Provider Max e Elever AI.
+      Claro por padrão, escuro sob demanda — a mesma folha atende os dois.
+    </p>
+    <div class="g-index">
+      <a href="#cores">Cores</a><a href="#tipografia">Tipografia</a><a href="#forma">Forma &amp; espaço</a>
+      <a href="#botoes">Botões</a><a href="#formularios">Formulários</a><a href="#navegacao">Navegação</a>
+      <a href="#feedback">Feedback</a><a href="#dados">Dados</a><a href="#compostos">Padrões compostos</a>
+      <a href="#marcas">Marcas</a><a href="#regras">Regras</a>
+    </div>
+  </section>
+
+  <!-- ============================ 1. CORES ============================ -->
+  <section class="g-sec" id="cores">
+    <div class="g-sec-head"><span class="g-sec-num">01</span><h2 class="sk-h2">Cores</h2></div>
+
+    <div class="g-sub">Superfícies e texto</div>
+    <div class="g-swatches" id="sw-superficie"></div>
+
+    <div class="g-sub">Acentos da marca</div>
+    <div class="g-swatches" id="sw-acento"></div>
+
+    <div class="g-sub">Estados semânticos</div>
+    <div class="g-swatches" id="sw-estado"></div>
+
+    <div class="g-sub">Os dois temas, lado a lado</div>
+    <div class="g-split">
+      <div class="theme-claro" style="background:var(--bg);color:var(--text)">
+        <div class="g-split-label">Claro · padrão</div>
+        <h3 class="sk-h2" style="font-size:28px">Cada departamento ganha um <span class="sk-accent">novo funcionário</span></h3>
+        <p class="sk-lead" style="font-size:15px;margin:12px 0 18px">O acento colore a palavra, nunca a caixa.</p>
+        <button class="sk-btn">Ação primária</button>
+        <button class="sk-btn sk-btn--secondary">Secundária</button>
+      </div>
+      <div class="theme-escuro" style="background:var(--bg);color:var(--text)">
+        <div class="g-split-label">Escuro · secundário</div>
+        <h3 class="sk-h2" style="font-size:28px">Cada departamento ganha um <span class="sk-accent">novo funcionário</span></h3>
+        <p class="sk-lead" style="font-size:15px;margin:12px 0 18px">Mesmo componente, token recalculado.</p>
+        <button class="sk-btn">Ação primária</button>
+        <button class="sk-btn sk-btn--secondary">Secundária</button>
+      </div>
+    </div>
+    <p class="g-note">O tema é um atributo na raiz: <span class="g-code">&lt;html data-theme="escuro"&gt;</span>. Nenhum componente muda — só os tokens recalculam. As classes <span class="g-code">.theme-claro</span> / <span class="g-code">.theme-escuro</span> fazem o mesmo em um trecho isolado da página (é o que está acontecendo acima).</p>
+  </section>
+
+  <!-- ============================ 2. TIPOGRAFIA ============================ -->
+  <section class="g-sec" id="tipografia">
+    <div class="g-sec-head"><span class="g-sec-num">02</span><h2 class="sk-h2">Tipografia</h2></div>
+    <div class="g-panel">
+      <div class="g-type-row">
+        <div class="g-type-tag">.sk-kicker<br>Archivo 700 · 12px</div>
+        <div class="sk-kicker">Método · Diagnóstico gratuito</div>
+      </div>
+      <div class="g-type-row">
+        <div class="g-type-tag">.sk-h1<br>Anton · 56px / .94</div>
+        <div class="sk-h1">Funcionário de IA</div>
+      </div>
+      <div class="g-type-row">
+        <div class="g-type-tag">.sk-h2<br>Anton · 40px / 1</div>
+        <div class="sk-h2">Redução de custo</div>
+      </div>
+      <div class="g-type-row">
+        <div class="g-type-tag">.sk-lead<br>Archivo · 19px / 1.55</div>
+        <div class="sk-lead">O lead chega às duas da manhã e alguém responde. Isso é tudo.</div>
+      </div>
+      <div class="g-type-row">
+        <div class="g-type-tag">corpo<br>Archivo · 15px / 1.5</div>
+        <div style="font-size:15px;line-height:1.5">Texto corrido do sistema. Uma criança de sete anos entende a frase — se não entender, a frase está errada.</div>
+      </div>
+      <div class="g-type-row" style="border-bottom:0">
+        <div class="g-type-tag">.sk-mono<br>JetBrains Mono · 13px</div>
+        <div class="sk-mono" style="font-size:13px">2026-08-05 · R$ 0,042 · seed 8814</div>
+      </div>
+    </div>
+    <p class="g-note"><b>Anton</b> é sempre caixa-alta com entrelinha apertada — é a voz do título. <b>Archivo</b> carrega todo o resto. <b>JetBrains Mono</b> só para número, data, custo e identificador.</p>
+  </section>
+
+  <!-- ============================ 3. FORMA & ESPAÇO ============================ -->
+  <section class="g-sec" id="forma">
+    <div class="g-sec-head"><span class="g-sec-num">03</span><h2 class="sk-h2">Forma &amp; espaço</h2></div>
+
+    <div class="g-sub">Raio</div>
+    <div class="g-radii">
+      <div class="g-radius" style="border-radius:var(--radius-sm)">sm · 8</div>
+      <div class="g-radius" style="border-radius:var(--radius-md)">md · 12</div>
+      <div class="g-radius" style="border-radius:var(--radius-lg)">lg · 16</div>
+      <div class="g-radius" style="border-radius:var(--radius-pill)">pill · 999</div>
+    </div>
+
+    <div class="g-sub">Escala de espaço (base 4)</div>
+    <div class="g-spaces" id="g-spaces"></div>
+
+    <div class="g-sub">Elevação</div>
+    <div class="sk-grid-3">
+      <div class="sk-card sk-card--flat"><div class="sk-metric-label">flat</div><p class="g-note" style="margin-top:8px">Sem sombra. Blocos dentro de outro card.</p></div>
+      <div class="sk-card"><div class="sk-metric-label">shadow</div><p class="g-note" style="margin-top:8px">Padrão. Card, tabela, lista, popover.</p></div>
+      <div class="sk-card" style="box-shadow:var(--shadow-lg)"><div class="sk-metric-label">shadow-lg</div><p class="g-note" style="margin-top:8px">Só flutuante: modal, menu, toast.</p></div>
+    </div>
+  </section>
+
+  <!-- ============================ 4. BOTÕES ============================ -->
+  <section class="g-sec" id="botoes">
+    <div class="g-sec-head"><span class="g-sec-num">04</span><h2 class="sk-h2">Botões</h2></div>
+    <div class="g-panel">
+      <div class="g-sub">Variantes</div>
+      <div class="g-demo">
+        <button class="sk-btn">Gerar conteúdo</button>
+        <button class="sk-btn sk-btn--secondary">Cancelar</button>
+        <button class="sk-btn sk-btn--ghost">Ver histórico</button>
+        <button class="sk-btn sk-btn--lime">Aprovar</button>
+        <button class="sk-btn sk-btn--danger">Excluir</button>
+        <button class="sk-btn" disabled>Desabilitado</button>
+      </div>
+
+      <div class="g-sub">Tamanhos</div>
+      <div class="g-demo">
+        <button class="sk-btn sk-btn--sm">Pequeno</button>
+        <button class="sk-btn">Padrão</button>
+        <button class="sk-btn sk-btn--lg">Grande</button>
+        <button class="sk-btn sk-btn--secondary sk-btn--icon" aria-label="Mais">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+
+      <div class="g-sub">Especiais</div>
+      <div class="g-demo">
+        <button class="sk-btn sk-btn--studio">✦ Estúdio IA</button>
+        <button class="sk-btn sk-btn--ai" style="width:auto;padding:11px 20px">Gerar fundo · custo estimado R$ 0,19</button>
+      </div>
+      <p class="g-note"><b>Um primário por tela.</b> Só um botão roxo cheio por vista — o resto é secundário ou fantasma. <span class="g-code">--lime</span> fica reservado a confirmação positiva; <span class="g-code">--ai</span> marca ação que gasta dinheiro.</p>
+    </div>
+  </section>
+
+  <!-- ============================ 5. FORMULÁRIOS ============================ -->
+  <section class="g-sec" id="formularios">
+    <div class="g-sec-head"><span class="g-sec-num">05</span><h2 class="sk-h2">Formulários</h2></div>
+    <div class="sk-grid-2">
+      <div class="g-panel">
+        <label class="sk-label">Título do post</label>
+        <input class="sk-input" value="O lead que some às duas da manhã">
+        <div style="height:18px"></div>
+        <label class="sk-label">Legenda</label>
+        <textarea class="sk-textarea" placeholder="Escreva como você falaria com um amigo…">Quem responde primeiro fica com o cliente. Simples assim.</textarea>
+        <div style="height:18px"></div>
+        <label class="sk-label">Canal</label>
+        <select class="sk-select"><option>Instagram · 1080×1350</option><option>LinkedIn · 1200×1500</option></select>
+      </div>
+      <div class="g-panel">
+        <div class="g-sub">Controles</div>
+        <div class="sk-row sk-gap-3" style="margin-bottom:16px">
+          <button class="sk-toggle is-on" aria-checked="true"></button><span style="font-size:14px">Grade de acabamento</span>
+        </div>
+        <div class="sk-row sk-gap-3" style="margin-bottom:16px">
+          <button class="sk-toggle" aria-checked="false"></button><span style="font-size:14px;color:var(--muted)">Marca-d'água</span>
+        </div>
+        <div class="sk-row sk-gap-3" style="margin-bottom:12px">
+          <span class="sk-check is-on"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span style="font-size:14px">Salvar no acervo</span>
+        </div>
+        <div class="sk-row sk-gap-3" style="margin-bottom:18px">
+          <span class="sk-check"></span><span style="font-size:14px;color:var(--muted)">Publicar direto</span>
+        </div>
+        <div class="sk-row sk-gap-3" style="margin-bottom:10px">
+          <span class="sk-radio is-on"></span><span style="font-size:14px">Tema claro</span>
+        </div>
+        <div class="sk-row sk-gap-3" style="margin-bottom:20px">
+          <span class="sk-radio"></span><span style="font-size:14px;color:var(--muted)">Tema escuro</span>
+        </div>
+        <div class="sk-slider-head"><label>Saturação</label><span class="sk-slider-val">112%</span></div>
+        <input type="range" class="sk-slider" value="62">
+        <div style="height:14px"></div>
+        <div class="g-sub" style="margin-top:22px">Barra de formatação</div>
+        <div class="sk-richbar">
+          <button>|<small>quebra</small></button>
+          <button>★<small>acento</small></button>
+          <button><b>B</b></button>
+          <button><i>I</i></button>
+          <span class="sk-rich-swatch"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 6. NAVEGAÇÃO ============================ -->
+  <section class="g-sec" id="navegacao">
+    <div class="g-sec-head"><span class="g-sec-num">06</span><h2 class="sk-h2">Navegação</h2></div>
+
+    <div class="g-panel">
+      <div class="g-sub">Abas</div>
+      <div class="sk-tabs" style="margin-bottom:8px">
+        <button class="sk-tab is-active">Publicações</button>
+        <button class="sk-tab">Acervo</button>
+        <button class="sk-tab">Custos</button>
+        <button class="sk-tab">Configuração</button>
+      </div>
+
+      <div class="g-sub">Segmentado — o padrão certo para filtro</div>
+      <div class="g-demo">
+        <div class="sk-segmented">
+          <button class="is-active">Todos</button><button>Rascunho</button><button>Aprovado</button><button>Publicado</button>
+        </div>
+        <div class="sk-segmented">
+          <button class="is-active">smark</button><button>Provider Max</button><button>Elever AI</button>
+        </div>
+      </div>
+
+      <div class="g-sub">Migalhas &amp; páginas</div>
+      <div class="g-demo" style="gap:30px">
+        <div class="sk-breadcrumb"><a href="#">Painel</a>›<a href="#">smark</a>›<span class="is-current">Instagram</span></div>
+        <div class="sk-row sk-gap-2">
+          <button class="sk-page">‹</button><button class="sk-page is-active">1</button>
+          <button class="sk-page">2</button><button class="sk-page">3</button><button class="sk-page">›</button>
+        </div>
+      </div>
+
+      <div class="g-sub">Pílulas &amp; links de nav</div>
+      <div class="g-demo">
+        <span class="sk-pill is-active">Instagram</span>
+        <span class="sk-pill">LinkedIn</span>
+        <span class="sk-pill">Anúncio</span>
+        <span style="width:20px"></span>
+        <a class="sk-navlink is-active">Painel</a><a class="sk-navlink">Vitrine</a><a class="sk-navlink">Config</a>
+      </div>
+
+      <div class="g-sub">Passos</div>
+      <div class="sk-stepper" style="max-width:560px">
+        <div class="sk-step is-done"><div class="sk-step-num">✓</div><div class="sk-step-label">Briefing</div></div>
+        <div class="sk-step-line is-done"></div>
+        <div class="sk-step is-current"><div class="sk-step-num">2</div><div class="sk-step-label">Arte</div></div>
+        <div class="sk-step-line"></div>
+        <div class="sk-step"><div class="sk-step-num">3</div><div class="sk-step-label">Revisão</div></div>
+      </div>
+
+      <div class="g-sub">Menu</div>
+      <div class="sk-menu-wrap" style="height:200px">
+        <button class="sk-btn sk-btn--secondary">Ações ▾</button>
+        <div class="sk-menu">
+          <div class="sk-menu-item">Duplicar publicação</div>
+          <div class="sk-menu-item">Enviar ao Drive</div>
+          <div class="sk-menu-item">Marcar no acervo ★</div>
+          <div class="sk-menu-sep"></div>
+          <div class="sk-menu-item is-danger">Excluir</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 7. FEEDBACK ============================ -->
+  <section class="g-sec" id="feedback">
+    <div class="g-sec-head"><span class="g-sec-num">07</span><h2 class="sk-h2">Feedback</h2></div>
+
+    <div class="g-panel">
+      <div class="g-sub">Selos de status</div>
+      <div class="g-demo">
+        <span class="sk-badge sk-badge--good">Publicado</span>
+        <span class="sk-badge sk-badge--warn">Agendado</span>
+        <span class="sk-badge sk-badge--bad">Bloqueado no gate</span>
+        <span class="sk-badge sk-badge--info">Em revisão</span>
+        <span class="sk-badge sk-badge--accent">Rascunho</span>
+      </div>
+
+      <div class="g-sub">Avisos</div>
+      <div class="sk-stack sk-gap-3">
+        <div class="sk-alert sk-alert--info"><div><div class="sk-alert-title">Fundo reaproveitado do acervo</div><div class="sk-alert-body">Nenhum custo de geração nesta peça.</div></div></div>
+        <div class="sk-alert sk-alert--warn"><div><div class="sk-alert-title">Jargão detectado</div><div class="sk-alert-body">"alavancar" na linha 3 — o revisar.py sinaliza, mas não bloqueia.</div></div></div>
+        <div class="sk-alert sk-alert--bad"><div><div class="sk-alert-title">Promessa de venda</div><div class="sk-alert-body">"garante 5× mais clientes" — o gate bloqueia. Reescreva sem prometer resultado.</div></div></div>
+      </div>
+
+      <div class="g-sub">Progresso</div>
+      <div class="sk-grid-2">
+        <div>
+          <div class="sk-slider-head"><label>Gerando fundos</label><span class="sk-slider-val">4/6</span></div>
+          <div class="sk-progress"><div class="sk-progress-bar" style="width:66%"></div></div>
+          <div style="height:14px"></div>
+          <div class="sk-progress"><div class="sk-progress-bar sk-progress-bar--lime" style="width:100%"></div></div>
+          <div style="height:14px"></div>
+          <div class="sk-progress sk-progress--indeterminate"><span></span></div>
+        </div>
+        <div>
+          <div class="sk-skel" style="height:14px;width:70%;margin-bottom:10px"></div>
+          <div class="sk-skel" style="height:14px;width:92%;margin-bottom:10px"></div>
+          <div class="sk-skel" style="height:14px;width:48%"></div>
+          <div class="g-note">Skeleton — <span class="g-code">.sk-skel</span> com width/height inline.</div>
+        </div>
+      </div>
+
+      <div class="g-sub">Dica &amp; estado vazio</div>
+      <div class="sk-grid-2" style="align-items:start">
+        <div style="padding-top:44px;text-align:center">
+          <span class="sk-tip-wrap">
+            <button class="sk-btn sk-btn--secondary">Passe o mouse</button>
+            <span class="sk-tip">Reroll usa a mesma seed como rótulo</span>
+          </span>
+        </div>
+        <div class="sk-empty">
+          <div class="sk-empty-icon sk-empty-icon--muted">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg>
+          </div>
+          <div class="sk-empty-title">Nenhuma arte ainda</div>
+          <div class="sk-empty-text">Gere o primeiro fundo ou puxe uma peça aprovada do acervo.</div>
+          <button class="sk-btn">Criar publicação</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="g-sub">Modal</div>
+    <div style="position:relative;height:280px;border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden">
+      <div class="sk-overlay" style="position:absolute">
+        <div class="sk-modal">
+          <h3 class="sk-h2" style="font-size:26px">Descartar rascunho?</h3>
+          <p class="sk-lead" style="font-size:15px;margin:12px 0 22px">A arte gerada continua no disco, mas a nota some.</p>
+          <div class="sk-row sk-gap-3" style="justify-content:flex-end">
+            <button class="sk-btn sk-btn--secondary">Manter</button>
+            <button class="sk-btn sk-btn--danger">Descartar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="g-note">O <span class="g-code">.sk-toast</span> é <span class="g-code">position:fixed</span> — não cabe numa moldura de galeria. Clique aqui para ver: <button class="sk-btn sk-btn--sm sk-btn--ghost" onclick="toast()">Disparar toast</button></p>
+  </section>
+
+  <!-- ============================ 8. DADOS ============================ -->
+  <section class="g-sec" id="dados">
+    <div class="g-sec-head"><span class="g-sec-num">08</span><h2 class="sk-h2">Dados &amp; conteúdo</h2></div>
+
+    <div class="g-sub">Cards de métrica</div>
+    <div class="sk-grid-3">
+      <div class="sk-card"><div class="sk-metric-label">Posts no mês</div><div class="sk-metric-value">37</div><div style="font-size:13px;color:var(--muted)">+9 vs. julho</div></div>
+      <div class="sk-card"><div class="sk-metric-label">Custo de geração</div><div class="sk-metric-value sk-mono" style="font-size:44px">R$ 24,80</div><div style="font-size:13px;color:var(--muted)">média R$ 0,67/peça</div></div>
+      <div class="sk-card sk-card--brand"><div class="sk-metric-label" style="color:rgba(255,255,255,.7)">Acervo aprovado</div><div class="sk-metric-value">128</div><div style="font-size:13px;opacity:.8">peças de referência</div></div>
+    </div>
+
+    <div class="g-sub">Tabela</div>
+    <div class="sk-table">
+      <div class="sk-table-head" style="grid-template-columns:2.4fr 1fr 1fr 1fr">
+        <div>Publicação</div><div>Marca</div><div>Canal</div><div>Status</div>
+      </div>
+      <div class="sk-table-row" style="grid-template-columns:2.4fr 1fr 1fr 1fr">
+        <div>O churn invisível dos ISPs</div><div>Provider Max</div><div>Instagram</div><div><span class="sk-badge sk-badge--good">Publicado</span></div>
+      </div>
+      <div class="sk-table-row" style="grid-template-columns:2.4fr 1fr 1fr 1fr">
+        <div>O lead que some às duas da manhã</div><div>Elever AI</div><div>Instagram</div><div><span class="sk-badge sk-badge--warn">Agendado</span></div>
+      </div>
+      <div class="sk-table-row" style="grid-template-columns:2.4fr 1fr 1fr 1fr">
+        <div>Um funcionário de IA por departamento</div><div>smark</div><div>LinkedIn</div><div><span class="sk-badge sk-badge--accent">Rascunho</span></div>
+      </div>
+    </div>
+
+    <div class="g-sub">Lista</div>
+    <div class="sk-list">
+      <div class="sk-list-item">
+        <div class="sk-list-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2-6.3-4.6-6.3 4.6L7.9 13.8 2 9.4h7.6z"/></svg></div>
+        <div class="sk-list-body"><div class="sk-list-title">Nina</div><div class="sk-list-meta">Elever AI · atende lead dia e noite</div></div>
+        <span class="sk-badge sk-badge--good">ativa</span>
+      </div>
+      <div class="sk-list-item">
+        <div class="sk-list-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20h-20"/></svg></div>
+        <div class="sk-list-body"><div class="sk-list-title">Clara</div><div class="sk-list-meta">Provider Max · executa 10 mil contratos</div></div>
+        <span class="sk-badge sk-badge--good">ativa</span>
+      </div>
+      <div class="sk-list-item">
+        <div class="sk-list-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <div class="sk-list-body"><div class="sk-list-title">Téo</div><div class="sk-list-meta">Prospecção · encontra quem ainda não te conhece</div></div>
+        <span class="sk-badge sk-badge--warn">piloto</span>
+      </div>
+    </div>
+
+    <div class="g-sub">Chips, avatares, calendário</div>
+    <div class="sk-grid-2" style="align-items:start">
+      <div class="g-panel">
+        <div class="g-demo" style="margin-bottom:20px">
+          <span class="sk-chip sk-chip--input">#automacao <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
+          <span class="sk-chip sk-chip--outline">#isp</span>
+          <span class="sk-chip sk-chip--solid">#prevendas</span>
+        </div>
+        <div class="sk-row sk-gap-4">
+          <span class="sk-avatar-wrap"><span class="sk-avatar sk-avatar--lg">A</span><span class="sk-avatar-status"></span></span>
+          <span class="sk-avatar sk-avatar--md">P</span>
+          <span class="sk-avatar sk-avatar--sm">E</span>
+          <span class="sk-avatar-group">
+            <span class="sk-avatar sk-avatar--md">N</span><span class="sk-avatar sk-avatar--md">C</span><span class="sk-avatar sk-avatar--md">T</span><span class="sk-avatar-more">+4</span>
+          </span>
+        </div>
+        <div class="g-sub" style="margin-top:24px">Grade de escolha</div>
+        <div class="sk-choicegrid">
+          <button class="sk-choice is-active">Nenhuma</button><button class="sk-choice">Duotone</button>
+          <button class="sk-choice">Vinheta</button><button class="sk-choice">Grão</button>
+        </div>
+      </div>
+      <div class="sk-cal">
+        <div class="sk-row" style="justify-content:space-between;margin-bottom:16px">
+          <b style="font-size:15px">Agosto 2026</b>
+          <div class="sk-row sk-gap-2"><button class="sk-page" style="width:30px;height:30px">‹</button><button class="sk-page" style="width:30px;height:30px">›</button></div>
+        </div>
+        <div class="sk-cal-grid" id="cal"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 9. PADRÕES COMPOSTOS ============================ -->
+  <section class="g-sec" id="compostos">
+    <div class="g-sec-head"><span class="g-sec-num">09</span><h2 class="sk-h2">Padrões compostos</h2></div>
+    <p class="g-note" style="margin:-12px 0 24px">Cor sozinha não conserta layout. Estes são os arranjos que resolvem "menus, filtros e grupos de elementos fora do padrão".</p>
+
+    <div class="g-sub">Cabeçalho de página + barra de ferramentas</div>
+    <div class="g-panel">
+      <div class="sk-pagehead">
+        <div>
+          <div class="sk-kicker">smark · Instagram</div>
+          <h3 class="sk-h2" style="font-size:32px;margin-top:8px">Publicações</h3>
+        </div>
+        <div class="sk-pagehead-actions">
+          <button class="sk-btn sk-btn--secondary">Importar</button>
+          <button class="sk-btn">Nova publicação</button>
+        </div>
+      </div>
+      <div class="sk-toolbar" style="margin-bottom:0">
+        <div class="sk-filter-group">
+          <span class="sk-filter-label">status</span>
+          <div class="sk-segmented"><button class="is-active">Todos</button><button>Rascunho</button><button>Aprovado</button></div>
+        </div>
+        <div class="sk-toolbar-sep"></div>
+        <div class="sk-filter-group">
+          <span class="sk-filter-label">marca</span>
+          <div class="sk-segmented"><button class="is-active">smark</button><button>PM</button><button>Elever</button></div>
+        </div>
+        <div class="sk-spacer"></div>
+        <input class="sk-input" placeholder="Buscar…" style="width:200px;padding:8px 12px;font-size:14px">
+      </div>
+    </div>
+
+    <div class="g-sub">Grade de cards de publicação</div>
+    <div class="sk-cardgrid">
+      <div class="sk-post is-selected">
+        <div class="sk-post-thumb">
+          <span class="sk-post-check is-on"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span class="sk-post-channel">IG</span>
+          <span style="font-family:var(--font-display);font-size:15px;text-transform:uppercase;color:rgba(255,255,255,.9);padding:0 16px;text-align:center;line-height:1.05">O lead que some às duas da manhã</span>
+        </div>
+        <div class="sk-post-body">
+          <div class="sk-post-title">O lead que some às duas da manhã</div>
+          <div class="sk-post-meta">Elever AI<span class="sk-dot"></span>05/08<span class="sk-dot"></span><span class="sk-mono">R$0,19</span></div>
+          <div class="sk-post-actions">
+            <button title="Ver"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="act-edit" title="Editar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+            <button title="Duplicar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            <button class="act-del" title="Excluir"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="sk-post">
+        <div class="sk-post-thumb">
+          <span class="sk-post-check"></span><span class="sk-post-channel">IG</span>
+          <span style="font-family:var(--font-display);font-size:15px;text-transform:uppercase;color:rgba(255,255,255,.9);padding:0 16px;text-align:center;line-height:1.05">O churn invisível dos ISPs</span>
+        </div>
+        <div class="sk-post-body">
+          <div class="sk-post-title">O churn invisível dos ISPs</div>
+          <div class="sk-post-meta">Provider Max<span class="sk-dot"></span>03/08</div>
+          <div class="sk-post-actions"><button>👁</button><button class="act-edit">✎</button><button>⧉</button><button class="act-del">🗑</button></div>
+        </div>
+      </div>
+      <div class="sk-post">
+        <div class="sk-post-thumb">
+          <span class="sk-post-check"></span><span class="sk-post-channel">IN</span>
+          <span style="font-family:var(--font-display);font-size:15px;text-transform:uppercase;color:rgba(255,255,255,.9);padding:0 16px;text-align:center;line-height:1.05">Um funcionário de IA por departamento</span>
+        </div>
+        <div class="sk-post-body">
+          <div class="sk-post-title">Um funcionário de IA por departamento</div>
+          <div class="sk-post-meta">smark<span class="sk-dot"></span>01/08</div>
+          <div class="sk-post-actions"><button>👁</button><button class="act-edit">✎</button><button>⧉</button><button class="act-del">🗑</button></div>
+        </div>
+      </div>
+      <div class="sk-post">
+        <div class="sk-post-thumb"><span class="sk-post-check"></span><span class="sk-post-channel">IG</span></div>
+        <div class="sk-post-body">
+          <div class="sk-skel" style="height:13px;width:88%;margin-bottom:7px"></div>
+          <div class="sk-skel" style="height:13px;width:56%;margin-bottom:14px"></div>
+          <div class="sk-skel" style="height:30px;width:100%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g-sub">Painel de propriedades (coluna do editor)</div>
+    <div class="sk-grid-2" style="align-items:start">
+      <div class="g-panel" style="padding:20px">
+        <div class="sk-prop-section" style="padding-top:0">
+          <div class="sk-prop-title">Camada</div>
+          <div class="sk-choicegrid"><button class="sk-choice is-active">Nenhuma</button><button class="sk-choice">Escura</button><button class="sk-choice">Roxa</button><button class="sk-choice">Grão</button></div>
+        </div>
+        <div class="sk-prop-section">
+          <div class="sk-prop-title">Ajuste de imagem</div>
+          <div class="sk-slider-row"><label>Brilho</label><input type="range" class="sk-slider" value="50"></div>
+          <div class="sk-slider-row"><label>Contraste</label><input type="range" class="sk-slider" value="64"></div>
+          <div class="sk-slider-row" style="margin-bottom:0"><label>Saturação</label><input type="range" class="sk-slider" value="42"></div>
+        </div>
+        <div class="sk-prop-section" style="border-bottom:0">
+          <div class="sk-prop-title">Slides</div>
+          <div class="sk-thumbrail">
+            <div class="sk-thumb is-active"><span class="sk-thumb-num">1</span><div class="sk-thumb-actions"><button class="act-dup">⧉</button><button class="act-del">×</button></div></div>
+            <div class="sk-thumb"><span class="sk-thumb-num">2</span><div class="sk-thumb-actions"><button class="act-dup">⧉</button><button class="act-del">×</button></div></div>
+            <div class="sk-thumb"><span class="sk-thumb-num">3</span><div class="sk-thumb-actions"><button class="act-dup">⧉</button><button class="act-del">×</button></div></div>
+            <button class="sk-thumb-add">+</button>
+          </div>
+          <div class="sk-accordion is-open">
+            <button class="sk-accordion-head">Assinatura <span class="sk-accordion-chev">›</span></button>
+            <div class="sk-accordion-body">
+              <div class="sk-selo"><span class="sk-selo-mark"><svg width="12" height="12" viewBox="0 0 100 100"><path fill="#fff" fill-rule="evenodd" d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg></span>smark. ✓</div>
+            </div>
+          </div>
+          <div class="sk-accordion">
+            <button class="sk-accordion-head">Exportar <span class="sk-accordion-chev">›</span></button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sk-command">
+          <div class="sk-command-head">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input placeholder="Buscar publicação, marca, comando…" value="">
+            <span class="sk-kbd">esc</span>
+          </div>
+          <div class="sk-command-group">Ações</div>
+          <div class="sk-command-item is-active"><span>Nova publicação</span><div class="sk-spacer" style="flex:1"></div><span class="sk-kbd">N</span></div>
+          <div class="sk-command-item"><span>Abrir acervo</span><div class="sk-spacer" style="flex:1"></div><span class="sk-kbd">A</span></div>
+          <div class="sk-command-group">Recentes</div>
+          <div class="sk-command-item"><span>O churn invisível dos ISPs</span></div>
+        </div>
+        <div style="height:18px"></div>
+        <div class="g-panel">
+          <div class="sk-prop-title" style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Emojis</div>
+          <div class="sk-emojigrid">
+            <button>🚀</button><button>💡</button><button>📈</button><button>⚡</button>
+            <button>🤖</button><button>✨</button><button>🎯</button><button>🔒</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 10. MARCAS ============================ -->
+  <section class="g-sec" id="marcas">
+    <div class="g-sec-head"><span class="g-sec-num">10</span><h2 class="sk-h2">Marcas</h2></div>
+    <p class="g-note" style="margin:-12px 0 24px">O sistema é um só. A marca troca o acento, o gradiente e a assinatura — nada mais. Produto sempre assina "uma plataforma smark."</p>
+    <div class="sk-grid-3">
+      <div class="g-brand">
+        <div class="g-brand-mark" style="background:linear-gradient(155deg,#8B3CF7 0%,#050D1A 100%)">
+          <svg width="26" height="26" viewBox="0 0 100 100"><path fill="#fff" fill-rule="evenodd" d="M50 7 L86 90 L50 58 L14 90 Z M41 46 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 Z"/></svg>
+        </div>
+        <div><div class="g-brand-name">smark.</div><div class="g-brand-role">marca-mãe · o método</div><div class="g-brand-hex sk-mono">#8B3CF7 · #C6F24E</div></div>
+      </div>
+      <div class="g-brand">
+        <div class="g-brand-mark" style="background:linear-gradient(155deg,#9A4DFF 0%,#2A1CA8 100%);color:#fff">
+          <svg width="28" height="28" viewBox="0 0 100 100"><circle cx="50" cy="71" r="7" fill="currentColor"/><path d="M37 61 Q50 46 63 61" stroke="currentColor" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M27 52 Q50 27 73 52" stroke="currentColor" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M17 43 Q50 10 83 43" stroke="currentColor" stroke-width="9" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div><div class="g-brand-name">Provider <span class="sk-accent">Max</span></div><div class="g-brand-role">produto · ISPs</div><div class="g-brand-hex sk-mono">#8B3CF7 → #2A1CA8</div></div>
+      </div>
+      <div class="g-brand">
+        <div class="g-brand-mark" style="background:linear-gradient(155deg,#9A4DFF 0%,#2A1CA8 100%)">
+          <svg width="26" height="26" viewBox="0 0 100 100"><path fill="#fff" d="M50 4 C54 34 66 46 96 50 C66 54 54 66 50 96 C46 66 34 54 4 50 C34 46 46 34 50 4 Z"/></svg>
+        </div>
+        <div><div class="g-brand-name">Elever <span class="sk-accent">AI</span></div><div class="g-brand-role">produto · pré-vendas</div><div class="g-brand-hex sk-mono">#8B3CF7 → #2A1CA8</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 11. REGRAS ============================ -->
+  <section class="g-sec" id="regras">
+    <div class="g-sec-head"><span class="g-sec-num">11</span><h2 class="sk-h2">Regras da marca</h2></div>
+    <div class="sk-grid-2">
+      <div class="sk-card">
+        <div class="sk-badge sk-badge--good" style="margin-bottom:14px">Faça</div>
+        <ul style="margin:0;padding-left:20px;line-height:1.75;font-size:15px;color:var(--sub)">
+          <li>Colore a <span class="sk-accent" style="font-weight:700">palavra-chave</span> com o acento.</li>
+          <li>Um botão primário por tela.</li>
+          <li>Anton em caixa-alta, entrelinha apertada.</li>
+          <li>Claro como padrão; escuro como contraponto.</li>
+          <li>Lime só em confirmação positiva.</li>
+        </ul>
+      </div>
+      <div class="sk-card">
+        <div class="sk-badge sk-badge--bad" style="margin-bottom:14px">Não faça</div>
+        <ul style="margin:0;padding-left:20px;line-height:1.75;font-size:15px;color:var(--sub)">
+          <li>Pintar caixas inteiras de roxo.</li>
+          <li>Espalhar pílulas de filtro soltas — use segmentado.</li>
+          <li>Botão flutuante de menu — use a topbar.</li>
+          <li>Anton em texto corrido.</li>
+          <li>Sombra grande em card comum.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="g-note" style="margin-top:24px">Fonte da verdade dos valores: <span class="g-code">tokens.json</span>. Mudou lá, atualize <span class="g-code">smark-ds.css</span> (bloco 1. TOKENS).</p>
+  </section>
+
+</div>
+
+<script>
+/* ---- tema ---- */
+function setTema(t, btn){
+  document.documentElement.setAttribute('data-theme', t);
+  btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('is-active', b===btn));
+  pintaSwatches();
+}
+
+/* ---- swatches lidos dos tokens em uso ---- */
+const GRUPOS = {
+  'sw-superficie': ['bg','surface','surface-2','inset','text','sub','muted','line'],
+  'sw-acento':     ['accent','accent-2','accent-soft','accent-ink','lime','lime-ink','lime-soft'],
+  'sw-estado':     ['good','good-soft','warn','warn-soft','bad','bad-soft','info','info-soft']
+};
+function pintaSwatches(){
+  const cs = getComputedStyle(document.documentElement);
+  for (const [id, vars] of Object.entries(GRUPOS)){
+    document.getElementById(id).innerHTML = vars.map(v=>{
+      const val = cs.getPropertyValue('--'+v).trim();
+      return `<div class="g-sw">
+        <div class="g-sw-chip" style="background:${val}"></div>
+        <div class="g-sw-meta"><div class="g-sw-name">--${v}</div><div class="g-sw-val">${val}</div></div>
+      </div>`;
+    }).join('');
+  }
+}
+
+/* ---- escala de espaço ---- */
+document.getElementById('g-spaces').innerHTML = [1,2,3,4,6,8,12,16].map(n=>{
+  const px = {1:4,2:8,3:12,4:16,6:24,8:32,12:48,16:64}[n];
+  return `<div><div class="g-space" style="height:${px*1.6}px"></div><div class="g-space-tag">${n}<br>${px}</div></div>`;
+}).join('');
+
+/* ---- calendário de exemplo (agosto/2026) ---- */
+document.getElementById('cal').innerHTML =
+  ['D','S','T','Q','Q','S','S'].map(d=>`<div class="sk-cal-dow">${d}</div>`).join('')
+  + Array.from({length:31},(_,i)=>{
+      const d=i+1, cls = d>=10&&d<=14 ? ' in-range' : (d===12 ? ' is-selected' : '');
+      return `<div class="sk-cal-day${d===12?' is-selected':cls}">${d}</div>`;
+    }).join('');
+
+/* ---- toast ---- */
+function toast(){
+  const t = document.createElement('div');
+  t.className = 'sk-toast';
+  t.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Publicação salva no acervo';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2600);
+}
+
+pintaSwatches();
+</script>
+</body>
+</html>

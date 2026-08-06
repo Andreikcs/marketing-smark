@@ -1,0 +1,65 @@
+/* =====================================================================
+   GRUPO SMARK — TOKENS
+   Só as variáveis CSS. Use esta folha se você já tem componentes próprios
+   e só quer as cores/tipos/raios/espacos do sistema.
+   Fonte da verdade: tokens.json
+   ===================================================================== */
+
+/* ---------- Fontes ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* =====================================================================
+   1. TOKENS
+   ===================================================================== */
+:root[data-theme="claro"], .theme-claro {
+  --bg:#F4F2FB;      --surface:#FFFFFF;   --surface-2:#FAF8FE;  --inset:#F3F0FB;
+  --text:#100D1C;    --sub:#4A4560;       --muted:#6B6680;
+  --line:rgba(16,13,28,.10);             --line-strong:rgba(16,13,28,.16);
+  --field:#FFFFFF;   --field-line:rgba(16,13,28,.18);
+  --accent:#8B3CF7;  --accent-2:#A472FF;  --accent-soft:#EFE7FF;  --accent-ink:#FFFFFF;
+  --lime:#C6F24E;    --lime-ink:#2A2E12;  --lime-soft:#EEF9CF;
+  --good:#1F8A5B;    --good-soft:#DFF3E9;
+  --warn:#B0741A;    --warn-soft:#FAEFD8;
+  --bad:#C4453B;     --bad-soft:#FAE3E1;
+  --info:#2A6FDB;    --info-soft:#E1ECFB;
+  --shadow:0 1px 2px rgba(16,13,28,.05),0 10px 26px rgba(16,13,28,.06);
+  --shadow-lg:0 24px 64px rgba(16,13,28,.16);
+}
+/* Tema escuro suavizado — menos preto puro, mais contraste legível */
+:root[data-theme="escuro"], .theme-escuro {
+  --bg:#14141A;      --surface:#1E1E26;   --surface-2:#26262F;  --inset:#191920;
+  --text:#F2F0F7;    --sub:#B8B5C4;       --muted:#918E9E;
+  --line:rgba(255,255,255,.12);          --line-strong:rgba(255,255,255,.20);
+  --field:#1A1A22;   --field-line:rgba(255,255,255,.18);
+  --accent:#B18BFF;  --accent-2:#9A6AFF;  --accent-soft:rgba(177,139,255,.22);  --accent-ink:#12081F;
+  --lime:#C6F24E;    --lime-ink:#1A1E08;  --lime-soft:rgba(198,242,78,.14);
+  --good:#4DDB9A;    --good-soft:rgba(77,219,154,.16);
+  --warn:#EBC06A;    --warn-soft:rgba(235,192,106,.16);
+  --bad:#F28B82;     --bad-soft:rgba(242,139,130,.16);
+  --info:#7AB0FF;    --info-soft:rgba(122,176,255,.16);
+  --shadow:0 1px 2px rgba(0,0,0,.28),0 12px 28px rgba(0,0,0,.32);
+  --shadow-lg:0 24px 56px rgba(0,0,0,.42);
+}
+/* fallback: sem data-theme assume claro */
+:root:not([data-theme]) {
+  --bg:#F4F2FB;--surface:#FFFFFF;--surface-2:#FAF8FE;--inset:#F3F0FB;
+  --text:#100D1C;--sub:#4A4560;--muted:#6B6680;
+  --line:rgba(16,13,28,.10);--line-strong:rgba(16,13,28,.16);
+  --field:#FFFFFF;--field-line:rgba(16,13,28,.18);
+  --accent:#8B3CF7;--accent-2:#A472FF;--accent-soft:#EFE7FF;--accent-ink:#FFFFFF;
+  --lime:#C6F24E;--lime-ink:#2A2E12;--lime-soft:#EEF9CF;
+  --good:#1F8A5B;--good-soft:#DFF3E9;--warn:#B0741A;--warn-soft:#FAEFD8;
+  --bad:#C4453B;--bad-soft:#FAE3E1;--info:#2A6FDB;--info-soft:#E1ECFB;
+  --shadow:0 1px 2px rgba(16,13,28,.05),0 10px 26px rgba(16,13,28,.06);
+  --shadow-lg:0 24px 64px rgba(16,13,28,.16);
+}
+
+:root {
+  --font-display:'Anton', sans-serif;
+  --font-text:'Archivo', system-ui, sans-serif;
+  --font-mono:'JetBrains Mono', ui-monospace, monospace;
+  --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-pill:999px;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
+  --space-6:24px; --space-8:32px; --space-12:48px; --space-16:64px;
+}
+
