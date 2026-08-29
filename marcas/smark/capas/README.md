@@ -19,7 +19,7 @@ Implantação de tecnologia e IA no dia a dia.
 | Arquivo | Tamanho | Onde sobe |
 |---|---|---|
 | `linkedin.jpg` | 1584×396 | Capa do perfil LinkedIn |
-| `whatsapp-capa.jpg` | **1920×640 (3:1)** | **Capa do perfil WhatsApp Business** — logo à esquerda, texto à direita, centro livre pra foto |
+| `whatsapp-capa.jpg` | **1920×1080 (16:9)** | **Capa do perfil WhatsApp Business** — logo esquerda, texto direita, centro livre. Também `whatsapp-capa-1211x681.jpg` (tamanho da documentação) |
 | `whatsapp-perfil.jpg` | 1080×1080 | Foto de perfil do WhatsApp (recorte circular) |
 | `whatsapp.jpg` | 1600×900 | Só pra mandar na conversa — **não** usar como capa do perfil |
 
