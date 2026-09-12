@@ -11,10 +11,12 @@
             "id": "f2700d1fdefc9f17",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Visualização em gráfico"
+              "type": "image",
+              "state": {
+                "file": "docs/branding/smark-assessoria.png"
+              },
+              "icon": "lucide-image",
+              "title": "smark-assessoria"
             }
           }
         ]
@@ -37,7 +39,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Explorador de arquivos"
@@ -179,8 +183,15 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "f2700d1fdefc9f17",
+  "active": "6b1f8781fc5f1a82",
   "lastOpenFiles": [
+    "docs/branding/favicon-s-claro.png",
+    "docs/branding/favicon-B.png",
+    "docs/branding/favicon-A.png",
+    "docs/proposta-clara/03-smark-escuro.png",
+    "docs/proposta-clara/03-smark-claro.png",
+    "docs/proposta-clara/01-elever-escuro.png",
+    "shared/formatos-canais.md",
     "design-system/assets/logos-perfil/03-empilhado-claro.png",
     "Sem título",
     "sites/smark-v2/img/renovador-v1.png",
@@ -190,12 +201,6 @@
     "sites/smark-v2/index.html",
     "sites/smark-v2/img",
     "sites/smark-v2",
-    "docs/funcionarios-visual/garimpeiro-v2.png",
-    "docs/funcionarios-visual/garimpeiro-v1.png",
-    "docs/funcionarios-visual/renovador-v2.png",
-    "docs/funcionarios-visual/renovador-v1.png",
-    "docs/funcionarios-visual/mensageiro-v2.png",
-    "docs/funcionarios-visual/mensageiro-v1.png",
     "docs/funcionarios-visual",
     "docs/_build_objetivos.py",
     "docs/_build_formatos.py",
@@ -225,7 +230,6 @@
     "marcas/smark/publicacoes/social/instagram/2026-06-10-5-habilidades-claude-2026.md",
     "marcas/smark/publicacoes/social/instagram/2026-06-10-agente-ia-vs-automacao.md",
     "marcas/smark/publicacoes/social/instagram/2026-06-10-ia-substitui-humanos.md",
-    "marcas/smark/publicacoes/social/instagram/2026-06-10-sistemas-agenticos-2028.md",
-    "marcas/smark/publicacoes/social/instagram/2026-06-11-assessoria-tec-escalar.md"
+    "marcas/smark/publicacoes/social/instagram/2026-06-10-sistemas-agenticos-2028.md"
   ]
 }
