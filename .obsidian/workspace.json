@@ -11,12 +11,10 @@
             "id": "f2700d1fdefc9f17",
             "type": "leaf",
             "state": {
-              "type": "image",
-              "state": {
-                "file": "docs/branding/smark-assessoria.png"
-              },
-              "icon": "lucide-image",
-              "title": "smark-assessoria"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Visualização em gráfico"
             }
           }
         ]
@@ -183,8 +181,9 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "6b1f8781fc5f1a82",
+  "active": "f2700d1fdefc9f17",
   "lastOpenFiles": [
+    "docs/branding/smark-assessoria.png",
     "docs/branding/favicon-s-claro.png",
     "docs/branding/favicon-B.png",
     "docs/branding/favicon-A.png",
@@ -197,7 +196,6 @@
     "sites/smark-v2/img/renovador-v1.png",
     "sites/smark-v2/img/garimpeiro-v1.png",
     "sites/smark-v2/img/cacador-v1.png",
-    "sites/smark-v2/img/atendente-v1.png",
     "sites/smark-v2/index.html",
     "sites/smark-v2/img",
     "sites/smark-v2",
